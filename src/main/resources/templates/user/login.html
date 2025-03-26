@@ -1,0 +1,178 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<link rel="icon" href="/css/favicon.ico" type="image/x-icon" sizes="16x16">
+	<title>얼라이언스</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/login.css}" />
+	<link rel="stylesheet" type="text/css"
+		href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+		integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+	<link rel="stylesheet" type="text/css"
+		href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+
+	<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+		integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="/js/commCode.js"></script>
+	<script>
+		var myCombo;
+		$(document).ready(function () {
+			var agent = navigator.userAgent.toLowerCase();
+			if ((navigator.appName == 'Netscape' && navigator.userAgent.search('Trident') != -1) || (agent.indexOf("msie") != -1)) {
+				alert('Internet Explorer는 호환되지 않는 브라우저 입니다.')
+				$("#body").hide();
+				return;
+			}
+
+			//로컬에 저장된 아이디가 있다면 그것을 아이디 란에 표시
+			var localLoginId = localStorage.getItem('loginId');
+			if (localLoginId) {
+				$("#loginId").val(localLoginId);
+				//체크박스에 체크를 하기
+				$("#idSave").prop("checked", true);
+			}
+
+			var localCmpyCd = localStorage.getItem('cmpyCd');
+			if (localCmpyCd) {
+				$("#cmpyCd").val(localCmpyCd);
+				$("#cmpyCdSave").prop("checked", true);
+			}
+
+			//암호 보기/안보기
+			$("input[id=pwCheck]:checkbox").click(function () {
+				if ($("input[id=pwCheck]:checkbox").is(":checked")) {
+					$("#password").attr('type', "text");
+				}
+				else {
+					$("#password").attr('type', 'password');
+				}
+			});
+
+
+
+			//저장된 아이디 보여주기 및 아이디 저장/해제
+			$("input[id=idSave]:checkbox").click(function () {
+				var localLoginId = localStorage.getItem('loginId');	//로컬에 저장된 아이디를 구함
+				var idSaveChk = $("input[id=pwCheck]:checkbox").is(":checked");
+				//아이디가 있다면 삭제를 함
+
+				if (!idSaveChk && localLoginId)	//체크 해제 & 아이디값이 있다(체크를 해제한다는것은 아이디를 저장하지 않겠다) 
+				{
+					localStorage.removeItem('loginId');
+				}
+
+				//로컬에 저장된 아이디가 없으면 
+				else {
+					localStorage.setItem('loginId', $("#loginId").val());	//로컬에 저장을 함
+
+				}
+
+			});
+
+
+
+
+			//저장된 컴퍼니 코드 보여주기 및 저장/해제
+			$("input[id=cmpyCdSave]:checkbox").click(function () {
+				var localLoginId = localStorage.getItem('cmpyCd');	//로컬에 저장된 아이디를 구함
+				var idSaveChk = $("input[id=cmpyCdSave]:checkbox").is(":checked");
+				//아이디가 있다면 삭제를 함
+
+				if (!idSaveChk && localLoginId)	//체크 해제 & 아이디값이 있다(체크를 해제한다는것은 아이디를 저장하지 않겠다) 
+				{
+					localStorage.removeItem('cmpyCd');
+				}
+
+				//로컬에 저장된 아이디가 없으면 
+				else {
+					localStorage.setItem('cmpyCd', $("#cmpyCd").val());	//로컬에 저장을 함
+
+				}
+
+			});
+
+			myCombo = new dhtmlXCombo("company");
+
+
+
+			comboList(myCombo, 'A', 'COMM', 'CMPY_CD', '', 'Y', 'req');
+
+			myCombo.selectOption(myCombo.getIndexByValue("A"));
+			$("#cmpyCd").val(myCombo.getSelectedValue());
+			myCombo.attachEvent("onChange", function (value, text) {
+				$("#cmpyCd").val(myCombo.getSelectedValue());
+			});
+			if (localCmpyCd) {
+				myCombo.selectOption(myCombo.getIndexByValue(localCmpyCd));
+			}
+			myCombo.disable();
+		});
+	</script>
+
+<body id="body">
+	<div class="login-container">
+
+
+		<div class="right-section">
+			<form th:action="@{/loginRe}" method="POST" class="login-form" id="login_form" name="login_form">
+				<div class="logo">
+					<img src="/img/logo.png" alt="Alliance Logo">
+				</div>
+
+				<div class="form-group" style="display:none;">
+					<div id="company" name="company"></div>
+					<input type="hidden" id="cmpyCd" name="cmpyCd" />
+				</div>
+
+				<div class="form-group">
+					<label>
+						아이디
+						<div class="checkbox-wrapper">
+							<input type="checkbox" id="idSave">
+							<span>저장</span>
+						</div>
+					</label>
+					<input type="text" id="loginId" name="loginId" class="form-control" placeholder="아이디를 입력하세요" />
+				</div>
+
+				<div class="form-group">
+					<label>
+						비밀번호
+						<div class="checkbox-wrapper">
+							<input type="checkbox" id="pwCheck">
+							<span>보기</span>
+						</div>
+					</label>
+					<input type="password" id="password" name="password" class="form-control"
+						placeholder="비밀번호를 입력하세요" />
+				</div>
+
+				<div th:if="${param.error}" class="error-message">
+					<p>
+						<span th:if="${param.error.toString() == 'cmpyCd'}" th:text="'선택한 회사를 확인하세요.'"></span>
+						<span th:if="${param.error.toString() == 'true'}" th:text="'아이디 또는 암호를 확인하세요.'"></span>
+						<span th:if="${param.error.toString() == 'loginH'}" th:text="'로그인과정중 문제가 발생하였습니다.'"></span>
+						<span th:if="${param.error.toString() == 'userInfo'}" th:text="'사용자정보를 찾을수 없습니다.'"></span>
+					</p>
+				</div>
+
+				<div th:if="${param.authError}" class="error-message">
+					<p>만료된 토큰이거나 토큰값을 갱신하여 주시길 바랍니다.</p>
+				</div>
+
+				<button class="btn btn-primary btn-block" name="Submit" value="Login" type="Submit">로그인</button>
+				<button type="button" class="btn btn-primary btn-block" name="repw"
+					onclick="top.location.href = './repw'">암호변경</button>
+			</form>
+		</div>
+	</div>
+</body>
+
+</html>

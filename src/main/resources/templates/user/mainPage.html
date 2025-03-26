@@ -1,0 +1,331 @@
+<!DOCTYPE HTML>
+<html 
+      style="height:100%;"
+>
+
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<link rel="stylesheet"  type="text/css" href="/plugin/suite_gpl/codebase/suite.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+		<script type="text/javascript" src="./plugin/suite_gpl/codebase/suite.js"></script>
+	
+
+	  	
+		<title>
+			mainPage
+		</title>	
+
+	</head>
+	<style>
+    .overflow_auto {
+        overflow:auto;
+        
+    }
+ 
+    
+</style>
+
+	<body  style="height:100%;">
+<button class="dhx_sample-btn dhx_sample-btn--flat" onclick="layout.cell('C1').collapse()">Collapse header</button>
+	<button class="dhx_sample-btn dhx_sample-btn--flat" onclick="layout.cell('C1').expand()">Expand header</button>
+		<div id="layout_container" style="height: 100%;">
+		
+		</div>
+		 
+        
+       	<script>
+            // creating dhtmlxLayout
+          
+			   
+            var config = {	
+            	type: "line",
+            	
+			    rows: [
+			        {
+			        	//header:"TOP",
+			            id: "С1",
+			            html: "1",
+			            height : "40px"
+			        },
+			        {
+			   
+			            type: "line",
+						
+			            //gravity:20,
+			            //height: "calc(100% - 80px)",
+			            //height:"300px",
+			            cols: [
+			                {
+			                	header:"LEFT",
+			                	collapsable: true,
+			                	//collapsed:true,
+			                	resizable:true,
+			                	css:'overflow_auto',
+			                    id: "С2",
+			                    html: "<div id='tree_container'></div>",
+			                    width : "200px"
+			                   	
+			                },
+			                {
+			                	//header:"RIGHT",
+			                    id: "С3",
+			                    html: "3",
+			                },
+			            ]
+			        },
+			        {
+			        	//header:"BOTTOM",
+			        	
+			        	
+			            id: "С4",
+			            html: "4",
+			            height : "40px",
+			          
+			           
+			        },
+			    ]
+            };
+			
+            var layout = new dhx.Layout("layout_container", config);
+           
+            
+            
+    		
+           
+       
+         
+        	
+    		// creating dhtmlxTree
+    		/* var tree = new dhx.Tree("tree_container", {
+    		    checkbox: true
+    		}); */
+    		
+    		
+    		var dataset = [
+    		    {
+    		        "value": "Books",
+    		        "id": "books",
+    		        "opened": true,
+    		        "items": [          
+    		            {
+    		                "value": "History",
+    		                "id": "history",
+    		                "items": [
+    		                			{
+    					                    "value": "John Mack Faragher",
+    					                    "id": "jmf",
+    					                   /*  "icon": {
+    					                        "folder": "fas fa-book",
+    					                        "openFolder": "fas fa-book-open",
+    					                        "file": "fas fa-file"
+    				                    	} */
+    				                	},
+    				               		{
+    				                	    "value": "Jim Dwyer",
+    				                	    "id": "jd"
+    					                },
+    					                {
+    					                    "value": "Larry Schweikart",
+    					                    "id": "ls"
+    					                },
+    					                {
+    					                	"value": "History2",
+    							            "id": "history2",
+    					                	"items": [
+    				                			{
+    							                    "value": "John Mack Faragher2",
+    							                    "id": "jmf2",
+    							                   /*  "icon": {
+    							                        "folder": "fas fa-book",
+    							                        "openFolder": "fas fa-book-open",
+    							                        "file": "fas fa-file"
+    						                    	} */
+    						                	},
+    						               		{
+    						                	    "value": "Jim Dwyer2",
+    						                	    "id": "jd2"
+    							                },
+    							                {
+    							                    "value": "Larry Schweikart2",
+    							                    "id": "ls2"
+    							                }
+    							            ]
+    					                	
+    					                }
+    					            ]
+    		            },
+    		            {
+    		                "value": "Fiction & Fantasy",
+    		                "id": "fantasy",
+    		                "items": [{
+    		                    "value": "Audrey Niffenegger",
+    		                    "id": "af"
+    		                },
+    		                {
+    		                    "value": "Philip Roth",
+    		                    "id": "pr"
+    		                }]
+    		            },
+    		            {
+    		                "value": "Teens",
+    		                "id": "teens",
+    		                "items": [{
+    		                    "value": "Joss Whedon",
+    		                    "id": "jw"
+    		                },
+    		                {
+    		                    "value": "Meg Cabot",
+    		                    "id": "mc"
+    		                },
+    		                {
+    		                    "value": "Garth Nix",
+    		                    "id": "gn"
+    		                }]
+    		            }
+    		        ]
+    		    }
+    		];
+    		var tree = new dhx.Tree("tree_container",{
+    		     data:dataset
+    		});
+    		//tree.data.parse(dataset);
+
+            
+        </script>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		<!-- tree -->
+	<!-- 	<div id="tree_container"></div>
+		<script type="text/javascript">
+	
+		// creating dhtmlxTree
+		/* var tree = new dhx.Tree("tree_container", {
+		    checkbox: true
+		}); */
+		var dataset = [
+		    {
+		        "value": "Books",
+		        "id": "books",
+		        "opened": true,
+		        "items": [          
+		            {
+		                "value": "History",
+		                "id": "history",
+		                "items": [
+		                			{
+					                    "value": "John Mack Faragher",
+					                    "id": "jmf",
+					                   /*  "icon": {
+					                        "folder": "fas fa-book",
+					                        "openFolder": "fas fa-book-open",
+					                        "file": "fas fa-file"
+				                    	} */
+				                	},
+				               		{
+				                	    "value": "Jim Dwyer",
+				                	    "id": "jd"
+					                },
+					                {
+					                    "value": "Larry Schweikart",
+					                    "id": "ls"
+					                },
+					                {
+					                	"value": "History2",
+							            "id": "history2",
+					                	"items": [
+				                			{
+							                    "value": "John Mack Faragher2",
+							                    "id": "jmf2",
+							                   /*  "icon": {
+							                        "folder": "fas fa-book",
+							                        "openFolder": "fas fa-book-open",
+							                        "file": "fas fa-file"
+						                    	} */
+						                	},
+						               		{
+						                	    "value": "Jim Dwyer2",
+						                	    "id": "jd2"
+							                },
+							                {
+							                    "value": "Larry Schweikart2",
+							                    "id": "ls2"
+							                }
+							            ]
+					                	
+					                }
+					            ]
+		            },
+		            {
+		                "value": "Fiction & Fantasy",
+		                "id": "fantasy",
+		                "items": [{
+		                    "value": "Audrey Niffenegger",
+		                    "id": "af"
+		                },
+		                {
+		                    "value": "Philip Roth",
+		                    "id": "pr"
+		                }]
+		            },
+		            {
+		                "value": "Teens",
+		                "id": "teens",
+		                "items": [{
+		                    "value": "Joss Whedon",
+		                    "id": "jw"
+		                },
+		                {
+		                    "value": "Meg Cabot",
+		                    "id": "mc"
+		                },
+		                {
+		                    "value": "Garth Nix",
+		                    "id": "gn"
+		                }]
+		            }
+		        ]
+		    }
+		];
+		var tree = new dhx.Tree("tree_container",{
+		     // config options
+		});
+
+		tree.data.parse(dataset);
+		</script> -->
+		
+		
+		
+		
+		<!-- <div id="tabbar_container"></div>
+        <script>
+            // creating dhtmlxTabbar
+            var tabbar = new dhx.Tabbar("tabbar_container",{
+                views:[ 
+                    { tab: "left", css:"panel flex"},
+                    { tab: "west", css:"panel flex"},
+                    { tab: "east", css:"panel flex"},
+                    { tab: "right", css:"panel flex"}
+                ]
+            });
+        </script> -->
+        
+        
+        
+        
+        
+	
+	</body>
+</html>

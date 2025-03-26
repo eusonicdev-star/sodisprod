@@ -1,0 +1,648 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <title>시공좌석 일괄생성 (erp202001p1)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+
+    <script th:inline="javascript" >
+        var myGrid;
+        var myGrid2;
+        var myCalendar;
+        fnObj = {
+            winOpen:{
+
+            },	//END of winOpen
+            comboOpen:{
+                comboCmpyCd : function(){		//회사콤보목록
+                    myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+                    comboList(myComboCmpyCd,'A','COMM','CMPY_CD','','Y','');
+                    myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/));
+                    myComboCmpyCd.setFontSize("12px","12px");
+                    myComboCmpyCd.attachEvent("onChange", function(value, text){
+                        myGrid.clearAll(false);
+                    });
+                    myComboCmpyCd.disable();
+
+                },
+                comboClndType : function(){		//달력유형 콤보
+                    myComboClndType = new dhtmlXCombo("clndType");
+                    myComboClndType.addOption([{value:"1", text:"범위"}]);
+                    myComboClndType.addOption([{value:"2", text:"단일"}]);
+                    myComboClndType.addOption([{value:"3", text:"다중"}]);
+                    myComboClndType.selectOption(0);
+                    myComboClndType.setFontSize("12px","12px");
+                    myComboClndType.attachEvent("onChange", function(value, text){
+                        if(value == "1")
+                        {
+                            $("#fromTo").show();
+                            $("#dateOne").hide();
+                            $("#dateInput").hide();
+                        }
+                        else if(value == "2")
+                        {
+                            $("#fromTo").hide();
+                            $("#dateOne").show();
+                            $("#dateInput").hide();
+                        }
+                        else if(value == "3")
+                        {
+                            $("#fromTo").hide();
+                            $("#dateOne").hide();
+                            $("#dateInput").show();
+                        }
+                    });
+
+                },
+                comboInstCapaCtgr : function(){		//시공카테고리 콤보
+                    myComboInstCapaCtgr = new dhtmlXCombo("instCapaCtgr");
+                    comboList(myComboInstCapaCtgr,'A','COMM','INST_CAPA_CTGR','','Y','req');
+                    myComboInstCapaCtgr.selectOption(1);
+                    myComboInstCapaCtgr.setFontSize("12px","12px");
+                    myComboInstCapaCtgr.attachEvent("onChange", function(value, text){
+
+                    });
+                },
+
+                comboZoneType : function(){		//권역유형 콤보
+                    myComboZoneType = new dhtmlXCombo("zoneType");
+
+                    //20220106 정연호 로딩 조건 변경
+                    //comboList(myComboZoneType,'A','COMM','ZONE_TYPE','','Y','req');
+                    comboList(myComboZoneType,'A','INST_ZONE_TYPE','ZONE_TYPE','','Y','req');
+
+                    myComboZoneType.selectOption(1);
+                    fnObj.btnOpen.areaSrch(myComboZoneType.getSelectedValue());
+                    myComboZoneType.setFontSize("12px","12px");
+                    myComboZoneType.attachEvent("onChange", function(value, text){
+                        myGrid2.clearAll(false);
+
+                        fnObj.btnOpen.areaSrch(myComboZoneType.getSelectedValue());
+                    });
+                },
+                comboInstCapaType : function(){		//시공유형 콤보
+                    myComboInstCapaType = new dhtmlXCombo("instCapaType");
+                    comboList(myComboInstCapaType,'A','COMM','INST_CAPA_TYPE','','Y','req');
+                    myComboInstCapaType.selectOption(0);
+                    myComboInstCapaType.setFontSize("12px","12px");
+                    myComboInstCapaType.attachEvent("onChange", function(value, text){
+
+                    });
+
+                },
+
+            },	//END of comboOpen
+            gridOpen : {
+                grid : function()
+                {
+                    myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
+                    myGrid.setHeader("시공좌석분류,#cspan,#cspan");
+                    myGrid.attachHeader("#master_checkbox,좌석분류 코드,좌석분류 명");
+                    myGrid.setColumnIds("chk,comboCd,comboNm");
+                    myGrid.setInitWidths("60,120,120");
+                    myGrid.setColAlign("center,center,center");
+                    myGrid.setColTypes("ch,ro,ro");
+
+
+                    myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
+                    myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+                    myGrid.enablePreRendering(10);	//20220423 정연호 추가
+                    fnObj.gridOpen.setWidth();
+                    //그래야 진짜 화면에 보이는 높이가 만들어진다
+                    myGrid.addRow(1,"");	//로우 추가
+                    myGrid.deleteRow(1);
+
+
+                },
+                gridSetList : function()
+                {
+                    myGrid.clearAll(false);
+                    //왼쪽 그리드에
+
+                    var comboForm = new FormData();
+                    comboForm.append("cmpyCd",myComboCmpyCd.getSelectedValue());
+                    comboForm.append("comboType","COMM");
+                    comboForm.append("commCd","INST_SEAT_TYPE");
+                    comboForm.append("comdCd","");
+                    comboForm.append("useYn","Y");
+
+                    $.ajax({
+                        url: "/comComboList",
+                        processData : false,
+                        contentType : false,
+                        data: comboForm,
+                        type:"POST",
+                        datatype:"json",
+                        async:false,		//동기식
+                        success : function(res){
+                            if(res)
+                            {
+                                var columns = myGrid.getColumnCount()
+                                for(var i=0;i<res.length;i++){
+                                    var jsonData = {};
+                                    for (var c=0; c<columns; c++){
+                                        jsonData[myGrid.getColumnId(c)] = res[i][myGrid.getColumnId(c)];
+                                    }
+                                    myGrid.addRow(i+1,"");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+                                    myGrid.setRowData(i+1,jsonData);
+                                }
+                            }
+                            else
+                            {
+                                alert("콤보조회 로직 조회 실패");
+                            }
+                        },
+                        error : function(res) {
+                            alert("콤보조회 로직 수행 실패");
+                        }
+                    });
+                },
+                grid2 : function()
+                {
+                    myGrid2.setImagePath("https://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
+                    myGrid2.setHeader("시공권역,#cspan,#cspan");
+                    myGrid2.attachHeader("#master_checkbox,권역코드,권역명");
+                    myGrid2.setColumnIds("chk,comboCd,comboNm");
+                    myGrid2.setInitWidths("60,120,120");
+                    myGrid2.setColAlign("center,center,center");
+                    myGrid2.setColTypes("ch,ro,ro");
+
+
+                    myGrid2.init();		//이걸써야 세팅한 그리드가 표시가 된다
+                    myGrid2.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+                    myGrid2.enablePreRendering(10);	//20220423 정연호 추가
+                    fnObj.gridOpen.setWidth();
+                    //그래야 진짜 화면에 보이는 높이가 만들어진다
+                    myGrid2.addRow(1,"");	//로우 추가
+
+                    myGrid2.deleteRow(1);
+
+
+
+                },
+                setWidth : function(){
+
+
+
+                    myGrid.enableAutoWidth(true,(window.innerWidth)*0.45-25,100);
+                    myGrid.enableAutoHeight(true,window.innerHeight/2-15);	//그리드 자동높이
+
+                    myGrid2.enableAutoWidth(true,(window.innerWidth)*0.45-25,200);
+                    myGrid2.enableAutoHeight(true,window.innerHeight/2-15);	//그리드 자동높이
+
+
+                    $("#gridDiv").width();
+                    $("#grid").width();
+                    $("#grid2").width();
+                    $("#centerLine").css("height",$("#gridDiv").height())
+                    //$("#centerLine").css("width",(window.innerWidth - (window.innerWidth)*0.9));
+                    $("#centerLine").css("width",($("#gridDiv").width() - $("#grid").width() - $("#grid2").width())/2);
+
+
+                },	//END of setWidth
+            },	//END of gridOpen
+            btnOpen:{
+                areaSrch : function(param){
+                    var comboForm = new FormData();
+                    comboForm.append("cmpyCd",myComboCmpyCd.getSelectedValue());
+                    comboForm.append("comboType","COMM");
+                    comboForm.append("commCd",param);
+                    comboForm.append("comdCd","");
+                    comboForm.append("useYn","Y");
+
+                    $.ajax({
+                        url: "/comComboList",
+                        processData : false,
+                        contentType : false,
+                        data: comboForm,
+                        type:"POST",
+                        datatype:"json",
+                        async:false,		//동기식
+                        success : function(res){
+                            if(res)
+                            {
+                                var columns = myGrid2.getColumnCount()
+                                for(var i=0;i<res.length;i++){
+                                    var jsonData = {};
+                                    for (var c=0; c<columns; c++){
+                                        jsonData[myGrid2.getColumnId(c)] = res[i][myGrid2.getColumnId(c)];
+                                    }
+                                    myGrid2.addRow(i+1,"");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+                                    myGrid2.setRowData(i+1,jsonData);
+                                }
+                            }
+                            else
+                            {
+                                alert("콤보조회 로직 조회 실패");
+                            }
+                        },
+                        error : function(res) {
+                            alert("콤보조회 로직 수행 실패");
+                        }
+                    });
+                }
+                ,
+                capaSave : function(){
+                    var rtnVal = true;
+                    var chkValMsg = ""
+                    //시공일자별 날짜 체크
+                    if(myComboClndType.getSelectedValue()	==	"1")	//1 범위
+                    {
+                        if(!$("#dateFrom").val()){
+                            chkValMsg = chkValMsg + "시공시작일을 입력하세요.\n";
+                            rtnVal = false;
+                        }
+                        if(!$("#dateTo").val()){
+                            chkValMsg = chkValMsg + "시공종료일을 입력하세요.\n";
+                            rtnVal = false;
+                        }
+
+                        if($("#dateFrom").val() && $("#dateTo").val())
+                        {
+                            var date1 = new Date($("#dateFrom").val());
+                            var date2 = new Date($("#dateTo").val());
+                            if(date1 > date2)	//시작날짜가 크고 종료날짜가 작을떄
+                            {
+                                chkValMsg = chkValMsg + "시공시작일이 시공종료일보다 작습니다.\n";
+                                rtnVal = false;
+                            }
+                        }
+
+                        /* if($("#dateFrom").val() && $("#dateTo").val())
+                        {
+                            var date1 = new Date($("#dateFrom").val());
+                            var date2 = new Date($("#dateTo").val());
+                            var gapDate = (date2.getTime() - date1.getTime()) / (1000*60*60*24);
+                            if(gapDate > 31)	//시작날짜가 크고 종료날짜가 작을떄
+                            {
+                                chkValMsg = chkValMsg + "시공일은 최대 31일 입니다.\n";
+                                rtnVal = false;
+                            }
+                        } */
+                    }
+                    else if(myComboClndType.getSelectedValue()	==	"2")	//2 단일
+                    {
+                        if(!$("#date").val()){
+                            chkValMsg = chkValMsg + "시공일을 입력하세요..\n";
+                            rtnVal = false;
+                        }
+
+                    }
+                    else if(myComboClndType.getSelectedValue()	==	"3")	//3 다중
+                    {
+                        if(!$("#dateFromTo").val())
+                        {
+                            chkValMsg = chkValMsg + "시공일을 입력하세요...\n";
+                            rtnVal = false;
+                        }
+                    }
+
+                    var weekDay="";
+                    $('input:checkbox[name="week"]').each(function() {
+
+                        if(this.checked)
+                        {
+                            weekDay = weekDay +","+$(this).val();
+                        }
+
+                    });
+                    if(!weekDay)
+                    {
+                        chkValMsg = chkValMsg + "요일이 어떤것도 체크되지 않았습니다.\n";
+                        rtnVal = false;
+                    }
+
+
+                    if(!myComboInstCapaCtgr.getSelectedValue())	//시공카테고리 선택된것 없을때
+                    {
+                        chkValMsg = chkValMsg + "시공카테고리를 선택하세요.\n";
+                        rtnVal = false;
+                    }
+                    if(!myComboInstCapaType.getSelectedValue())	//시공유형 선택된것 없을때
+                    {
+                        chkValMsg = chkValMsg + "시공유형 선택하세요.\n";
+                        rtnVal = false;
+                    }
+
+                    if(!myComboZoneType.getSelectedValue())	//권역유형 선택된것 없을때
+                    {
+                        chkValMsg = chkValMsg + "권역유형을 선택하세요.\n";
+                        rtnVal = false;
+                    }
+
+
+
+                    //왼쪽 시공권역 그리드에서 체크한것이 하나도 없을때
+                    var leftChecked=myGrid.getCheckedRows(myGrid.getColIndexById("chk"));
+                    if(!leftChecked)
+                    {
+                        chkValMsg = chkValMsg + "시공권역명에 체크를 하세요.\n";
+                        rtnVal = false;
+                    }
+
+                    //오른쪽 시공좌석유형 그리드에서 체크한것이 하나도 없을때
+                    var rightChecked=myGrid2.getCheckedRows(myGrid2.getColIndexById("chk"));
+                    if(!rightChecked)
+                    {
+                        chkValMsg = chkValMsg + "시공좌석유형에 체크를 하세요.\n";
+                        rtnVal = false;
+                    }
+
+                    if(!$("#crtCapaCnt").val())
+                    {
+                        chkValMsg = chkValMsg + "생성좌석수를 입력하세요.\n";
+                        rtnVal = false;
+                    }
+                    if(isNaN($("#crtCapaCnt").val()))	//숫자가아니면 true
+                    {
+
+                        chkValMsg = chkValMsg + "생성좌석수에 숫자를 입력하세요.\n";
+                        rtnVal = false;
+                    }
+
+                    if(rtnVal == false)
+                    {
+                        alert(chkValMsg)
+                        return false;
+                    }
+
+                    if(!("시공좌석을 일괄생성합니다.\n이미 생성되었다면 다시 생성하지 않습니다.\n진행하시겠습니까?"))
+                    {
+                        alert("취소하였습니다.");
+                        return;
+                    }
+
+
+
+                    var seatTypeList="";
+                    myGrid.forEachRow(function(rId){
+                        if(myGrid.cellById(rId,myGrid.getColIndexById("chk")).getValue() == "1"	)
+                        {
+                            seatTypeList = seatTypeList + "," + myGrid.cellById(rId,myGrid.getColIndexById("comboCd")).getValue()	;
+                        }
+                    });
+
+                    var instZoneList = "";
+                    myGrid2.forEachRow(function(rId){
+                        if(myGrid2.cellById(rId,myGrid2.getColIndexById("chk")).getValue() == "1"	)
+                        {
+                            instZoneList = instZoneList + "," + myGrid2.cellById(rId,myGrid2.getColIndexById("comboCd")).getValue()	;
+                        }
+                    });
+
+
+
+                    var save	=	new FormData();
+
+                    save.append("cmpyCd"		,	myComboCmpyCd.getSelectedValue()						);	//회사코드
+                    save.append("dtType"		,	myComboClndType.getSelectedValue() == "1" ? "1" : "2"	);	//시공일자 유형 1 범위, 2 단일 & 다중
+                    save.append("fromDt"		,	$("#dateFrom").val().replace(/-/g,"")					);	//시공일 시작일
+                    save.append("toDt"			,	$("#dateTo").val().replace(/-/g,"")						);	//시공일 종료일
+                    save.append("dtList"		,	myComboClndType.getSelectedValue() == "2" ?	$("#date").val().replace(/-/g,"") :	(myComboClndType.getSelectedValue() == "3" ? 	$("#dateFromTo").val().replace(/\n/g,",").replace(/-/g,"")	:	"")		);
+                    save.append("instCtgr"		,	myComboInstCapaCtgr.getSelectedValue()					);		//시공카테고리
+                    save.append("instType"		,	myComboInstCapaType.getSelectedValue()					);	//시공유형
+                    save.append("seatTypeList"  ,	seatTypeList											);		//왼쪽 그리드 체크한것 리스트
+                    save.append("instZoneType"  ,	myComboZoneType.getSelectedValue()						);	//권역유형
+                    save.append("instZoneList"  ,	instZoneList											);		//오른쪽 그리드 체크한것 리스트
+                    save.append("weekList"  		,	weekDay	);
+                    save.append("capaCnt"  		,	$("#crtCapaCnt").val()									);
+                    save.append("saveUser"  	,	/*[[${session.tblUserMId}]]*/	);
+
+                    for (var pair of save.entries())
+                    {
+                        console.log(pair[0]+ ' ==> ' + pair[1]);
+                    }
+
+                    $.ajax({
+                        url: "/erp202001p1Save",
+                        processData : false,
+                        contentType : false,
+                        data: save,
+                        type:"POST",
+                        datatype:"json",
+                        success : function(res){
+                            if(res)
+                            {
+                                console.log(res);
+                                if(res.rtnYn=="Y")	//신규등록
+                                {
+                                    //parent.myGrid.clearAll(false);
+
+                                    alert("완료하였습니다.")
+
+                                    //parent.myWins.window(sendObj.windowId).close();
+                                }
+
+                                else		//결과 리턴값이 없으면 오류다
+                                {
+                                    alert("실패하였습니다.\n"+res.rtnMsg);
+                                }
+                            }
+                            else
+                            {
+                                alert("시공좌석 일괄생성 수행 실패.")
+                            }
+                        },
+                    });
+
+
+                },		//END of capaSave : function(){
+
+                clndClose : function(){
+                    parent.myWins.window(/*[[${sendObject.windowId}]]*/).close();
+                },
+            }
+
+        };//END of fnObj
+
+
+
+
+
+
+        $(document).ready(function() {
+
+
+            var sendObj = /*[[${sendObject}]]*/
+                fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+            myGrid = new dhtmlXGridObject('grid');	//그리드
+            myGrid2 = new dhtmlXGridObject('grid2');	//그리드
+            fnObj.gridOpen.grid()
+            fnObj.gridOpen.grid2()
+            fnObj.gridOpen.gridSetList()
+
+            fnObj.comboOpen.comboClndType();	//달력유형콤보 바인드
+            fnObj.comboOpen.comboInstCapaCtgr();	//시공카테고리
+            fnObj.comboOpen.comboZoneType();
+            fnObj.comboOpen.comboInstCapaType();
+
+
+
+
+            myCalendar = new dhtmlXCalendarObject([{input:"dateFrom",button:"dateFromIcon"},{input:"dateTo",button:"dateToIcon"},{input:"date",button:"dateIcon"}]);
+
+            var now = new Date()
+            var year = now.getFullYear()+"";
+            var month = (now.getMonth()+1)+"";
+            var date = now.getDate()+"";
+            if(month.length == 1 )
+            {
+                month = "0"+month;
+            }
+            if(date.length == 1 )
+            {
+                date = "0"+date;
+            }
+
+            var today =  year+"-" + month + "-" + date;
+
+            $("#dateFrom").val(today);
+            $("#dateTo").val(today);
+            $("#date").val(today);
+            myCalendar.loadUserLanguage("ko");
+
+
+            window.onresize = function(event) {		//윈도우의 사이즈가 변경했을떄
+                fnObj.gridOpen.setWidth();
+                fnObj.gridOpen.setWidth();
+            };
+
+
+        });
+
+
+
+    </script>
+
+    <style>
+
+
+
+
+    </style>
+</head>
+
+<body>
+
+<div id="mainDiv"  style="height:calc(100% - 60px);padding:10px 10px 0 10px;border:1px solid black;" >
+
+    <div id="inputDiv1" style="width:100%;height:40px;font-size:12px;">
+		<span class="cell" style="width:220px;display:none;">
+			<span class="item-head" style="width:80px;">회사</span>
+			<span class="item-data" style="width:140px;"><div id="cmpyCd" ></div></span>
+		</span>
+        <span class="cell" style="width:220px;">
+			<span class="item-head" style="width:80px;">시공일자유형</span>
+			<span class="item-data" style="width:140px;"><div id="clndType" ></div></span>
+		</span>
+        <span id="fromTo" class="cell" style="width:360px;">
+			<span class="item-head" style="width:80px;">시공일</span>
+			<span class="item-data" style="width:140px;"><input type="text" id="dateFrom"  style="height:20px;width:90px;"><i id="dateFromIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i></span>
+			<span class="item-data" style="width:140px;"><input type="text" id="dateTo"  style="height:20px;width:90px;"><i id="dateToIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i></span>
+		</span>
+        <span id="dateOne" class="cell" style="width:360px;display:none;">
+			<span class="item-head" style="width:80px;">시공일</span>
+			<span class="item-data" style="width:140px;"><input type="text" id="date"  style="height:20px;width:90px;"><i id="dateIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i></span>
+		</span>
+        <span id="dateInput" class="cell" style="width:360px;display:none;">
+			<span class="item-head" style="width:80px;">시공일</span>
+			<span class="item-data" style="width:140px;"><textArea id="dateFromTo" style="width:132px;" oninput="this.value = this.value.replace(/[^0-9-\n]/g, '').replace(/(\..*)\./g, '$1');"  ></textArea></span>
+		</span>
+
+    </div>
+    <!-- <div id="inputDiv2" style="width:100%;height:30px;font-size:12px;">
+        <span class="cell" style="width:220px;">
+            <span class="item-head" style="width:80px;">시공카테고리</span>
+            <span class="item-data" style="width:140px;"><div id="instCapaCtgr" ></div></span>
+        </span>
+
+    </div> -->
+    <hr style="width:100%;border: solid 1px darkgray;">
+    <!-- <div style="width:100%;height:40px;font-size:12px;"></div> -->
+    <div id="inputDiv2" style="width:100%;height:40px;font-size:12px;"><center>
+		<span class="cell" style="height:40px;font-size:18px;align-items: center;">
+				<input type="checkBox" id="mon" name="week" value="MON" checked>월</input>&nbsp;&nbsp;
+				<input type="checkBox" id="tue" name="week" value="TUE" checked>화</input>&nbsp;&nbsp;
+				<input type="checkBox" id="wed" name="week" value="WED" checked>수</input>&nbsp;&nbsp;
+				<input type="checkBox" id="thu" name="week" value="THU" checked>목</input>&nbsp;&nbsp;
+				<input type="checkBox" id="fri" name="week" value="FRI" checked>금</input>&nbsp;&nbsp;
+				<input type="checkBox" id="sat" name="week" value="SAT" checked><font color="blue">토</font></input>&nbsp;&nbsp;
+				<input type="checkBox" id="sun" name="week" value="SUN"><font color="red">일</font></input>
+			</span></center>
+    </div>
+
+
+
+    <div id="inputDiv3"  style="width:100%;height:50px;font-size:12px;padding-bottom:5px;">
+        <div id="div3Left" style="width:45%;height:100%;float:left;">
+			<span class="cell" style="width:220px;">
+				<span class="item-head" style="width:80px;">시공카테고리</span>
+				<span class="item-data" style="width:140px;"><div id="instCapaCtgr" ></div></span>
+			</span>
+            <span class="cell" style="width:220px;">
+				<span class="item-head" style="width:80px;">시공유형</span>
+				<span class="item-data" style="width:140px;"><div id="instCapaType" ></div></span>
+			</span>
+        </div>
+        <div id="div3Right" style="width:45%;height:100%;float:right;">
+			<span class="cell" style="width:260px;">
+			<!-- 20220106 정연호 너비를 늘림 -->
+				<span class="item-head" style="width:80px;">권역유형</span>
+				<span class="item-data" style="width:180px;"><div id="zoneType" ></div></span>
+			</span>
+            <span class="cell" style="width:220px;">
+				<span class="item-head" style="width:80px;">생성좌석수</span>
+				<span class="item-data" style="width:140px;"><input type="text" id="crtCapaCnt"  style="height:20px;width:120px;background: yellow;border-radius: 2px;border: 1px solid black;" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"></input></span>
+			</span>
+        </div>
+    </div>
+
+    <!-- 가로라인 -->
+    <hr style="width:100%;border: solid 1px darkgray;">
+
+    <div id="gridDiv"  style="width:100%;height:60%;font-size:12px;padding-bottom:5px;">
+
+        <div id="grid" style="width:45%;height:100%;float:left;"></div>
+
+
+        <!-- 세로라인 -->
+        <div id = "centerLine" style="width:10%;height:100%;float:left;border-right: solid 2px darkgray; "></div>
+
+        <div id="grid2" style="width:45%;height:100%;float:right;"></div>
+
+
+    </div>
+
+
+
+
+</div>
+<div id="inputDiv4" style="width:100%;height:30px;font-size:12px;"><br>
+    <center>
+		<span class="cell" style="width:90px;" id="spanclndSave">
+			<span class="item-data"><input id="btnclndSave" type="button" onclick="fnObj.btnOpen.capaSave()" value="등록" style="width:70px;"></span>
+		</span>
+
+        <span class="cell" style="width:90px;" id="spanGrntUpdt">
+			<span class="item-data"><input id="btnGrntUpdt" type="button" onclick="fnObj.btnOpen.clndClose();" value="닫기" style="width:70px;"></span>
+		</span>
+    </center>
+
+</div>
+
+
+</body>
+</html>

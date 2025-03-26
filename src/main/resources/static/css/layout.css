@@ -1,0 +1,195 @@
+/* 메뉴 영역 스타일 */
+#menuInfo {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    border: none !important;
+    background: transparent;
+}
+
+#menuInfo a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    margin-right: 15px;
+    border: none;
+    color: #424242;
+    transition: all 0.2s ease;
+    padding: 6px 12px;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+}
+
+#menuInfo a:hover {
+    color: #212121;
+    background-color: #e0e0e0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+#menuInfo a:active {
+    background-color: #bdbdbd;
+    transform: translateY(1px);
+}
+
+#menuInfo a i {
+    margin-right: 8px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 20px;
+}
+
+#menuInfo a span {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+#menuInfo img {
+    height: 45px;
+    margin: 20px;
+    border: none;
+    object-fit: contain;
+}
+
+.pull-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    border: none;
+}
+
+/* 로그아웃 버튼 특별 스타일 */
+#menuInfo .pull-right a:first-child {
+    background-color: transparent;
+    color: #666666;
+    border: 1px solid #e0e0e0;
+    padding: 5px 12px;
+}
+
+#menuInfo .pull-right a:first-child:hover {
+    background-color: #f5f5f5;
+    border-color: #bdbdbd;
+    color: #333333;
+}
+
+#menuInfo .pull-right a:first-child i {
+    font-size: 13px;
+    color: #666666;
+}
+
+#menuInfo .pull-right a:first-child:hover i {
+    color: #333333;
+}
+
+/* 타이머 버튼 스타일 제외 */
+#menuInfo .pull-right a:last-child {
+    background-color: transparent;
+    padding: 0;
+}
+
+#menuInfo .pull-right a:last-child:hover {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+/* DHTMLX 레이아웃 테두리 제거 */
+.dhxlayout_base_material .dhx_cell_layout {
+    border: none !important;
+    background: #ffffff;
+    box-shadow: none;
+    overflow: hidden !important;
+}
+
+.dhxlayout_base_material .dhx_cell_layout .dhx_cell_cont_layout {
+    border: none !important;
+    overflow: hidden !important;
+}
+
+/* 트리뷰 스타일 커스터마이징 */
+.dhxtree_material {
+    background: #ffffff !important;
+    font-family: 'Roboto', sans-serif !important;
+    padding: 8px;
+    overflow: hidden !important;
+}
+
+.dhxtabbar_base_material div.dhxtabbar_tabs div.dhxtabbar_tabs_base div.dhxtabbar_tab.dhxtabbar_tab_actv {
+    color: #2a5caa !important;
+}
+
+.dhxlayout_base_material div.dhx_cell_layout div.dhx_cell_hdr {
+    background: #2a5caa !important;
+}
+
+/* 트리뷰 컨테이너 스크롤바 제거 */
+.dhxtree_material .dhxtree_cont_zone {
+    overflow: hidden !important;
+}
+
+/* 모든 스크롤바 제거 */
+* {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+    display: none;
+}
+
+/* 트리 아이템 스타일 */
+.dhxtree_material .standartTreeRow {
+    font-size: 13px;
+    color: #333333;
+    padding: 8px 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    line-height: 20px;
+}
+
+/* 트리 아이템 호버 효과 */
+.dhxtree_material .standartTreeRow:hover {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* 선택된 트리 아이템 스타일 */
+.dhxtree_material .selectedTreeRow {
+    background-color: rgba(33, 150, 243, 0.1) !important;
+    color: #2196F3 !important;
+    font-weight: 500;
+}
+
+/* 트리 라인 스타일 */
+.dhxtree_material .standartTreeRow td {
+    padding: 4px;
+}
+
+/* 트리 아이콘 스타일 */
+.dhxtree_material .dhxtree_icon {
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    color: #757575;
+}
+
+/* 폴더 아이콘 스타일 */
+.dhxtree_material .dhxtree_icon.folder {
+    color: #FFC107;
+}
+
+/* 확장/축소 아이콘 스타일 */
+.dhxtree_material .dhxtree_icon.plus,
+.dhxtree_material .dhxtree_icon.minus {
+    color: #757575;
+    font-weight: normal;
+}
+
+/* 트리 아이템 간격 */
+.dhxtree_material .standartTreeRow,
+.dhxtree_material .selectedTreeRow {
+    margin: 2px 0;
+}

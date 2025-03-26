@@ -1,0 +1,404 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>공통코드관리 (erp991005)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/erp-style.css">
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+    <script th:inline="javascript">
+        var myWins;
+        var myGrid;
+        var myGrid2;
+        fnObj = {
+            winOpen: {
+                save: function (saveGubn, tblCommMId) {	//사용자 추가 팝업
+                    if (!myGrid.getSelectedRowId()) {
+                        alert("마스터 공통코드를 선택 하세요");
+                        return;
+                    }
+                    var selData = myGrid.getRowData(myGrid.getSelectedRowId());
+
+                    if (saveGubn == "INS") {
+                        windowId = "commSave";
+                        windowText = "등록 erp991005p1";
+                    } else if (saveGubn == "UPDT") {
+                        windowId = "commUpdt";
+                        windowText = "수정 erp991005p1";
+                    }
+
+                    windowUrl = "/erp991005p1"
+                    windowLeft = 0;
+                    windowTop = 0;
+                    windowWidth = 900;
+                    windowHeight = 600;
+                    windowsModal = true;
+                    windowOnClose = function (windowId) {
+
+                    };
+                    windowSendObject = {
+                        windowId: windowId,
+                        cmpyCd: myComboCmpyCd.getSelectedValue(),
+                        saveGubn: saveGubn,
+                        tblCommMId: tblCommMId,
+                        commCd: selData.commCd,
+                        commNm: selData.commNm,
+                        commDesc: selData.commDesc
+                    };
+
+                    myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+                    myWins.window(windowId).attachEvent("onClose", function (win) {
+                        var leftParam = myGrid.getRowData(myGrid.getSelectedRowId());
+                        fnObj.searchOpen.searchBtn.search2(myComboCmpyCd.getSelectedValue(), leftParam.commCd);
+
+                        $(top.document).find('#loader').hide();
+                        return true;
+                    });
+
+                },	//END of save
+                rtnObject: function (windowId, rtnObj, srchInput) {	//popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+                    if (rtnObj.newComm == "Y") {
+                        fnObj.searchOpen.searchBtn.search()
+
+                    }
+                },	//END of rtnObject : function(windowId,rtnObj){
+            },	//END of winOpen
+            comboOpen: {
+                comboCmpyCd: function () {
+                    myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+                    comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+                    myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue('A'));
+                    myComboCmpyCd.setFontSize("12px", "12px");
+                    myComboCmpyCd.attachEvent("onChange", function (value, text) {
+                        myGrid.clearAll(false);
+                        myGrid2.clearAll(false);
+                    });
+                },
+            },	//END of comboOpen
+            gridOpen: {
+                grid: function () {
+                    myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
+                    myGrid.setHeader("마스터,,#cspan");
+                    myGrid.attachHeader("마스터코드,마스터명칭,마스터상세");
+                    myGrid.attachHeader("#text_filter,#text_filter,#text_filter");
+                    myGrid.setColumnIds("commCd,commNm,commDesc");
+                    myGrid.setInitWidths("160,180,180");
+                    myGrid.setColAlign("left,left,left");
+                    myGrid.setColTypes("ro,ro,ro");
+                    myGrid.setColSorting("str,str,str");
+
+
+                    myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
+                    myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+                    myGrid.enablePreRendering(10);	//20220423 정연호 추가
+                    fnObj.gridOpen.setWidth();
+                    //그래야 진짜 화면에 보이는 높이가 만들어진다
+                    myGrid.addRow(1, "");	//로우 추가
+
+                    myGrid.deleteRow(1);
+                    myGrid.enableEditEvents(true, false, false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+                    myGrid.enableBlockSelection(true);
+                    myGrid.attachEvent("onKeyPress", fnObj.keyOpen.onKeyPressed);
+                    myGrid.attachEvent("onRowDblClicked", function (rId, cInd) {
+
+                        var leftParam = myGrid.getRowData(rId);
+
+                        fnObj.searchOpen.searchBtn.search2(myComboCmpyCd.getSelectedValue(), leftParam.commCd);
+                    });
+                },
+                grid2: function () {
+                    myGrid2.setImagePath("https://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
+                    myGrid2.setHeader("상세코드,상세코드,상세코드,상세코드,상세코드,상세코드,,#cspan,#cspan,#cspan,#cspan,#cspan,#cspan,#cspan");
+                    myGrid2.attachHeader("고유ID,회사코드,마스터코드,마스터명칭,마스터상세,공통코드,공통명칭,공통상세,순번,사용유무,저장자,저장일,수정자,수정일");
+                    myGrid2.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#numeric_filter,#text_filter,,,,");	//필턴은 공백이 있으면 표시가 안된다
+                    myGrid2.setColumnIds("tblCommMId,cmpyCd,commCd,commNm,commDesc,comdCd,comdNm,comdDesc,seq,useYn,saveUser,saveTime,updtUser,updtTime");
+                    myGrid2.setInitWidths("80,80,120,120,120,120,120,120,60,80,80,120,80,120");
+                    myGrid2.setColAlign("right,center,left,left,left,left,leftr,left,right,center,left,left,left,left");
+                    myGrid2.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+                    myGrid2.setColSorting("int,str,str,str,str,str,str,str,int,str,,,,");
+
+                    myGrid2.init();		//이걸써야 세팅한 그리드가 표시가 된다
+                    myGrid2.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+                    myGrid2.enablePreRendering(10);	//20220423 정연호 추가
+                    fnObj.gridOpen.setWidth();
+                    //그래야 진짜 화면에 보이는 높이가 만들어진다
+                    myGrid2.addRow(1, "");	//로우 추가
+
+                    myGrid2.deleteRow(1);
+                    myGrid2.enableEditEvents(true, false, false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+                    myGrid2.enableBlockSelection(true);
+                    myGrid2.attachEvent("onKeyPress", fnObj.keyOpen.onKeyPressed2);
+
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("tblCommMId"), true);	//컬럼 아이디로 해당 컬럼 가리기
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("cmpyCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("commCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("commNm"), true);	//컬럼 아이디로 해당 컬럼 가리기
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("commDesc"), true);	//컬럼 아이디로 해당 컬럼 가리기
+
+
+                    myGrid2.attachEvent("onRowDblClicked", function (rId, cInd) {
+
+                        if (!myGrid2.getRowData(rId).tblCommMId) {
+                            alert("수정 할 수 없습니다.(고유ID가 없음)");
+                            return;
+                        }
+                        fnObj.winOpen.save('UPDT', myGrid2.getRowData(rId).tblCommMId)
+                        $(top.document).find('#loader').hide();
+                    });
+
+
+                },
+                setWidth: function () {
+                    c_width = top.myLayout.cells("c").getWidth();
+                    searchDiv_height = $("#searchDiv").height();
+                    btnDiv1_height = $("#btnDiv1").height();
+                    searchDiv1_height = $("#searchDiv1").height();
+
+                    xhdr_height = $(".xhdr").height();
+
+                    myGrid.enableAutoWidth(true, (c_width - 25) * 0.33, 100);
+                    myGrid.enableAutoHeight(true, window.innerHeight - searchDiv_height - xhdr_height - 25);	//그리드 자동높이
+
+                    myGrid2.enableAutoWidth(true, (c_width - 25) * 0.57, 200);
+                    myGrid2.enableAutoHeight(true, window.innerHeight - searchDiv_height - xhdr_height - 25);	//그리드 자동높이
+
+                    $("#searchDiv").width(c_width - 25);
+
+                },	//END of setWidth
+            },	//END of gridOpen
+            searchOpen: {
+                searchBtn: {	//검색영역의 버튼
+                    search: function () {	//왼쪽 마스터 목록
+
+                        myGrid.clearAll(false);
+                        myGrid2.clearAll(false);
+                        if (!fnObj.searchOpen.searchChkVal.chkVal()) {
+                            alert(chkValMsg);
+                            return false;
+                        }
+
+                        var srchData = new FormData();
+                        srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+                        srchData.append("commNm", $("#commNm").val());
+                        srchData.append("comdNm", $("#comdNm").val());
+
+                        $.ajax({
+                            url: "/erp991005LCommList",
+                            processData: false,
+                            contentType: false,
+                            data: srchData,
+                            type: "POST",
+                            datatype: "json",
+                            async: false,
+                            success: function (res) {
+                                if (res) {
+
+
+                                    for (var i = 0; i < res.length; i++) {
+                                        myGrid.addRow(i + 1, "");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+                                        myGrid.setRowData(i + 1, {	//그 로우에 데이터 추가
+                                            "commCd": res[i].commCd
+                                            , "commNm": res[i].commNm
+                                            , "commDesc": res[i].commDesc
+
+                                        });	//추가한 로우에 데이터 넣기
+                                    }
+                                } else {
+                                    alert("공통코드 마스터 조회 수행 결과 없음");
+                                }
+                            },
+                        });
+                    },	//END of search : function() {
+                    search2: function (cmpyCdRight, commCdRight) {	//오른쪽 상세코드 조회
+
+                        myGrid2.clearAll(false);
+                        if (!fnObj.searchOpen.searchChkVal.chkVal()) {
+                            alert(chkValMsg);
+                            return false;
+                        }
+
+                        var rightData = new FormData();
+                        rightData.append("cmpyCd", cmpyCdRight);
+                        rightData.append("commCd", commCdRight);
+
+
+                        $.ajax({
+                            url: "/erp991005RComdList",
+                            processData: false,
+                            contentType: false,
+                            data: rightData,
+                            type: "POST",
+                            datatype: "json",
+                            async: false,
+                            success: function (res) {
+                                if (res) {
+
+                                    var columns = myGrid2.getColumnCount()
+
+
+                                    for (var i = 0; i < res.length; i++) {
+
+                                        var jsonData = {};
+                                        for (var c = 0; c < columns; c++) {
+                                            jsonData[myGrid2.getColumnId(c)] = res[i][myGrid2.getColumnId(c)];
+                                        }
+
+                                        myGrid2.addRow(i + 1, "");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+                                        myGrid2.setRowData(i + 1, jsonData);
+                                    }
+                                } else {
+                                    alert("공통코드 마스터 조회 수행 결과 없음");
+                                }
+                            },
+                        });
+                    },	//END of search : function() {
+                },	//END of searchBtn
+                searchChkVal: {
+                    chkVal: function () {
+                        chkValMsg = "";	//메세지 초기화
+                        var rtnVal = true;
+
+                        /* if(!myComboCmpyCd.getSelectedValue()){
+                            chkValMsg = chkValMsg + "회사를 선택하세요\n";
+                            rtnVal = false;
+                        } */
+                        return rtnVal;
+                    },	//END of chkVal : function(){
+                },	//END of searchChkVal
+            },	//END of searchOpen
+            keyOpen: {
+                onKeyPressed: function (code, ctrl, shift) {
+                    if (code == 67 && ctrl) {
+                        myGrid.setCSVDelimiter("\t");
+                        myGrid.copyBlockToClipboard()
+                    }
+                    if (code == 86 && ctrl) {
+                        myGrid.pasteBlockFromClipboard()
+                    }
+                    return true;
+                },
+                onKeyPressed2: function (code, ctrl, shift) {
+                    if (code == 67 && ctrl) {
+                        myGrid2.setCSVDelimiter("\t");
+                        myGrid2.copyBlockToClipboard()
+                    }
+                    if (code == 86 && ctrl) {
+                        myGrid2.pasteBlockFromClipboard()
+                    }
+                    return true;
+                },
+            }
+
+
+        }
+
+
+        $(document).ready(function () {
+
+            myWins = new dhtmlXWindows();
+
+            myGrid = new dhtmlXGridObject('grid');	//그리드
+            myGrid2 = new dhtmlXGridObject('grid2');	//그리드
+
+            fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+
+
+            fnObj.gridOpen.grid()
+            fnObj.gridOpen.grid2()
+
+
+            window.onresize = function (event) {		//윈도우의 사이즈가 변경했을떄
+                fnObj.gridOpen.setWidth();
+                fnObj.gridOpen.setWidth();
+            };
+
+        });
+
+        //20211226 정연호 추가. 키보드에서 F2 누르면 조회하기
+        $(document).keydown(function (event) {
+            if (event.keyCode == 113 || event.which == 113) {
+                fnObj.searchOpen.searchBtn.search()
+            }
+        });
+    </script>
+</head>
+<!-- top , left, bottom , right,  -->
+<body>
+<div id="mainDiv">
+    <div id="searchDiv">
+        <div id="btnDiv1">
+            <div class="title-container">
+                <span class="item-head title-text">
+                    공통 코드 관리
+                </span>
+                <span class="sub-title">
+                    erp991005
+                </span>
+            </div>
+            <span class="btn-container">
+					<span class="item-data">
+                        <input id="btnSearch" class="action-button primary" type="button"
+                               onclick="fnObj.searchOpen.searchBtn.search()"
+                               value="조회(F2)">
+                    </span>
+					<span class="item-data">
+                        <input id="btnHistory" class="action-button success" type="button"
+                               onclick="fnObj.winOpen.save('INS','')"
+                               value="등록">
+                    </span>
+					<span class="item-data">
+                        <input id="btnReload" class="action-button" type="button"
+                               onclick="location.reload(true);"
+                               value="초기화">
+                    </span>
+				</span>
+        </div>
+        <div id="searchDiv1">
+            <span class="cell" style="display:none;">
+					<span class="item-head">회사</span>
+					<span class="item-data">
+                        <div id="cmpyCd"></div>
+                    </span>
+				</span>
+            <span class="cell">
+					<span class="item-head">
+                        마스터검색
+                    </span>
+					<span class="item-data">
+                        <input type="text" id="commNm" name="commNm">
+                    </span>
+				</span>
+            <span class="cell">
+					<span class="item-head">
+                        상세검색
+                    </span>
+					<span class="item-data">
+                        <input type="text" id="comdNm" name="comdNm">
+                    </span>
+				</span>
+        </div>
+
+    </div>
+
+    <div id="gridDiv">
+        <div id="grid" style="width:35%;float:left;"></div>
+
+        <div id="centerLine" style="width:2%;float:left; ">&nbsp;</div>
+
+        <div id="grid2" style="width:60%;float:left;"></div>
+    </div>
+</div>
+</body>
+</html>

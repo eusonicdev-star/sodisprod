@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.allianceLogistics.alsys.erp.erp104004.mapper.Erp104004Mapper">
+
+	<!-- 그리드 목록 조회하기 -->
+	    <select id="erp104004List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp104004.entity.Erp104004VO" 	
+    																resultType		="com.allianceLogistics.alsys.erp.erp104004.entity.Erp104004VO">
+        {
+	      CALL sonictmsdev_mssql..USP_SO_PRINT_PICK_LISTBYALL  (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{dtType		,mode=IN	,	jdbcType=VARCHAR},
+			#{fromDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{toDt			,mode=IN	,	jdbcType=VARCHAR},
+			#{dcList		,mode=IN	,	jdbcType=VARCHAR},
+			#{teamList		,mode=IN	,	jdbcType=VARCHAR},
+			#{zoneList		,mode=IN	,	jdbcType=VARCHAR},
+			#{pickGrpArea	,mode=IN	,	jdbcType=VARCHAR},
+			<!-- 20220106 정연호 추가 시공카테고리 -->
+			#{instCtgr		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+</mapper>

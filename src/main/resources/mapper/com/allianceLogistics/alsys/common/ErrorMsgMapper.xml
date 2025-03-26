@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.allianceLogistics.alsys.common.mapper.ErrorMsgMapper">
+
+    <select id="errorSave"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.common.entity.ErrorMsgVO"	
+    														resultType		="com.allianceLogistics.alsys.common.entity.ErrorMsgVO">
+    							
+        {																				
+	      CALL sonictmsdev_mssql..USP_ERROR_INS (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
+			#{tblUserMId	,mode=IN	,	jdbcType=VARCHAR},	
+			#{msg			,mode=IN	,	jdbcType=VARCHAR},
+			#{system		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+</mapper>

@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+       style="height:100%;"
+>
+<head> 
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+	<title>얼라이언스</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/login.css}" />
+	<link rel="stylesheet"  type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css"> 
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css"> 
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css"> 
+
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+    
+    
+	
+	
+	<body id="body">
+
+	<br><br>
+		<div class="container">
+			<br><br>
+	        <a href="http://gloakoreahost.cafe24.com"> <h1>ERP 테스트 페이지 접속주소 : http://gloakoreahost.cafe24.com</h1></a>
+			
+			<br><br><br><br><br><br>
+			
+			<a href="http://gloakoreahost.cafe24.com/alliance/alliance.apk"> <h1>모바일앱(안드로이드)다운로드 : http://gloakoreahost.cafe24.com/alliance/alliance.apk</h1></a>
+			
+			
+		</div>
+	</body>
+</html>

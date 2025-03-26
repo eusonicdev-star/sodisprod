@@ -1,0 +1,584 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>주문리스트 선택 팝업 (erp102001p1)</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" type="text/css" href="/css/common.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+
+<style>
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	overflow: auto;
+}
+</style>
+<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/js/commCode.js"></script>
+
+<script th:inline="javascript">
+	var pagePerRow	=	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/
+	var myGrid;
+
+
+	var myWins;
+	
+	
+	fnObj	=	{
+			winOpen : {
+				
+				
+				
+
+					
+				commSrch : function(title,cmpyCd,srchCtgr,srchInput){		//공통코드 찾기 팝업
+					windowId	=	"commSrch";
+					windowText	=	title +" commSrch";
+					windowUrl	=	"/commSrch"
+					windowLeft	=	-14400;
+					windowTop	=	-14400;
+					windowWidth	=	800;
+					windowHeight	=	600;
+					windowsModal	=	true;
+					windowOnClose	=	 function(windowId){
+						return true;
+					  		  };
+					windowSendObject = {
+							cmpyCd : 	cmpyCd,
+							srchCtgr : 	srchCtgr,
+							srchInput : srchInput,
+							windowId : windowId,
+							srchCd : $("#srchCode").val(),
+							srchNm : $("#srchName").val()
+					};
+					
+
+					myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+					
+					myWins.window(windowId).attachEvent("onClose", function(win){
+						return true;
+					});
+				},	//END of commSrch : function(){
+				rtnObject : function(windowId,rtnObj,srchInput){	//popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+					if(rtnObj == null)
+					{
+						myWins.window(windowId).setPosition(0, 0);
+						return;
+					}
+				
+					if(windowId == "commSrch")
+					{
+						if(srchInput == "text"){
+							$("#srchCode").val(rtnObj[0].commCd);
+							$("#srchName").val(rtnObj[0].commNm);
+						}
+					}
+				},	//END of rtnObject : function(windowId,rtnObj){
+			},	//END of winOpen:{
+			
+			comboOpen : {
+				comboCmpyCd : function(){		//회사콤보목록
+					myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+			    	comboList(myComboCmpyCd,'A','COMM','CMPY_CD','','Y','');		     
+			    	myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/));
+			    	myComboCmpyCd.setFontSize("12px","12px");
+			    	myComboCmpyCd.attachEvent("onChange", function(value, text){
+			    		myGrid.clearAll(false);
+			    	});
+			    	myComboCmpyCd.disable();
+			    	
+				},	
+				
+				
+			},	//END of comboOpen : {
+			
+			gridOpen : {
+				
+				
+				grid : function(){
+					myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
+					myGrid.setHeader("주문고유ID,회사코드,AL 오더,고객사<br>주문번호,시스템등록일,배송확정일,판매오더유형코드,판매오더유형,판매상태코드,판매상태,화주사코드,화주사,쇼핑몰,고객명,고객휴대전화,품목");
+					myGrid.setColumnIds("tblSoMId,cmpyCd,soNo,refSoNo,ordrInptDt,dlvyCnfmDt,soType,soTypeNm,soStatCd,soStatNm,agntCd,agntNm,mallCd,acptEr,acptTel2,prodNm");
+					myGrid.setInitWidths("40,60,120,160,100,100,80,120,80,120,80,120,120,120,100,160");
+					myGrid.setColAlign("center,center,center,left,center,center,center,center,center,center,center,center,center,center,center,left");
+					myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+					myGrid.setColSorting("str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str");
+					myGrid.attachHeader(",,#text_filter,#text_filter,#text_filter,#text_filter,,#text_filter,,#text_filter,,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
+		
+					
+					myGrid.setColumnHidden(myGrid.getColIndexById("tblSoMId"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("cmpyCd"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("agntCd"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("soType"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("soStatCd"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("agntCd"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
+
+					myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+					myGrid.enablePreRendering(10);
+					fnObj.gridOpen.setWidth();
+					myGrid.addRow(1,"");	//로우 추가
+					myGrid.deleteRow(1);
+					myGrid.enableBlockSelection(true);
+					myGrid.attachEvent("onKeyPress",fnObj.keyOpen.onKeyPressed);
+					myGrid.enableEditEvents(true,false,false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+					
+					
+					myGrid.attachEvent("onRowDblClicked", function(rId,cInd){
+
+
+						/***********************************
+						1000, 일반오더
+						2000, 반품오더
+						3100, 교환오더(일반)
+						3200, 교환오더(반품)
+						4000, 업체직출
+						5000, 일반(고객지정)
+						6000, A/S오더
+						9901, 일반(2인배송)
+						9902, 익일
+						9903, 익일(반품)
+						9904, 반품(정품)
+						9906, 택배반품
+						9907, 기타
+						9905, 택배
+						***************************/
+	
+						rtnObj=[]; 
+						rtn={};
+						rtn = myGrid.getRowData(rId);
+						rtn.rtnSoType = /*[[${sendObject.soType}]]*/
+						rtnObj.push(rtn);
+						rtn={};
+						parent.fnObj.winOpen.rtnObject(/*[[${sendObject.windowId}]]*/,rtnObj,"");
+						parent.myWins.window(/*[[${sendObject.windowId}]]*/).close();
+						
+					});
+					
+					
+					window.onresize = function(event) {		//윈도우의 사이즈가 변경했을떄
+						 fnObj.gridOpen.setWidth();
+					};
+				},		//ENd of grid : function(){}
+		
+				
+				
+				setWidth : function(){
+					searchDiv_height =  0;
+					page_height =  $("#page").height();
+					xhdr_height =  $(".xhdr").height();
+					myGrid.enableAutoWidth(true, window.innerWidth-30,400);
+					myGrid.enableAutoHeight(true,window.innerHeight-searchDiv_height-page_height-xhdr_height-100);	//그리드 자동높이
+				},	//END of setWidth
+				
+				
+				
+			},		//ENd of gridOpen : {
+			searchOpen : {
+				search : function() {	//그리드 목록 조회하기
+					myGrid.clearAll(false);
+
+					if(!fnObj.searchOpen.searchChkVal.chkVal("search"))
+					{
+					
+					
+						alert(chkValMsg);
+						return false;
+					}
+					
+					
+					var srchData = new FormData();
+					srchData.append("cmpyCd",				myComboCmpyCd.getSelectedValue()			);
+					srchData.append("dtType",				"3"											);
+					srchData.append("fromDt",				$("#dateFrom").val().replace(/-/g,"")		);
+					srchData.append("toDt",					$("#dateTo").val().replace(/-/g,"")			);
+					srchData.append("agntCd",				$("#srchCode").val()						);	//화주사
+					srchData.append("soNo",					$("#soNo").val()							);		//AL 오더
+					srchData.append("refSoNo",				$("#refSoNo").val()							);	//주문유형
+					srchData.append("acptNm",				$("#acptNm").val()							);		//수령인
+					srchData.append("mallNm",				$("#mall").val()							);		//쇼핑몰
+				
+					/* for (var pair of srchData.entries()) 
+					{ 
+						console.log(pair[0]+ ' :  ' + pair[1]);
+					} */
+
+					$.ajax({
+				        url: "/erp101016p4List",
+				        processData : false,
+						contentType : false,
+				        data: srchData,
+				        type:"POST",
+				        datatype:"json",
+				        //async:false,
+				        success : function(res){
+				        	
+				        	if(res){
+					        
+					        	
+				        		searchRes = res;
+				        		searchPaging(1);
+	
+				        	}
+				        	else{
+				       			alert("조회 수행 결과 없음");
+				        	}
+				        },
+					});
+					
+			
+				},	//END of search : function() {
+					
+
+				delSrchCode : function(){
+					$("#srchCode").val("");
+					$("#srchName").val("");
+				},	//END of delSrchCode : function(){
+				searchChkVal : {
+					chkVal : function(chkGubn){
+						chkValMsg="";	//메세지 초기화
+						var rtnVal = true;
+						
+						if(chkGubn == "search")
+						{
+							if(!myComboCmpyCd.getSelectedValue()){
+								chkValMsg = chkValMsg + "회사코드가 없습니다\n";
+								rtnVal = false;
+							}							
+							if(!$("#dateFrom").val()){
+								chkValMsg = chkValMsg + "검색시작일을 입력하세요\n";
+								rtnVal = false;
+							}
+							if(!$("#dateTo").val()){
+								chkValMsg = chkValMsg + "검색종료일을 입력하세요\n";
+								rtnVal = false;
+							}
+				
+							if($("#dateFrom").val() && $("#dateTo").val())
+							{
+								var date1 = new Date($("#dateFrom").val());
+								var date2 = new Date($("#dateTo").val());
+								if(date1 > date2)	//시작날짜가 크고 종료날짜가 작을떄
+								{
+									chkValMsg = chkValMsg + "검색시작일이 검색종료일보다 작습니다.\n";
+									rtnVal = false;
+								}
+							}
+						
+							if($("#dateFrom").val() && $("#dateTo").val())
+							{
+								var date1 = new Date($("#dateFrom").val());
+								var date2 = new Date($("#dateTo").val());
+								var gapDate = (date2.getTime() - date1.getTime()) / (1000*60*60*24);
+								if(gapDate > 31)	//시작날짜가 크고 종료날짜가 작을떄
+								{
+									chkValMsg = chkValMsg + "검색일은 최대 31일 입니다.\n";
+									rtnVal = false;
+								}
+							}
+						}
+						return rtnVal;
+					},	//END of chkVal : function(){
+				},	//END of searchChkVal
+				
+			},		//ENd of searchOpen : {
+			keyOpen : {
+				enterKey : function(enterType){
+					if(enterType == "srchName")
+					{
+						
+						if (window.event.keyCode == 13) {
+							$("#srchCode").val("");
+							$("#srchCode").blur();
+							$("#srchName").blur();
+						
+				            fnObj.winOpen.commSrch('화주','A','AGENCY','text');
+				        }
+					}
+				},
+				onKeyPressed : function (code,ctrl,shift){
+				    if(code==67&&ctrl){
+				        myGrid.setCSVDelimiter("\t");
+				        myGrid.copyBlockToClipboard()
+				    }
+				    if(code==86&&ctrl){
+				        myGrid.pasteBlockFromClipboard()
+				    }
+				    return true;
+				},
+			}
+	}	//END of fnObj
+
+	
+	function searchPaging(page)
+	{
+		
+		//pagePerRow	=	15;	//페이지당 몇줄을 보여줄것인가
+
+		if($("#rowPerPage").val())
+		{
+			pagePerRow = parseInt($("#rowPerPage").val());
+		}
+
+		var pageRange	=	10;	//페이지범위를 몇개씩짜를것인가. 예) 23페이지 라면 1 2 3 4 5 6 7 8 9 10  이 한번 나오고 >> 누르면 11 12 13 14 15 16 17 18 19 20 나오고 >> 누르면 21 22 23 나옴
+		
+		var totalPageCnt	=	searchRes.length % pagePerRow == 0 ? parseInt(searchRes.length / pagePerRow) : parseInt(searchRes.length / pagePerRow) + 1
+
+		var a="";
+
+		//패이징 처리 
+		var start=(page-1);
+		var end  = (page-1)+pageRange;
+
+		if(start%pageRange != 0)
+		{
+			start = parseInt(start/pageRange)*pageRange ;
+		}
+
+		if(end%pageRange !=  0 || page == 1)
+		{
+			end = parseInt(end/pageRange)*pageRange;
+		}
+
+		if(start >= pageRange)
+		{
+			a=a +	"<input type='button' onclick='searchPaging("+1+");' value='<<'></input>";
+			a=a +	"<input type='button' onclick='searchPaging("+(start -1)+");' value='<'></input>";
+		}
+
+		var r=0;
+		
+		for(r=start;r<end;r++)
+		{
+			if(r < totalPageCnt)
+			{
+				if(r+1 == page)		//현재페이지 강조
+				{
+					a=a+"<input type='button' onclick='searchPaging("+(r+1)+");' style='color:red;font-weight:bold;' value="+(r+1)+"></input>";
+				}
+				else
+				{
+					a=a+"<input type='button' onclick='searchPaging("+(r+1)+");' value="+(r+1)+"></input>";
+				}
+			}
+		}
+
+		if(end*pagePerRow  < searchRes.length )
+		{
+			a=a +	"<input type='button' onclick='searchPaging("+(end+1)+");' value='>'></input>";
+			a=a +	"<input type='button' onclick='searchPaging("+totalPageCnt+");' value='>>'></input>";
+		}
+
+		a=a+"&nbsp;&nbsp;<input type='number' maxlength=4 style='width:60px;' id='rowPerPage' value="+pagePerRow+"></input><input type='button' value='적용' onclick='searchPaging("+1+");'></input>";
+		a=a+"&nbsp;&nbsp;<i class='fa fa-calculator fa-lg' aria-hidden='true'></i>&nbsp;" + searchRes.length; 
+		$("#page").html(a);
+
+		var is=(page-1)*pagePerRow;	//시작점
+		var ie=(page-1)*pagePerRow+pagePerRow;	//종료점
+
+		if(searchRes.length < ie)
+		{
+			ie = searchRes.length;
+
+		}
+
+		myGrid.clearAll(false);
+	
+		var columns = myGrid.getColumnCount()
+		for(var i=is;i<ie;i++){
+			
+    			
+    			var jsonData = {};
+    			for (var c=0; c<columns; c++){ 
+    			
+    					jsonData[myGrid.getColumnId(c)] = searchRes[i][myGrid.getColumnId(c)];
+   
+        		}
+    			
+    			myGrid.addRow(i+1,"");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+    			myGrid.setRowData(i+1,jsonData);
+      		
+			
+		}
+	}			
+		
+
+	
+$(document).ready(function() {
+
+	myWins = new dhtmlXWindows();
+
+	myGrid = new dhtmlXGridObject('grid');	//그리드
+	fnObj.gridOpen.grid();
+	
+	fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+	
+	
+	
+	myCalendar = new dhtmlXCalendarObject([{input:"dateFrom",button:"dateFromIcon"},{input:"dateTo",button:"dateToIcon"}]);
+
+	var now = new Date()
+	var year = now.getFullYear()+"";
+	var month = (now.getMonth()+1)+"";
+	var date = now.getDate()+"";
+	if(month.length == 1 )
+	{
+		month = "0"+month;
+	}
+	if(date.length == 1 )
+	{
+		date = "0"+date;
+	}
+	
+	var today =  year+"-" + month + "-" + date;
+	
+	$("#dateFrom").val(today);
+	$("#dateTo").val(today);
+	
+	myCalendar.loadUserLanguage("ko");
+
+	sendObj = /*[[${sendObject}]]*/
+
+	
+	/* fnObj.searchOpen.search(); */
+	fnObj.gridOpen.setWidth();
+	fnObj.gridOpen.setWidth();
+	
+	
+	
+	
+	
+	sessionUserGrntCd =  /*[[${session.userGrntCd}]]*/
+	sessionAgntCd = /*[[${session.agntCd}]]*/
+	sessionAgntNm = /*[[${session.agntNm}]]*/
+	//4100, 화주-관리자	4200, 화주-대리점
+	if(sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200")	
+	{
+		$("#srchName").val(sessionAgntNm);
+		$("#srchCode").val(sessionAgntCd);
+		$("#srchName").attr("readonly",true);
+		$("#srchCode").attr("readonly",true);
+		
+		$("#srchName").css("color","gray");
+		$("#srchCode").css("color","gray");
+		
+		$("#srchIcon").hide();
+		$("#delIcon").hide();
+	}
+	
+	
+});
+
+//20211226 정연호 추가. 키보드에서 F2 누르면 조회하기
+$(document).keydown(function(event) {
+    if ( event.keyCode == 113 || event.which == 113 ) {
+    	fnObj.searchOpen.search()
+    }
+});
+
+
+</script>
+</head>
+<body>
+	<div id="mainDiv" style="padding: 10px 10px 0 10px; border: 1px solid black;">
+		<div id="searchDiv" style="width: 100%; font-size: 12px; padding-bottom: 5px;">
+			<div id="btnDiv1" style="width: 100%;">
+				<span class="cell" style="float: right;">
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<input id="btnSearch" type="button" onclick="fnObj.searchOpen.search()" value="조회(F2)">
+					</span>
+					<span class="item-data" style="padding: 0 20px 0 20px;"><input id="btnReload" type="button" onclick="location.reload(true);" value="초기화"></span>
+				</span>
+			</div>
+			<div id="searchDiv1" style="width: 100%;">
+
+				<span class="cell" style="width: 220px; display: none;">
+					<span class="item-head" style="width: 80px;">회사</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="cmpyCd"></div>
+					</span>
+				</span>
+
+
+
+				<span id="fromTo" class="cell" style="width: 360px;">
+					<span class="item-head" style="width: 80px;">배송일자</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="dateFrom" style="height: 20px; width: 90px;">
+						<i id="dateFromIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+					</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="dateTo" style="height: 20px; width: 90px;">
+						<i id="dateToIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+					</span>
+				</span>
+
+
+				<span class="cell" style="width: 400px;">
+					<span class="item-head" style="width: 80px;">화주사</span>
+					<span class="item-data" style="width: 160px;">
+						<input type="text" id="srchName" style="width: 112px;" onkeyup="fnObj.keyOpen.enterKey('srchName');">
+						</input>
+						<i id="srchIcon" class="fa fa-search" aria-hidden="true" onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"> </i>
+					</span>
+					<span class="item-data" style="width: 160px;">
+						<input type="text" id="srchCode" style="width: 112px;" readonly>
+						</input>
+
+						<i id="delIcon" class="fa fa-minus-circle" aria-hidden="true" onclick="fnObj.searchOpen.delSrchCode()"> </i>
+					</span>
+				</span>
+
+				<span class="cell" style="width: 220px;">
+					<!-- <span class="item-head" style="width: 80px;">오더번호</span> -->
+					<span class="item-head" style="width: 80px;">AL오더</span>	<!-- 20211226 정연호 수정. 명칭수정 오더번호를 AL오더 -->
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="soNo" style="height: 20px; width: 132px;">
+					</span>
+				</span>
+				<span class="cell" style="width: 280px;">
+					<span class="item-head" style="width: 140px;">고객사 주문번호</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="refSoNo" style="height: 20px; width: 132px;">
+					</span>
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">고객명</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="acptNm" style="height: 20px; width: 132px;">
+					</span>
+				</span>
+
+				<span class="cell" style="width: 220;">
+					<span class="item-head" style="width: 80px;">쇼핑몰</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="mall" style="width: 132px;"></input>
+					</span>
+				</span>
+
+
+
+			</div>
+
+
+		</div>
+		<div id="gridDiv" style="width: 100%; font-size: 12px;">
+			<div id="grid" style="width: 100%;"></div>
+			<br>
+			<span id="noGridResult" style="width: 100%; font-weight: bold; font-size: 14; display: none;">
+				<center>조회결과가 없습니다.</center>
+			</span>
+		</div>
+		<div id="page" style="width: 100%; height: 30px; padding-bottom: 5px;"></div>
+	</div>
+</body>
+</html>

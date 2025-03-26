@@ -1,0 +1,174 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>스케줄 발송 실행일자 선택 (erp102002p2)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/popup.css"/>
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+    <script th:inline="javascript">
+        var srchInput;
+        var myCalendar;
+        var rtnObj = [];
+        var sendObject;
+        fnObj = {
+            winOpen: {},	//END of winOpen:{
+            comboOpen: {},	//END of comboOpen : {
+            gridOpen: {},		//ENd of gridOpen : {
+            searchOpen: {
+                comdSave: function () {
+                    if (!$("#dateScdl").val()) {
+                        alert("스케줄 수행일자를 선택하세요.");
+                        return;
+                    }
+
+                    var scdl = {};
+                    scdl.dateScdl = $("#dateScdl").val();
+                    rtnObj.push(scdl)
+                    scdl = {};
+                    parent.fnObj.winOpen.rtnObject(/*[[${sendObject.windowId}]]*/, rtnObj, "text");
+                    parent.myWins.window(/*[[${sendObject.windowId}]]*/).close();
+
+                },	//END of comdSave : function(){
+
+            },		//ENd of searchOpen : {
+            keyOpen: {},
+        }	//END of fnObj
+
+        $(document).ready(function () {
+
+            sendObject = /*[[${sendObject}]]*/;
+//console.log(sendObject)
+            myCalendar = new dhtmlXCalendarObject([{input: "dateScdl", button: "dateScdlIcon"}]);
+            var now = new Date()
+            var year = now.getFullYear() + "";
+            var month = (now.getMonth() + 1) + "";
+            var date = now.getDate() + "";
+            if (month.length == 1) {
+                month = "0" + month;
+            }
+            if (date.length == 1) {
+                date = "0" + date;
+            }
+
+            var today = year + "-" + month + "-" + date;
+
+            $("#dateScdl").val(today);
+
+            myCalendar.loadUserLanguage("ko");
+
+
+            $("#tblAlrmScdlId").val(/*[[${sendObject.tblAlrmScdlId}]]*/);
+
+
+        });
+    </script>
+</head>
+<body>
+<div id="mainDiv">
+    <div class="popup-header-container">
+        <div class="popup-header-text">
+            <span>스케줄 수행일자 선택</span>
+        </div>
+        <div>
+            <input id="commSave" class="action-button primary" name="commSave"
+                   type="button"
+                   onclick="fnObj.searchOpen.comdSave()"
+                   value="스케줄 실행">
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-item">
+            <span class="search-label">
+                스케줄 수행 일자
+            </span>
+            <input type="text" class="search-input" id="dateScdl" readonly>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">
+                날짜계산일
+            </span>
+            <input type="text" id="dtCalDay"
+                   class="search-input"
+                   style="width:10px;"
+                   disabled
+                   th:value="${sendObject.dtCalDay}">
+            <div class="tooltip-container">
+                <i class="fa fa-question-circle search-icon"></i>
+                <div class="tooltip">
+                    +1 : [날짜계산]의 다음날 알림톡 발송
+                    0 : [날짜계산] 당일 알림톡 발송
+                    -3 : [날짜계산]의 3일 전 날짜에 알림톡발송
+                </div>
+            </div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">
+                전송 시간
+            </span>
+            <input type="text" id="sendTime"
+                   class="search-input"
+                   style="width:10px;"
+                   disabled
+                   th:value="${sendObject.sendTime}">
+            <div class="tooltip-container">
+                <i class="fa fa-question-circle search-icon"></i>
+                <div class="tooltip">
+                    예) 오후3시 : 15, 오전9시 : 09
+                </div>
+            </div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">
+                화주사
+            </span>
+            <input type="text" class="search-input"
+                   th:value="${sendObject.agntNm}"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">
+                템플릿
+            </span>
+            <input type="text" class="search-input"
+                   th:value="${sendObject.alrmMsgTypeNm}">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">
+                날짜 계산 조건
+            </span>
+            <input type="text" class="search-input"
+                   th:value="${sendObject.dtCalTypeNm}">
+
+        </div>
+
+        <div class="info-container">
+            <span class="stress">
+                ※주의※
+            </span>
+            <div>
+                스케줄 수행일자입니다. <b>알림톡 발송일이 아닙니다.</b> 날짜계산일과 전송시간을 고려하여 실행하세요.
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

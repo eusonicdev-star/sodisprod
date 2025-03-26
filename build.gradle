@@ -1,0 +1,133 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.0'
+
+    //id 'org.springframework.boot' version '2.5.2'
+
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    id 'war'
+}
+
+group = 'com.allianceLogistics'
+version = '0.0.2-SNAPSHOT'            //0.0.1
+sourceCompatibility = '1.8'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'war'
+
+//war {
+//    baseName = 'gradle'
+//    version = '0.0.2'        //0.0.1
+//}
+
+bootWar {
+    archiveFileName = "alliance.war"
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    /*
+    jasperreports {
+            transitive = true
+        }
+      */
+
+    //2021-12-12 정연호추가. spring boot 에서 logging 모듈 제거
+
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+
+bootWar.enabled = false
+war.enabled = true
+
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
+
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+
+    //javx.validation
+    implementation 'javax.validation:validation-api'
+
+    //디비로그
+    implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+
+    //jasperreports
+//	implementation 'com.itextpdf:itext-pdfa:5.5.13.2'
+    implementation 'com.itextpdf:itext-pdfa:5.5.13.3'
+
+//	6.17.0 은 login 페이지 잘됨 dhtmlx5 combo 잘 됨. 6.19.1은 값은 db에서 불렀는데 화면에 combo에 값들이 없음		
+//	implementation 'net.sf.jasperreports:jasperreports:6.17.0'
+//	implementation 'net.sf.jasperreports:jasperreports:6.19.1'
+//	implementation 'net.sf.jasperreports:jasperreports:6.19.0'
+    implementation 'net.sf.jasperreports:jasperreports:6.18.1'
+
+//	implementation 'net.sf.jasperreports:jasperreports-functions:6.17.0'
+    implementation 'net.sf.jasperreports:jasperreports-functions:6.19.1'
+
+//	implementation 'net.sf.jasperreports:jasperreports-metadata:6.17.0'
+    implementation 'net.sf.jasperreports:jasperreports-metadata:6.19.1'
+
+//	implementation 'net.sf.jasperreports:jasperreports-chart-themes:6.17.0'
+    implementation 'net.sf.jasperreports:jasperreports-chart-themes:6.19.1'
+
+//	implementation 'net.sf.jasperreports:jasperreports-annotation-processors:6.17.0'
+    implementation 'net.sf.jasperreports:jasperreports-annotation-processors:6.19.1'
+
+//	implementation 'net.sf.jasperreports:jasperreports-chart-customizers:6.17.0'
+    implementation 'net.sf.jasperreports:jasperreports-chart-customizers:6.19.1'
+
+//	implementation 'net.sf.jasperreports:jasperreports-custom-visualization:6.17.0'
+    implementation 'net.sf.jasperreports:jasperreports-custom-visualization:6.19.1'
+
+    implementation 'com.lowagie:itext:4.2.2'
+    implementation 'org.eclipse.birt.runtime.3_7_1:com.lowagie.text:2.1.7'
+
+    // https://mvnrepository.com/artifact/net.sourceforge.barbecue/barbecue
+    implementation 'net.sourceforge.barbecue:barbecue:1.5-beta1'
+
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    implementation files('libs/NanumGoThic.jar')
+
+    //mssql
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
+
+    annotationProcessor 'org.projectlombok:lombok'
+
+
+    //애플리케이션의 내장 서블릿 컨테이너(내장톰캣)가 외부 서블릿컨테이너 작동에 영향을 주지 않도록 providedRuntime으로 명시해야 한다
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+
+    //java에서 json 사용
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+    //json 파싱
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation 'com.google.code.gson:gson:2.9.0'
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2:2.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}

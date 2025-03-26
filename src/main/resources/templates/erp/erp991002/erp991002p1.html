@@ -1,0 +1,223 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <title>권한그룹추가 (erp991002p1)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/popup.css">
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+
+    <script th:inline="javascript">
+        //권한그룹코드 중복 체크
+        function doubleChk() {
+            $("#spanGrntSave").hide();
+            $("#spanGrntUpdt").hide();
+
+            if (!$("#userGrntCd").val()) {
+                alert("권한그룹코드를 입력하세요");
+                return false;
+            }
+            if ($("#userGrntCd").val().length != 4) {
+                alert("숫자 4자리를 입력하세요");
+                return false;
+            }
+
+            var sendData = new FormData();
+            sendData.append("cmpyCd", $("#cmpyCd").text());
+            sendData.append("commCd", "USER_GRNT_CD");
+            sendData.append("comdCd", $("#userGrntCd").val());
+
+
+            $.ajax({
+                url: "/erp991002p1DoubleChk",
+                processData: false,
+                contentType: false,
+                data: sendData,
+                type: "POST",
+                datatype: "json",
+                async: false,
+                success: function (res) {
+                    if (res) {
+
+                        if (res.rtnYn == "Y")	//신규등록
+                        {
+                            alert("없는 권한그룹코드입니다. 권한그룹 신규등록 가능!")
+                            $("#spanGrntSave").show();
+                            $("#spanGrntUpdt").hide();
+
+                        } else if (res.rtnYn == "N")	//기존것 수정
+                        {
+                            alert("사용중인 권한그룹코드입니다. 권한그룹명칭만 수정가능!")
+                            $("#spanGrntSave").hide();
+                            $("#spanGrntUpdt").show();
+                            $("#userGrntNm").val(res.comdNm);
+                            $("#tblCommMId").val(res.tblCommMId);
+                        } else		//결과 리턴값이 없으면 오류다
+                        {
+                            alert("중복확인 결과 없음")
+                        }
+                    } else {
+                        alert("중복확인 결과 없음.")
+                    }
+
+                },
+
+            });
+        };
+
+
+        function infoInput() {
+
+
+        }
+
+        $(document).ready(function () {
+            console.log(pageUrl());
+            $("#pageCode").text(pageUrl());
+            var thisfilefullname = document.URL.substring(document.URL.lastIndexOf("/") + 1, document.URL.length);
+            var pageName = thisfilefullname.substring(0, thisfilefullname.lastIndexOf("?"))
+
+
+            $("#cmpyCd").text(/*[[${sendObject.cmpyCd}]]*/);
+            $("#cmpyNm").text(/*[[${sendObject.cmpyNm}]]*/);
+
+
+            $("#userGrntCd").focus(function () {
+                $("#spanGrntSave").hide();
+                $("#spanGrntUpdt").hide();
+                $("#userGrntNm").val("");
+                $("#tblCommMId").val("");
+            });
+
+        });
+
+        function grntSave(saveGubn) {
+            console.log("saveGubn : " + saveGubn);
+            if (!saveGubn) {
+                alert("오류 발생 : 등록/수정 구별인자 없음");
+                return;
+            }
+
+
+            var save = new FormData();
+
+            save.append("saveGubn", saveGubn);
+            save.append("tblCommMId", $("#tblCommMId").val());
+            save.append("cmpyCd", $("#cmpyCd").text());
+            save.append("commCd", "USER_GRNT_CD");
+            save.append("commNm", "사용자권한그룹");
+            save.append("commDesc", "사용자권한그룹");
+            save.append("comdCd", $("#userGrntCd").val());
+            save.append("comdNm", $("#userGrntNm").val());
+            save.append("comdDesc", $("#userGrntNm").val());
+            save.append("useYn", "Y");
+            save.append("saveUser",	/*[[${session.tblUserMId}]]*/);
+
+            $(top.document).find('#loader').show();
+            $.ajax({
+                url: "/erp991002p1Save",
+                processData: false,
+                contentType: false,
+                data: save,
+                type: "POST",
+                datatype: "json",
+                //async:false,
+                success: function (res) {
+                    $(top.document).find('#loader').hide();
+                    if (res) {
+                        console.log(res);
+                        if (res.rtnYn == "Y")	//신규등록
+                        {
+                            parent.myComboUserGrntCd.unSelectOption();
+                            parent.myGrid.clearAll(false);
+                            parent.myComboUserGrntCd.clearAll();
+                            parent.comboList(parent.myComboUserGrntCd, 'A', 'COMM', 'USER_GRNT_CD', '', 'Y', 'req');
+                            parent.myComboUserGrntCd.selectOption(0);
+                            alert("완료하였습니다.")
+
+                            parent.myWins.window('grntAdd').close();
+
+                        } else		//결과 리턴값이 없으면 오류다
+                        {
+                            alert("실패하였습니다.")
+                        }
+                    } else {
+                        alert("실패하였습니다.")
+                    }
+
+                },
+
+            });
+
+
+        }
+
+    </script>
+</head>
+<body>
+<div id="mainDiv">
+    <div class="popup-header-container">
+        <div class="popup-header-text">
+            권한그룹 추가
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-item">
+            <span class="search-label">회사코드</span>
+            <span class="search-input" id="cmpyCd" disabled></span>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">회사명칭</span>
+            <span class="search-input" id="cmpyNm"></span>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">권한그룹 코드</span>
+            <input type="text" id="userGrntCd" class="search-input" name="userGrntCd"
+                   minlength='4' maxlength='4'
+                   onKeyup="this.value=this.value.replace(/[^0-9]/g,'');"/>
+        </div>
+
+        <div class="search-item">
+            <input id="btnDoubleChk" class="action-button" type="button" onclick="doubleChk()" value="중복확인">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">권한그룹 명칭</span>
+            <input type="text" id="userGrntNm" class="search-input" name="userGrntNm">
+            <span class="cell" style="display:none;" id="spanGrntSave">
+            	<span class="item-data">
+                    <input id="btnGrntSave" class="action-button primary" type="button" onclick="grntSave('ins')"
+                           value="등록">
+                </span>
+            </span>
+
+            <span class="cell" style="display:none;" id="spanGrntUpdt">
+                <span class="item-data">
+                    <input id="btnGrntUpdt" class="action-button primary" type="button" onclick="grntSave('updt')"
+                           value="수정">
+                </span>
+            </span>
+        </div>
+
+        <input type="text" id="tblCommMId" name="tblCommMId" style="display:none;" readOnly/>
+    </div>
+</div>
+</body>
+</html>

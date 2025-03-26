@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.allianceLogistics.alsys.erp.erp203003.mapper.Erp203003Mapper">
+
+	<!-- 메인화면 조회 -->
+    <select id="erp203003List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp203003.entity.Erp203003VO" 	
+    															resultType		="com.allianceLogistics.alsys.erp.erp203003.entity.Erp203003VO">
+        {
+	      CALL sonictmsdev_mssql..USP_INST_EVAL_LISTBYALL (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},	
+			#{dtType		,mode=IN	,	jdbcType=VARCHAR},	
+			#{fromDt		,mode=IN	,	jdbcType=VARCHAR},	
+			#{toDt			,mode=IN	,	jdbcType=VARCHAR},	
+			#{agntList		,mode=IN	,	jdbcType=VARCHAR},	
+			#{dcList		,mode=IN	,	jdbcType=VARCHAR},	
+			#{instErList	,mode=IN	,	jdbcType=VARCHAR},	
+			#{soNoList		,mode=IN	,	jdbcType=VARCHAR}
+	      )
+      }
+    </select>
+
+	<!-- 응답률 조회 -->
+    <select id="erp203003List2"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp203003.entity.Erp203003VO" 	
+    															resultType		="com.allianceLogistics.alsys.erp.erp203003.entity.Erp203003VO">
+        {
+	      CALL sonictmsdev_mssql..USP_INST_EVAL_LISTBYALL_RESPONSE_RATE (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},	
+			#{dtType		,mode=IN	,	jdbcType=VARCHAR},	
+			#{fromDt		,mode=IN	,	jdbcType=VARCHAR},	
+			#{toDt			,mode=IN	,	jdbcType=VARCHAR},	
+			#{agntList		,mode=IN	,	jdbcType=VARCHAR},	
+			#{dcList		,mode=IN	,	jdbcType=VARCHAR},	
+			#{instErList	,mode=IN	,	jdbcType=VARCHAR},	
+			#{soNoList		,mode=IN	,	jdbcType=VARCHAR}
+	      )
+      }
+    </select>
+</mapper>

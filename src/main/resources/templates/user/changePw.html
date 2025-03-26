@@ -1,0 +1,308 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+       style="height:100%;"
+>
+<head> 
+<!-- <link rel="icon" href="data:;base64,iVBORw0KGgo="> -->
+<link rel="icon" href="/css/favicon.ico" type="image/x-icon" sizes="16x16">
+	<title>얼라이언스</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/login.css}" />
+	<link rel="stylesheet"  type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css"> 
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css"> 
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css"> 
+
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="/js/commCode.js"></script>
+    
+	<style>
+
+	    html, body {
+	        width: 100%;
+	        height: 100%;
+	        margin: 0px;
+	        overflow: auto;
+	    }
+
+	</style>
+<script th:inline="javascript" >
+
+
+var paran;
+
+
+var alertText="";
+	function chkVal()
+	{
+		alertText="";
+		resultRtn=true;
+
+		if(!$("#cmpyCd").val())		//선택한 회사코드가 없다면
+		{
+			alertText = alertText + '회사코드가 없습니다\n';
+			resultRtn = false;
+		}
+		if(!$("#loginId").val())		//아이디가 없다면
+		{
+			alertText = alertText + '아이디가 없습니다\n';
+			resultRtn = false;
+		}
+		if(!$("#phoneNo").val())		//아이디가 없다면
+		{
+			alertText = alertText + '핸드폰번호가 없습니다\n';
+			resultRtn = false;
+		}
+		
+		if(!resultRtn)
+		{
+			alertText = alertText + "이전 단계로 돌아가 다시 진행해보세요."
+			
+		}
+		
+		return resultRtn;
+		
+	}
+	function	pwChange()
+	{
+		if(chkVal())
+		{
+			
+			if($("#password").val() != $("#passwordConfirm").val())
+			{
+				alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.")
+				return
+
+			}
+			
+			
+			var formData = new FormData();
+			formData.append("cmpyCd", $("#cmpyCd").val());
+			formData.append("loginId", $("#loginId").val());
+			formData.append("phoneNo", $("#phoneNo").val());
+			formData.append("password", $("#password").val());
+		
+		 	$.ajax({
+		        url: "/changePwSend",
+		        processData : false,
+				contentType : false,
+		        data: formData,
+		        type:"POST",
+		        datatype:"json",
+		        success : function(res){
+		        	if(res)	//인증서 발급 로직을 수행했는데
+		        	{
+		        		if(res.rtnYn == 'Y')	//성공
+		        		{
+			        		alert(res.rtnMsg);
+			        		top.location.href = './login';
+		        		}
+		        		else	//실패
+		        		{
+		        			alert(res.rtnMsg);
+		        		}
+		        	}
+		        	else	//인증번호발급 로직 수행을 실패
+		        	{
+		        		alert("비밀번호 로직 수행 실패");
+		        	}
+		        },
+		       /*  error : function(res) {
+		        	console.log(res);
+					alert(res.responseText);
+				} */
+		 	
+		 	
+			});
+		}
+	}
+
+	
+	
+		$(document).ready(function(){
+			param= /*[[${repw}]]*/; 
+
+		    var myCombo = new dhtmlXCombo("company");
+	
+
+	    	comboList(myCombo,'A','COMM','CMPY_CD','','Y','req');	
+	    
+	    	myCombo.selectOption(myCombo.getIndexByValue(param.cmpyCd));
+	    	myCombo.disable();
+	    	
+	    	
+	    	
+	    	$("#cmpyCd").val(param.cmpyCd);
+	    	$("#loginId").val(param.loginId);
+	    	$("#phoneNo").val(param.phoneNo);
+		    	
+		    	
+	    	
+	    	//암호 보기/안보기
+	    	//암호 보기/안보기
+			$("input[id=pwCheck]:checkbox").click( function (){ 
+				if($("input[id=pwCheck]:checkbox").is(":checked"))
+					{
+					 $("#password").attr('type',"text");	
+					 $("#passwordConfirm").attr('type',"text");	
+					}
+				else
+					{
+					 $("#password").attr('type','password');
+					 $("#passwordConfirm").attr('type',"password");	
+					}
+			});
+		    	
+		    	
+		    	
+		   
+		});
+	</script>
+	<body>
+<br><br>
+	
+		<div class="form-signin" style="background-color:white;border: 2px solid black;">
+	        <form method="POST"  id="sms_form" name="sms_form">
+	    
+				<h3 class="form-signin-heading">암호변경</h3>
+
+				 <table width="100%" border=0>
+				 
+				 	 <tr>
+				
+					 	<td>
+					 	
+					 	</td>
+					 	<td>
+					 		<span>회사</span>
+					 	</td>
+					 </tr>
+					 <tr>
+				 		<td>
+				 			
+							<input type="hidden" id="cmpyCd" name="cmpyCd" disabled/>
+						</td>
+						<td>
+							<span class="form-control"><div id="company" name="company" ></div></span>
+						</td>
+						
+						
+					</tr>
+					<tr>
+						<td>
+							<br>
+						</td>
+						<td>
+						</td>
+					</tr>
+					<tr>
+				
+					 	<td>
+					 	
+					 	</td>
+					 	<td>
+					 		<span>아이디</span>
+					 	</td>
+					 </tr>
+				 	<tr>
+				 		<td >
+							
+						</td>
+						<td>
+							<input type="text" id="loginId" name="loginId"  placeholder="사용자 아이디" class="form-control" disabled/>
+						</td>
+						
+					
+					</tr>
+					<tr>
+						<td>
+							<br>
+						</td>
+						<td>
+						</td>
+					</tr>
+					<tr>
+				
+					 	<td>
+					 	
+					 	</td>
+					 	<td>
+					 		<span>전화번호</span>
+					 	</td>
+					 </tr>
+					<tr>
+						<td >
+							
+						</td>
+						<td>
+							<input type="text" placeholder="핸드폰 번호" id="phoneNo" name="phoneNo" class="form-control" disabled/>
+						</td>
+						
+				
+					</tr>
+					<tr>
+						<td>
+							<br>
+						</td>
+						<td>
+						</td>
+					</tr>
+					<tr>
+				
+					 	<td>
+					 	
+					 	</td>
+					 	<td>
+					 		
+					 		<span>변경 비밀번호</span><span  class="pull-right"><input type="checkbox"  id="pwCheck" >보기</input></span>
+					 	</td>
+					 </tr>
+					<tr>
+						<td >
+							
+						
+						</td>
+						<td>
+							<input type="password" placeholder="변경 비밀번호" id="password" name="password" class="form-control"/>
+						</td>
+						
+				
+					</tr>
+					<tr>
+						<td>
+							<br>
+						</td>
+						<td>
+						</td>
+					</tr>
+					<tr>
+				
+					 	<td>
+					 	
+					 	</td>
+					 	<td>
+					 		<span>변경 비밀번호 확인</span>
+					 	</td>
+					 </tr>
+					<tr>
+						<td >
+						
+						</td>
+						<td>
+							<input type="password" placeholder="변경 비밀번호 확인" id="passwordConfirm" name="passwordConfirm" class="form-control" />
+						</td>
+						
+				
+					</tr>
+				
+				</table>
+			</form>
+			<br>
+			<input id="pwChange" type="button" class="btn btn-lg btn-primary btn-block" name="pwChange" value="변경하기" onclick="pwChange();"></input>
+		</div>
+	</body>
+</html>

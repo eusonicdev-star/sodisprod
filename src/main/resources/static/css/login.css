@@ -1,0 +1,177 @@
+body {
+  height: 100%;
+  margin: 0;
+  background: url('/img/eugene-sonic.jpg') no-repeat center center fixed;
+  background-size: cover;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.right-section {
+  width: 450px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 3rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-form {
+  background: transparent !important;
+  border: none !important;
+  padding: 2rem;
+}
+
+.form-control {
+  height: 50px;
+  border-radius: 25px;
+  padding: 0.5rem 1.5rem;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.form-control::placeholder {
+  color: #999;
+}
+
+.login-form .btn-primary {
+  height: 50px;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #600c8c 0%, #8a2be2 100%);
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.login-form .btn-primary:hover {
+  background: linear-gradient(135deg, #8a2be2 0%, #600c8c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.logo {
+  text-align: center;
+}
+
+.logo img {
+  max-width: 200px;
+  margin-bottom: 2rem;
+  display: inline-block;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.error-message {
+  color: #ff1744;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.form-signin {
+  width: 450px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 3rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  border: none !important;
+}
+
+.form-signin-heading {
+  text-align: center;
+  color: #600c8c;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+.form-signin table {
+  margin-bottom: 1.5rem;
+}
+
+.form-signin span {
+  color: #333;
+  font-weight: 500;
+}
+
+.form-signin input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+.form-signin .btn-lg {
+  height: 50px;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #600c8c 0%, #8a2be2 100%);
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.form-signin .btn-lg:hover {
+  background: linear-gradient(135deg, #8a2be2 0%, #600c8c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.form-signin .btn-outline-primary {
+  color: #600c8c;
+  border: 2px solid #600c8c;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.form-signin .btn-outline-primary:hover {
+  color: white;
+  background: linear-gradient(135deg, #600c8c 0%, #8a2be2 100%);
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}

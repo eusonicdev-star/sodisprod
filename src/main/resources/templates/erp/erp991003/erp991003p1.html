@@ -1,0 +1,896 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>등록(erp991003p1)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/popup.css">
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+
+    <script th:inline="javascript">
+        var srchInput;
+        var myWins;
+        var myCalendar;
+        var id;
+        var sendObject;
+        var fnObj = {
+            winOpen: {
+
+                //지점찾기 공통 DC_CD
+                commSrch: function (title, cmpyCd, srchCtgr, srchInput) {		//공통코드 찾기 팝업
+                    windowId = "commSrch";
+                    windowText = title + " commSrch";
+                    windowUrl = "/commSrch"
+                    windowLeft = -14400;
+                    windowTop = -14400;
+                    windowWidth = 800;
+                    windowHeight = 400;
+                    windowsModal = true;
+                    windowOnClose = function (windowId) {
+                        //alert("windowId : " + windowId);
+                        return true;
+                    };
+                    windowSendObject = {
+                        cmpyCd: cmpyCd,
+                        srchCtgr: srchCtgr,
+                        srchInput: srchInput,
+                        windowId: windowId,
+                        srchCd: $("#srchCode").val(),
+                        srchNm: $("#srchName").val()
+                    };
+
+
+                    myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+
+                    myWins.window(windowId).attachEvent("onClose", function (win) {
+                        //alert("windowId : " + windowId);
+                        return true;
+                    });
+                },	//END of commSrch : function(){
+                //화주찾기 공통 AGNY_CD
+                commSrch2: function (title, cmpyCd, srchCtgr, srchInput) {		//공통코드 찾기 팝업
+                    windowId = "commSrch2";
+                    windowText = title + " commSrch";
+                    windowUrl = "/commSrch"
+                    windowLeft = -14400;
+                    windowTop = -14400;
+                    windowWidth = 800;
+                    windowHeight = 400;
+                    windowsModal = true;
+                    windowOnClose = function (windowId) {
+
+                        return true;
+                    };
+                    windowSendObject = {
+                        cmpyCd: cmpyCd,
+                        srchCtgr: srchCtgr,
+                        srchInput: srchInput,
+                        windowId: windowId,
+                        srchCd: $("#srchCode2").val(),
+                        srchNm: $("#srchName2").val()
+                    };
+
+
+                    myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+
+                    myWins.window(windowId).attachEvent("onClose", function (win) {
+                        //alert("windowId : " + windowId);
+                        return true;
+                    });
+                },	//END of commSrch : function(){
+                rtnObject: function (windowId, rtnObj, srchInput) {	//popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+                    if (windowId == "commSrch") {
+
+                        if (rtnObj == null) {
+
+                            myWins.window(windowId).setPosition(0, 0);
+                            return;
+                        }
+
+                        if (srchInput == "text") {
+                            $("#srchCode").val(rtnObj[0].commCd);	//지점찾기 DC_CD
+                            $("#srchName").val(rtnObj[0].commNm);
+                        }
+
+                    }
+                    if (windowId == "commSrch2") {
+                        if (rtnObj == null) {
+                            myWins.window(windowId).setPosition(0, 0);
+
+                            return;
+                        }
+
+                        if (srchInput == "text") {
+                            $("#srchCode2").val(rtnObj[0].commCd);	//화주찾기 AGNT_CD
+                            $("#srchName2").val(rtnObj[0].commNm);
+                        }
+
+                    }
+                },	//END of rtnObject : function(windowId,rtnObj){
+            },	//END of winOpen:{
+            comboOpen: {
+
+                comboCmpyCd: function () {
+                    myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+                    comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+                    myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${sendObject.cmpyCd}]]*/));
+                    myComboCmpyCd.setFontSize("12px", "12px");
+                    myComboCmpyCd.attachEvent("onChange", function (value, text) {
+
+                    });
+                    myComboCmpyCd.disable();
+                },
+
+
+                //사용자구분
+                comboUserGrd: function () {
+                    myComboUserGrd = new dhtmlXCombo("userGrd");
+                    comboList(myComboUserGrd, 'A', 'COMM', 'USER_GRD', '', 'Y', 'req');
+                    myComboUserGrd.selectOption(0);
+                    myComboUserGrd.setFontSize("12px", "12px");
+                    myComboUserGrd.attachEvent("onChange", function (value, text) {
+                        if (value == "9000") //화주사
+                        {
+                            $("#srchCode2Title").html("<b>소속화주<font color=red>*</font></b>")
+                            $("#srchName2Title").html("<b>소속화주명<font color=red>*</font></b>")
+                            $("#srchCodeTitle").html("소속물류센터")
+                            $("#srchNameTitle").html("소속물류센터명")
+                        } else if (value == "2000") //시공기사
+                        {
+                            $("#srchCodeTitle").html("<b>소속물류센터<font color=red>*</font></b>")
+                            $("#srchNameTitle").html("<b>소속물류센터명<font color=red>*</font></b>")
+                            $("#srchCode2Title").html("소속화주")
+                            $("#srchName2Title").html("소속화주명")
+                        } else {
+                            $("#srchCodeTitle").html("소속물류센터")
+                            $("#srchNameTitle").html("소속물류센터명")
+                            $("#srchCode2Title").html("소속화주")
+                            $("#srchName2Title").html("소속화주명")
+                        }
+
+
+                    });
+                },
+
+                //팀
+                comboTeam: function () {
+                    myComboTeam = new dhtmlXCombo("team");
+                    comboList(myComboTeam, 'A', 'COMM', 'TEAM', '', 'Y', 'req');
+                    myComboTeam.selectOption(0);
+                    myComboTeam.setFontSize("12px", "12px");
+                    myComboTeam.attachEvent("onChange", function (value, text) {
+
+                    });
+                },
+                //mobileGrntCd	//모바일권한
+                comboMobileGrntCd: function () {
+                    myComboMobileGrntCd = new dhtmlXCombo("mobileGrntCd");
+                    comboList(myComboMobileGrntCd, 'A', 'COMM', 'MOBILE_GRNT_CD', '', 'Y', 'req');
+                    myComboMobileGrntCd.selectOption(0);
+                    myComboMobileGrntCd.setFontSize("12px", "12px");
+                    myComboMobileGrntCd.attachEvent("onChange", function (value, text) {
+
+                    });
+                },
+
+                //사용자권한
+                comboUserGrntCd: function () {
+                    myComboUserGrntCd = new dhtmlXCombo("userGrntCd");
+                    comboList(myComboUserGrntCd, 'A', 'COMM', 'USER_GRNT_CD', '', 'Y', 'req');
+                    myComboUserGrntCd.selectOption(0);
+                    myComboUserGrntCd.setFontSize("12px", "12px");
+                    myComboUserGrntCd.attachEvent("onChange", function (value, text) {
+
+
+                        /* if(value == "6000") //RDC관리자
+                        {
+                            $("#srchCodeTitle").html("<b>소속물류센터<font color=red>*</font></b>")
+                            $("#srchNameTitle").html("<b>소속물류센터명<font color=red>*</font></b>")
+                        }
+                        else
+                        {
+                            $("#srchCodeTitle").html("소속물류센터")
+                            $("#srchNameTitle").html("소속물류센터명")
+                        } */
+                    });
+                },
+
+                comboUseYn: function () {
+                    myComboUseYn = new dhtmlXCombo("useYn");
+                    myComboUseYn.addOption([{value: "Y", text: "Y"}]);
+                    myComboUseYn.addOption([{value: "N", text: "N"}]);
+                    myComboUseYn.selectOption(0);
+                    myComboUseYn.setFontSize("12px", "12px");
+                    myComboUseYn.readonly(true);
+
+                },
+
+            },	//END of comboOpen : {
+            gridOpen: {
+                grid: function () {
+                    myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
+                    myGrid.setHeader("선택,코드,명칭,비고");
+                    myGrid.setColumnIds("chk,commCd,commNm,commDesc");
+                    myGrid.setInitWidths("60,120,120,180");
+                    myGrid.setColAlign("center,center,center,center");
+                    myGrid.setColTypes("ch,ro,ro,ro");
+                    myGrid.setColSorting(",,,");
+                    myGrid.attachHeader(",#text_filter,#text_filter,#text_filter");
+
+                    myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
+
+                    myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+                    myGrid.enablePreRendering(10);	//20220423 정연호 추가
+                    fnObj.gridOpen.setWidth();
+                    //그래야 진짜 화면에 보이는 높이가 만들어진다
+                    myGrid.addRow(1, "");	//로우 추가
+                    //myGrid.setRowData(1,{	"tblMenuMId":""});	//처음에 빈 로우 1개를 보여준다 (좌우 스크롤 보여줄려고)
+                    myGrid.deleteRow(1);
+                    window.onresize = function (event) {		//윈도우의 사이즈가 변경했을떄
+                        fnObj.gridOpen.setWidth();
+                    };
+                },		//ENd of grid : function(){}
+                setWidth: function () {
+                    searchDiv_height = $("#searchDiv").height();
+                    xhdr_height = $(".xhdr").height();
+                    myGrid.enableAutoWidth(true, window.innerWidth, 400);
+                    myGrid.enableAutoHeight(true, window.innerHeight - searchDiv_height - xhdr_height - 15);	//그리드 자동높이
+                },	//END of setWidth
+            },		//ENd of gridOpen : {
+            searchOpen: {
+                //비밀번호초기화
+                pwResetBtn: function () {	//비밀번호 초기화
+                    if ($("#userId").val() != id)	//수정으로 들어왔는데 비번이 바뀜
+                    {
+                        alert("사용자ID 입력란을 수정하였으므로 비밀번호를 초기화 할수 없습니다.");
+                        return false;
+                    }
+
+                    if (!confirm("비밀번호를 초기화 하시겠습니까?\n(비밀번호가 사용자ID와 같아집니다.)"))			//수정으로 들어왔는데 비번이 바뀜
+                    {
+
+                        return false;
+                    }
+
+
+                    //검색조건을 폼 형식으로 생성하기
+                    var pwReData = new FormData();
+                    pwReData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+                    pwReData.append("userId", $("#userId").val());
+
+                    $.ajax({
+                        url: "/erp991003p1PwReset",
+                        processData: false,
+                        contentType: false,
+                        data: pwReData,
+                        type: "POST",
+                        datatype: "json",
+                        async: false,
+                        success: function (res) {
+                            if (res) {
+
+                                if (res.rtnYn == "Y") {
+                                    alert("비밀번호 초기화 완료");
+                                } else {
+                                    alert("비밀번호 초기화 실패\n" + res.rtnMsg);
+                                }
+                            } else {
+                                alert("비밀번호 초기화 수행 결과 없음")
+                            }
+                        },
+                    });
+                },	//END of pwResetBtn : function() {
+
+
+                dupSearch: function () {	//아이디 중복확인하기
+                    if (!$("#userId").val()) {
+                        alert("사용자ID를 입력하세요");
+                        return false;
+                    }
+                    if (id && id == $("#userId").val().trim()) {
+                        $("#userIdChk").val("Y");
+                        return;
+                    }
+
+                    //검색조건을 폼 형식으로 생성하기
+                    var srchData = new FormData();
+                    srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+                    srchData.append("userId", $("#userId").val());
+
+                    $.ajax({
+                        url: "/erp991003p1DoubleChk",
+                        processData: false,
+                        contentType: false,
+                        data: srchData,
+                        type: "POST",
+                        datatype: "json",
+                        async: false,
+                        success: function (res) {
+                            if (res) {
+
+                                alert(res.rtnMsg);
+
+                                if (res.rtnYn == "Y") {
+                                    $("#userIdChk").val("Y");
+                                } else {
+                                    $("#userIdChk").val("N");
+                                }
+                            } else {
+                                alert("아이디 중복 조회 수행 결과 없음")
+                            }
+                        },
+                    });
+                },	//END of dupSearch : function() {
+                userInfo: function (myGrid) {		//tblUserMId 로 사용자 정보불러오기 - 수정모드일때 saveGubn 이 UPDT 일때만 사용
+                    //검색조건을 폼 형식으로 생성하기
+                    var userInfo = new FormData();
+                    userInfo.append("tblUserMId", sendObject.tblUserMId);
+                    $.ajax({
+                        url: "/erp991003p1TblUserMId",
+                        processData: false,
+                        contentType: false,
+                        data: userInfo,
+                        type: "POST",
+                        datatype: "json",
+                        async: false,
+                        success: function (res) {
+                            if (res) {
+
+                                $("#userId").val(res.userId);
+
+                                id = res.userId;
+                                $("#userNm").val(res.userNm);
+                                myComboUserGrd.selectOption(myComboUserGrd.getIndexByValue(res.userGrd));
+                                myComboTeam.selectOption(myComboTeam.getIndexByValue(res.team));
+                                $("#deptNm").val(res.deptNm);
+                                myComboUserGrntCd.selectOption(myComboUserGrntCd.getIndexByValue(res.userGrntCd));		//ERP권한
+                                myComboMobileGrntCd.selectOption(myComboMobileGrntCd.getIndexByValue(res.mobileGrntCd));		//모바일권한
+                                $("#telNo").val(res.telNo.replace(/-/g, ""));
+                                $("#hp").val(res.hp.replace(/-/g, ""));
+                                $("#email").val(res.email);
+                                $("#srchCode").val(res.dcCd);//지점 DC_CD
+                                $("#srchName").val(res.dcNm);
+                                $("#srchCode2").val(res.agntCd);	//화주 AGNT_CD
+                                $("#srchName2").val(res.agntNm);
+                                $("#inptDt").val(res.inptDt.replace(/-/g, ""));
+                                $("#outDt").val(res.outDt.replace(/-/g, ""));
+                            } else {
+                                alert("사용자 정보 조회 수행 결과 없음")
+                            }
+                        },
+                    });
+
+                },		//END of userInfo
+
+                comdSave: function () {
+
+                    if (!fnObj.searchOpen.searchChkVal.chkVal("commSave")) {
+                        alert(chkValMsg);
+                        return false;
+                    }
+
+
+                    if (!confirm((sendObject.saveGubn == "INS" ? "등록" : "수정") + "하시겠습니까?")) {
+                        alert("취소하였습니다.");
+                        return;
+                    }
+
+
+                    //저장할 값 폼 형식으로 생성하기
+                    var saveData = new FormData();
+
+                    saveData.append("saveGubn",	/*[[${sendObject.saveGubn}]]*/);
+                    saveData.append("tblUserMId",	/*[[${sendObject.tblUserMId}]]*/);
+                    saveData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+                    saveData.append("userId", $("#userId").val());
+                    saveData.append("userPw", $("#userPw").val());
+                    saveData.append("userNm", $("#userNm").val());
+                    saveData.append("deptNm", $("#deptNm").val());
+                    saveData.append("emplNo", "");
+                    saveData.append("email", $("#email").val());
+                    saveData.append("telNo", $("#telNo").val().replace(/-/g, ""));
+                    saveData.append("hp", $("#hp").val().replace(/-/g, ""));
+                    saveData.append("userGrd", myComboUserGrd.getSelectedValue());
+                    saveData.append("team", myComboTeam.getSelectedValue());
+                    saveData.append("agntCd", $("#srchCode2").val());	//화주
+                    saveData.append("dcCd", $("#srchCode").val());	//지점
+                    saveData.append("inptDt", $("#inptDt").val().replace(/-/g, ""));
+
+                    saveData.append("outDt", !$("#outDt").val() ? "29991231" : $("#outDt").val().replace(/-/g, ""));
+                    saveData.append("useYn", myComboUseYn.getSelectedValue());
+                    saveData.append("userKey", "");
+                    saveData.append("memo", "");
+                    saveData.append("userGrntCd", myComboUserGrntCd.getSelectedValue());
+                    saveData.append("mobileGrntCd", myComboMobileGrntCd.getSelectedValue());
+                    saveData.append("saveUser",	/*[[${session.tblUserMId}]]*/);
+
+                    for (var pair of saveData.entries()) {
+                        console.log(pair[0] + ' : ' + pair[1]);
+                    }
+
+                    $.ajax({
+                        url: "/erp991003p1ComdSave",
+                        processData: false,
+                        contentType: false,
+                        data: saveData,
+                        type: "POST",
+                        datatype: "json",
+                        async: false,
+                        success: function (res) {
+                            if (res) {
+                                if (res.rtnYn == "Y") {
+                                    alert("성공 : " + res.rtnMsg);
+                                    parent.fnObj.searchOpen.search();
+                                    parent.myWins.window(sendObject.windowId).close();
+                                } else {
+                                    alert("실패 : " + res.rtnMsg);
+                                }
+                            } else {
+                                alert("등록/수정 수행 결과 없음")
+                            }
+                        },
+                    });
+
+
+                },	//END of comdSave : function() {
+                delSrchCode: function (srchGubn) {
+
+                    if (srchGubn == "srch") {
+                        $("#srchCode").val("");
+                        $("#srchName").val("");
+                    }
+                    if (srchGubn == "srch2") {
+                        $("#srchCode2").val("");
+                        $("#srchName2").val("");
+                    }
+
+                },	//END of delSrchCode : function(){
+
+                searchChkVal: {
+                    chkVal: function (chkGubn) {
+                        chkValMsg = "";	//메세지 초기화
+                        var rtnVal = true;
+                        if (chkGubn == "commSave") {
+
+                            if ($("#userIdChk").val() != "Y") {
+                                chkValMsg = chkValMsg + "사용자ID 중복확인을 하세요\n"
+                                return false;
+                            }
+
+                            if (sendObject.saveGubn == "INS") {
+                                if (!$("#userPw").val()) {
+                                    chkValMsg = chkValMsg + "암호를 입력 하세요\n"
+                                    return false;
+                                }
+                                if (!$("#userPwCf").val()) {
+                                    chkValMsg = chkValMsg + "암호확인을 입력 하세요\n"
+                                    return false;
+                                }
+                                if ($("#userPw").val() != $("#userPwCf").val()) {
+                                    chkValMsg = chkValMsg + "[암호] 와 [암호확인] 이 다릅니다.\n"
+                                    return false;
+                                }
+
+                            }
+
+
+                            if (!$("#userNm").val()) {
+                                chkValMsg = chkValMsg + "사용자명(이름)을 입력하세요\n";
+                                rtnVal = false;
+                            }
+
+                            //=사용자구분 필수
+
+
+                            if (!myComboUserGrd.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "사용자구분을 선택하세요\n";
+                                rtnVal = false;
+                            }
+
+                            if (myComboUserGrd.getSelectedValue() == "9000") //화주사 를 선택
+                            {
+                                //사용자 구분 9000 화주사 를 선택했다면 소속화주코 와 소속화주명 은 필수임
+                                if (!$("#srchCode2").val()) {
+                                    chkValMsg = chkValMsg + "사용자구분이 화주사일 경우 소속화주사코드는 필수입니다.\n";
+                                    rtnVal = false;
+                                }
+                                if (!$("#srchName2").val()) {
+                                    chkValMsg = chkValMsg + "사용자구분이 화주사일 경우 소속화주사명칭은 필수입니다.\n";
+                                    rtnVal = false;
+                                }
+                            }
+
+                            if (myComboUserGrd.getSelectedValue() == "2000") //시공기사 를 선택
+                            {
+                                //사용자 구분 2000 화주사 를 선택했다면 소속물류센터코드 와 소속지점명 은 필수임
+                                if (!$("#srchCode").val()) {
+                                    chkValMsg = chkValMsg + "사용자구분이 시공기사일 경우 소속물류센터코드는 필수입니다.\n";
+                                    rtnVal = false;
+                                }
+                                if (!$("#srchName").val()) {
+                                    chkValMsg = chkValMsg + "사용자구분이 시공기사일 경우 소속물류센터명칭은 필수입니다.\n";
+                                    rtnVal = false;
+                                }
+                            }
+
+
+                            /* if(!$("#deptNm").val()){
+                                chkValMsg = chkValMsg + "사용자부서를 입력하세요\n";
+                                rtnVal = false;
+                            } */
+                            if (!myComboUserGrntCd.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "ERP권한을 선택하세요\n";
+                                rtnVal = false;
+                            }
+
+
+                            //20211128 정연호 추가
+                            if (myComboUserGrntCd.getSelectedValue() == "6000") //RDC관리자
+                            {
+                                //ERP 권한이  6000 RDC관리자 를 선택했다면 소속물류센터코드 와 소속지점명 은 필수임
+                                if (!$("#srchCode").val()) {
+                                    chkValMsg = chkValMsg + "ERP권한이 RDC관리자일 경우 소속물류센터코드는 필수입니다.\n";
+                                    rtnVal = false;
+                                }
+                                if (!$("#srchName").val()) {
+                                    chkValMsg = chkValMsg + "ERP권한이 RDC관리자일 경우 소속물류센터명칭은 필수입니다.\n";
+                                    rtnVal = false;
+                                }
+                            }
+
+
+                            if (!$("#hp").val()) {
+                                chkValMsg = chkValMsg + "휴대전화를 입력하세요\n";
+                                rtnVal = false;
+                            }
+
+
+                            /*
+                            if(!$("#srchCode").val()){
+                                chkValMsg = chkValMsg + "소속지점이 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if(!$("#srchName").val()){
+                                chkValMsg = chkValMsg + "소속지점명이 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if(!$("#srchCode2").val()){
+                                chkValMsg = chkValMsg + "소속화주가 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if(!$("#srchName2").val()){
+                                chkValMsg = chkValMsg + "소속화주명이 없습니다\n";
+                                rtnVal = false;
+                            }
+                            */
+
+                            if (!$("#inptDt").val()) {
+                                chkValMsg = chkValMsg + "입사일이 없습니다\n";
+                                rtnVal = false;
+                            }
+                        }
+                        return rtnVal;
+                    },	//END of chkVal : function(){
+                },	//END of searchChkVal
+
+            },		//ENd of searchOpen : {
+            keyOpen: {
+                enterKey: function (enterType) {
+                    if (window.event.keyCode == 13) {
+
+                        if (enterType == 'srchName2') {
+                            $("#srchName2").blur();
+                            $("#srchCode2").blur();
+
+
+                            $("#srchCode2").val("");
+
+                            fnObj.winOpen.commSrch2('화주', 'A', 'AGENCY', 'text');
+                        }
+
+                        if (enterType == 'srchName') {
+                            $("#srchName").blur();
+                            $("#srchCode").blur();
+
+
+                            $("#srchCode").val("");
+                            fnObj.winOpen.commSrch('지점찾기(물류센터찾기)', 'A', 'DC', 'text')
+
+                        }
+                    }
+                },
+                onKeyPressed: function (code, ctrl, shift) {
+                    if (code == 67 && ctrl) {
+                        myGrid.setCSVDelimiter("\t");
+                        myGrid.copyBlockToClipboard()
+                    }
+                    if (code == 86 && ctrl) {
+                        myGrid.pasteBlockFromClipboard()
+                    }
+                    return true;
+                },
+            }
+
+
+        };	//END of fnObj
+
+        $(document).ready(function () {
+
+            //windowOpen 정의
+            myWins = new dhtmlXWindows();
+
+            fnObj.comboOpen.comboCmpyCd();
+            fnObj.comboOpen.comboUserGrntCd();
+            fnObj.comboOpen.comboMobileGrntCd();
+
+            fnObj.comboOpen.comboUserGrd();
+            fnObj.comboOpen.comboTeam();
+
+            fnObj.comboOpen.comboUseYn();
+
+
+            sendObject = /*[[${sendObject}]]*/;
+
+
+            //사용자 정보 조회 - 수정일 경우
+
+            if (sendObject.saveGubn == "UPDT") {
+                $("#commSave").val("수정");
+                $("#userIdChk").val("Y");	//ID사용가능여부
+                //$("#idDup").hide();
+                $("#idDup").show();		//아이디 중복체크
+                $("#passArea").hide();	//암호,암호확인 부분
+                $("#pwResetSpan").show();	//암호초기화
+
+
+                fnObj.searchOpen.userInfo();
+            }
+
+
+            myCalendar = new dhtmlXCalendarObject([{input: "inptDt", button: "inptDtIcon"}, {
+                input: "outDt",
+                button: "outDtIcon"
+            }]);
+            var now = new Date()
+            var year = now.getFullYear() + "";
+            var month = (now.getMonth() + 1) + "";
+            var date = now.getDate() + "";
+            if (month.length == 1) {
+                month = "0" + month;
+            }
+            if (date.length == 1) {
+                date = "0" + date;
+            }
+
+            var today = year + "" + month + "" + date;
+
+            //$("#inptDt").val(today);
+
+            myCalendar.loadUserLanguage("ko");
+            myCalendar.setDateFormat("%Y%m%d");
+
+            $("#eye").on('click', function () {
+                $("#userPw").toggleClass('active');
+                if ($("#userPw").hasClass('active')) {
+                    $("#eye").attr('class', "fa fa-eye-slash fa-lg")
+                    $("#userPw").attr('type', "text");
+                    $("#userPwCf").attr('type', "text");
+                } else {
+                    $("#eye").attr('class', "fa fa-eye fa-lg")
+                    $("#userPw").attr('type', 'password');
+                    $("#userPwCf").attr('type', "password");
+                }
+            });
+
+
+            $("#userId").change(function () {
+                $("#userIdChk").val("");
+                if (sendObject.saveGubn == "UPDT") {
+
+                    if (id == $("#userId").val().trim()) {
+
+
+                        $("#userIdChk").val("Y");
+                        $("#pwResetSpan").show();
+                        return;
+                    }
+
+                    if (!$("#idDup").is(':visible')) {
+                        if (!confirm("ID를 변경하시겠습니까?\n중복체크 : 활성화\n비밀번호 초기화 : 비활성화")) {
+                            $("#idDup").hide();
+
+                            $("#userId").val(id);
+
+                            return;
+
+                        } else {
+                            $("#idDup").show();
+                            $("#pwResetSpan").hide();
+                        }
+                    }
+
+                } else {
+                    $("#idDup").show();
+                    $("#pwResetSpan").hide();
+                }
+
+
+                $("#idDup").show();
+                $("#pwResetSpan").hide();
+
+            });
+
+
+        });
+    </script>
+</head>
+<body>
+<div id="mainDiv">
+    <div class="popup-header-container">
+        <div class="popup-header-text">
+            사용자 등록
+        </div>
+
+        <div class="button-container">
+            <input id="commSave" class="action-button success" name="commSave" type="button"
+                   onclick="fnObj.searchOpen.comdSave()"
+                   value="등록">
+
+            <span id="pwResetSpan">
+                <input id="pwResetBtn" class="action-button warning" name="pwResetBtn" type="button"
+                       onclick="fnObj.searchOpen.pwResetBtn()"
+                       value="비밀번호 초기화">
+            </span>
+        </div>
+    </div>
+
+    <div class="search-container" autocomplete="new-password">
+        <div class="search-item" style="display: none;">
+            <span class="search-label">회사</span>
+            <div id="cmpyCd"></div>
+        </div>
+
+        <div class="search-item">
+			<span class="search-label">
+                사용자 ID<span class="stress">*</span>
+			</span>
+            <input type="text" id="userId" class="search-input" name="userId"
+                   oninput="this.value = this.value.replace(/[^0-9^A-Z^a-z]/g, '').replace(/(\..*)\./g, '$1');"
+                   autocomplete="off"/>
+            <button id="idDup" class="action-button" onclick="fnObj.searchOpen.dupSearch()">ID 중복체크</button>
+
+            <span class="search-label">
+                가능 여부<span class="stress">*</span>
+            </span>
+            <input type="text" id="userIdChk" class="search-input" name="userIdChk" readOnly/>
+        </div>
+
+        <div id="passArea" class="search-item">
+				<span class="search-label">
+					암호<span class="stress">*</span>
+				</span>
+
+            <input type="password" id="userPw" class="search-input" name="userPw"
+                   autocomplete="new-password">
+
+            <span class="search-label">
+					암호확인<span class="stress">*</span>
+				</span>
+
+            <input type="password" id="userPwCf" class="search-input" name="userPwCf">
+            <i id="eye" class="fa fa-eye fa-lg" aria-hidden="true"></i>
+        </div>
+    </div>
+
+    <div class="popup-header-container">
+        <div class="popup-header-text sub">
+            사용자 정보
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-item">
+            <span class="search-label">사용자명<span class="stress">*</span></span>
+            <input type="text" id="userNm" class="search-input"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">사용자구분</span>
+            <div id="userGrd"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">팀</span>
+            <div id="team"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">사용자부서</span>
+            <input type="text" id="deptNm" class="search-input"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">ERP 권한<span class="stress">*</span></span>
+            <div id="userGrntCd"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">모바일 권한</span>
+            <div id="mobileGrntCd"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">일반전화</span>
+            <input type="text" id="telNo" class="search-input"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">휴대전화</span>
+            <input type="text" id="hp" class="search-input"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">이메일</span>
+            <input type="text" id="email" class="search-input"
+                   oninput="this.value = this.value.replace(/[^0-9^a-z^A-Z@.-]/g, '').replace(/(\..*)\./g, '$1');"
+                   autocomplete="new-password"/>
+        </div>
+
+        <div class="search-item">
+            <span id="srchNameTitle" class="search-label">소속물류센터명</span>
+            <input type="text" id="srchName" class="search-input"
+                   onkeyup="fnObj.keyOpen.enterKey('srchName');">
+            <i class="fa fa-search fa-lg search-icon" aria-hidden="true"
+               onclick="fnObj.winOpen.commSrch('지점찾기(물류센터찾기)','A','DC','text')"></i>
+
+            <input type="text" id="srchCode" class="search-input" readonly>
+            <i id="delIcon" class="fa fa-minus-circle search-icon" aria-hidden="true"
+               onclick="fnObj.searchOpen.delSrchCode('srch')"></i>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">입사일자<span class="stress">*</span></span>
+            <input type="text" id="inptDt" class="search-input"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');">
+            <i id="inptDtIcon" class="fa fa-calendar fa-lg search-icon" aria-hidden="true"></i>
+        </div>
+
+        <div class="search-item">
+            <span id="srchName2Title" class="search-label">소속화주명</span>
+            <input type="text" id="srchName2" class="search-input"
+                   onkeyup="fnObj.keyOpen.enterKey('srchName2');">
+            <i class="fa fa-search fa-lg search-icon" aria-hidden="true"
+               onclick="fnObj.winOpen.commSrch2('소속화주','A','AGENCY','text')"></i>
+            <input type="text" id="srchCode2" class="search-input" readonly>
+            <i id="delIcon" class="fa fa-minus-circle search-icon" aria-hidden="true"
+               onclick="fnObj.searchOpen.delSrchCode('srch2')"></i>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">퇴사일자</span>
+            <input type="text" id="outDt" class="search-input"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');">
+            <i id="outDtIcon" class="fa fa-calendar fa-lg search-icon" aria-hidden="true"></i>
+        </div>
+        <div class="search-item">
+            <span class="search-label">사용여부</span>
+            <div id="useYn"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+       style="height:100%;"
+>
+<head>
+ <title>얼라이언스</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet"  type="text/css" href="/plugin/suite_gpl/codebase/suite.css">
+<link rel="stylesheet"	type="text/css" th:href="@{/css/common.css}" />
+<link rel="stylesheet"  type="text/css" href="/css/sidemenu.css">
+<link rel="stylesheet"	href="http://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"  />
+<link rel="stylesheet"  type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+<link rel="stylesheet"  type="text/css" href="/css/tab.css">
+<!-- <link rel="stylesheet" href="/css/magnific-popup.css"> -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"  crossorigin="anonymous"></script>
+<script type="text/javascript" src="/plugin/suite_gpl/codebase/suite.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/js/tab.js"></script>
+<!-- <script type="text/javascript" src="/js/magnific-popup.js"></script>
+ -->
+
+
+
+</head>
+<body  style="height:100%;">
+<!-- 
+Welcon Page!!!<br>
+<a href="/login">login page</a>
+
+<br>
+<br>
+-->
+<div class="container-fluid">
+<!-- left side menu -->
+    <div class="row">
+        <!-- <div class="overflow-auto vh-100 col-md-2 col-1 pl-0 pr-0 collapse show" id="sidebar"> -->
+        <div class="overflow-auto vh-100 col-1 pl-0 pr-0 collapse show" id="sidebar" style="min-width:200px;width:200px;">
+            <div class="list-group border-0 card text-center text-md-left">
+                <a href="#menu1" class="list-group-item d-inline-block collapsed" data-toggle="collapse" data-parent="#sidebar" aria-expanded="false"><i class="fa fa-dashboard"></i> <span class="hidden-sm-down">Item 1</span></a>
+                <div class="collapse" id="menu1">
+                    <a href="#menu1sub1" class="list-group-item" data-toggle="collapse" aria-expanded="false">Subitem 1 </a>
+                    <div class="collapse" id="menu1sub1">
+                        <a href="#" class="list-group-item" data-parent="#menu1sub1">Subitem 1 a</a>
+                        <a href="#" class="list-group-item" data-parent="#menu1sub1">Subitem 2 b</a>
+                        <a href="#menu1sub1sub1" class="list-group-item" data-toggle="collapse" aria-expanded="false">Subitem 3 c </a>
+                        <div class="collapse" id="menu1sub1sub1">
+                            <a href="#" class="list-group-item" data-parent="#menu1sub1sub1">Subitem 3 c.1</a>
+                            <a href="#" class="list-group-item" data-parent="#menu1sub1sub1">Subitem 3 c.2</a>
+                        </div>
+                        <a href="#" class="list-group-item" data-parent="#menu1sub1">Subitem 4 d</a>
+                        <a href="#menu1sub1sub2" class="list-group-item" data-toggle="collapse" aria-expanded="false">Subitem 5 e </a>
+                        <div class="collapse" id="menu1sub1sub2">
+                            <a href="#" class="list-group-item" data-parent="#menu1sub1sub2">Subitem 5 e.1</a>
+                            <a href="#" class="list-group-item" data-parent="#menu1sub1sub2">Subitem 5 e.2</a>
+                        </div>
+                    </div>
+                    <a href="#" class="list-group-item" data-parent="#menu1">Subitem 2</a>
+                    <a href="#" class="list-group-item" data-parent="#menu1">Subitem 3</a>
+                </div>
+                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar"><i class="fa fa-film"></i> <span class="hidden-sm-down" onclick="btnAdd('Item_2','아이템2','/sel0002');"  value="Item_2">아이템2</span></a>
+                <a href="#menu3" class="list-group-item d-inline-block collapsed" data-toggle="collapse" data-parent="#sidebar" aria-expanded="false"><i class="fa fa-book"></i> <span class="hidden-sm-down">Item 3 </span></a>
+                <div class="collapse" id="menu3">
+                    <a href="#" class="list-group-item" data-parent="#menu3">3.1</a>
+                    <a href="#menu3sub2" class="list-group-item" data-toggle="collapse" aria-expanded="false">3.2 </a>
+                    <div class="collapse" id="menu3sub2">
+               
+                        <a href="#" class="list-group-item" data-parent="#menu3sub2" onclick="btnAdd('3_2_a','아이템3.2 a','/3_2_a');" value="3.2_a">아이템3.2 a</a>
+                        <a href="#" class="list-group-item" data-parent="#menu3sub2" onclick="btnAdd('3_2_b','아이템3.2 b','/3_2_b');" value="3.2_b">아이템3.2 b</a>
+                        <a href="#" class="list-group-item" data-parent="#menu3sub2" onclick="btnAdd('3_2_c','아이템3.2 c','/3_2_c');" value="3.2_c">아이템3.2 c</a>
+             
+
+               
+                    </div>
+                    <a href="#" class="list-group-item" data-parent="#menu3">3.3</a>
+                </div>
+                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar"><i class="fa fa-heart"></i> <span class="hidden-sm-down" onclick="btnAdd('Item_4','아이템4','/Item_4');" value="Item_4">아이템4</span></a>
+                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar"><i class="fa fa-list"></i> <span class="hidden-sm-down">Item 5</span></a>
+                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar"><i class="fa fa-clock-o"></i> <span class="hidden-sm-down">Link</span></a>
+                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar"><i class="fa fa-th"></i> <span class="hidden-sm-down">Link</span></a>
+                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar"><i class="fa fa-gear"></i> <span class="hidden-sm-down">Link</span></a>
+                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar"><i class="fa fa-calendar"></i> <span class="hidden-sm-down">Link</span></a>
+                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar"><i class="fa fa-envelope"></i> <span class="hidden-sm-down">Link</span></a>
+                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar"><i class="fa fa-bar-chart-o"></i> <span class="hidden-sm-down">Link</span></a>
+                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar"><i class="fa fa-star"></i> <span class="hidden-sm-down">Link</span></a>
+            </div>
+        </div>
+        <main class="col pl-2 pt-2"  style="min-width:200px;width:100%;min-height:200px;height:100%;">
+            <a href="#sidebar" data-toggle="collapse"><i class="fa fa-navicon fa-1x" style="color:black;"></i></a>
+          	</span><span sec:authentication = "name"></span>
+         <sec:authorize access="hasRole('ADMIN')">
+    Manage Users
+</sec:authorize>
+            <sec:authorize access = "isAuthenticated()"><a href="#"><i class="fa fa-sign-out fa-1x pull-right" aria-hidden="true"  onclick="btnLogOut();"  style="color:black;font-weight:500;"><span>LOGOUT</span></i></a></sec:authorize>
+
+        <a href="#"><i class="fa fa-history fa-1x pull-right" style="color:black;font-weight:500;">
+						<font id='m' style="font-size:1.1em;font-weight:lighter;" onclick="sessionTimePlus();">00:00</font>
+	
+			</i></a>
+					
+            <ul id="tab-list" class="nav nav-tabs" role="tablist" border=4>
+                <li class="active"><a href="#tab1" role="tab" data-toggle="tab"><span  class="tabBtnClick" style="color:black;" id="mainPage">메인페이지</span></a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div id="tab-content" class="tab-content">
+                <div class="sys_tab_content tab-pane fade in active" id="tab1">
+                	Tab 1 content
+                	<div class="page-header">
+                		<h1>Bootstrap 4 Sidebar Menu</h1>
+            		</div>
+            		<p class="lead">A responsive, multi-level vertical accordion.</p>
+                </div>
+            </div>
+            
+           
+        </main>
+    </div>
+</div>
+</body>
+</html>

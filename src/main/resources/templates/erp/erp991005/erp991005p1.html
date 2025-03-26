@@ -1,0 +1,365 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <title>등록/수정(erp991005p1)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/popup.css">
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+
+    <script th:inline="javascript">
+        var srchInput;
+        var myWins2;
+        var myCalendarInptdt;
+        var myCalendarOutdt;
+        var sendObject;
+        fnObj = {
+            winOpen: {
+                commSrch: function (title, cmpyCd, srchCtgr, srchInput) {		//공통코드 찾기 팝업
+                    windowId = "commSrch";
+                    windowText = title;
+                    windowUrl = "/commSrch"
+                    windowLeft = 0;
+                    windowTop = 0;
+                    windowWidth = 700;
+                    windowHeight = 400;
+                    windowsModal = true;
+                    windowOnClose = function (windowId) {
+                        //alert("windowId : " + windowId);
+                        return true;
+                    };
+                    windowSendObject = {
+                        cmpyCd: cmpyCd,
+                        srchCtgr: srchCtgr,
+                        srchInput: srchInput,
+                        windowId: windowId
+                    };
+
+
+                    myWindowsOpen2(myWins2, windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+
+                    myWins2.window(windowId).attachEvent("onClose", function (win) {
+                        //alert("windowId : " + windowId);
+                        return true;
+                    });
+                },	//END of commSrch : function(){
+                rtnObject: function (windowId, rtnObj, srchInput) {	//popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+                    if (srchInput == "text") {
+                        $("#srchCode").val(rtnObj[0].commCd);
+                        $("#srchName").val(rtnObj[0].commNm);
+                    } else if (srchInput == "textArea") {
+                        var areaContent = "";
+                        for (var i = 0; i < rtnObj.length; i++) {
+                            areaContent = areaContent + rtnObj[i].commCd;
+
+                            if (i < rtnObj.length - 1) {
+                                areaContent = areaContent + "\n";
+                            }
+                        }
+                        $("#srchArea").val(areaContent);
+                    }
+                },	//END of rtnObject : function(windowId,rtnObj){
+            },	//END of winOpen:{
+            comboOpen: {
+
+                comboCmpyCd: function () {
+                    myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+                    comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+                    myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${sendObject.cmpyCd}]]*/));
+                    myComboCmpyCd.setFontSize("12px", "12px");
+                    myComboCmpyCd.attachEvent("onChange", function (value, text) {
+                        //myGrid.clearAll(false);
+                    });
+                },
+                comboUseYn: function () {
+                    myComboUseYn = new dhtmlXCombo("useYn");
+                    myComboUseYn.addOption([{value: "Y", text: "사용"}]);
+                    myComboUseYn.addOption([{value: "N", text: "미사용"}]);
+
+                    myComboUseYn.selectOption(0);
+                    myComboUseYn.setFontSize("12px", "12px");
+
+                },
+            },	//END of comboOpen : {
+            gridOpen: {},		//ENd of gridOpen : {
+            searchOpen: {
+                searchBtn: {	//검색영역의 버튼
+                    comdSearch: function () {
+                        //검색조건을 폼 형식으로 생성하기
+                        var srchData = new FormData();
+                        srchData.append("tblCommMId",	/*[[${sendObject.tblCommMId}]]*/);
+
+
+                        $.ajax({
+                            url: "/erp991005p1ComdSearch",
+                            processData: false,
+                            contentType: false,
+                            data: srchData,
+                            type: "POST",
+                            datatype: "json",
+                            async: false,
+                            success: function (res) {
+                                if (res) {
+                                    //console.log(res)
+                                    $("#commCd").val(res.commCd);
+                                    $("#commCd").attr("disabled", "disabled");
+                                    $("#commNm").val(res.commNm);
+                                    $("#commNm").attr("disabled", "disabled");
+                                    $("#commDesc").val(res.commDesc);
+                                    $("#commDesc").attr("disabled", "disabled");
+                                    $("#comdCd").val(res.comdCd);
+                                    $("#comdNm").val(res.comdNm);
+                                    $("#comdDesc").val(res.comdDesc);
+                                    $("#seq").val(res.seq);
+                                    myComboUseYn.selectOption(myComboUseYn.getIndexByValue(res.useYn));
+
+                                } else {
+                                    alert("상세 공통코드 조회 수행 결과 없음")
+                                }
+                            },
+                        });
+                    },	//END of search : function() {
+                    comdSave: function () {
+
+
+                        if (!fnObj.searchOpen.searchChkVal.chkVal()) {
+                            alert(chkValMsg);
+                            return false;
+                        }
+                        //저장할 값 폼 형식으로 생성하기
+                        var saveData = new FormData();
+
+                        saveData.append("saveGubn",	/*[[${sendObject.saveGubn}]]*/);
+                        saveData.append("tblCommMId",	/*[[${sendObject.tblCommMId}]]*/);
+                        saveData.append("cmpyCd", $("#cmpyCd").val());
+                        saveData.append("commCd", $("#commCd").val());
+                        saveData.append("commNm", $("#commNm").val());
+                        saveData.append("commDesc", $("#commDesc").val());
+                        saveData.append("comdCd", $("#comdCd").val());
+                        saveData.append("comdNm", $("#comdNm").val());
+                        saveData.append("comdDesc", $("#comdDesc").val());
+                        saveData.append("seq", $("#seq").val());
+                        saveData.append("useYn", myComboUseYn.getSelectedValue());
+                        saveData.append("saveUser",	/*[[${session.tblUserMId}]]*/);
+
+
+                        $.ajax({
+                            url: "/erp991005p1ComdSave",
+                            processData: false,
+                            contentType: false,
+                            data: saveData,
+                            type: "POST",
+                            datatype: "json",
+                            async: false,
+                            success: function (res) {
+                                if (res) {
+                                    if (res.rtnYn == "Y") {
+                                        alert("성공 : " + res.rtnMsg);
+                                        if ($("#newComm").is(":checked")) {
+                                            rtnObj = {"newComm": "Y"};
+                                            parent.fnObj.winOpen.rtnObject(/*[[${sendObject.windowId}]]*/, rtnObj, '');
+                                            console.log(rtnObj.newComm)
+                                        }
+                                        parent.myWins.window(/*[[${sendObject.windowId}]]*/).close();
+                                    } else {
+                                        alert("실패 : " + res.rtnMsg);
+                                    }
+                                } else {
+                                    alert("상세 공통코드 조회 수행 결과 없음")
+                                }
+                            },
+                        });
+                    },	//END of comdSave : function() {
+
+                },		//END of searchBtn : {
+                searchChkVal: {
+                    chkVal: function () {
+                        chkValMsg = "";	//메세지 초기화
+                        var rtnVal = true;
+
+                        if (!$("#cmpyCd").val()) {
+                            chkValMsg = chkValMsg + "회사코드가 없습니다\n";
+                            rtnVal = false;
+                        }
+                        if (!$("#commCd").val()) {
+                            chkValMsg = chkValMsg + "마스터공통코드가 없습니다\n";
+                            rtnVal = false;
+                        }
+                        if (!$("#commNm").val()) {
+                            chkValMsg = chkValMsg + "마스터공통명칭이 없습니다\n";
+                            rtnVal = false;
+                        }
+                        if (!$("#comdCd").val()) {
+                            chkValMsg = chkValMsg + "상세공통코드가 없습니다\n";
+                            rtnVal = false;
+                        }
+                        if (!$("#comdNm").val()) {
+                            chkValMsg = chkValMsg + "상세공통명칭이 없습니다\n";
+                            rtnVal = false;
+                        }
+                        if (!$("#seq").val()) {
+                            chkValMsg = chkValMsg + "순번이 없습니다\n";
+                            rtnVal = false;
+                        }
+
+                        return rtnVal;
+                    },	//END of chkVal : function(){
+                },	//END of searchChkVal
+            },		//ENd of searchOpen : {
+
+
+        }	//END of fnObj
+
+        $(document).ready(function () {
+            console.log(pageUrl());
+
+            //windowOpen 정의
+            myWins2 = new dhtmlXWindows();
+
+            fnObj.comboOpen.comboUseYn();
+
+            sendObject = /*[[${sendObject}]]*/;
+
+            $("#cmpyCd").val(/*[[${sendObject.cmpyCd}]]*/);
+
+            //사용자 정보 조회 - 수정일 경우
+            console.log("sendObject.saveGubn : " + sendObject.saveGubn);
+            if (sendObject.saveGubn == "UPDT") {
+                //조회하기
+                fnObj.searchOpen.searchBtn.comdSearch();
+                $("#commSave").val("수정");
+            } else if (sendObject.saveGubn == "INS") {
+                $("#commSave").val("등록");
+
+                $("#commCd").val(sendObject.commCd);
+                $("#commCd").attr("disabled", "disabled");
+                $("#commNm").val(sendObject.commNm);
+                $("#commNm").attr("disabled", "disabled");
+                $("#commDesc").val(sendObject.commDesc);
+                $("#commDesc").attr("disabled", "disabled");
+                $("#newCommCell").show();
+
+            }
+
+
+            myCalendarInptdt = new dhtmlXCalendarObject({input: "inptDt", button: "inptDtIcon"});
+            myCalendaroutDt = new dhtmlXCalendarObject({input: "outDt", button: "outDtIcon"});
+
+            $("#eye").on('click', function () {
+                $("#userPw").toggleClass('active');
+                if ($("#userPw").hasClass('active')) {
+                    $("#eye").attr('class', "fa fa-eye-slash fa-lg")
+                    $("#userPw").attr('type', "text");
+                    $("#userPwCf").attr('type', "text");
+                } else {
+                    $("#eye").attr('class', "fa fa-eye fa-lg")
+                    $("#userPw").attr('type', 'password');
+                    $("#userPwCf").attr('type', "password");
+                }
+            });
+
+
+            //if($("input:checkbox[name=newComm]").is(":checked"))
+
+            $("#newComm").change(function () {
+                if ($("#newComm").is(":checked")) {
+                    $("#commCd").val("").removeAttr("disabled");
+                    $("#commNm").val("").removeAttr("disabled");
+                    $("#commDesc").val("").removeAttr("disabled");
+
+                } else {
+                    $("#commCd").val(sendObject.commCd);
+                    $("#commCd").attr("disabled", "disabled");
+                    $("#commNm").val(sendObject.commNm);
+                    $("#commNm").attr("disabled", "disabled");
+                    $("#commDesc").val(sendObject.commDesc);
+                    $("#commDesc").attr("disabled", "disabled");
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<div id="mainDiv">
+    <div class="popup-header-container">
+        <div class="popup-header-text">
+            공통코드 관리
+        </div>
+
+        <div class="button-container">
+            <input id="commSave" class="action-button primary" name="commSave"
+                   type="button"
+                   onclick="fnObj.searchOpen.searchBtn.comdSave()"
+                   value="등록">
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-item">
+            <span class="search-label">회사코드</span>
+            <input type="text" id="cmpyCd" class="search-input" name="cmpyCd" disabled>
+        </div>
+
+        <div class="search-item" style="display:none;" id="newCommCell">
+            <span class="search-label">신규마스터코드</span>
+            <input type="checkbox" id="newComm" name="newComm">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">마스터공통코드</span>
+            <input type="text" id="commCd" class="search-input" name="commCd">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">마스터공통명칭</span>
+            <input type="text" id="commNm" class="search-input" name="commNm">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">마스터공통설명</span>
+            <input type="text" id="commNm" class="search-input" name="commNm">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">상세공통코드</span>
+            <input type="text" id="comdCd" class="search-input" name="comdCd">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">상세공통명칭</span>
+            <input type="text" id="comdNm" class="search-input" name="comdNm">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">상세공통설명</span>
+            <input type="text" id="comdDesc" class="search-input" name="comdDesc">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">정렬순서</span>
+            <input type="text" id="seq" class="search-input" name="seq">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">사용유무</span>
+            <div id="useYn"></div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

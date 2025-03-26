@@ -1,0 +1,112 @@
+var button='<button class="close" type="button" title="Remove this page">×</button>';
+var tabID = 1;
+function resetTab(){
+	var tabs=$("#tab-list li:not(:first)");
+	//var tabNames = $("#tab-list li:not(:first) a span:nth-child(1)");
+	/*$(tabs).each(function(k,v){
+		console.log("resetTab() " + k + " : " + v.id);
+	})
+	*/
+	var len=1
+	$(tabs).each(function(k,v){
+		console.log("k : " + k);
+		len++;
+		//$(this).find('a').html('Tab ' + len + button);
+		$(this).find('a').attr('href','#tab'+len);
+	})
+	tabID--;
+}
+
+$(document).ready(function() {
+	
+	//var list = document.getElementById("tab-list");
+   
+ $('#tab-list').on('click', function() {
+	alert("클릭");
+	
+	});
+    
+    $('#tab-list').on('click', '.close', function() {
+        var tabID = $(this).parents('a').attr('href');
+		var tabSpanID = $(this).parents('a').find('span').attr('id');		// 탭에서 x 표시 누른것의 id 찾기
+console.log("close tabID : " + tabID);
+console.log("close tabSpanID : " + tabSpanID);
+		$(this).parents('li').remove();
+        $(tabID).remove();	//탭버튼 누르면 보여지는 내용이 나오는 div를 제거
+
+        //display first tab
+        /////////////////var tabFirst = $('#tab-list a:first');
+        resetTab();
+        /////////////////tabFirst.tab('show');
+    });
+
+    var list = document.getElementById("tab-list");
+
+});
+
+/*var editHandler = function() {
+  var t = $(this);
+  t.css("visibility", "hidden");
+  $(this).prev().attr("contenteditable", "true").focusout(function() {
+    $(this).removeAttr("contenteditable").off("focusout");
+    t.css("visibility", "visible");
+  });
+};
+
+$(".edit").click(editHandler);*/
+
+
+
+function btnAdd(value) {
+	//console.log(this.value);
+	var tabs2=$("#tab-list li:not(:first) a span:nth-child(1)");
+	//console.log(tabs2);
+	////////////////////////////console.log("value : " + value);
+	var thisVal=value;
+	var cnt=0;
+	$(tabs2).each(function(k,v){
+		
+		/////////////////////////console.log(v.id);
+		if(thisVal == v.id)
+		{
+			///////////////////////////console.log("같음");	
+			cnt++;
+		}
+		
+	})
+
+	
+		if(cnt != 0)
+		{
+			alert("같음");	
+			return;
+		}
+	
+        if(tabID >= 10)
+        {
+            alert("더이상 탭 못만듦");
+            return;
+            
+        }
+        tabID++;
+		if(this.value != null || this.value != undefined || this.value != '')
+		{
+			//$('#tab-list').append($('<li><a href="#tab' + tabID + '" role="tab" data-toggle="tab"><span id='+ value +'> ' + value + '</span> <span class="glyphicon glyphicon-pencil text-muted edit">@</span> <button class="close" type="button" title="Remove this page">×</button></a></li>'));
+			$('#tab-list').append($('<li><a href="#tab' + tabID + '" role="tab" data-toggle="tab"><span id='+ value +'> ' + value + '</span><button class="close" type="button" title="Remove this page">×</button></a></li>'));
+			
+			$('#tab-content').append($('<div class="tab-pane fade" id="tab' + tabID + '">Tab ' + value + ' content</div>'));
+			$('#tab'+tabID).load('/login');
+			//$('#tab-content').append($('<div class="tab-pane fade" id="tab' + tabID + ' th:replace="/index :: tab-content">Tab ' + value + ' content</div>'));
+		}
+        else
+		{
+			//$('#tab-list').append($('<li><a href="#tab' + tabID + '" role="tab" data-toggle="tab"><span id='+ tabID +'>Tab ' + tabID + '</span> <span class="glyphicon glyphicon-pencil text-muted edit">@</span> <button class="close" type="button" title="Remove this page">×</button></a></li>'));
+			$('#tab-list').append($('<li><a href="#tab' + tabID + '" role="tab" data-toggle="tab"><span id='+ tabID +'>Tab ' + tabID + '</span><button class="close" type="button" title="Remove this page">×</button></a></li>'));
+			
+			$('#tab-content').append($('<div class="tab-pane fade" id="tab' + tabID + '">Tab ' + tabID + ' content</div>'));
+		}
+		
+		$('#tab-list a:first')
+       
+        //$(".edit").click(editHandler);
+    };

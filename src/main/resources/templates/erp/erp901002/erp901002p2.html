@@ -1,0 +1,453 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>상품관리 엑셀업로드(erp901002p2)</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+<link rel="stylesheet" type="text/css" href="/css/common.css">
+<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/js/commCode.js"></script>
+
+
+
+<!-- 엑셀 다운로드 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+<script th:inline="javascript">
+	var srchInput;
+	var myGrid;
+	var myWins;
+	var myCalendarInptdt;
+	var myCalendarOutdt;
+	var sendObject;
+	fnObj	=	{
+			winOpen : {
+
+			},	//END of winOpen:{
+			comboOpen : {
+				comboCmpyCd : function(){
+					myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+			    	comboList(myComboCmpyCd,'A','COMM','CMPY_CD','','Y','');		     
+			    	myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/));
+			    	myComboCmpyCd.setFontSize("12px","12px");
+			    	
+			    	myComboCmpyCd.disable();
+				},
+			},	//END of comboOpen : {
+			gridOpen : {
+			    grid : function()
+				{
+					myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
+		
+					myGrid.setHeader("회사코드,화주코드,상품유형,상품코드,상품명,상품설명,상품상태,심플코드,소비자가,판매가,공가,매입가,규격명,가로,깊이,높이1,높이2,CBM,무게,대분류,중분류,소분류,세트유무,BOM유무,MTO유무,정규격유무,시공유무,시공카테고리,시공유형,시공좌석유형,시공비,시공URL,시공이미지경로,제자리표,배송유무,배송유형,배송비,익일배송유무,3자배송유무,배송리드타임,변환코드,변환코드명,변환수량,변환단위,메모,사용유무,시공권역유형,픽킹ZONE");
+					myGrid.setColumnIds("cmpyCd,agntCd,mtrlType,mtrlCd,mtrlNm,mtrlDesc,statCd,smplCd,custPrc,salePrc,factPrc,purcPrc,sizeNm,lnth,dpth,hght,hght2,cbm,wght,mtrlCtgr1,mtrlCtgr2,mtrlCtgr3,setYn,bomYn,mtoYn,stdYn,instYn,instCtgr,instType,instSeatType,instCost,instUrl,instImgPath,pstnNm,dlvyYn,dlvyType,dlvyCost,ndlvyYn,thrDlvyYn,dlvyLt,cnvtMtrlCd,cnvtMtrlNm,cnvtQty,cnvtUnit,memo,useYn,zoneType,pickZone");
+					myGrid.setInitWidths("80,80,80,80,240,300,80,80,80,80,80,80,80,60,60,60,60,60,60,80,80,80,80,80,80,80,80,80,80,80,80,200,200,160,80,80,80,80,80,80,80,200,80,80,200,80,120,80");
+					myGrid.setColAlign("center,center,center,center,left,left,center,center,right,right,right,right,left,right,right,right,right,right,right,center,center,center,center,center,center,center,center,center,center,center,right,left,left,left,center,center,right,center,center,right,center,left,right,center,left,center,center,center");
+					myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+					
+					myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
+							    
+					
+					//20220106 정연호 시공카테고리코드 가림
+					myGrid.setColumnHidden(myGrid.getColIndexById("instCtgr"),true);	
+						
+					myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
+					myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+					myGrid.enablePreRendering(10);	//20220423 정연호 추가
+					
+					
+					fnObj.gridOpen.setWidth();
+					fnObj.gridOpen.setWidth();																//그래야 진짜 화면에 보이는 높이가 만들어진다
+					myGrid.addRow(1,"");	//로우 추가
+					myGrid.deleteRow(1);
+					myGrid.enableEditEvents(true,false,false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+					myGrid.enableBlockSelection(true);
+					myGrid.attachEvent("onKeyPress",fnObj.keyOpen.onKeyPressed);
+					myGrid.attachEvent("onRowDblClicked", function(rId,cInd){
+					
+					});
+
+				},
+				setWidth : function(){
+					c_width =  window.innerWidth;
+					searchDiv_height =  $("#searchDiv").height();
+					btnDiv1_height =  $("#btnDiv1").height();
+					
+					searchDiv1_height =  $("#searchDiv1").height();
+					
+					xhdr_height =  $(".xhdr").height();
+					
+					
+					myGrid.enableAutoWidth(true,c_width-25,100);
+					myGrid.enableAutoHeight(true,window.innerHeight-searchDiv_height-xhdr_height-30);	//그리드 자동높이
+					
+					
+					$("#searchDiv").width(c_width-25);
+					
+				},	//END of setWidth
+			},		//ENd of gridOpen : {
+			searchOpen : {
+			    exclUpload : function() {	//일괄 업로드
+				$("#fileUpload").val("");
+			    
+					
+						fnObj.searchOpen.excelUploadJson(excelUploadData);
+						},
+					
+					
+					excelUploadJson : function(uploadData) {	//엑셀을 json으로 바꾼걸 table 에 insert
+						
+						if(uploadData.length == 0)
+						{
+							alert("업로드할 주문 데이터가 없습니다.");
+							return;
+						}
+						
+						if(!confirm("엑셀파일의 주문내용을 업로드 하시겠습니까?"))
+						{
+							//alert("취소하였습니다.");
+							return;
+						}
+					
+						
+						$.ajax({
+					        url: "/erp901002p2ExcelUploadJson",
+					        processData : false,
+							contentType : "application/json",
+					        data: JSON.stringify(uploadData),
+					        type:"POST",
+					        datatype:"json",
+					        success : function(res){
+	    	
+					        	if(res){
+
+									var rtnY=0;
+									for(var i=0;i<res.length;i++)
+									{
+										
+										
+										if(res[i].rtnYn =="Y")	//원래는 Y 가 아닌 것.
+										{
+											rtnY++;
+											myGrid.deleteRow(parseInt(res[i].exclRow));
+										}
+									}
+									
+									
+									$(top.document).find('#loader').hide();
+									
+									alert(res.length + "중 " + rtnY +"건 성공. " + (res.length - rtnY) + "건 실패.");
+									//myGrid.clearAll(false);
+									//$("#fileUpload").val("");
+									
+					        	}
+					        	else
+					        	{
+					       			alert("등록 수행 실패");
+					       			$(top.document).find('#loader').hide();
+					        	}
+					        	$(top.document).find('#loader').hide();
+					        },
+						});
+						
+						fnObj.gridOpen.setWidth();
+					},	//END of excelUploadJson : function() {
+	
+			},		//ENd of searchOpen : {
+			keyOpen : {
+				enterKey : function(enterType){
+					if(enterType == "agency" )
+					{
+						 if (window.event.keyCode == 13) {
+							 
+							 $("#agencyNm").blur();
+							 $("#agencyCd").blur();
+							 
+							 $("#agencyCd").val("");
+				            fnObj.winOpen.commSrch('화주','A','AGENCY','text');
+	
+				        }
+					}
+				},
+			},
+
+	}	//END of fnObj
+
+	
+	
+	//엑셀 다운로드
+			//엑셀 헨들러
+			var excelHandler = {
+					
+
+			    getExcelFileName : function(){
+			        return '상품관리 일괄업로드 양식'+'.xlsx';		//엑셀파일명
+			    },
+			    getSheetName : function(){
+			        return '상품관리 일괄업로드';		//시트명
+			    },
+			    getExcelData : function(){ 
+			        return get_json_for_tmpl(myGrid);
+			    },
+			    getWorksheet : function(){
+			    	//myGrid.deleteRow(1);
+			   
+			        return XLSX.utils.json_to_sheet(this.getExcelData());
+			    },
+			}
+			
+			//그리드 to json  헤더텍스트를 포함하여 표시	//다운로드 할 양식 생성
+			
+			function get_json_for_tmpl(myGrid)
+			{ 
+			   
+				var rowArr = {}; 
+				var newArr = []; 
+		
+
+				rowArr.회사코드		=	"A"
+			    rowArr.화주코드		=	"8002"
+			    rowArr.상품유형 		=	"LGST"
+			    rowArr.상품코드		=	"59684"
+			    rowArr.상품명			=	"더라인플러스_ 파세인리빙 로고"
+			    rowArr.상품설명		=	""
+			    rowArr.상품상태 		=	"9999"
+			    rowArr.심플코드		=	""
+			    rowArr.소비자가		=	""
+			    rowArr.판매가			=	""
+			    rowArr.공가 			=	""
+			    rowArr.매입가			=	""
+			    rowArr.규격명			=	""
+			    rowArr.가로			=	"0"
+			    rowArr.깊이 			=	"0"
+			    rowArr.높이1			=	"0"
+			    rowArr.높이2			=	""
+			    rowArr.CBM			=	"0"
+			    rowArr.무게 			=	""
+			    rowArr.대분류			=	"700"
+			    rowArr.중분류			=	""
+			    rowArr.소분류			=	""
+			    rowArr.세트유무 		=	"N"
+			    rowArr.BOM유무		=	"N"
+			    rowArr.MTO유무		=	"N"
+			    rowArr.정규격유무	   	=	"Y"
+			    rowArr.시공유무		=	"Y"
+			    rowArr.시공카테고리	  	=	"NORMAL"
+			    rowArr.시공유형		=	"1000"
+			    rowArr.시공좌석유형	  	=	"1111"
+			    rowArr.시공비			=	""
+			    rowArr.시공URL		=	""
+			    rowArr.시공이미지경로	=	""
+			    rowArr.제자리표		=	"ASSM"
+			    rowArr.배송유무		=	""
+			    rowArr.배송유형		=	""
+			    rowArr.배송비			=	""
+			    rowArr.익일배송유무	  	=	"";
+			    rowArr["3자배송유무"]=	"";
+			    rowArr.배송리드타임	  	=	""
+			    rowArr.변환코드		=	""
+			    rowArr.변환코드명	   	=	""
+			    rowArr.변환수량		=	""
+			    rowArr.변환단위		=	"Y"
+			    rowArr.메모			 =	"NULL"
+			    rowArr.사용유무		=	"Y"
+			    rowArr.시공권역유형	  	=	"1000_ZONE_CD"
+			    rowArr.픽킹ZONE		=	"7"
+				
+				newArr.push(rowArr);
+				rowArr = {}; 
+				return newArr;
+			}	
+			
+			function exportExcel2(){ 
+
+
+
+			    // step 1. workbook 생성
+			    var wb = XLSX.utils.book_new();
+				
+			    // step 2. 시트 만들기 
+			    var newWorksheet = excelHandler.getWorksheet();
+			  
+			     // step 3. workbook에 새로만든 워크시트에 이름을 주고 붙인다.  
+			    XLSX.utils.book_append_sheet(wb, newWorksheet, excelHandler.getSheetName());
+			 
+			   
+			   
+				// step 4. 엑셀 파일 만들기 
+			    var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+
+			    // step 5. 엑셀 파일 내보내기 
+			    saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), excelHandler.getExcelFileName());
+			    
+
+			}	
+	
+	
+	//엑셀업로드
+	var excelJson;
+	//엑셀파일 읽어 json으로 변경하기
+	function readExcel() {
+	
+		
+	    let input = event.target;
+	    let reader = new FileReader();
+	    reader.onload = function () {
+	        let data = reader.result;
+	        let workBook = XLSX.read(data, { type: 'binary' });
+	      
+	        workBook.SheetNames.forEach(function (sheetName) {
+	            let rows = XLSX.utils.sheet_to_json(workBook.Sheets[sheetName]);
+	
+	            excelJson = rows;
+	            
+	            excelJsonToGrid(excelJson)
+	        })
+	    };
+	    reader.readAsBinaryString(input.files[0]);
+	}
+	
+	
+	//json 형태로 바꾼 엑셀내용을 그리드에 표시
+	function excelJsonToGrid(excelJson){
+	   
+	
+		myGrid.clearAll(false);
+		
+		if(!myComboCmpyCd.getSelectedValue())
+		{
+			alert("회사코드가 없습니다.");
+			return;
+		}
+
+		excelUploadData = [];
+		var columns = myGrid.getColumnCount()
+		for(var i=0;i<excelJson.length;i++){
+
+    			var jsonData = {};
+    			
+    		
+    			for (var c=0; c<columns; c++){ 
+    				jsonData[myGrid.getColumnId(c)] = excelJson[i][myGrid.getColLabel(c)];
+        		}
+    			
+    			
+    			
+    			
+    			jsonData["exclRow"] = (i+1);
+    			jsonData["saveUser"] = /*[[${session.tblUserMId}]]*/;
+    			jsonData["inptSys"]	=	"ERP_EXCL";
+    			
+    			
+    			//그리드에표시
+    			myGrid.addRow(i+1,"");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+    			myGrid.setRowData(i+1,jsonData);
+    			//그리드에표시 끝
+    			
+    			excelUploadData.push(jsonData)
+			
+		}
+		//console.log(excelUploadData)
+		//fnObj.searchOpen.excelUploadJson(excelUploadData);
+	}
+	
+	
+	
+	function exclDown(){
+		
+		var rowNum = myGrid.getRowsNum();
+		
+		
+		var eqCnt = 1;
+		myGrid.forEachRow(function(rId){
+			if(rId == rowNum)	//로우 아이디와 로우수가 같으면
+			{
+				eqCnt++;	//더함
+			}
+		});
+		//로우수에 eqCnt을 더해서 같은 로우아이디가 없게 한다
+		rowNum = rowNum + eqCnt;
+		myGrid.addRow(rowNum,'');
+		exportExcel2();
+		myGrid.deleteRow(rowNum);
+	
+	}
+	
+$(document).ready(function() {
+
+
+	myGrid = new dhtmlXGridObject('grid');	//그리드
+
+
+	fnObj.gridOpen.grid()
+
+	fnObj.comboOpen.comboCmpyCd();
+
+
+	sendObject = /*[[${sendObject}]]*/;
+
+	
+	//사용자 정보 조회 - 수정일 경우
+	window.onresize = function(event) {		//윈도우의 사이즈가 변경했을떄
+		fnObj.gridOpen.setWidth();
+		fnObj.gridOpen.setWidth();
+	};
+});
+</script>
+</head>
+<body>
+	<div id="mainDiv" style="padding: 10px 10px 0 10px; border: 1px solid black;">
+		<div id="searchDiv" style="width: 100%; font-size: 12px;">
+			<div id="btnDiv1" style="width: 100%;">
+
+				<span class="cell" style="float: right;">
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<input id="fileUpload" type="file" style="width: 360px;" onchange="readExcel()" accept=".xls,.xlsx" /></input>
+					</span>
+			
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<input id="btnSearch" type="button" onclick="fnObj.searchOpen.exclUpload()" value="일괄등록"></input>
+					</span>
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<button id="btnExcelDown" onclick="exclDown();">엑셀업로드 양식 다운로드</button>
+					</span>
+				</span>
+			</div>
+			<div id="inputDiv12" style="width: 100%; font-size: 14px; padding-bottom: 10px;">
+				<span class="cell" style="width: 320px; padding-bottom: 10px;">
+					<span class="item-head" style="font-size: 14px; font-weight: bold; color: darkblue; text-align: left; padding: 0 0 10px 0;">상품관리 엑셀업로드&nbsp;</span>
+					<span class="item-head" id="changeTitle" style="font-size: 14px; font-weight: bold; color: darkblue; text-align: left; padding: 0 0 10px 0;"></span>
+					<font size=2 color=black>erp901002p2</font>
+				</span>
+				<br>
+			</div>
+
+			<div id="inputDiv0" style="width: 100%; font-size: 12px; padding-bottom: 10px; display: none;">
+				<span class="cell" style="width: 190px; padding-bottom: 10px;">
+					<span class="item-head" style="width: 70px;">
+						<b>회사<font color=red>*</font></b>
+					</span>
+					<span class="item-data" style="width: 120px;" disabled>
+						<div id="cmpyCd"></div>
+					</span>
+				</span>
+			</div>
+
+
+		</div>
+		<div id="gridDiv" style="width: 100%; font-size: 12px; padding-bottom: 5px;">
+			<div id="grid" style="width: 100%; height: 100%;"></div>
+		</div>
+	</div>
+
+</body>
+</html>

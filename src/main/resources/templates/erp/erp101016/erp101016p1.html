@@ -1,0 +1,1746 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>미마감 요청 등록 팝업 (erp101016p1)</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" type="text/css" href="/css/common.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+
+<style>
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	overflow: auto;
+}
+</style>
+<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/js/commCode.js"></script>
+
+<script th:inline="javascript">
+	var myWins;
+	var myGrid;
+	var myGrid2
+	
+	var myCalendar;
+	var myCalendar2;
+	var dlvyCnfmDtRange = 89;	//배송확정일 가능/불가능 날짜 구하는 범위 31 일이면 오늘부터 31일 후 까지 중에 가능 / 불가능 표시
+	var today;	//오늘날짜
+	
+	var prodSrchRowId;
+	
+	fnObj	=	{
+			winOpen : {
+				commSrch : function(title,cmpyCd,srchCtgr,srchInput){		//공통코드 찾기 팝업
+					windowId	=	"commSrch";
+					windowText	=	title + " commSrch";
+					windowUrl	=	"/commSrch"
+					windowLeft	=	-14400;
+					windowTop	=	-14400;
+					windowWidth	=	800;
+					windowHeight	=	600;
+					windowsModal	=	true;
+					windowOnClose	=	 function(windowId){
+					  		  
+					  		      return true;
+					  		  };
+					windowSendObject = {
+							cmpyCd : 	cmpyCd,
+							srchCtgr : 	srchCtgr,	//
+							srchInput : srchInput,	
+							windowId : windowId,
+							srchCd : $("#srchCode").val(),
+							srchNm : $("#srchName").val()
+					};
+					
+
+					myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+					
+					myWins.window(windowId).attachEvent("onClose", function(win){
+						
+						return true;
+					});
+				},	//END of commSrch : function(){
+					
+		
+				prodCommSrch : function(rowId,title,cmpyCd,srchCtgr,srchInput){		//공통코드 찾기 팝업
+					windowId	=	"prodCommSrch";
+					windowText	=	title + " prodSrch";
+					windowUrl	=	"/prodSrch"
+					windowLeft	=	0;
+					windowTop	=	0;
+					windowWidth	=	800;
+					windowHeight	=	600;
+					windowsModal	=	true;
+					windowOnClose	=	 function(windowId){	return true;	};
+					windowSendObject = {
+							windowId : windowId,
+							cmpyCd : 	cmpyCd,				//A
+							srchCtgr : 	srchCtgr,			//MTRL_SO
+							srchInput : srchInput,			//text
+							srchCd : "",
+							srchNm : "",
+							srchArea : $("#srchCode").val(), 	//화주코드 8013 
+							agntCd :  $("#srchCode").val(),
+							agntNm : $("#srchName").val()
+					};
+					prodSrchRowId = rowId;
+					var errMsg = "";
+					var rtnVal=true;
+					if(!$("#srchCode").val()){
+						errMsg = errMsg + "화주코드가 없습니다. 화주를 검색하세요.\n";
+						rtnVal = false;
+						
+					}
+					if(!$("#srchName").val()){
+						errMsg = errMsg + "화주명칭이 없습니다. 화주를 검색하세요.\n";
+						rtnVal = false;
+					}
+					if(errMsg != "" && rtnVal == false){
+						alert(errMsg);
+						return;
+					}
+					myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+					myWins.window(windowId).attachEvent("onClose", function(win){
+						return true;
+					});
+				},	//END of prodCommSrch : function(){
+										
+				prodCommSrchGrid : function(rowId,title,cmpyCd,srchCtgr,srchInput,nValue){		//공통코드 찾기 팝업
+
+					windowId	=	"prodCommSrchGrid";
+					windowText	=	title + " prodSrch";
+					windowUrl	=	"/prodSrch"
+					windowLeft	=	-14400;
+					windowTop	=	-14400;
+					windowWidth	=	1300;
+					windowHeight	=	600;
+					windowsModal	=	true;
+					windowOnClose	=	 function(windowId){	return true;  };
+					windowSendObject = {
+						windowId : windowId,
+						cmpyCd : 	cmpyCd,				//A
+						srchCtgr : 	srchCtgr,			//MTRL_SO
+						srchInput : srchInput,			//text
+						srchCd : "",
+						srchNm : nValue,
+						srchArea : $("#srchCode").val(), 	//화주코드 8013 
+						agntCd :  $("#srchCode").val(),
+						agntNm : $("#srchName").val()
+					};
+					prodSrchRowId = rowId;
+					var errMsg = "";
+					var rtnVal=true;
+					if(!$("#srchCode").val()){
+						errMsg = errMsg + "화주코드가 없습니다. 화주를 검색하세요.\n";
+						rtnVal = false;
+					}
+					if(!$("#srchName").val()){
+						errMsg = errMsg + "화주명칭이 없습니다. 화주를 검색하세요.\n";
+						rtnVal = false;
+					}
+					if(errMsg != "" && rtnVal == false){
+						alert(errMsg);
+						return;
+					}
+
+					myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+					myWins.window(windowId).attachEvent("onClose", function(win){
+						return true;
+					});
+				},	//END of prodCommSrchGrid : function(){
+					
+				//popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+				rtnObject : function(windowId,rtnObj,srchInput){	
+					if(rtnObj == null){
+						myWins.window(windowId).setPosition(0, 0);
+						return;
+					}
+					if(windowId == "commSrch"){
+						if(srchInput == "text"){
+							$("#srchCode").val(rtnObj[0].commCd);
+							$("#srchName").val(rtnObj[0].commNm);
+						}
+					}
+					if(windowId == "prodCommSrch"){
+						myGrid.cellById(prodSrchRowId,myGrid.getColIndexById("prodCd")).setValue(rtnObj[0].commCd);
+						myGrid.cellById(prodSrchRowId,myGrid.getColIndexById("prodNm")).setValue(rtnObj[0].commNm);
+						myGrid.cellById(prodSrchRowId,myGrid.getColIndexById("instCost")).setValue(rtnObj[0].commDesc);
+						myGrid.cellById(prodSrchRowId,myGrid.getColIndexById("instCostOrg")).setValue(rtnObj[0].commDesc);
+					}
+					if(windowId == "prodCommSrchGrid"){
+						myGrid.cellById(prodSrchRowId,myGrid.getColIndexById("prodCd")).setValue(rtnObj[0].commCd);
+						myGrid.cellById(prodSrchRowId,myGrid.getColIndexById("prodNm")).setValue(rtnObj[0].commNm);
+						myGrid.cellById(prodSrchRowId,myGrid.getColIndexById("instCost")).setValue(rtnObj[0].commDesc);
+						myGrid.cellById(prodSrchRowId,myGrid.getColIndexById("instCostOrg")).setValue(rtnObj[0].commDesc);
+						//20211226 정연호추가. 착불비는 기본 0원
+						myGrid.cellById(prodSrchRowId,myGrid.getColIndexById("rcptCost")).setValue("0");
+						//수량컬럼으로 이동
+						myGrid.selectCell(myGrid.getRowIndex(prodSrchRowId),myGrid.getColIndexById("qty"),true,true);
+						myGrid.editCell();
+					}
+				},	//END of rtnObject : function(windowId,rtnObj){
+			},	//END of winOpen:{
+			
+			comboOpen : {
+				//회사콤보목록
+				comboCmpyCd : function(){		
+					myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+			    	comboList(myComboCmpyCd,'A','COMM','CMPY_CD','','Y','');		     
+			    	myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${sendObject.cmpyCd}]]*/));
+			    	myComboCmpyCd.setFontSize("12px","12px");
+			    	myComboCmpyCd.attachEvent("onChange", function(value, text){
+			    	
+			    	});
+			    	myComboCmpyCd.disable();
+				},	
+				//주문유형
+				comboSoType : function(){		
+					myComboSoType = new dhtmlXCombo("soType");
+			    	comboList(myComboSoType,'A','COMM','SO_ORDR_TYPE','','Y','req');
+			    	myComboSoType.selectOption(myComboSoType.getIndexByValue(/*[[${sendObject.rtnSoType}]]*/));	
+			    	myComboSoType.setFontSize("12px","12px");
+			    	myComboSoType.attachEvent("onChange", function(value, text){
+			    		
+			    	});
+			    	myComboSoType.disable();
+				},
+				//주문상태
+				comboSoStat : function(){		
+					myComboSoStat = new dhtmlXCombo("soStatCd");
+			    	comboList(myComboSoStat,'A','COMM','SO_STAT_CD','','Y','req');		     
+			    	myComboSoStat.selectOption(myComboSoStat.getIndexByValue(/*[[${sendObject.rtnSoStatCd}]]*/));
+			    	myComboSoStat.attachEvent("onChange", function(value, text){
+			       		
+			    	});
+			    	myComboSoStat.disable();
+				},
+				//출고물류센터 콤보
+				comboDcCd : function(){		
+					myComboDcCd = new dhtmlXCombo("dcCd");
+					comboList(myComboDcCd,'A','DC_CD','','','Y','req');		     
+					myComboDcCd.selectOption(0);
+					myComboDcCd.setFontSize("12px","12px");
+					myComboDcCd.attachEvent("onChange", function(value, text){
+			    		
+			    	});
+				},
+				//운임구분 콤보
+				comboDlvyCostType : function(){		
+					myComboDlvyCostType = new dhtmlXCombo("dlvyCostType");
+					comboList(myComboDlvyCostType,'A','COMM','DLVY_COST_TYPE','','Y','req');		     
+					myComboDlvyCostType.selectOption(0);
+					myComboDlvyCostType.setFontSize("12px","12px");
+					myComboDlvyCostType.attachEvent("onChange", function(value, text){
+			    		
+			    	});
+				},
+			},	//END of comboOpen : {
+			
+			gridOpen : {
+				grid : function(){
+					myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
+					myGrid.setHeader(	"#master_checkbox"+
+										",CUD"+
+										",ROW_ID"+
+										",순번"+
+										",<font color='blue'><strong>상품명</strong></font>"+
+										",상품코드"+
+										",<font color='blue'><strong>수량</strong></font>"+
+										",시공비"+
+										",시공단가"+
+										",<font color='blue'><strong>삭제사유(50자)</strong></font>"+
+										",사용여부"+
+										",사용자"+
+										",tblSoPId"+
+										",tblSoMId"+
+										",soNo"+
+										",<font color='blue'><strong>고객사주문번호</strong></font>"+
+										",<font color='blue'><strong>착불비</strong></font>"
+							);
+					myGrid.setColumnIds(	"chk"+
+											",cud"+
+											",rowId"+
+											",prodSeq"+
+											",prodNm"+
+											",prodCd"+
+											",qty"+
+											",instCost"+
+											",instCostOrg"+
+											",delResn"+
+											",useYn"+
+											",userId"+
+											",tblSoPId"+
+											",tblSoMId"+
+											",soNo"+
+											",refSoNo"+
+											",rcptCost"	
+							);
+					myGrid.setInitWidths(	"40"+
+											",60"+
+											",40"+
+											",80"+
+											",600"+
+											",200"+
+											",60"+
+											",80"+
+											",80"+
+											",240"+
+											",80"+
+											",80"+
+											",80"+
+											",80"+
+											",80"+
+											",160"+
+											",80"
+							);
+					myGrid.setColAlign(		"center"+
+											",center"+
+											",center"+
+											",right"+
+											",left"+
+											",left"+
+											",right"+
+											",right"+
+											",right"+
+											",left"+
+											",center"+
+											",center"+
+											",center"+
+											",center"+
+											",center"+
+											",center"+
+											",right"
+							);
+					myGrid.setColTypes(		"ch"+
+											",ro"+
+											",ro"+
+											",ro"+
+											",ed"+
+											",ro"+
+											",edn"+
+											",ro"+
+											",ro"+
+											",ed"+
+											",ro"+
+											",ro"+
+											",ro"+
+											",ro"+
+											",ro"+
+											",ed"+
+											",edn"
+							);
+				
+					
+					myGrid.setColumnHidden(myGrid.getColIndexById("cud"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("useYn"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("userId"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("delResn"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("tblSoPId"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("tblSoMId"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("soNo"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("rowId"),true);	//컬럼 아이디로 해당 컬럼 가리기
+
+					myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
+
+					myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+					myGrid.enablePreRendering(10);
+
+					myGrid.enableBlockSelection(true);
+					myGrid.attachEvent("onKeyPress",fnObj.keyOpen.onKeyPressed);
+					
+					myGrid.enableEditEvents(true,false,false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+					
+					myGrid.attachEvent("onEditCell", function(stage,rId,cInd,nValue,oValue){
+						if(	cInd == myGrid.getColIndexById("qty")){
+							if (stage==1 && this.editor && this.editor.obj){
+								this.editor.obj.select();
+							}
+							//값이 바뀌었으며 숫자가 아니다 (isNaN 은  true 숫자가 아니다, false 숫자다	)
+							if(stage == 2 && isNaN(nValue))	{
+						    	alert("숫자를 넣으세요");
+						    	return false;	//입력한걸 취소시킨다
+						    }
+							//해당로우의 옆에 있는 시공비를 곱한다
+							else if(stage == 2 && !isNaN(nValue)){
+								//그리드 반복 돌면서 
+								var rowQty = 			myGrid.cellById(rId,myGrid.getColIndexById("qty")).getValue();
+								var rowInstCostOrg = 	myGrid.cellById(rId,myGrid.getColIndexById("instCostOrg")).getValue();
+								//숫자를 넣었으면
+								if(rowQty){
+									myGrid.cellById(rId,myGrid.getColIndexById("instCost")).setValue( rowQty * rowInstCostOrg);
+								}
+								var sumInstCost=0;
+								myGrid.forEachRow(function(eachRowId){
+									var eachQty = 	myGrid.cellById(eachRowId,myGrid.getColIndexById("qty")).getValue();
+									//숫자를 넣었으면
+									if(eachQty)	{
+										sumInstCost = sumInstCost + parseInt(myGrid.cellById(eachRowId,myGrid.getColIndexById("instCost")).getValue() );
+									}
+								});
+								$("#instCost").val(sumInstCost);
+								return true;
+						    }
+						}
+						else if(	cInd == myGrid.getColIndexById("delResn")){ 
+							if (stage==1 && this.editor && this.editor.obj){
+								this.editor.obj.select();
+							}
+							if(myGrid.cellById(rId,myGrid.getColIndexById("tblSoPId")).getValue().trim() == ""){
+								return false;
+							}
+							//변경완료이고 변경한 값이 빈값이 아닐때	
+							if(stage == 2	){
+							 	if(nValue.length > 50){
+							 		alert("최대 50자 입니다")	
+							 		return false;
+							 	}
+								return true;
+						    }
+						}						
+						else if(	cInd == myGrid.getColIndexById("prodNm")  ){ 
+							if (stage==1 && this.editor && this.editor.obj){
+								this.editor.obj.select();
+							}							
+							//DB에서 불러와서 그리드에 표시한것
+							if(	myGrid.cellById(rId,myGrid.getColIndexById("tblSoPId")).getValue().trim() != "" || 
+								myGrid.cellById(rId,myGrid.getColIndexById("cud")).getValue() != "C"){
+								return false;
+							}
+							//변경완료	
+							if(stage ==2 && nValue == "" && nValue != oValue){
+								return true;
+						    }
+							//변경완료	
+							if(stage ==2){
+							 	fnObj.winOpen.prodCommSrchGrid(rId,"제품정보찾기","A","MTRL_SO","text",nValue);
+								var sumInstCost=0;
+								var sumMainRcptCost=0;	//20211226 정연호 추가. 착불비 합계 계산하기
+								myGrid.forEachRow(function(eachRowId){
+									var eachQty = 	myGrid.cellById(eachRowId,myGrid.getColIndexById("qty")).getValue();
+									myGrid2.cellById(eachRowId,myGrid2.getColIndexById("qty")).setValue(eachQty);
+									//숫자를 넣었으면
+									if(eachQty){
+										sumInstCost = sumInstCost + parseInt(myGrid.cellById(eachRowId,myGrid.getColIndexById("instCost")).getValue());
+									}
+									if(	!isNaN(parseInt(myGrid.cellById(eachRowId,myGrid.getColIndexById("rcptCost")).getValue()) ))
+								    {
+										sumMainRcptCost = sumMainRcptCost + parseInt(myGrid.cellById(eachRowId,myGrid.getColIndexById("rcptCost")).getValue());
+								    }
+								});
+								$("#instCost").val(sumInstCost);
+								console.log("onEditCell prodNm mainRcptCost - 전 : " + $("#mainRcptCost").val());
+								$("#mainRcptCost").val(sumMainRcptCost);
+								console.log("onEditCell prodNm mainRcptCost - 후 : " + $("#mainRcptCost").val());
+								return true;
+						    }
+						}
+						
+						//20211226 정연호 추가. 착불비 합계 계산하기
+						else if (cInd == myGrid.getColIndexById("rcptCost")){
+							if (stage==1 && this.editor && this.editor.obj){
+								this.editor.obj.select();
+							}
+							//값이 바뀌었으며 숫자가 아니다 (isNaN 은  true 숫자가 아니다, false 숫자다	)
+							if(stage == 2 && isNaN(nValue)){
+						    	alert("숫자를 넣으세요");
+						    	return false;	//입력한걸 취소시킨다
+						    }							
+							else if(stage == 2 && !isNaN(nValue)){
+								var sumMainRcptCost=0;	//20211226 정연호 추가. 착불비 합계 계산하기
+								myGrid.forEachRow(function(eachRowId){
+									if(	!isNaN(parseInt(myGrid.cellById(eachRowId,myGrid.getColIndexById("rcptCost")).getValue()) ))
+								    {
+										sumMainRcptCost = sumMainRcptCost + parseInt(myGrid.cellById(eachRowId,myGrid.getColIndexById("rcptCost")).getValue());
+								    }
+								});
+								//20211226 정연호 추가. 착불비 합계 계산하기
+								console.log("onEditCell rcptCost mainRcptCost - 전 : " + $("#mainRcptCost").val());
+								$("#mainRcptCost").val(sumMainRcptCost);
+								console.log("onEditCell rcptCost mainRcptCost - 후 : " + $("#mainRcptCost").val());
+								return true;
+						    }
+						}
+						else{
+							return true;
+						}
+					});
+
+					window.onresize = function(event) {		//윈도우의 사이즈가 변경했을떄
+						 //fnObj.gridOpen.setWidth();
+					};
+				},		//ENd of grid : function(){}
+				grid2 : function(){
+					myGrid2.setImagePath("https://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
+					myGrid2.setHeader(	"#master_checkbox"+
+										",CUD"+
+										",ROW_ID"+
+										",순번"+
+										",<font color='blue'><strong>상품명</strong></font>"+
+										",상품코드"+
+										",<font color='blue'><strong>수량</strong></font>"+
+										",시공비"+
+										",시공단가"+
+										",<font color='blue'><strong>삭제사유(50자)</strong></font>"+
+										",사용여부"+
+										",사용자"+
+										",tblSoPId"+
+										",tblSoMId"+
+										",soNo"+
+										",<font color='blue'><strong>고객사주문번호</strong></font>"+
+										",<font color='blue'><strong>착불비</strong></font>"
+					);
+					myGrid2.setColumnIds(	"chk"+
+											",cud"+
+											",rowId"+
+											",prodSeq"+
+											",prodNm"+
+											",prodCd"+
+											",qty"+
+											",instCost"+
+											",instCostOrg"+
+											",delResn"+
+											",useYn"+
+											",userId"+
+											",tblSoPId"+
+											",tblSoMId"+
+											",soNo"+
+											",refSoNo"+
+											",rcptCost"
+			
+					);	
+					myGrid2.setInitWidths(	"40"+
+											",60"+
+											",40"+
+											",80"+
+											",160"+
+											",80"+
+											",60"+
+											",80"+
+											",80"+
+											",120"+
+											",80"+
+											",80"+
+											",80"+
+											",80"+
+											",80"+
+											",160"+
+											",80"
+					);
+					myGrid2.setColAlign(	"center"+
+											",center"+
+											",center"+
+											",right"+
+											",left"+
+											",center"+
+											",right"+
+											",right"+
+											",right"+
+											",left"+
+											",center"+
+											",center"+
+											",center"+
+											",center"+
+											",center"+
+											",center"+
+											",right"
+											);
+					myGrid2.setColTypes(	"ch"+
+											",ro"+
+											",ro"+
+											",ro"+
+											",ro"+
+											",ro"+
+											",edn"+
+											",ro"+
+											",ro"+
+											",ed"+
+											",ro"+
+											",ro"+
+											",ro"+
+											",ro"+
+											",ro"+
+											",ed"+
+											",edn"
+											);
+					myGrid2.setColumnHidden(myGrid2.getColIndexById("useYn"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid2.setColumnHidden(myGrid2.getColIndexById("userId"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					
+					myGrid2.init();		//이걸써야 세팅한 그리드가 표시가 된다
+
+					myGrid2.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+							
+					myGrid.enablePreRendering(10);
+					myGrid2.enableBlockSelection(true);
+					myGrid2.attachEvent("onKeyPress",fnObj.keyOpen.onKeyPressed);
+					
+					myGrid2.enableEditEvents(true,false,false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+
+				},
+				addRowMyGrid : function() {
+					//제일 큰 순번 구하기
+					var maxSeq = 0;
+					var maxRow = 0;
+					myGrid.forEachRow(function(RowId){
+						//제일 큰 로우아이디 구하기
+						var nowRowId = 	parseInt(myGrid.cellById(RowId,myGrid.getColIndexById("rowId")).getValue());
+						if(nowRowId > maxRow){
+							maxRow = nowRowId;
+						}						
+						//제일 큰 품목순번 구하기
+						var nowSeq = 	parseInt(myGrid.cellById(RowId,myGrid.getColIndexById("prodSeq")).getValue());
+						if(nowSeq > maxSeq){
+							maxSeq = nowSeq;
+						}
+					});
+					
+					var rowNo = maxRow;
+					var seqNo = maxSeq;
+					
+					myGrid.addRow((rowNo+1),"");
+					myGrid2.addRow((rowNo+1),"");
+					var rowData = {"cud":"C","prodSeq":(seqNo+1),"rowId":(rowNo+1) };
+			
+					myGrid.setRowData((rowNo+1),rowData);
+					myGrid2.setRowData((rowNo+1),rowData);
+					myGrid.selectRowById((rowNo+1)); 
+					
+					var sumMainRcptCost=0;	//20211226 정연호 추가. 착불비 합계 계산하기
+					myGrid.forEachRow(function(eachRowId){
+						if(	!isNaN(parseInt(myGrid.cellById(eachRowId,myGrid.getColIndexById("rcptCost")).getValue()) ))
+						{
+							sumMainRcptCost = sumMainRcptCost + parseInt(myGrid.cellById(eachRowId,myGrid.getColIndexById("rcptCost")).getValue());
+						}
+					});
+					//20211226 정연호 추가. 착불비 합계 계산하기
+					console.log("addRowMyGrid mainRcptCost - 전 : " + $("#mainRcptCost").val());
+					$("#mainRcptCost").val(sumMainRcptCost);
+					console.log("addRowMyGrid mainRcptCost - 후 : " + $("#mainRcptCost").val());
+				},
+				//체크한것 삭제(CUD 가 C 면 그냥 로우만 삭제, CUD 가 C 가 아니면 DB에서 읽었다는것-DB에서 삭제 & 로우에서삭제)
+				delRowMyGrid : function() {
+					//체크한것 몇개인지 체크
+					var chkCnt=0;
+					myGrid.forEachRow(function(chkRowId){
+						var chkRow = 	myGrid.cellById(chkRowId,myGrid.getColIndexById("chk")).getValue();
+						//체크를 했으면
+						if(chkRow == "1"){
+							chkCnt++;
+						}
+					});
+					if(chkCnt == 0){
+						alert("삭제할 대상을 체크 하세요.");
+						return;
+					}				
+					if(!confirm("체크한것을 삭제하시겠습니까?")){
+						return;
+					}					
+					var errMsg="";
+					myGrid.forEachRow(function(delRowId){
+						var delChk = 	myGrid.cellById(delRowId,myGrid.getColIndexById("chk")).getValue();
+						//체크를 했는데
+						if(delChk == "1"){
+							myGrid.deleteRow(delRowId,"");
+							myGrid2.deleteRow(delRowId,"");
+						}
+					});
+					
+					var sumMainRcptCost=0;	//20211226 정연호 추가. 착불비 합계 계산하기
+					myGrid.forEachRow(function(eachRowId){
+						if(	!isNaN(parseInt(myGrid.cellById(eachRowId,myGrid.getColIndexById("rcptCost")).getValue()) ))
+						{
+							sumMainRcptCost = sumMainRcptCost + parseInt(myGrid.cellById(eachRowId,myGrid.getColIndexById("rcptCost")).getValue());
+						}
+					});
+					//20211226 정연호 추가. 착불비 합계 계산하기
+					console.log("delRowMyGrid mainRcptCost - 전 : " + $("#mainRcptCost").val());
+					$("#mainRcptCost").val(sumMainRcptCost);
+					console.log("delRowMyGrid mainRcptCost - 후 : " + $("#mainRcptCost").val());
+				},
+				setWidth : function(){
+					searchDiv_height =  $("#searchDiv").height();
+					page_height =  $("#page").height();
+					xhdr_height =  $(".xhdr").height();
+					myGrid.enableAutoWidth(true, window.innerWidth,400);
+					myGrid.enableAutoHeight(true,240,240);	//그리드 자동높이
+				},	//END of setWidth
+			},		//ENd of gridOpen : {
+			searchOpen : {
+				//우편번호로 물류세터 찾기
+				postChange : function(postCd) {	
+					var postData = new FormData();
+					postData.append("cmpyCd",		myComboCmpyCd.getSelectedValue()		);		
+					postData.append("postCd",				postCd			);		
+					//헤더조회
+					$.ajax({
+				        url: "/erp101016p1PostCdDcCd",
+				        processData : false,
+						contentType : false,
+				        data: postData,
+				        type:"POST",
+				        datatype:"json",
+				        success : function(res){
+				        	if(res){
+				        		myComboDcCd.selectOption(myComboDcCd.getIndexByValue(res.dcCd));	
+				        	}
+				        	else{
+				       			alert("우편번호로 물류센터 찾기 실패");
+				        	}
+				        },
+					});
+				},
+				
+				//조회하기
+				search : function(tblSoMId) {	
+					var srchData = new FormData();
+					srchData.append("tblSoMId",				tblSoMId			);		//주문 고유 아이디
+					//헤더조회
+					$.ajax({
+				        url: "/erp101016p1HeaderList",
+				        processData : false,
+						contentType : false,
+				        data: srchData,
+				        type:"POST",
+				        datatype:"json",
+				        success : function(res){
+				        	if(res){
+				        		myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(res.cmpyCd));
+				        		$("#tblSoMId").val(res.tblSoMId);	
+				        		$("#orgnSoMId").val(res.tblSoMId);	
+				        		$("#soNo").val("");		
+								$("#refSoNo").val(res.refSoNo)	
+								$("#orgnSoNo").val(res.soNo);
+								
+								$("#srchCode").val(res.agntCd)	
+								$("#srchName").val(res.agntNm)	
+								$("#mallCd").val(res.mallCd)			
+								$("#brand").val(res.brand)			
+
+								$("#rcptDt").val(dateTypeChange(res.rcptDt,10))		
+								$("#rqstDt").val(dateTypeChange(res.rqstDt,10))	
+								$("#dlvyCnfmDt").val(dateTypeChange(res.dlvyCnfmDt,10))
+								
+								$("#acptEr").val(res.acptEr)	
+								$("#ordrEr").val(res.ordrEr)		
+								$("#acptTel1").val(res.acptTel1)
+								$("#acptTel2").val(res.acptTel2)			
+								$("#findAdd_postcode").val(res.postCd)	
+								$("#findAdd_roadAddress").val(res.addr1)			
+								$("#findAdd_detailAddress").val(res.addr2)		
+								$("#dlvyRqstMsg").val(res.dlvyRqstMsg)		
+								$("#custSpclTxt").val(res.custSpclTxt)					
+
+								myComboDlvyCostType.selectOption(myComboDlvyCostType.getIndexByValue("AFTER"));
+								console.log("res.rcptCost 전 :  ");
+								console.log(res.rcptCost);
+								if(!res.rcptCost)
+								{
+									res.rcptCost = 0;
+								}
+								console.log("res.rcptCost 후 :  ");
+								console.log(res.rcptCost);
+								$("#mainRcptCost").val(res.rcptCost)
+								$("#passCost").val(res.passCost)
+								myComboDcCd.selectOption(myComboDcCd.getIndexByValue(res.dcCd));
+				        	}
+				        	else{				        		
+				       			alert("헤더 조회 결과 없음");
+				        	}
+				        },
+					});
+					
+					//상세조회 (제품정보)
+					$.ajax({
+				        url: "/erp101016p1DetailList",
+				        processData : false,
+						contentType : false,
+				        data: srchData,
+				        type:"POST",
+				        datatype:"json",
+				        success : function(res){
+				        	myGrid.detachEvent("onCellChanged");
+				        	if(res){
+				        		myGrid.clearAll(false);
+				        		var columns = myGrid.getColumnCount()
+				        		var sumInstCost=0;
+				        		var sumMainRcptCost=0;	//20211226 정연호 추가. 착불비 합계 계산하기
+		        				for(var i=0;i<res.length;i++){
+		        					
+		        					//오출고 처리시 화면 하단 그리드 제품영역 그리드의 수량으느 마이너스 로 나오게 한다
+		        					//반품(정품) 
+		        					if(	sendObj.rtnSoType == "9904"){
+		        						//제품정보 영역 (화면 하단 그리드)
+		        						res[i]["qty"] = res[i]["qty"] * -1	;
+		        					}
+		        				
+	        		    			var jsonData = {};
+	        		    			for (var c=0; c<columns; c++){ 
+	        		    					
+									        		    			
+	        		    				if(myGrid.getColumnId(c) == "instCost"){
+	        		    					if(!res[i][myGrid.getColumnId(c)]){ //시공비에 값이 없으면 
+	        		    						jsonData[myGrid.getColumnId(c)] = "0";
+	        		    					}
+	        		    					else{
+	        		    						jsonData[myGrid.getColumnId(c)]  = res[i][myGrid.getColumnId(c)];
+	        		    						sumInstCost = sumInstCost + parseInt(res[i][myGrid.getColumnId(c)]);
+	        		    					}
+	        		    				}
+	        		    				
+	        		    				//착불비 합
+	        		    				else if(myGrid.getColumnId(c) == "rcptCost"){
+	        		    					
+	        		    					console.log("res["+i+"][myGrid.getColumnId(c)] : " );
+	        		    					console.log(res[i][myGrid.getColumnId(c)]);
+	        		    					console.log("sumMainRcptCost : " + sumMainRcptCost); 
+	        		    					if(!res[i][myGrid.getColumnId(c)]){ 
+	        		    						console.log("sumMainRcptCost if : " + sumMainRcptCost); 
+	        		    					
+	        		    						jsonData[myGrid.getColumnId(c)] = "0";
+	        		    					}
+	        		    					else{
+	        		    						jsonData[myGrid.getColumnId(c)]  = res[i][myGrid.getColumnId(c)];
+	        		    						sumMainRcptCost = sumMainRcptCost + parseInt(res[i][myGrid.getColumnId(c)]);
+	        		    						console.log("sumMainRcptCost else : " + sumMainRcptCost); 
+	        		    					}
+	        		    				}
+	        		    				
+	        		    				else if(myGrid.getColumnId(c) == "instCostOrg"){
+        		    						jsonData["instCostOrg"] =   res[i]["instCost"] / res[i]["qty"]
+	        		    				}
+	        		    				else if(myGrid.getColumnId(c) == "rowId"){
+	        		    						jsonData["rowId"] =   i+1
+	        		    				}
+	        		    				else if(myGrid.getColumnId(c) == "cud"){
+	        		    						jsonData["cud"] =   "C";
+	        		    				}
+	        		    				else{
+	        		    					jsonData[myGrid.getColumnId(c)] = res[i][myGrid.getColumnId(c)];
+	        		    				}
+	        		        		}
+	        		    			
+	        		    			myGrid.addRow(i+1,"");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+	        		    			myGrid.setRowData(i+1,jsonData);
+	        		    			myGrid2.addRow(i+1,"");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+	        		    			myGrid2.setRowData(i+1,jsonData);
+		        				}
+		        				$("#instCost").val(sumInstCost)
+		        				
+		        				//착불비 합계 계산하기
+		        				console.log("끝 : " + sumMainRcptCost); 
+		        				console.log("mainRcptCost val - 전 : " + $("#mainRcptCost").val()); 
+								$("#mainRcptCost").val(sumMainRcptCost);
+								console.log("mainRcptCost val - 후 : " + $("#mainRcptCost").val());
+		        				myGrid.attachEvent("onCellChanged", function(rId,cInd){
+           							//상품명 넘김
+        							if(myGrid.getColumnId(cInd) == "prodNm"){
+        								myGrid2.cellById(rId,myGrid2.getColIndexById("prodNm")).setValue(myGrid.cellById(rId,myGrid.getColIndexById("prodNm")).getValue());	
+        							}
+        							//상품코드 넘김
+        							if(myGrid.getColumnId(cInd) == "prodCd"){
+        								myGrid2.cellById(rId,myGrid2.getColIndexById("prodCd")).setValue(myGrid.cellById(rId,myGrid.getColIndexById("prodCd")).getValue());	
+        							}
+        							//수량넘김
+        							if(myGrid.getColumnId(cInd) == "qty"){
+        								myGrid2.cellById(rId,myGrid2.getColIndexById("qty")).setValue(myGrid.cellById(rId,myGrid.getColIndexById("qty")).getValue());	
+        							}	
+        							//시공비 넘김
+        							if(myGrid.getColumnId(cInd) == "instCost"){
+        								myGrid2.cellById(rId,myGrid2.getColIndexById("instCost")).setValue(myGrid.cellById(rId,myGrid.getColIndexById("instCost")).getValue());	
+        							}	
+        							//시공단가 넘김
+        							if(myGrid.getColumnId(cInd) == "instCostOrg"){
+        								myGrid2.cellById(rId,myGrid2.getColIndexById("instCostOrg")).setValue(myGrid.cellById(rId,myGrid.getColIndexById("instCostOrg")).getValue());	
+        							}        							
+        							if(myGrid.getColumnId(cInd) == "delResn"){
+        								myGrid2.cellById(rId,myGrid2.getColIndexById("delResn")).setValue(myGrid.cellById(rId,myGrid.getColIndexById("delResn")).getValue());	
+        							}        								
+        							//20211226 정연호 추가. 고객주문번호, 착불비 추가
+        							if(myGrid.getColumnId(cInd) == "refSoNo"){
+        								myGrid2.cellById(rId,myGrid2.getColIndexById("refSoNo")).setValue(myGrid.cellById(rId,myGrid.getColIndexById("refSoNo")).getValue());	
+        							}	
+        							if(myGrid.getColumnId(cInd) == "rcptCost"){
+        								myGrid2.cellById(rId,myGrid2.getColIndexById("rcptCost")).setValue(myGrid.cellById(rId,myGrid.getColIndexById("rcptCost")).getValue());	
+        							}						
+        						});
+				        	}
+				        	else{
+				       			alert("조회 수행 결과 없음");
+				        	}
+				        },
+					});
+					
+					//20220604 정연호 입력란 설정 (가리기, 보여주기)
+			
+					if(	sendObj.rtnSoType == "6000"	||	//AS
+						sendObj.rtnSoType == "2000"	||	//반품
+						sendObj.rtnSoType == "3100"	||	//교환1
+						sendObj.rtnSoType == "3200"	||	//교환2
+						sendObj.rtnSoType == "9904"		//반품(정품)
+							
+					){
+						//오더정보 영역
+					
+						$("#ordrInptDt").attr("disabled",true);	//시스템등록일
+						$("#srchName").attr("disabled",true);	//화주사명칭
+						$("#srchCode").attr("disabled",true);	//화주사코드
+						$("#srchIcon").hide();					//화주사검색돋보기아이콘
+						$("#delIcon").hide();					//화주사검색삭제아이콘
+						myComboSoType.disable();				//주문유형 콤보
+						myComboSoStat.disable();				//주문상태 콤보
+						$("#soNo").attr("disabled",true);		//AL 오더
+						$("#orgnSoNo").attr("disabled",true);	//원 AL 오더
+						$("#refSoNo").attr("disabled",true);	//고객사주문번호
+						$("#mallCd").attr("disabled",true);		//쇼핑몰
+						$("#brand").attr("disabled",true);		//브랜드
+						$("#rcptDt").attr("disabled",true);		//고객접수일
+						$("#rcptDtIcon").hide();				//고객접수일 버튼
+						$("#rqstDt").attr("disabled",true);		//고객배송요청일
+						$("#rqstDtIcon").hide();				//고객배송요청일 버튼
+						
+						//고객정보(수령인) 영역
+						
+						//운임정보 영역
+						myComboDlvyCostType.disable();			//운임구분
+						$("#rcptCost").attr("disabled",true);	//착불비
+						$("#passCost").attr("disabled",true);	//통행료
+						$("#instCost").attr("disabled",true);	//시공비
+					}
+					
+				},	//END of search : function() {
+	
+				//배송확정일 가능 한 날 조회 - 오늘날짜부터 31일뒤 까지 중에서 불가능일 조사하기	
+				searchDisableDate : function() {	
+					if(!fnObj.searchOpen.searchChkVal.chkVal("searchDisableDate")){
+						alert(chkValMsg);
+						myCalendar2.hide();
+						return false;
+					}
+					
+					var prodCdList = "";
+					var qtyList = "";
+					myGrid.forEachRow(function(rId){
+						//체크가 되어있고 수량에 값이 있는것 (0 이라도 숫자가 들어있는것)
+						var rIdChk = 	myGrid.cellById(rId,myGrid.getColIndexById("chk")).getValue();
+						var rIdQty = 	myGrid.cellById(rId,myGrid.getColIndexById("qty")).getValue();
+						var rIdCud = 	myGrid.cellById(rId,myGrid.getColIndexById("cud")).getValue();
+
+						if(	((parseInt(rIdQty) >= 0 || parseInt(rIdQty) < 0) && rIdCud =="C") || (   (parseInt(rIdQty) >= 0 || parseInt(rIdQty) < 0) && rIdCud !="C" )	){
+							prodCdList = prodCdList +"," + myGrid.cellById(rId,myGrid.getColIndexById("prodCd")).getValue();
+							qtyList = qtyList +"," + myGrid.cellById(rId,myGrid.getColIndexById("qty")).getValue();
+						}
+					});
+				
+					if(!prodCdList || !qtyList){
+						alert("제품정보 그리드를 확인하세요.(품목,수량)")
+						myCalendar2.hide();
+						return false;
+					}
+					
+					var srchData = new FormData();
+					srchData.append("cmpyCd",				myComboCmpyCd.getSelectedValue()			);		//회사코드
+					srchData.append("dcCd",					$("#srchCode").val()						);		//화주사 코드
+					srchData.append("fromDt",				today										);		//오늘날짜
+					srchData.append("srchDay",				dlvyCnfmDtRange								);		//배송확정일 체크 범위 일자
+					srchData.append("prodCdList",			prodCdList									);		//상품코드 리스트
+					srchData.append("qtyList",				qtyList										);		//수량리스트
+					srchData.append("postCd",				$("#findAdd_postcode").val()				);		//AL 오더
+					srchData.append("addr",					$("#findAdd_roadAddress").val()				);	//주소
+				
+					/*
+					for (var pair of srchData.entries()) { 
+						console.log(pair[0]+ ' :  ' + pair[1]);
+					}
+					*/
+					$.ajax({
+				        url: "/erp101016p1List",
+				        processData : false,
+						contentType : false,
+				        data: srchData,
+				        type:"POST",
+				        datatype:"json",
+				        async:false,
+				        success : function(res){				
+				        	if(res && res.length > 0){
+				        		var disableDays = [];
+				        		for(var i=0;i<res.length;i++){
+				        			if(res[i].ableYn != "Y"){ //사용할수 없는 날짜
+				        				disableDays.push(res[i].instDt.substring(0,4)+"-"+res[i].instDt.substring(4,6)+"-"+res[i].instDt.substring(6,8))
+				        			}
+				        		}
+				       
+				        		if(disableDays.length > 0){
+				        			myCalendar2.disableDays("year",JSON.stringify(disableDays));
+				        		}	
+				        	}
+				        	else{
+				        		myCalendar2.hide();
+				       			alert("조회 수행 결과 없음");
+				        	}
+				        },
+					});
+				},	//END of searchDisableDate : function() {
+					
+				//등록버튼 눌렀을때 수행
+				saveData : function() {	
+					myGrid.selectRow(0);
+					var prodGrid2 = [];
+					
+					var rIdProdCdErrCnt = 0;
+					var rIdrIdQty = 0;					
+					
+					var errRefSoNoCnt=0;//20211226 정연호 고객사주문번호가 빈칸일때
+					var errRcptCost=0;//20211226 정연호 착불비가 빈칸일때
+					
+					myGrid.forEachRow(function(rId){
+						//체크가 되어있고 수량에 값이 있는것 (0 이라도 숫자가 들어있는것)
+						var rIdChk = 	myGrid2.cellById(rId,myGrid2.getColIndexById("chk")).getValue();
+						var rIdQty = 	myGrid2.cellById(rId,myGrid2.getColIndexById("qty")).getValue();
+						var rIdProdCd = 	myGrid2.cellById(rId,myGrid2.getColIndexById("prodCd")).getValue();
+						var rIdCud = 	myGrid2.cellById(rId,myGrid2.getColIndexById("cud")).getValue();
+
+						//고객사 주문번호 : 빈칸이면 안됨
+						//착불비 : 빈칸이면 안됨. 0 이라도 있어야함
+						var rIdRefSoNo	=	myGrid.cellById(rId,myGrid.getColIndexById("refSoNo")).getValue();
+						var rIdRcptCost	=	myGrid.cellById(rId,myGrid.getColIndexById("rcptCost")).getValue();
+						
+						//20211226 정연호 고객사주문번호가 빈칸일때
+						if(rIdRefSoNo.trim() == ""){
+							errRefSoNoCnt++;
+						}						
+						//20211226 정연호 착불비가 빈칸일때
+						if(rIdRcptCost.trim() == ""){
+							errRcptCost++;
+						}						
+						//품목이 없음
+						if(!rIdProdCd){
+							rIdProdCdErrCnt++;
+						}
+						//수량이 없거나 0 임
+						if(!rIdQty || parseInt(rIdQty) == 0){
+							rIdrIdQty++;
+						}
+						//채크했고, 수량입력했고, 상품코드 있고 신규 만 넘김
+						if((parseInt(rIdQty) > 0 || parseInt(rIdQty) < 0) && rIdProdCd && (rIdCud == "C") ){
+							prodGrid2.push(myGrid2.getRowData(rId));
+						}
+					});
+				
+					if(errRefSoNoCnt	!=	0){
+						alert("제품정보의 고객사주문번호를 확인하세요.(필수)");	
+						return;
+					}
+					if(errRcptCost	!=	0){
+						alert("제품정보의 착불비를 확인하세요.\n빈칸 안됨. 숫자(0포함)만 가능");	
+						return;
+					}					
+					if(rIdProdCdErrCnt > 0){
+						alert("제품정보에 상품명을 입력하세요");
+						return;
+					}
+					if(rIdrIdQty > 0){
+						alert("제품정보에 수량을 입력하세요");
+						return;
+					}
+					if(!fnObj.searchOpen.searchChkVal.chkVal("saveData")){
+						alert(chkValMsg);
+						return false;
+					}
+					
+					var save = {};
+					save.cmpyCd			=	myComboCmpyCd.getSelectedValue()			
+					save.soNo			=		""			
+					save.orgnSoNo			=	$("#orgnSoNo").val()		
+					save.refSoNo		=		$("#refSoNo").val()			
+						
+					save.soType			=		myComboSoType.getSelectedValue()			
+					save.soStatCd		=		myComboSoStat.getSelectedValue()			
+					save.agntCd			=		$("#srchCode").val()			
+					save.mallCd			=		$("#mallCd").val()			
+					save.brand			=		$("#brand").val()			
+					save.ordrInptDt		=		$("#ordrInptDt").val().replace(/-/g,"")				
+					save.rcptDt			=		$("#rcptDt").val().replace(/-/g,"")		
+					save.rqstDt			=		$("#rqstDt").val().replace(/-/g,"")	
+					save.dlvyCnfmDt		=		$("#dlvyCnfmDt").val().replace(/-/g,"")			
+					save.acptEr			=		$("#acptEr").val()			
+					save.ordrEr			=		$("#ordrEr").val()				
+					save.acptTel1		=		$("#acptTel1").val()				
+					save.acptTel2		=		$("#acptTel2").val()				
+					save.postCd			=		$("#findAdd_postcode").val()			
+					save.addr1			=		$("#findAdd_roadAddress").val()			
+					save.addr2			=		$("#findAdd_detailAddress").val()			
+					save.dlvyRqstMsg	=		$("#dlvyRqstMsg").val()				
+					save.custSpclTxt	=		$("#custSpclTxt").val()				
+					//20211226 정연호 수정 운임구분은 후불 넣음
+					save.costType		=		"AFTER";
+					//20211226 정연호 수정. 새로 만든 착불비 합계를 rcptCost 에 넣는다
+					save.rcptCost		=		$("#mainRcptCost").val()
+					
+					save.passCost		=		$("#passCost").val()			
+					save.dcCd			=		myComboDcCd.getSelectedValue()			
+					save.useYn			=		"Y"			
+					save.memo			=		""			
+					save.inptSys		=		"ERP_SO_MISS"			
+					save.saveUser		=		/*[[${session.tblUserMId}]]*/			
+	
+					save.orgnSoMId		=		$("#orgnSoMId").val()	
+					save.missCloseType	=		sendObj.missCloseType;
+					save.missCloseStep	=		sendObj.missCloseStep;
+					
+					save.detailData		=		prodGrid2
+
+					//미마감 주문 등록 하기
+					$.ajax({
+				        url: "/erp101016p1Save",
+				        processData : false,
+						contentType : "application/json",
+				        data: JSON.stringify(save),
+				        type:"POST",
+				        datatype:"json",
+				        success : function(res){
+				        	if(res){
+								if(res.rtnYn == "Y"){
+									var step = "";	
+									if(sendObj.missCloseStep != sendObj.endCloseStep){
+										step = "\n확인을 눌러 " + (parseInt(sendObj.missCloseStep)+1) + "단계를 수행하세요."
+									}
+									
+									
+									alert(	"["+sendObj.rtnName+"]이(가) 완료되었습니다.\n"+
+											"해당오더는 주문현황 리스트 및 주문현황 상품리스트 에서 확인 할 수 있습니다.\n"+
+											"(고객명 : "+ res.custNm +", AL 오더번호 : " + res.soNo + ")" + 
+											step
+										);						
+									$(top.document).find('#loader').hide();
+								
+									//마지막 단계 라면
+									if(step == "")	{
+										parent.myWins.window("erp101016p1").close();	//팝업창 닫기
+								
+									}
+									else {
+										var rtnObj=[]; 
+										var rtn={};
+										rtn.windowId = "erp101016p1";
+										rtn.rtnSoType = sendObj.rtnSoType;
+										rtn.rtnBtnType = sendObj.rtnBtnType;
+										rtn.tblSoMId = res.tblSoMId;
+								
+										rtnObj.push(rtn);
+										rtn={};
+										parent.fnObj.winOpen.rtnObject("erp101016p1",rtnObj,"");
+									}
+								}
+								else{
+									alert("미마감주문 입력 실패")
+									$(top.document).find('#loader').hide();
+								}
+				        	}
+				        	else{
+				       			alert("미마감주문 수행 실패");
+				       			$(top.document).find('#loader').hide();
+				        	}
+				        	$(top.document).find('#loader').hide();
+				        },
+					});
+				},	//END of saveData : function() {
+					
+				delSrchCode : function(){
+					$("#srchCode").val("");
+					$("#srchName").val("");
+				},	//END of delSrchCode : function(){
+					
+				searchChkVal : {
+					chkVal : function(chkGubn){
+						chkValMsg="";	//메세지 초기화
+						var rtnVal = true;
+						
+						if(chkGubn == "searchDisableDate"){
+							if(!myComboCmpyCd.getSelectedValue()){
+								chkValMsg = chkValMsg + "회사코드가 없습니다\n";
+								rtnVal = false;
+							}
+							
+							if(!$("#srchCode").val()){
+								chkValMsg = chkValMsg + "화주사 코드가 없습니다. 화주사를 선택하세요\n";
+								rtnVal = false;
+							}
+							if(!today){
+								chkValMsg = chkValMsg + "오늘날짜를 구할 수 없습니다.\n";
+								rtnVal = false;
+							}
+							if(!dlvyCnfmDtRange){
+								chkValMsg = chkValMsg + "배송확정일 범위를 구할 수 없습니다.\n";
+								rtnVal = false;
+							}
+							if(!$("#findAdd_postcode").val()){
+								chkValMsg = chkValMsg + "우편번호를 구할 수 없습니다.\n";
+								rtnVal = false;
+							}
+							if(!$("#findAdd_roadAddress").val()){
+								chkValMsg = chkValMsg + "주소를 구할 수 없습니다.\n";
+								rtnVal = false;
+							} 
+						}
+						
+						if(chkGubn == "saveData"){
+							//회사코드		 필수			
+							if(!myComboCmpyCd.getSelectedValue()){
+								chkValMsg = chkValMsg + "회사코드가 없습니다\n";
+								rtnVal = false;
+							}
+							//시스템등록일 필수
+							if(!$("#ordrInptDt").val()){
+								chkValMsg = chkValMsg + "시스템등록일을 입력하세요\n";
+								rtnVal = false;
+							}							
+							//화주사코드 필수
+							if(!$("#srchCode").val()){
+								chkValMsg = chkValMsg + "화주사 코드가 없습니다. 화주사를 선택하세요\n";
+								rtnVal = false;
+							}
+							//화주사명칭 필수
+							if(!$("#srchName").val()){
+								chkValMsg = chkValMsg + "화주사 명칭이 없습니다. 화주사를 선택하세요\n";
+								rtnVal = false;
+							}							
+							//고객명(수취인) 필수
+							if(!$("#acptEr").val()){
+								chkValMsg = chkValMsg + "고객명(수취인)을 입력하세요\n";
+								rtnVal = false;
+							}
+							//휴대전화 acptTel2 필수
+							if(!$("#acptTel2").val()){
+								chkValMsg = chkValMsg + "연락처를 입력하세요\n";
+								rtnVal = false;
+							}
+							//20211226 정연호 추가. 착불비합계 체크
+							if($("#mainRcptCost").val().trim() == ""){
+								chkValMsg = chkValMsg + "착불비 합계가 없습니다.\n(제품정보의 착불비를 확인하세요)\n";
+								rtnVal = false;
+							}
+							//20211226 정연호 추가. 착불비합계 체크
+							if(isNaN(	$("#mainRcptCost").val()	)){	//착불비 합계가 숫자가 아닐때 isNaN 은 true 가 숫자가아님
+								chkValMsg = chkValMsg + "착불비 합계가 숫자가 아닙니다.\n(제품정보의 착불비를 확인하세요)\n";
+								rtnVal = false;
+							}
+							//우편번호 필수
+							if(!$("#findAdd_postcode").val()){
+								chkValMsg = chkValMsg + "우편번호를 구할 수 없습니다.\n";
+								rtnVal = false;
+							}
+							//주소 필수
+							if(!$("#findAdd_roadAddress").val()){
+								chkValMsg = chkValMsg + "주소를 구할 수 없습니다.\n";
+								rtnVal = false;
+							} 
+						}
+						return rtnVal;
+					},	//END of chkVal : function(){
+				},	//END of searchChkVal
+			},		//ENd of searchOpen : {
+				
+			keyOpen : {
+				enterKey : function(enterType){
+					 if (window.event.keyCode == 13) {
+						$("#srchName").blur();
+						$("#srchCode").blur();
+						$("#srchCode").val("");
+				
+		            	fnObj.winOpen.commSrch('화주','A','AGENCY','text');
+			        }
+				},
+				onKeyPressed : function (code,ctrl,shift){
+				    if(code==67&&(ctrl || 93)){
+				        myGrid.setCSVDelimiter("\t");
+				        myGrid.copyBlockToClipboard()
+				    }
+				    if(code==86&&(ctrl || 93)){
+				    	var cellType = myGrid.getColType(myGrid.getSelectedCellIndex());
+				    	if(cellType != "ed" && cellType != "edn"){
+				        	myGrid.pasteBlockFromClipboard();
+				    	}
+				    }
+				    return true;
+				},
+			},
+			delSrchCode : function(){
+				$("#srchCode").val("");
+				$("#srchName").val("");
+			},	//END of delSrchCode : function(){
+	}	//END of fnObj
+		
+$(document).ready(function() {
+	myGrid = new dhtmlXGridObject('grid');	//그리드
+	fnObj.gridOpen.grid();
+	
+	myGrid2 = new dhtmlXGridObject('grid2');	//그리드
+	fnObj.gridOpen.grid2();
+	myWins = new dhtmlXWindows();
+
+	fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+	fnObj.comboOpen.comboSoType();	//주문유형 콤보
+	fnObj.comboOpen.comboSoStat();	//주문상태 콤보
+	fnObj.comboOpen.comboDcCd();	//출고물류센터 콤보
+	fnObj.comboOpen.comboDlvyCostType();	//운임구분 콤보
+	
+	sendObj = /*[[${sendObject}]]*/
+
+	//달력정의
+	myCalendar = new dhtmlXCalendarObject([	{input:"ordrInptDt"	,button:"ordrInptDtIcon"	},
+											{input:"rcptDt"			,button:"rcptDtIcon"	},
+											{input:"rqstDt"			,button:"rqstDtIcon"	}
+	]);
+
+	var now = new Date()
+	
+	var year = now.getFullYear()+"";
+	var month = (now.getMonth()+1)+"";
+	var date = now.getDate()+"";
+	if(month.length == 1 ){
+		month = "0"+month;
+	}
+	if(date.length == 1 ){
+		date = "0"+date;
+	}
+	today =  year+"-" + month + "-" + date;
+	$("#ordrInptDt").val(today);
+	myCalendar.loadUserLanguage("ko");
+	
+	//오늘날짜부터 31일 이후의 날짜 구하기
+	var	oneMonthLater = new Date(now.setDate(now.getDate() + dlvyCnfmDtRange));
+	var oneMonthLaterYear = oneMonthLater.getFullYear()+"";
+	var oneMonthLaterMonth = (oneMonthLater.getMonth()+1)+"";
+	var oneMonthLaterDate = oneMonthLater.getDate()+"";
+	if(oneMonthLaterMonth.length == 1 ){
+		oneMonthLaterMonth = "0"+oneMonthLaterMonth;
+	}
+	if(oneMonthLaterDate.length == 1 ){
+		oneMonthLaterDate = "0"+oneMonthLaterDate;
+	}
+	var oneMonthLaterToday =  oneMonthLaterYear+"-" + oneMonthLaterMonth + "-" + oneMonthLaterDate;
+	//달력정의
+	myCalendar2 = new dhtmlXCalendarObject([{input:"dlvyCnfmDt"		,button:"dlvyCnfmDtIcon"		}	]);
+	myCalendar2.loadUserLanguage("ko");
+	myCalendar2.setSensitiveRange(today,oneMonthLaterToday);			//이만큼 범위만 날짜 선택가능 (오늘 부터 1달 후 로 지정)
+	myCalendar2.attachEvent("onBeforeChange", function(date){
+   		return true;
+	});
+	myCalendar2.attachEvent("onShow", function(){
+		fnObj.searchOpen.searchDisableDate();
+	});
+	
+	fnObj.searchOpen.search(sendObj.tblSoMId);
+
+	sessionUserGrntCd =  /*[[${session.userGrntCd}]]*/
+	sessionAgntCd = /*[[${session.agntCd}]]*/
+	sessionAgntNm = /*[[${session.agntNm}]]*/
+	//4100, 화주-관리자	4200, 화주-대리점
+	if(sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200"){
+		$("#srchName").val(sessionAgntNm);
+		$("#srchCode").val(sessionAgntCd);
+		
+		$("#srchName").attr("disabled",true);
+		$("#srchCode").attr("disabled",true);
+		
+		$("#srchIcon").hide();
+		$("#delIcon").hide();
+		
+		$("#dlvyCnfm").hide();
+	}
+});
+</script>
+</head>
+<body>
+	<div id="mainDiv" style="padding: 10px 10px 10px 10px; border: 1px solid black;">
+		<div id="searchDiv" style="width: 100%; font-size: 12px;">
+			<!-- 검색조건영역 -->
+			<div id="inputDiv1" style="width: 100%; font-size: 12px;">
+				<span class="cell" style="width: 180px; float: right;">
+					<span class="item-data" style="width: 90px;">
+						<input id="btnSrch" type="button" onclick="fnObj.searchOpen.saveData();" value="등록" style="width: 70px;">
+					</span>
+					<span class="item-data" style="width: 90px;">
+						<input id="btnSrch" type="button" onclick="parent.myWins.window('erp101016p1').close();" value="닫기" style="width: 70px;">
+					</span>
+				</span>
+
+				<span class="cell" style="width: 120px;">
+					<span class="item-head" style="width: 120px; text-align: left; font-size: 14px; color: darkblue; font-weight: bold;">오더정보</span>
+				</span>
+				<br>
+				<span class="cell" style="width: 220px; display: none;">
+					<span class="item-head" style="width: 80px;">
+						<b>회사<font color="red">*</font></b>
+					</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="cmpyCd"></div>
+					</span>
+				</span>
+				<span class="cell" style="width: 240px;">
+					<span class="item-head" style="width: 100px;">
+						<b>시스템등록일<font color="red">*</font></b>
+					</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="ordrInptDt" style="height: 20px; width: 90px;" disabled>
+						<i id="ordrInptDtIcon" class="fa fa-calendar fa-lg" aria-hidden="true" style="display:none;"></i>
+					</span>
+				</span>
+				<span class="cell" style="width: 380px;">
+					<span class="item-head" style="width: 80px;">
+						<b>화주사<font color="red">*</font></b>
+					</span>
+					<span class="item-data" style="width: 160px;">
+						<input type="text" id="srchName" style="width: 112px;" onkeyup="fnObj.keyOpen.enterKey('srchName');"></input>
+						<i id="srchIcon" class="fa fa-search" aria-hidden="true" onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"></i>
+					</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="srchCode" style="width: 102px;" readonly></input>
+						<i id="delIcon" class="fa fa-minus-circle" aria-hidden="true" onclick="fnObj.searchOpen.delSrchCode()"></i>
+					</span>
+				</span>
+
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">주문유형</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="soType"></div>
+					</span>
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">주문상태</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="soStatCd"></div>
+					</span>
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">AL 오더</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="soNo" style="width: 122px; height: 20px;" disabled></input>
+					</span>
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">원 AL 오더</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="orgnSoNo" style="width: 122px; height: 20px;" disabled></input>
+					</span>
+				</span>
+				<span class="cell" style="width: 260px;">
+					<span class="item-head" style="width: 120px;">고객사 주문번호</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="refSoNo" style="width: 122px; height: 20px;" onKeyUp="javascript:fnChkByte(this,'100')"></input>
+					</span>
+					<!-- 100 byte -->
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">쇼핑몰</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="mallCd" style="width: 122px; height: 20px;" onKeyUp="javascript:fnChkByte(this,'50')"></input>
+					</span>
+					<!-- 50 byte -->
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">브랜드</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="brand" style="width: 122px; height: 20px;" onKeyUp="javascript:fnChkByte(this,'50')"></input>
+					</span>
+					<!-- 50 byte -->
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">고객접수일</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="rcptDt" style="height: 20px; width: 90px;">
+						<i id="rcptDtIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+					</span>
+				</span>
+				<span class="cell" style="width: 240px;">
+					<span class="item-head" style="width: 100px;">고객배송요청일</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="rqstDt" style="height: 20px; width: 90px;">
+						<i id="rqstDtIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+					</span>
+				</span>
+				<span id="dlvyCnfm" class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">배송확정일</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="dlvyCnfmDt" style="height: 20px; width: 90px;" readOnly>
+
+						<i id="dlvyCnfmDtIcon" class="fa fa-calendar fa-lg" aria-hidden="true"> </i>
+						</input>
+					</span>
+				</span>
+				<span class="cell" style="width: 220px; display: none;">
+					<span class="item-head" style="width: 90px;">tblSoMId</span>
+					<span class="item-data" style="width: 130px;">
+						<input type="text" id="tblSoMId" style="width: 112px; height: 20px;" disabled></input>
+					</span>
+				</span>
+				<br>
+				<span class="cell" style="width: 220px; display: none;">
+					<span class="item-head" style="width: 90px;">orgnSoMId</span>
+					<span class="item-data" style="width: 130px;">
+						<input type="text" id="orgnSoMId" style="width: 112px; height: 20px;" disabled></input>
+					</span>
+				</span>
+				<br>
+				<span class="cell" style="width: 140px;">
+					<span class="item-head" style="width: 120px; text-align: left; font-size: 14px; color: darkblue; font-weight: bold;">고객정보(수령인)</span>
+				</span>
+				<br>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 110px;">
+						<b>고객명(수취인)<font color="red">*</font></b>
+					</span>
+					<span class="item-data" style="width: 110px;">
+						<input type="text" id="acptEr" style="width: 102px; height: 20px;" onKeyUp="javascript:fnChkByte(this,'50')"></input>
+					</span>
+					<!-- 50 byte -->
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">주문자</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="ordrEr" style="width: 122px; height: 20px;" onKeyUp="javascript:fnChkByte(this,'50')"></input>
+					</span>
+					<!-- 50 byte -->
+				</span>
+				
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">
+						<b>연락처<font color="red">*</font></b>
+					</span>
+					<!--  휴대전화  -->
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="acptTel2" style="width: 122px; height: 20px;" oninput="this.value = this.value.replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');" onKeyUp="javascript:fnChkByte(this,'20')"></input>
+					</span>
+					<!-- 20 byte -->
+				</span>
+
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">연락처(보조)</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="acptTel1" style="width: 122px; height: 20px;" oninput="this.value = this.value.replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');" onKeyUp="javascript:fnChkByte(this,'20')"></input>
+					</span>
+					<!-- 20 byte -->
+				</span>
+
+				<!--  20211226 정연호 추가. 착불비 합계를 추가함 -->
+				<!--  USP_SO_M_INS 입력시 DLVY_COST_TYPE = 'AFTER' , RCPT_COST에 넣어 -->
+				<span class="cell" style="width: 220px;border:0px solid black;">
+					<span class="item-head" style="width: 80px;">착불비합계</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="mainRcptCost" style="width: 122px; height: 20px;" disabled oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"></input>
+					</span>
+				</span>
+				<br>
+				<span class="cell" style="width: 240px;">
+					<span class="item-head" style="width: 100px;">
+						<b>우편번호<font color="red">*</font></b>
+					</span>
+					<span class="item-data" style="width: 120px;">
+						<input type="text" id="findAdd_postcode" name="findAdd_postcode" style="width: 112px; height: 20px;" readOnly></input>
+					</span>
+					<span class="item-data" style="width: 20px;">
+						<i class="fa fa-search" aria-hidden="true" onclick="findAdd_execDaumPostcode();" style="width: 20px;"></i>
+					</span>
+					<!-- 우편번호 레이어 팝업 -->
+					<!-- iOS에서는 position:fixed 버그가 있음, 적용하는 사이트에 맞게 position:absolute 등을 이용하여 top,left값 조정 필요 -->
+					<div id="layer" style="display: none; position: fixed; overflow: hidden; z-index: 1; -webkit-overflow-scrolling: touch;">
+						<img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer" style="cursor: pointer; position: absolute; right: -3px; top: -3px; z-index: 1" onclick="closeDaumPostcode()" alt="닫기 버튼">
+					</div>
+					<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+					<script>
+					    // 우편번호 찾기 화면을 넣을 element
+					    var element_layer = document.getElementById('layer');
+					
+					    function closeDaumPostcode() {
+					        // iframe을 넣은 element를 안보이게 한다.
+					        element_layer.style.display = 'none';
+					    }
+					
+					    function findAdd_execDaumPostcode() {
+					        new daum.Postcode({
+					            oncomplete: function(data) {
+					                // 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+					                // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+					                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+					                var addr = ''; // 주소 변수
+					                var extraAddr = ''; // 참고항목 변수
+					
+					                //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+					                if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+					                    addr = data.roadAddress;
+					                } else { // 사용자가 지번 주소를 선택했을 경우(J)
+					                    addr = data.jibunAddress;
+					                }
+					
+					                // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+					                if(data.userSelectedType === 'R'){
+					                    // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+					                    // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+					                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+					                        extraAddr += data.bname;
+					                    }
+					                 	// 건물명이 있고, 공동주택일 경우 추가한다.		--original source
+					                    /*  if(data.buildingName !== '' && data.apartment === 'Y'){
+					                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+					                    } */
+	
+					                    //20211192 정연호 변경. 아파트 이런거 상관없이 빌딩이름이 있으면 추가함
+					                    if(data.buildingName !== ''){
+					                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+					                    }
+					                    
+					                    // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+					                    if(extraAddr !== ''){
+					                        extraAddr = ' (' + extraAddr + ')';
+					                    }
+					                    // 조합된 참고항목을 해당 필드에 넣는다.
+					                    //document.getElementById("findAdd_extraAddress").value = extraAddr;
+					                
+					                } else {
+					                    //document.getElementById("findAdd_extraAddress").value = '';
+					                }
+					
+					                // 우편번호와 주소 정보를 해당 필드에 넣는다.
+					                document.getElementById('findAdd_postcode').value = data.zonecode;
+					                
+					                fnObj.searchOpen.postChange(data.zonecode);	//20211031 정연호 추가
+					                
+					                //20220225 정연호 수정. 지번 도로명 둘다쓰니깐 addr 이 들어가게 수정해줌
+					                //document.getElementById("findAdd_roadAddress").value = data.roadAddress  + ' ' + extraAddr;
+					                document.getElementById("findAdd_roadAddress").value = addr  + ' ' + extraAddr;
+					                
+					                //document.getElementById("findAdd_jibunAddress").value = data.jibunAddress;
+					                // 커서를 상세주소 필드로 이동한다.
+					                document.getElementById("findAdd_detailAddress").focus();
+					
+					                // iframe을 넣은 element를 안보이게 한다.
+					                // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+					                element_layer.style.display = 'none';
+					            },
+					            width : '100%',
+					            height : '100%',
+					            maxSuggestItems : 5
+					        }).embed(element_layer);
+					
+					        // iframe을 넣은 element를 보이게 한다.
+					        element_layer.style.display = 'block';
+					
+					        // iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+					        initLayerPosition();
+					    }
+					
+					    // 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
+					    // resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
+					    // 직접 element_layer의 top,left값을 수정해 주시면 됩니다.
+					    function initLayerPosition(){
+					        var width = 400; //우편번호서비스가 들어갈 element의 width
+					        var height = 500; //우편번호서비스가 들어갈 element의 height
+					        var borderWidth = 5; //샘플에서 사용하는 border의 두께
+					
+					        // 위에서 선언한 값들을 실제 element에 넣는다.
+					        element_layer.style.width = width + 'px';
+					        element_layer.style.height = height + 'px';
+					        element_layer.style.border = borderWidth + 'px solid';
+					        // 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
+					        element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width)/2 - borderWidth) + 'px';
+					        element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height)/4 - borderWidth) + 'px';
+					    }
+					</script>
+				</span>
+
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">출고물류센터</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="dcCd"></div>
+					</span>
+				</span>
+				<br>
+				<span class="cell" style="width: 100%;">
+					<span class="item-head" style="width: 100px;">
+						<b>주소<font color="red">*</font></b>
+					</span>
+					<span class="item-data" style="width: 50%;">
+						<input type="text" id="findAdd_roadAddress" name="findAdd_roadAddress" style="width: 100%; height: 20px;" readOnly placeholder="주소"></input>
+					</span>
+					<!-- 100 byte -->
+					<span class="item-data" style="width: 50%;">
+						<input type="text" id="findAdd_detailAddress" name="findAdd_detailAddress" style="width: 100%; height: 20px;" placeholder="상세주소" onKeyUp="javascript:fnChkByte(this,'200')"></input>
+					</span>
+					<!-- 200 byte -->
+				</span>
+
+				<span class="cell" style="width: 100%;">
+					<span class="item-head" style="width: 100px;">배송메세지</span>
+					<span class="item-data" style="width: 100%;">
+						<textarea id="dlvyRqstMsg" name="dlvyRqstMsg" style="width: 100%; height: 80px;" onKeyUp="javascript:fnChkByte(this,'500')"></textarea>
+					</span>
+					<!-- 500 byte -->
+				</span>
+				<span class="cell" style="width: 100%;">
+					<span class="item-head" style="width: 100px;">고객사메세지</span>
+					<span class="item-data" style="width: 100%;">
+						<textarea id="custSpclTxt" name="custSpclTxt" style="width: 100%; height: 80px;" onKeyUp="javascript:fnChkByte(this,'500')"></textarea>
+					</span>
+					<!-- 500 byte -->
+				</span>
+				<br>
+
+				<span class="cell" style="width: 120px;">
+					<span class="item-head" style="width: 120px; text-align: left; font-size: 14px; color: darkblue; font-weight: bold;">운임정보</span>
+				</span>
+				<br>
+
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">운임구분</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="dlvyCostType"></div>
+					</span>
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">착불비</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="rcptCost" style="width: 122px; height: 20px;" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"></input>
+					</span>
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">통행료</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="passCost" style="width: 122px; height: 20px;" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"></input>
+					</span>
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">시공비</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="instCost" style="width: 122px; height: 20px;" disabled oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"></input>
+					</span>
+				</span>
+				<br>
+				<span class="cell" style="width: 160px;">
+					<span class="item-head" style="width: 160px; text-align: left; font-size: 14px; color: darkblue; font-weight: bold;">
+						제품정보&nbsp;&nbsp;&nbsp;
+						<i id=rowPlusBtn class="fa fa-plus-circle fa-lg" aria-hidden="true" style="font-size: 18px; color: black; font-weight: bold;" onclick="fnObj.gridOpen.addRowMyGrid()";></i>
+						&nbsp;&nbsp;&nbsp;
+						<i id=rowMinusBtn class="fa fa-minus-circle fa-lg" aria-hidden="true" style="font-size: 18px; color: black; font-weight: bold;" onclick="fnObj.gridOpen.delRowMyGrid()";></i>
+					</span>
+				</span>
+				<br>
+				<br>
+				<div id="grid" style="width: 100%; height: 240px;"></div>
+				<div id="grid2" style="width: 100%; height: 200px; display: none;"></div>
+			</div>
+		</div>
+		<!-- 	<div id="grid" style="width:100%;height:100%;">
+		
+		</div> -->
+
+	</div>
+</body>
+</html>

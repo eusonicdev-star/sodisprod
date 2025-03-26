@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.allianceLogistics.alsys.mobile.mDeliveryDelay.mapper.MobileDeliveryDelayMapper">
+
+    
+
+    <select id="mDeliveryDelayList"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mDeliveryDelay.entity.MobileDeliveryDelayVO" 	
+    																resultType		="com.allianceLogistics.alsys.mobile.mDeliveryDelay.entity.MobileDeliveryDelayVO">
+        {
+	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_POSTPONE_SEATCAPA_LOAD (
+	      	#{cmpyCd			,mode=IN	,	jdbcType=VARCHAR},
+			#{tblSoMId			,mode=IN	,	jdbcType=VARCHAR}
+			
+	      )
+      }
+    </select>
+    
+    
+    
+    
+    <select id="mDeliveryDelaySave"  statementType="CALLABLE"	parameterType	="com.allianceLogistics.alsys.mobile.mDeliveryDelay.entity.MobileDeliveryDelayVO" 	
+    															resultType		="com.allianceLogistics.alsys.mobile.mDeliveryDelay.entity.MobileDeliveryDelayVO">
+        {
+	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_POSTPONE_SAVE (
+	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
+			#{tblSoMId			,mode=IN	,	jdbcType=VARCHAR},
+			#{capaId			,mode=IN	,	jdbcType=VARCHAR},
+			#{orgnDlvyDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{postPoneDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{postPoneMemo		,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser			,mode=IN	,	jdbcType=VARCHAR}
+	      )
+      }
+    </select>
+    
+    
+    
+   
+</mapper>

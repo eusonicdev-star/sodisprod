@@ -1,0 +1,3492 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>시공계획 관리 (erp2030010)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css"
+          th:href="@{/css/common.css(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}">
+    <link rel="stylesheet" type="text/css"
+          th:href="@{https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}">
+    <link rel="stylesheet" type="text/css"
+          th:href="@{https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}">
+    <link rel="stylesheet" type="text/css"
+          th:href="@{https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}">
+    <link rel="stylesheet" type="text/css" href="/css/erp-style.css">
+    <link rel="stylesheet" type="text/css"
+          th:href="@{https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}">
+    <script th:src="@{https://cdn.dhtmlx.com/edge/dhtmlx.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"
+            crossorigin="anonymous"></script>
+    <script
+            th:src="@{https://code.jquery.com/jquery-3.6.0.min.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript"
+            th:src="@{/js/common.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"></script>
+    <script type="text/javascript"
+            th:src="@{/js/commCode.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"></script>
+    <script
+            th:src="@{https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"></script>
+    <script
+            th:src="@{https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"></script>
+    <script
+            th:src="@{https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"></script>
+
+    <script th:inline="javascript">
+        var addr = [];
+        var selectedMarker = null;// 클릭한 마커를 담을 변수
+        var searchRes;
+        var pagePerRow = 0;
+        var myWins;
+        var myGrid;
+        var myGrid2;
+
+        var myCalendar;
+
+        var distanceOverlay = [];	//키로수 표시하기
+        var drawLine = [];	//거리직선표시
+        var myGridOnCellChanged;
+
+        fnObj = {
+            winOpen: {
+
+                //시공기사 찾기 팝업
+                instErOpen: function (rId, cmpyCd, dcCd, instEr, useYn) {		//공통코드 찾기 팝업
+                    windowId = "instErOpen";
+                    windowText = "시공기사 찾기 팝업 erp203001p1";
+                    windowUrl = "/erp203001p1"
+                    windowLeft = 0;
+                    windowTop = 0;
+                    windowWidth = 800;
+                    windowHeight = 600;
+                    windowsModal = true;
+                    windowOnClose = function (windowId) {
+                        return true;
+                    };
+                    windowSendObject = {
+                        cmpyCd: cmpyCd,
+                        dcCd: dcCd,
+                        instEr: instEr,
+                        useYn: useYn,
+                        rowId: rId,
+                        windowId: windowId
+                    };
+
+
+                    myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+
+                    myWins.window(windowId).attachEvent("onClose", function (win) {
+
+                        return true;
+                    });
+                },	//END of instErOpen : function(){
+                grid2InstErNameOpen: function (cmpyCd, instDt, dcCd, instEr, restYn) {		//공통코드 찾기 팝업
+                    windowId = "grid2InstErNameOpen";
+                    windowText = "시공기사 찾기 팝업2 erp203001p2";
+                    windowUrl = "/erp203001p2"
+                    windowLeft = -14400;
+                    windowTop = -14400;
+                    windowWidth = 1200;
+                    windowHeight = 600;
+                    windowsModal = true;
+                    windowOnClose = function (windowId) {
+
+                        return true;
+                    };
+                    windowSendObject = {
+                        cmpyCd: cmpyCd,
+                        instDt: instDt,
+                        dcCd: dcCd,
+                        instEr: instEr,
+                        restYn: restYn,
+
+                        windowId: windowId
+                    };
+
+
+                    myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+
+                    myWins.window(windowId).attachEvent("onClose", function (win) {
+
+                        return true;
+                    });
+                },	//END of instErOpen : function(){
+                grid2InstErStatOpen: function () {		//시공기사현황3
+                    windowId = "grid2InstErStatOpen";
+                    windowText = "시공기사 현황 erp203001p3";
+                    windowUrl = "/erp203001p3"
+                    windowLeft = window.innerWidth / 2;
+                    windowTop = 0;
+                    windowWidth = 630;
+                    windowHeight = 600;
+                    windowsModal = false;
+                    windowOnClose = function (windowId) {
+
+                        return true;
+                    };
+                    windowSendObject = {
+                        cmpyCd: myComboCmpyCd.getSelectedValue(),
+                        instDt: $("#dateFrom").val().replace(/-/g, ""),
+                        dcCd: myComboDcCd.getSelectedValue(),
+                        windowId: windowId
+                    };
+                    myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+                    myWins.window(windowId).attachEvent("onClose", function (win) {
+                        return true;
+                    });
+                },
+                rtnObject: function (windowId, rtnObj, srchInput) {	//popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+                    if (rtnObj == null) {
+                        myWins.window(windowId).setPosition(0, 0);
+                        return;
+                    }
+                    if (windowId == "grid2InstErStatOpen") {
+                        var rtn = rtnObj[0];
+                        $("#instErName").val(rtnObj[0].instEr);
+                        $("#tblUserMId").val(rtnObj[0].tblUserMId);
+                    }
+                    if (windowId == "grid2InstErNameOpen") {
+                        var rtn = rtnObj[0];
+                        $("#instErName").val(rtnObj[0].instEr);
+                        $("#tblUserMId").val(rtnObj[0].tblUserMId);
+                    }
+                    if (windowId == "instErOpen") {
+                        var rtn = rtnObj[0];
+
+                        var paltNo = myGrid.cellById(rtn.rowId, myGrid.getColIndexById("paltNoxx")).getValue();
+
+                        //시공기사 이름을 바꾸려는데 해당 로우에 팔렛트 넘버가 있다면, 모든 팔렛트 넘버에 해당하는 시공기사 이름을 모두 바꿀것인가?
+                        if (paltNo) {
+                            myGrid.forEachRow(function (eachRId) {		//그리드 반복
+                                if (myGrid.cellById(eachRId, myGrid.getColIndexById("paltNoxx")).getValue() == paltNo)	//팔렛트 넘버가 입력한 바꾸려는 시공기사이름의 팔렛트 넘버와 같으면
+                                {
+                                    myGrid.cellById(eachRId, myGrid.getColIndexById("instEr")).setValue(rtn.userNm);
+                                    myGrid.cellById(eachRId, myGrid.getColIndexById("tblUserMId")).setValue(rtn.tblUserMId);
+                                    myGrid.cellById(eachRId, myGrid.getColIndexById("cud")).setValue("U");
+                                    myGrid.cellById(eachRId, myGrid.getColIndexById("chk")).setValue("1");
+                                }
+                            });
+                        } else {
+                            myGrid.cellById(rtn.rowId, myGrid.getColIndexById("instEr")).setValue(rtn.userNm);
+                            myGrid.cellById(rtn.rowId, myGrid.getColIndexById("tblUserMId")).setValue(rtn.tblUserMId);
+                            myGrid.cellById(rtn.rowId, myGrid.getColIndexById("cud")).setValue("U");
+                            myGrid.cellById(rtn.rowId, myGrid.getColIndexById("chk")).setValue("1");
+                        }
+                    }
+                },	//END of rtnObject : function(windowId,rtnObj){
+            },	//END of winOpen
+            comboOpen: {
+                comboCmpyCd: function () {		//회사콤보목록
+                    myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+                    comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+                    myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/));
+                    myComboCmpyCd.setFontSize("12px", "12px");
+                    myComboCmpyCd.attachEvent("onChange", function (value, text) {
+                        myGrid.clearAll(false);
+                        myGrid2.clearAll(false);
+                        $("#totCnt").val("");
+                        $("#xtotCnt").val("");
+                        $("#cbmSumInput").val("");
+                        $("#costSumInput").val("");
+                        $("#distance").val("");
+                        $("#paltNoInput").val("");
+                        $("#instErName").val("");
+                        $("#tblUserMId").val("");
+                    });
+                    myComboCmpyCd.disable();
+
+                },
+
+
+                comboInstCapaCtgr: function () {		//시공카테고리 콤보
+                    myComboInstCapaCtgr = new dhtmlXComboFromSelect("instCapaCtgr");
+                    comboList(myComboInstCapaCtgr, 'A', 'COMM', 'INST_CAPA_CTGR', '', 'Y', 'all');
+
+                    myComboInstCapaCtgr.selectOption(0);
+                    myComboInstCapaCtgr.setFontSize("12px", "12px");
+                    myComboInstCapaCtgr.attachEvent("onChange", function (value, text) {
+                        myGrid.clearAll(false);
+                        myGrid2.clearAll(false);
+                        $("#totCnt").val("");
+                        $("#xtotCnt").val("");
+                        $("#cbmSumInput").val("");
+                        $("#costSumInput").val("");
+                        $("#distance").val("");
+                        $("#paltNoInput").val("");
+                        $("#instErName").val("");
+                        $("#tblUserMId").val("");
+                        if (this.getIndexByValue(value) != 0) {
+                            this.setChecked(this.getIndexByValue(value), true);
+                            var c = 0;
+                            for (var i = 1; i < this.getOptionsCount(); i++) {
+                                if (this.isChecked(i)) {
+                                    c++;
+                                }
+                            }
+                            this.updateOption("", "", c + "개 선택", "");
+                            this.selectOption(0);
+                            this.openSelect();
+                        }
+                    });
+                    myComboInstCapaCtgr.attachEvent("onCheck", function (value, text) {
+
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+                        {
+                            if (myComboInstCapaCtgr.isChecked(0)) {
+
+                                var c = 0;
+                                for (var i = 1; i < myComboInstCapaCtgr.getOptionsCount(); i++) {
+                                    myComboInstCapaCtgr.setChecked(i, true);
+                                    c++;
+                                }
+                                myComboInstCapaCtgr.updateOption("", "", c + "개 선택", "");
+                                //myComboInstCapaCtgr.selectOption(0);
+                                myComboInstCapaCtgr.openSelect();
+                            }
+                            if (!myComboInstCapaCtgr.isChecked(0))		//전체에 체크를 안했을때
+                            {
+
+                                var c = 0;
+                                for (var i = 1; i < myComboInstCapaCtgr.getOptionsCount(); i++) {
+                                    myComboInstCapaCtgr.setChecked(i, false);
+                                }
+                                myComboInstCapaCtgr.updateOption("", "", c + "개 선택", "");
+                                //myComboInstCapaCtgr.selectOption(0);
+                                myComboInstCapaCtgr.openSelect();
+                                return;
+                            }
+
+                        } else {
+                            var cnt = 0;
+
+                            for (var i = 1; i < myComboInstCapaCtgr.getOptionsCount(); i++) {
+                                if (myComboInstCapaCtgr.isChecked(i)) {
+                                    cnt++;
+                                }
+                            }
+                            if ((myComboInstCapaCtgr.getOptionsCount() - 1) == cnt) {
+                                myComboInstCapaCtgr.setChecked(0, true);
+                            } else {
+                                myComboInstCapaCtgr.setChecked(0, false);
+                            }
+
+                            myComboInstCapaCtgr.updateOption("", "", cnt + "개 선택", "");
+                            //myComboInstCapaCtgr.selectOption(0);
+                            myComboInstCapaCtgr.openSelect();
+
+                            return;
+                        }
+
+                    });
+                    myComboInstCapaCtgr.readonly(true);
+                },
+
+
+                comboInstCapaType: function () {		//시공유형 콤보
+                    myComboInstCapaType = new dhtmlXComboFromSelect("instCapaType");
+                    comboList(myComboInstCapaType, 'A', 'COMM', 'INST_CAPA_TYPE', '', 'Y', 'all');
+
+                    myComboInstCapaType.selectOption(0);
+                    myComboInstCapaType.setFontSize("12px", "12px");
+                    myComboInstCapaType.attachEvent("onChange", function (value, text) {
+                        myGrid.clearAll(false);
+                        myGrid2.clearAll(false);
+                        $("#totCnt").val("");
+                        $("#xtotCnt").val("");
+                        $("#cbmSumInput").val("");
+                        $("#costSumInput").val("");
+                        $("#distance").val("");
+                        $("#paltNoInput").val("");
+                        $("#instErName").val("");
+                        $("#tblUserMId").val("");
+                        if (this.getIndexByValue(value) != 0) {
+                            this.setChecked(this.getIndexByValue(value), true);
+                            var c = 0;
+                            for (var i = 1; i < this.getOptionsCount(); i++) {
+                                if (this.isChecked(i)) {
+                                    c++;
+                                }
+                            }
+                            this.updateOption("", "", c + "개 선택", "");
+                            this.selectOption(0);
+                            this.openSelect();
+                        }
+
+                    });
+                    myComboInstCapaType.attachEvent("onCheck", function (value, text) {
+
+                        if (!value) {		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+                            if (myComboInstCapaType.isChecked(0)) {
+                                var c = 0;
+                                for (var i = 1; i < myComboInstCapaType.getOptionsCount(); i++) {
+                                    myComboInstCapaType.setChecked(i, true);
+                                    c++;
+                                }
+                                myComboInstCapaType.updateOption("", "", c + "개 선택", "");
+                                myComboInstCapaType.openSelect();
+                            }
+                            if (!myComboInstCapaType.isChecked(0)) {		//전체에 체크를 안했을때
+                                var c = 0;
+                                for (var i = 1; i < myComboInstCapaType.getOptionsCount(); i++) {
+                                    myComboInstCapaType.setChecked(i, false);
+                                }
+                                myComboInstCapaType.updateOption("", "", c + "개 선택", "");
+                                myComboInstCapaType.openSelect();
+                                return;
+                            }
+                        } else {
+                            var cnt = 0;
+                            for (var i = 1; i < myComboInstCapaType.getOptionsCount(); i++) {
+                                if (myComboInstCapaType.isChecked(i)) {
+                                    cnt++;
+                                }
+                            }
+
+                            if ((myComboInstCapaType.getOptionsCount() - 1) == cnt) {
+                                myComboInstCapaType.setChecked(0, true);
+                            } else {
+                                myComboInstCapaType.setChecked(0, false);
+                            }
+                            myComboInstCapaType.updateOption("", "", cnt + "개 선택", "");
+                            myComboInstCapaType.openSelect();
+                            return;
+                        }
+                    });
+                    myComboInstCapaType.readonly(true);
+                },
+
+                comboZoneType: function () {		//권역유형 콤보
+                    myComboZoneType = new dhtmlXCombo("zoneType");
+                    comboList(myComboZoneType, 'A', 'INST_ZONE_TYPE', 'ZONE_TYPE', '', 'Y', 'all');
+                    myComboZoneType.readonly(true);
+                    myComboZoneType.selectOption(0);
+                    myComboZoneType.setFontSize("12px", "12px");
+                    myComboZoneType.attachEvent("onChange", function (value, text) {
+                        myGrid.clearAll(false);
+                        myComboZone.clearAll();
+                        comboList(myComboZone, 'A', 'COMM', myComboZoneType.getSelectedValue(), '', 'Y', 'req');
+                        myComboZone.selectOption(0);
+                    });
+                },
+
+                comboZone: function () {		//권역 콤보
+                    myComboZone = new dhtmlXComboFromSelect("zone");
+                    comboList(myComboZone, 'A', 'COMM_LIST', '', '', 'Y', 'all');
+                    myComboZone.selectOption(0);
+                    myComboZone.setFontSize("12px", "12px");
+                    myComboZone.attachEvent("onChange", function (value, text) {
+                        myGrid.clearAll(false);
+                        myGrid2.clearAll(false);
+                        $("#totCnt").val("");
+                        $("#xtotCnt").val("");
+                        $("#cbmSumInput").val("");
+                        $("#costSumInput").val("");
+                        $("#distance").val("");
+                        $("#paltNoInput").val("");
+                        $("#instErName").val("");
+                        $("#tblUserMId").val("");
+                        if (this.getIndexByValue(value) != 0) {
+                            this.setChecked(this.getIndexByValue(value), true);
+                            var c = 0;
+                            for (var i = 1; i < this.getOptionsCount(); i++) {
+                                if (this.isChecked(i)) {
+                                    c++;
+                                }
+                            }
+                            this.updateOption("", "", c + "개 선택", "");
+                            this.selectOption(0);
+                            this.openSelect();
+                        }
+
+                    });
+                    myComboZone.attachEvent("onCheck", function (value, text) {
+
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+                        {
+                            if (myComboZone.isChecked(0)) {
+                                var c = 0;
+                                for (var i = 1; i < myComboZone.getOptionsCount(); i++) {
+                                    myComboZone.setChecked(i, true);
+                                    c++;
+                                }
+                                myComboZone.updateOption("", "", c + "개 선택", "");
+                                //myComboZone.selectOption(0);
+                                myComboZone.openSelect();
+                            }
+                            if (!myComboZone.isChecked(0))		//전체에 체크를 안했을때
+                            {
+
+                                var c = 0;
+                                for (var i = 1; i < myComboZone.getOptionsCount(); i++) {
+                                    myComboZone.setChecked(i, false);
+                                }
+                                myComboZone.updateOption("", "", c + "개 선택", "");
+                                //myComboZone.selectOption(0);
+                                myComboZone.openSelect();
+                                return;
+                            }
+
+                        } else {
+                            var cnt = 0;
+
+                            for (var i = 1; i < myComboZone.getOptionsCount(); i++) {
+                                if (myComboZone.isChecked(i)) {
+                                    cnt++;
+                                }
+                            }
+
+                            if ((myComboZone.getOptionsCount() - 1) == cnt) {
+                                myComboZone.setChecked(0, true);
+                            } else {
+                                myComboZone.setChecked(0, false);
+                            }
+
+                            myComboZone.updateOption("", "", cnt + "개 선택", "");
+                            //myComboZone.selectOption(0);
+                            myComboZone.openSelect();
+
+                            return;
+                        }
+
+                    });
+                    myComboZone.readonly(true);
+                },
+
+
+                comboDcCd: function () {		//물류센터 콤보
+                    myComboDcCd = new dhtmlXCombo("dcCd");
+                    comboList(myComboDcCd, 'A', 'DC_CD', '', '', 'Y', 'req');
+
+                    myComboDcCd.selectOption(0);
+                    myComboDcCd.setFontSize("12px", "12px");
+                    myComboDcCd.attachEvent("onChange", function (value, text) {
+                        myGrid.clearAll(false);
+                        myGrid2.clearAll(false);
+                        $("#totCnt").val("");
+                        $("#xtotCnt").val("");
+                        $("#cbmSumInput").val("");
+                        $("#costSumInput").val("");
+                        $("#distance").val("");
+                        $("#paltNoInput").val("");
+                        $("#instErName").val("");
+                        $("#tblUserMId").val("");
+
+                    });
+                    myComboDcCd.readonly(true);
+                },
+                comboUseYn: function () {
+                    myComboUseYn = new dhtmlXCombo("useYn");
+                    myComboUseYn.addOption([{value: "", text: "전체"}]);
+                    myComboUseYn.addOption([{value: "Y", text: "계획"}]);
+                    myComboUseYn.addOption([{value: "N", text: "미계획"}]);
+                    myComboUseYn.selectOption(0);
+                    myComboUseYn.setFontSize("12px", "12px");
+                    myComboUseYn.attachEvent("onChange", function (value, text) {
+
+                    });
+                    myComboUseYn.readonly(true);
+                },
+
+
+                //시공좌석 분류 콤보 (1인시공 2인시공 나오는 콤보)
+                comboSeatType: function () {
+                    myComboSeatType = new dhtmlXComboFromSelect("seatType");
+
+                    comboList(myComboSeatType, 'A', 'COMM', 'INST_SEAT_TYPE', '', 'Y', 'all');
+                    myComboSeatType.selectOption(0);
+                    myComboSeatType.setFontSize("12px", "12px");
+                    myComboSeatType.attachEvent("onChange", function (value, text) {
+                        myGrid.clearAll(false);
+                        myGrid2.clearAll(false);
+                        $("#totCnt").val("");
+                        $("#xtotCnt").val("");
+                        $("#cbmSumInput").val("");
+                        $("#costSumInput").val("");
+                        $("#distance").val("");
+                        $("#paltNoInput").val("");
+                        $("#instErName").val("");
+                        $("#tblUserMId").val("");
+                        if (this.getIndexByValue(value) != 0) {
+                            this.setChecked(this.getIndexByValue(value), true);
+                            var c = 0;
+                            for (var i = 1; i < this.getOptionsCount(); i++) {
+                                if (this.isChecked(i)) {
+                                    c++;
+                                }
+                            }
+                            this.updateOption("", "", c + "개 선택", "");
+                            this.selectOption(0);
+                            this.openSelect();
+                        }
+
+                    });
+                    myComboSeatType.attachEvent("onCheck", function (value, text) {
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+                        {
+                            if (myComboSeatType.isChecked(0)) {
+                                var c = 0;
+                                for (var i = 1; i < myComboSeatType.getOptionsCount(); i++) {
+                                    myComboSeatType.setChecked(i, true);
+                                    c++;
+                                }
+                                myComboSeatType.updateOption("", "", c + "개 선택", "");
+                                //myComboSeatType.selectOption(0);
+                                myComboSeatType.openSelect();
+                            }
+                            if (!myComboSeatType.isChecked(0))		//전체에 체크를 안했을때
+                            {
+                                var c = 0;
+                                for (var i = 1; i < myComboSeatType.getOptionsCount(); i++) {
+                                    myComboSeatType.setChecked(i, false);
+                                }
+                                myComboSeatType.updateOption("", "", c + "개 선택", "");
+                                //myComboSeatType.selectOption(0);
+                                myComboSeatType.openSelect();
+                                return;
+                            }
+                        } else {
+                            var cnt = 0;
+                            for (var i = 1; i < myComboSeatType.getOptionsCount(); i++) {
+                                if (myComboSeatType.isChecked(i)) {
+                                    cnt++;
+                                }
+                            }
+                            if ((myComboSeatType.getOptionsCount() - 1) == cnt) {
+                                myComboSeatType.setChecked(0, true);
+                            } else {
+                                myComboSeatType.setChecked(0, false);
+                            }
+
+                            myComboSeatType.updateOption("", "", cnt + "개 선택", "");
+                            //myComboSeatType.selectOption(0);
+                            myComboSeatType.openSelect();
+
+                            return;
+                        }
+                    });
+                    myComboSeatType.readonly(true);
+                },
+
+
+            },	//END of comboOpen
+            gridOpen: {
+                grid: function ()		//20211222 정연호 팔렛트 초기화 체크박스를 시공계획 앞으로 위치를 변경함
+                    //20211222 정연호 시공기사를 주소 뒤로 위치를 변경함
+                {
+                    myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
+
+                    myGrid.setHeader(
+                        "계획" +
+                        ",CUD" +
+                        ",No" +
+                        ",팔렛트<br>초기화" +
+                        ",시공<br>계획" +				//5
+                        ",모바일<br>전송유무" +			//6
+                        ",타업체" +	//20220517 정연호 추가
+                        ",판매오더<br>유형" +
+                        ",시공카테<br>고리" +
+                        ",고객명" +
+                        ",물류센터" +
+                        ",주소" +
+                        ",팔렛트<br>번호" +
+                        ",시공기사" +
+                        ",배송메모" +
+                        ",고객요청" +
+                        ",CBM" +
+                        ",제품리스트" +
+                        ",시공비" +
+                        ",순번" +
+                        ",기사고유아이디" +
+                        ",요청일" +
+                        ",AL오더" +
+                        ",시공유형" +
+                        ",시공좌석유형" +
+                        ",지도<br>찾기" +
+                        ",mapY" +
+                        ",mapX" +
+                        ",mapIndex" +
+                        ",시공계획고유ID" +
+                        ",시공일" +
+                        ",회사코드" +
+                        ",판매오더고유ID" +
+                        ",화주사코드" +
+                        ",화주사" +
+                        ",판매오더유형코드" +
+                        ",판매오더<br>상태코드" +
+                        ",판매오더<br>상태" +
+                        ",쇼핑몰" +
+                        ",우편번호" +
+                        ",상세주소" +
+                        ",시공여부	" +
+                        ",시공카테고리코드" +
+                        ",시공유형코드" +
+                        ",시공좌석유형코드" +
+                        ",권역유형코드" +
+                        ",권역유형" +
+                        ",권역코드" +
+                        ",권역" +
+                        ",물류센터코드" +
+                        ",익일배송유무" +
+                        ",수량" +
+                        ",시공상태코드" +
+                        ",시공사" +
+                        ",시공계획시간" +
+                        ",확정일" +
+                        ",배송비" +
+                        ",간단주소" +
+                        ",총건수" +
+                        ",미확정건수" +
+                        ",제품목록"
+                    );
+                    //20211231 정연호 품목 리스트 추가
+
+
+                    myGrid.setColumnIds(
+                        "chk" +
+                        ",cud" +
+                        ",rowId" +
+                        ",delChk" +
+                        ",instPlanYn" +			//5
+                        ",mobileTranYn" +
+                        ",outCmpyCd" +			//20220517 정연호 추가
+                        ",soTypeNm" +
+                        ",instCtgrNm" +
+                        ",acptEr" +
+                        ",dcNm" +
+                        ",addr1" +
+                        ",paltNoxx" +
+                        ",instEr" +
+                        ",dlvyRqstMsg" +
+                        ",custSpclTxt" +
+                        ",cbm" +
+                        ",prodNm" +
+                        ",instCost" +
+                        ",seq" +
+                        ",tblUserMId" +
+                        ",rqstDt" +
+                        ",soNo" +
+                        ",instTypeNm" +
+                        ",instSeatTypeNm" +
+                        ",mapFindAddr" +
+                        ",mapY" +
+                        ",mapX" +
+                        ",mapIndex" +
+                        ",instPlanId" +
+                        ",instDt" +
+                        ",cmpyCd" +
+                        ",tblSoMId" +
+                        ",agntCd" +
+                        ",agntNm" +
+                        ",soType" +
+                        ",soStatCd" +
+                        ",soStatNm" +
+                        ",mallCd" +
+                        ",postCd" +
+                        ",addr2" +
+                        ",instYn" +
+                        ",instCtgr" +
+                        ",instType" +
+                        ",instSeatType" +
+                        ",zoneType" +
+                        ",zoneTypeNm" +
+                        ",zoneCd" +
+                        ",zoneNm" +
+                        ",dcCd" +
+                        ",ndlvyYn" +
+                        ",qty" +
+                        ",instStatCd" +
+                        ",instCmpy" +
+                        ",instPlanDt" +
+                        ",cnfmTime" +
+                        ",dlvyCost" +
+                        ",smplAddr" +
+                        ",totCnt" +
+                        ",xtotCnt" +
+                        ",prodList"
+                    );
+
+                    myGrid.setInitWidths(
+                        "50" +
+                        ",40" +
+                        ",40" +
+                        ",60" +
+                        ",50" +			//5
+                        ",70" +
+                        ",70" +			//20220517 정연호 추가
+                        ",80" +
+                        ",80" +
+                        ",80" +
+                        ",100" +
+                        ",200" +
+                        ",80" +
+                        ",120" +
+                        ",160" +
+                        ",160" +
+                        ",60" +
+                        ",120" +
+                        ",80" +
+                        ",60" +
+                        ",120" +
+                        ",80" +
+                        ",100" +
+                        ",80" +
+                        ",160" +
+                        ",60" +
+                        ",120" +
+                        ",120" +
+                        ",40" +
+                        ",100" +
+                        ",80" +
+                        ",80" +
+                        ",100" +
+                        ",100" +
+                        ",120" +
+                        ",120" +
+                        ",120" +
+                        ",80" +	//판매오더상태
+                        ",120" +
+                        ",160" +
+                        ",80" +
+                        ",160" +
+                        ",80" +
+                        ",120" +
+                        ",120" +
+                        ",120" +
+                        ",120" +
+                        ",160" +
+                        ",80" +
+                        ",160" +
+                        ",120" +
+                        ",120" +
+                        ",60" +
+                        ",100" +
+                        ",120" +
+                        ",120" +
+                        ",160" +
+                        ",80" +
+                        ",160" +
+                        ",60" +
+                        ",60" +
+                        ",100"
+                    );
+
+                    myGrid.setColAlign(
+                        "center" +
+                        ",center" +
+                        ",right" +
+                        ",center" +
+                        ",center" +			//5
+                        ",center" +
+                        ",center" +			//20220517 정연호 추가
+                        ",center" +
+                        ",center" +
+                        "center" +
+                        ",center" +
+                        ",left" +
+                        ",center" +
+                        ",center" +
+                        ",left" +
+                        ",left" +
+                        ",right" +
+                        ",left" +
+                        ",right" +
+                        ",right" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",left" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",right" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",center" +
+                        ",left" +
+                        ",right" +
+                        ",right" +
+                        ",left"
+                    );
+
+                    myGrid.setColTypes(
+                        "ch" +
+                        ",ro" +
+                        ",ro" +
+                        ",ch" +
+                        ",ro" +		//5
+                        ",ro" +
+                        ",ro" +		//20220517 정연호 추가
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",edn" +
+                        ",ro" +
+                        ",ed" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro" +
+                        ",ro"
+                    );
+
+                    myGrid.setColSorting(
+                        "" +
+                        "," +
+                        "," +
+                        "," +
+                        ",str" +						//5
+                        ",str" +
+                        ",str" +						//20220517 정연호 추가. 타업체
+                        "," +
+                        ",str" +
+                        ",str" +
+                        "," +
+                        ",str" +
+                        ",str" +
+                        ",str" +
+                        ",str" +
+                        ",str" +
+                        ",str" +
+                        ",str" +
+                        ",str" +
+                        ",str" +
+                        "," +
+                        ",str" +
+                        ",str" +
+                        ",str" +
+                        ",str" +
+                        ",str" +
+                        ",str" +
+                        ",str" +
+                        ",str" +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        ","
+                    );
+
+                    myGrid.attachHeader(
+                        "#master_checkbox" +
+                        "," +
+                        "," +
+                        ",#master_checkbox" +
+                        ",#text_filter" +					//5
+                        ",#text_filter" +
+                        ",#text_filter" +					//20220517 정연호 추가. 타업체
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        "," +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        "," +
+                        ",#text_filter" +
+                        ",#numeric_filter" +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        ",#text_filter" +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        "," +
+                        ","
+                    );
+
+
+                    myGrid.setColumnHidden(myGrid.getColIndexById("rowId"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("cud"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("instPlanId"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("instDt"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("cmpyCd"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("tblSoMId"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("agntCd"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("agntNm"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("soType"), true);
+
+                    myGrid.setColumnHidden(myGrid.getColIndexById("soStatCd"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("soStatNm"), false);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("mallCd"), true);
+
+                    myGrid.setColumnHidden(myGrid.getColIndexById("postCd"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("addr2"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("instYn"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("instCtgr"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("instType"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("instSeatType"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("zoneType"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("zoneTypeNm"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("zoneCd"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("zoneNm"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("dcCd"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("ndlvyYn"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("qty"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("instStatCd"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("instCmpy"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("instPlanDt"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("cnfmTime"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("dlvyCost"), true);
+
+                    myGrid.setColumnHidden(myGrid.getColIndexById("mapY"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("mapX"), true);
+
+                    myGrid.setColumnHidden(myGrid.getColIndexById("mapIndex"), true);
+
+                    myGrid.setColumnHidden(myGrid.getColIndexById("smplAddr"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("totCnt"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("xtotCnt"), true);
+
+                    myGrid.setColumnHidden(myGrid.getColIndexById("prodList"), true);
+
+                    myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
+
+                    myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+                    myGrid.enablePreRendering(10);	//20220423 정연호 추가
+                    fnObj.gridOpen.setWidth();				//그래야 진짜 화면에 보이는 높이가 만들어진다
+                    myGrid.addRow(1, "");	//로우 추가
+                    myGrid.deleteRow(1);
+
+
+                    myGrid.enableEditEvents(true, false, false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+                    myGrid.enableBlockSelection(true);
+                    myGrid.attachEvent("onKeyPress", fnObj.keyOpen.onKeyPressed);
+
+                    myGrid.attachEvent("onEditCell", function (stage, rId, cInd, nValue, oValue) {
+                        if (distanceOverlay != undefined || distanceOverlay != null) {
+                            distanceOverlay.forEach(function (distance, i) {
+                                distanceOverlay[i].setMap(null);
+                            });
+                        }
+
+                        if (drawLine != undefined || drawLine != null) {
+                            drawLine.forEach(function (draw, i) {
+                                drawLine[i].setMap(null);
+                            });
+                        }
+                        //순번
+                        if (cInd == myGrid.getColIndexById("seq")) {
+                            if (stage == 1 && this.editor && this.editor.obj) {
+                                this.editor.obj.select();
+                            }
+                            if (stage == 2 && nValue == "" && nValue != oValue)	//빈값이 들어가게
+                            {
+                                return true;
+                            }
+
+                            //팔렛트 번호가 없는데 순번을 넣으려고 하면 못넣게 함
+                            if (stage == 2 && !myGrid.cellById(rId, myGrid.getColIndexById("paltNoxx")).getValue()) {
+                                alert("팔렛트번호가 없습니다.");
+                                return false;	//입력한걸 취소시킨다
+                            }
+                            //값이 바뀌었으며 숫자가 아니다 (isNaN 은  true 숫자가 아니다, false 숫자다	)
+                            if (stage == 2 && isNaN(nValue)) {
+                                alert("숫자를 넣으세요");
+                                return false;	//입력한걸 취소시킨다
+                            }
+                            //그리드에 이미 같은 팔렛트에 같은 순번이 있으면 취소시킴
+
+                            //선택한 로우의 팔렛트 번호를 구하기
+                            var selSeqPalt = myGrid.cellById(rId, myGrid.getColIndexById("paltNoxx")).getValue()
+                            var errCnt = 0;
+                            if (stage == 2 && !isNaN(nValue)) {
+                                myGrid.forEachRow(function (eachRId) {		//그리드 반복
+                                    if (eachRId != rId	 //로우번호가 다른것들중에서
+                                        && nValue	//새로입력한 값이 있고
+                                        && myGrid.cellById(eachRId, myGrid.getColIndexById("paltNoxx")).getValue() == selSeqPalt	//선택한 로우의 팔렛트번와 같은 팔렛트 번호이고
+                                        && myGrid.cellById(eachRId, myGrid.getColIndexById("seq")).getValue() == nValue	//순번이 입력한 값 과 같으면
+                                    ) {
+                                        errCnt++;
+                                    }
+                                });
+                            }
+                            if (errCnt > 0) {
+                                alert("팔렛트번호 " + selSeqPalt + " 의 순번 " + nValue + " (은)는 이미 있습니다.");
+                                return false;
+                            } else {
+                                myGrid.cellById(rId, myGrid.getColIndexById("cud")).setValue("U");
+                                myGrid.cellById(rId, myGrid.getColIndexById("chk")).setValue("1");
+
+                                //순번이 바꼈으니깐 그리드의 내용으로 지도에 마커를 새로 표시해줌
+                                //그리드 내용을 지도에 마커 뿌려주기
+                                addr = [];
+                                myGrid.forEachRow(function (eachRId) {		//그리드 반복
+
+                                    var arrdVal = {};
+                                    arrdVal["seq"] = myGrid.cellById(eachRId, myGrid.getColIndexById("seq")).getValue();
+                                    arrdVal["addr1"] = myGrid.cellById(eachRId, myGrid.getColIndexById("addr1")).getValue();
+                                    arrdVal["addr2"] = myGrid.cellById(eachRId, myGrid.getColIndexById("addr2")).getValue();
+                                    arrdVal["instPlanYn"] = myGrid.cellById(eachRId, myGrid.getColIndexById("instPlanYn")).getValue();	//시공계획
+
+                                    arrdVal["rowId"] = myGrid.cellById(eachRId, myGrid.getColIndexById("rowId")).getValue();
+                                    arrdVal["paltNoxx"] = myGrid.cellById(eachRId, myGrid.getColIndexById("paltNoxx")).getValue();
+                                    arrdVal["mapFindAddr"] = myGrid.cellById(eachRId, myGrid.getColIndexById("mapFindAddr")).getValue();
+                                    //20211120 시공좌석유형 추가 1인시공  2인시공
+                                    arrdVal["instSeatType"] = myGrid.cellById(eachRId, myGrid.getColIndexById("instSeatType")).getValue();
+
+
+                                    //20211231 정연호 추가. 상품목록 추가
+                                    arrdVal["prodList"] = myGrid.cellById(eachRId, myGrid.getColIndexById("prodList")).getValue();
+
+                                    addr.push(arrdVal);
+                                });
+                                onLoadMap();
+                                return true;	//입력한걸 넣는다
+                            }
+                        }
+
+                        //팔렛트번호
+                        else if (cInd == myGrid.getColIndexById("paltNoxx")) {
+                            if (stage == 1 && this.editor && this.editor.obj) {
+                                this.editor.obj.select();
+                            }
+                            if (stage == 2 && nValue == "" && nValue != oValue)	//빈값이 들어가게
+                            {
+                                return true;
+                            }
+                            //값이 바뀌었는데 새로 입력한 값의 내용이 있고 이전값과 새로 입력한 값이 다르면 순번 날림
+                            if (stage == 2 && nValue != oValue) {
+                                myGrid.cellById(rId, myGrid.getColIndexById("seq")).setValue("");
+                            }
+
+                            //else
+                            if (stage == 2 && nValue)//바뀌었고 새로입력한 값의 내용이 있으면
+                            {
+                                myGrid.cellById(rId, myGrid.getColIndexById("cud")).setValue("U");
+                                myGrid.cellById(rId, myGrid.getColIndexById("chk")).setValue("1");
+                                var paltUserNm = "";
+
+                                myGrid.forEachRow(function (eachRId) {		//그리드 반복
+                                    if (myGrid.cellById(eachRId, myGrid.getColIndexById("paltNoxx")).getValue() == nValue)	//팔렛트 넘버가 입력한 값 과 같으면 그걸 찾어
+                                    {
+                                        //같은 팔렛트 번호의 시공기사 이름 뽑기
+                                        if (paltUserNm == "")	//한번만 추출한다
+                                        {
+                                            paltUserNm = myGrid.cellById(eachRId, myGrid.getColIndexById("instEr")).getValue();
+                                            myGrid.cellById(rId, myGrid.getColIndexById("instEr")).setValue(paltUserNm);
+                                        }
+                                    }
+                                });
+
+                                //팔렛트 번호가 바꼈으니깐 그리드의 내용으로 지도에 마커를 새로 표시해줌
+                                //그리드 내용을 지도에 마커 뿌려주기
+                                addr = [];
+                                myGrid.forEachRow(function (eachRId) {		//그리드 반복
+
+                                    var arrdVal = {};
+                                    arrdVal["seq"] = myGrid.cellById(eachRId, myGrid.getColIndexById("seq")).getValue();
+                                    arrdVal["addr1"] = myGrid.cellById(eachRId, myGrid.getColIndexById("addr1")).getValue();
+                                    arrdVal["addr2"] = myGrid.cellById(eachRId, myGrid.getColIndexById("addr2")).getValue();
+                                    arrdVal["instPlanYn"] = myGrid.cellById(eachRId, myGrid.getColIndexById("instPlanYn")).getValue();	//시공계획
+
+                                    arrdVal["rowId"] = myGrid.cellById(eachRId, myGrid.getColIndexById("rowId")).getValue();
+                                    arrdVal["paltNoxx"] = myGrid.cellById(eachRId, myGrid.getColIndexById("paltNoxx")).getValue();
+                                    arrdVal["mapFindAddr"] = myGrid.cellById(eachRId, myGrid.getColIndexById("mapFindAddr")).getValue();
+                                    //20211120 시공좌석유형 추가 1인시공  2인시공
+                                    arrdVal["instSeatType"] = myGrid.cellById(eachRId, myGrid.getColIndexById("instSeatType")).getValue();
+
+
+                                    //20211231 정연호 추가. 상품목록 추가
+                                    arrdVal["prodList"] = myGrid.cellById(eachRId, myGrid.getColIndexById("prodList")).getValue();
+
+                                    addr.push(arrdVal);
+                                });
+                                onLoadMap();
+                                return true;	//입력한걸 넣는다
+                            }
+                        }
+
+                        //시공기사 변경
+                        else if (cInd == myGrid.getColIndexById("instEr")) {
+                            var rtn = true;
+                            if (stage == 1 && this.editor && this.editor.obj) {
+                                this.editor.obj.select();
+                            }
+
+                            if (stage == 2 && nValue == "" && nValue != oValue)	//빈값입력 가능
+                            {
+                                var paltNo = myGrid.cellById(rId, myGrid.getColIndexById("paltNoxx")).getValue();
+                                //시공기사 이름을 바꾸려는데 해당 로우에 팔렛트 넘버가 있다면, 모든 팔렛트 넘버에 해당하는 시공기사 이름을 모두 바꿀것인가?
+                                if (paltNo) {
+                                    myGrid.forEachRow(function (eachRId) {		//그리드 반복
+                                        if (myGrid.cellById(eachRId, myGrid.getColIndexById("paltNoxx")).getValue() == paltNo)	//팔렛트 넘버가 입력한 바꾸려는 시공기사이름의 팔렛트 넘버와 같으면
+                                        {
+                                            myGrid.cellById(eachRId, myGrid.getColIndexById("instEr")).setValue(nValue);
+
+                                            //20211024 정연호 추가
+                                            myGrid.cellById(eachRId, myGrid.getColIndexById("tblUserMId")).setValue(nValue);
+                                            myGrid.cellById(eachRId, myGrid.getColIndexById("cud")).setValue("U");
+                                            myGrid.cellById(eachRId, myGrid.getColIndexById("chk")).setValue("1");
+
+                                        }
+                                    });
+                                } else {
+                                    myGrid.cellById(rId, myGrid.getColIndexById("instEr")).setValue(nValue);
+
+                                    //20211024 정연호 추가
+                                    myGrid.cellById(rId, myGrid.getColIndexById("tblUserMId")).setValue(nValue);
+                                    myGrid.cellById(rId, myGrid.getColIndexById("cud")).setValue("U");
+                                    myGrid.cellById(rId, myGrid.getColIndexById("chk")).setValue("1");
+                                }
+                                return true;
+
+                            }
+                            if (stage == 2)	//값이 바뀌었고 값이 있을때
+                            {
+                                var cmpyCd_value = myGrid.cellById(rId, myGrid.getColIndexById("cmpyCd")).getValue();
+                                var dcCd_value = myGrid.cellById(rId, myGrid.getColIndexById("dcCd")).getValue();
+                                var instEr_value = nValue;
+
+                                var return_value = fnObj.searchOpen.instErSrch(rId, cmpyCd_value, dcCd_value, instEr_value);
+
+                                if (return_value && return_value.userNm && return_value.tblUserMId) {
+                                    nValue = return_value.userNm;
+                                    var paltNo = myGrid.cellById(rId, myGrid.getColIndexById("paltNoxx")).getValue();
+                                    //시공기사 이름을 바꾸려는데 해당 로우에 팔렛트 넘버가 있다면, 모든 팔렛트 넘버에 해당하는 시공기사 이름을 모두 바꿀것인가?
+                                    if (paltNo) {
+
+                                        myGrid.forEachRow(function (eachRId) {		//그리드 반복
+                                            if (myGrid.cellById(eachRId, myGrid.getColIndexById("paltNoxx")).getValue() == paltNo)	//팔렛트 넘버가 입력한 바꾸려는 시공기사이름의 팔렛트 넘버와 같으면
+                                            {
+                                                myGrid.cellById(eachRId, myGrid.getColIndexById("instEr")).setValue(return_value.userNm);
+
+                                                //20211024 정연호 추가
+                                                myGrid.cellById(eachRId, myGrid.getColIndexById("tblUserMId")).setValue(return_value.tblUserMId);
+                                                myGrid.cellById(eachRId, myGrid.getColIndexById("cud")).setValue("U");
+                                                myGrid.cellById(eachRId, myGrid.getColIndexById("chk")).setValue("1");
+
+                                            }
+                                        });
+                                    } else {
+                                        myGrid.cellById(rId, myGrid.getColIndexById("instEr")).setValue(return_value.userNm);
+
+                                        //20211024 정연호 추가
+                                        myGrid.cellById(rId, myGrid.getColIndexById("tblUserMId")).setValue(return_value.tblUserMId);
+                                        myGrid.cellById(rId, myGrid.getColIndexById("cud")).setValue("U");
+                                        myGrid.cellById(rId, myGrid.getColIndexById("chk")).setValue("1");
+                                    }
+                                } else {
+                                    rtn = false;
+                                }
+                            } else if (stage == 2 && !nValue) {
+                                rtn = false;
+                            }
+                            return rtn;
+                        } else	//위 조건에 해당안되는 셀 편집 (체크하고 빼고 포함)은 무사통과
+                        {
+                            return true;	//입력한걸 넣는다
+                        }
+                    });
+
+
+                    myGrid.attachEvent("onRowSelect", function (rId, cInd) {
+                        var mapIndex;
+
+                        markers.forEach(function (marker, index) {
+                            if (markers[index].index == myGrid.cellById(rId, myGrid.getColIndexById("mapIndex")).getValue()) {
+                                mapIndex = index;
+                            }
+                        });
+                        var mapFindAddr = myGrid.cellById(rId, myGrid.getColIndexById("mapFindAddr")).getValue()
+
+                        if (mapFindAddr.trim() == "OK") {
+                            var rowY = myGrid.cellById(rId, myGrid.getColIndexById("mapY")).getValue()
+                            var rowX = myGrid.cellById(rId, myGrid.getColIndexById("mapX")).getValue()
+                            var rowLatlng = new kakao.maps.LatLng(rowY, rowX);
+
+                            map.setCenter(rowLatlng); 	//표시되는 마커를 지도의 중심으로 옮기기
+                        }
+
+                    }),
+                        myGrid.attachEvent("onCheckBox", function (rId, cInd, state) {
+
+
+                            if (cInd == myGrid.getColIndexById("delChk"))	//팔렛트 삭제에 체크를 했다
+                            {
+                                fnObj.searchOpen.grid2Distance();
+
+
+                                if (state == false) {
+                                    $("#grid").find("input:eq(3)").prop("checked", false);	//20211221 정연호 수정 팔렛트초기화 체크의 위치수정으로 순서 수정 10 -> 3
+                                } else {
+                                    var delCnt1 = 0;
+                                    var enChk = 0
+                                    myGrid.forEachRow(function (pId) {
+                                        if (myGrid.cellById(pId, myGrid.getColIndexById("delChk")).getValue() == "1") {
+                                            delCnt1++;
+                                        }
+                                        if (!myGrid.cells(pId, cInd).isDisabled()) {
+                                            enChk++;
+                                        }
+
+                                    });
+                                    //로우수 와 체크한 로우수가 같으면(젠체체크를 했다)
+                                    if (enChk == delCnt1) {
+                                        $("#grid").find("input:eq(3)").prop("checked", true);	//20211221 정연호 수정 팔렛트초기화 체크의 위치수정으로 순서 수정 10 -> 3
+                                    }
+                                }
+
+
+                            }
+
+                            if (cInd == myGrid.getColIndexById("chk"))	//계획에 체크를 했다
+                            {
+                                if (state == false) {
+                                    $("#grid").find("input:eq(0)").prop("checked", false);
+                                } else {
+
+
+                                    //20220423 정연호 수정. 배송완료일경우에는 배송완료라고 메세지 표시
+                                    if (myGrid.cellById(rId, myGrid.getColIndexById("soStatCd")).getValue() == "9999") {
+                                        toastr.error('이미 배송 완료 입니다.');
+                                        $("#grid").find("input:eq(0)").prop("checked", false);
+                                        myGrid.cellById(rId, myGrid.getColIndexById("chk")).setValue("0")
+
+                                        return;
+                                    }
+                                    //20220423 정연호 수정. 배송완료일 - 미마감 경우에는 배송완료(미마감)이라고 메세지 표시
+                                    if (myGrid.cellById(rId, myGrid.getColIndexById("soStatCd")).getValue() == "8000") {
+                                        toastr.error('이미 배송 완료 (미마감) 입니다.');
+                                        $("#grid").find("input:eq(0)").prop("checked", false);
+                                        myGrid.cellById(rId, myGrid.getColIndexById("chk")).setValue("0")
+
+                                        return;
+                                    }
+                                    //20211129 정연호 모바일전송상태가 Y 일경우 못넣음
+                                    if (myGrid.cellById(rId, myGrid.getColIndexById("mobileTranYn")).getValue() == "Y") {
+                                        toastr.error('이미 모바일 전송 완료 입니다.');
+                                        $("#grid").find("input:eq(0)").prop("checked", false);
+                                        myGrid.cellById(rId, myGrid.getColIndexById("chk")).setValue("0")
+
+                                        return;
+                                    }
+                                    var chkCnt1 = 0;
+                                    myGrid.forEachRow(function (pId) {
+                                        if (myGrid.cellById(pId, myGrid.getColIndexById("chk")).getValue() == "1") {
+                                            chkCnt1++;
+                                        }
+
+                                    });
+                                    //로우수 와 체크한 로우수가 같으면(젠체체크를 했다)
+                                    if (myGrid.getRowsNum() == chkCnt1) {
+                                        $("#grid").find("input:eq(0)").prop("checked", true);
+                                    }
+                                }
+
+                            }
+
+                            /* if(cInd == myGrid.getColIndexById("delChk"))	//삭제에 체크를 했다
+                        {
+                            if(state == true)	//삭제를 체크를 했을때
+                            {
+                                myGrid.cellById(rId,myGrid.getColIndexById("chk")).setValue("0");
+                                myGrid.cellById(rId,myGrid.getColIndexById("chk")).setDisabled(true);
+                            }
+                            else
+                            {
+
+                                myGrid.cellById(rId,myGrid.getColIndexById("chk")).setDisabled(false);
+                            }
+                        } */
+                            /* if(cInd == myGrid.getColIndexById("seq") || cInd == myGrid.getColIndexById("paltNoxx") || cInd == myGrid.getColIndexById("instEr"))
+                        {
+                            myGrid.editCell();
+                            return;
+                        } */
+                            var selectPaltNoxx = myGrid.cellById(rId, myGrid.getColIndexById("paltNoxx")).getValue()
+                            var mapIndex;
+
+                            markers.forEach(function (marker, index) {
+                                if (markers[index].index == myGrid.cellById(rId, myGrid.getColIndexById("mapIndex")).getValue()) {
+                                    mapIndex = index;
+                                }
+                            });
+                            var mapFindAddr = myGrid.cellById(rId, myGrid.getColIndexById("mapFindAddr")).getValue()
+
+                            if (mapFindAddr.trim() == "OK") {
+                                var rowY = myGrid.cellById(rId, myGrid.getColIndexById("mapY")).getValue()
+                                var rowX = myGrid.cellById(rId, myGrid.getColIndexById("mapX")).getValue()
+                                var rowLatlng = new kakao.maps.LatLng(rowY, rowX);
+
+                                map.setCenter(rowLatlng); 	//표시되는 마커를 지도의 중심으로 옮기기
+                            }
+
+
+                            if (cInd == myGrid.getColIndexById("chk"))	//계획에 체크를 했다
+                            {
+                                if (mapIndex >= 0) {
+                                    //해당마커가 클릭 안된상태 & 체크를 하는 상태
+                                    if (markers[mapIndex].clickYn == "N" && state == true) {
+                                        //마커를 체크한상태로 바꿈
+                                        markers[mapIndex].clickYn = "Y";
+                                        markers[mapIndex].setImage(markers[mapIndex].clickImage);
+                                        myGrid.selectRowById(markers[mapIndex].rowId);
+
+                                        //위 그리드의 1줄을 아래그리드로 복사
+                                        var cnt = 0;
+                                        myGrid2.forEachRow(function (eId) {
+                                            if (myGrid2.cellById(eId, myGrid2.getColIndexById("rowId")).getValue() == myGrid.cellById(markers[mapIndex].rowId, myGrid.getColIndexById("rowId")).getValue()) {
+                                                cnt++;
+                                            }
+                                        });
+                                        if (cnt == 0) {
+                                            myGrid2.addRow(markers[mapIndex].rowId, "");
+                                            myGrid2.setRowData(markers[mapIndex].rowId, myGrid.getRowData(markers[mapIndex].rowId));
+
+                                            //20211120 추가. 그리드2에 로우를 넣으면 그리드1에 해당로우는 delChk를 비활성화
+                                            myGrid.cellById(markers[mapIndex].rowId, myGrid.getColIndexById("delChk")).setValue("0");
+                                            myGrid.cellById(markers[mapIndex].rowId, myGrid.getColIndexById("delChk")).setDisabled(true);
+
+                                            if (myGrid2.cellById(markers[mapIndex].rowId, myGrid2.getColIndexById("instPlanYn")).getValue() == "Y") {
+                                                myGrid2.cellById(markers[mapIndex].rowId, myGrid2.getColIndexById("saveGubn")).setValue("UPDT");
+                                            } else {
+                                                myGrid2.cellById(markers[mapIndex].rowId, myGrid2.getColIndexById("saveGubn")).setValue("INS");
+                                            }
+
+                                            var newPaltNo = 0;
+                                            myGrid2.forEachRow(function (pId) {
+                                                if (Number(myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).getValue()) > newPaltNo) {
+                                                    newPaltNo = Number(myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).getValue())
+                                                }
+                                            });
+                                            myGrid2.cellById(markers[mapIndex].rowId, myGrid2.getColIndexById("newPaltNoSeq")).setValue((newPaltNo + 1) + "")
+
+                                            myGrid2.cellById(markers[mapIndex].rowId, myGrid2.getColIndexById("chk")).setValue("");
+                                            fnObj.searchOpen.grid2CbmSum();
+                                            fnObj.searchOpen.grid2InstCostSum();
+                                            fnObj.searchOpen.grid2Distance();
+                                        }
+                                    }
+
+                                    //해당마커가 이미 클릭되어 빨간상태 & 체크를 빼는 상태
+                                    else if (markers[mapIndex].clickYn == "Y" && state == false) {
+                                        markers[mapIndex].clickYn = "N";
+                                        markers[mapIndex].setImage(markers[mapIndex].normalImage);
+                                        myGrid.selectRowById(markers[mapIndex].rowId);
+                                        myGrid2.forEachRow(function (pId) {
+                                            var oldP = Number(myGrid2.cellById(markers[mapIndex].rowId, myGrid2.getColIndexById("newPaltNoSeq")).getValue());
+                                            var newP = Number(myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).getValue());
+                                            if (newP > oldP) {
+                                                myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).setValue((newP - 1) + "")
+                                            }
+                                        });
+                                        myGrid2.deleteRow(markers[mapIndex].rowId);
+
+
+                                        //20211128 정연호 . 계획에서 체크를 풀었을때 시공계획을 하지 않은것은 팔렛트 초기화 체크에 체크를 할수없게 함
+                                        if (myGrid.cellById(markers[mapIndex].rowId, myGrid.getColIndexById("instPlanYn")).getValue() != "Y") {
+                                            //20211120 추가. 그리드2에 로우를 삭제하면 그리드1에 해당로우는 delChk를 활성화
+                                            myGrid.cellById(markers[mapIndex].rowId, myGrid.getColIndexById("delChk")).setDisabled(true);
+                                        }
+                                            //20211231 정연호 주석처리. SP에서 처리하므로 삭제유무 상관없음
+                                        /* else if (myGrid.cellById(markers[mapIndex].rowId,myGrid.getColIndexById("mobileTranYn")).getValue() == "Y")
+                                    {
+                                         myGrid.cellById(markers[mapIndex].rowId,myGrid.getColIndexById("delChk")).setDisabled(true);
+                                    } */
+                                        else {
+                                            myGrid.cellById(markers[mapIndex].rowId, myGrid.getColIndexById("delChk")).setDisabled(false);
+                                        }
+
+                                        fnObj.searchOpen.grid2CbmSum();
+                                        fnObj.searchOpen.grid2InstCostSum();
+                                        fnObj.searchOpen.grid2Distance();
+                                    }
+                                } else {
+                                    //체크를 하는 상태
+                                    if (state == true) {
+
+                                        myGrid.selectRowById(rId);
+                                        //위 그리드의 1줄을 아래그리드로 복사
+                                        var cnt = 0;
+                                        myGrid2.forEachRow(function (eId) {
+                                            if (myGrid2.cellById(eId, myGrid2.getColIndexById("rowId")).getValue() == myGrid.cellById(rId, myGrid.getColIndexById("rowId")).getValue()) {
+                                                cnt++;
+                                            }
+
+                                        });
+                                        if (cnt == 0) {
+                                            myGrid2.addRow(rId, "");
+                                            myGrid2.setRowData(rId, myGrid.getRowData(rId));
+
+                                            //20211120 추가. 그리드2에 로우를 넣으면 그리드1에 해당로우는 delChk를 비활성화
+                                            myGrid.cellById(rId, myGrid.getColIndexById("delChk")).setValue("0");
+                                            myGrid.cellById(rId, myGrid.getColIndexById("delChk")).setDisabled(true);
+
+
+                                            if (myGrid2.cellById(rId, myGrid2.getColIndexById("instPlanYn")).getValue() == "Y") {
+                                                myGrid2.cellById(rId, myGrid2.getColIndexById("saveGubn")).setValue("UPDT");
+                                            } else {
+                                                myGrid2.cellById(rId, myGrid2.getColIndexById("saveGubn")).setValue("INS");
+                                            }
+                                            var newPaltNo = 0;
+                                            myGrid2.forEachRow(function (pId) {
+                                                if (Number(myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).getValue()) > newPaltNo) {
+                                                    newPaltNo = Number(myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).getValue())
+                                                }
+                                            });
+                                            myGrid2.cellById(rId, myGrid2.getColIndexById("newPaltNoSeq")).setValue((newPaltNo + 1) + "")
+                                            myGrid2.cellById(rId, myGrid2.getColIndexById("chk")).setValue("")
+                                            fnObj.searchOpen.grid2CbmSum();
+                                            fnObj.searchOpen.grid2InstCostSum();
+                                            fnObj.searchOpen.grid2Distance();
+                                        }
+                                    }
+
+                                    //해당마커가 이미 클릭되어 빨간상태 & 체크를 빼는 상태
+                                    else if (state == false) {
+                                        myGrid.selectRowById(rId);
+                                        myGrid2.forEachRow(function (pId) {
+                                            var oldP = Number(myGrid2.cellById(rId, myGrid2.getColIndexById("newPaltNoSeq")).getValue());
+                                            var newP = Number(myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).getValue());
+                                            if (newP > oldP) {
+                                                myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).setValue((newP - 1) + "")
+                                            }
+                                        });
+                                        myGrid2.deleteRow(rId);
+
+                                        //20211120 추가. 그리드2에 로우를 삭제하면 그리드1에 해당로우는 delChk를 활성화
+
+
+                                        //myGrid.cellById(rId,myGrid.getColIndexById("delChk")).setDisabled(false);
+                                        if (myGrid.cellById(rId, myGrid.getColIndexById("instPlanYn")).getValue() != "Y") {
+                                            //20211120 추가. 그리드2에 로우를 삭제하면 그리드1에 해당로우는 delChk를 활성화
+                                            myGrid.cellById(rId, myGrid.getColIndexById("delChk")).setDisabled(true);
+                                        }
+                                            //20211231 정연호 주석처리. SP에서 처리하므로 삭제유무 상관없음
+                                        /* else if (myGrid.cellById(rId,myGrid.getColIndexById("mobileTranYn")).getValue() == "Y")
+                                        {
+                                             myGrid.cellById(rId,myGrid.getColIndexById("delChk")).setDisabled(true);
+                                        } */
+                                        else {
+                                            myGrid.cellById(rId, myGrid.getColIndexById("delChk")).setDisabled(false);
+                                        }
+
+
+                                        fnObj.searchOpen.grid2CbmSum();
+                                        fnObj.searchOpen.grid2InstCostSum();
+                                        fnObj.searchOpen.grid2Distance();
+                                    }
+                                }
+                            }
+                            var cbmSum = 0;
+                            var costSum = 0;
+                            var selPaltNo = myGrid.cellById(rId, myGrid.getColIndexById("paltNoxx")).getValue();	//현재 선택한 로우의 팔렛트 넘버
+                        });
+
+                    myGrid.attachEvent("onRowDblClicked", function (rId, cInd) {
+                        $("#grid1RowId").val(rId);
+                        //fnObj.searchOpen.search2();
+                    });
+
+                },//grid
+
+                grid2: function ()//20211222 정연호 시공기사를 주소 뒤로 위치를 변경함
+                {
+                    myGrid2.setImagePath("https://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
+                    myGrid2.setHeader("#master_checkbox,CUD,No,saveGubn,순번," +
+                        "시공<br>계획,모바일<br>전송유무," +
+
+                        "타업체,판매오더<br>유형,시공카테<br>고리," +
+
+                        "고객명,물류센터,주소,팔렛트<br>번호,시공기사,배송메모,고객요청," +
+                        "CBM,제품리스트,시공비,순번," +
+                        "기사고유아이디,요청일,AL오더," +
+                        "시공유형,시공좌석유형,지도<br>찾기,mapY,mapX," +
+                        "mapIndex ,시공계획고유ID,시공일,회사코드,판매오더고유ID," +
+                        "화주사코드,화주사,판매오더유형코드,판매오더상태코드," +
+                        "판매오더상태,쇼핑몰,우편번호,상세주소," +
+                        "시공여부,시공카테고리코드,시공유형코드,시공좌석유형코드,권역유형코드," +
+                        "권역유형,권역코드,권역,물류센터코드,익일배송유무," +
+                        "수량,시공상태코드,시공사,시공계획시간,확정일," +
+                        "배송비,간단주소,총건수,미확정건수");
+                    myGrid2.setColumnIds("chk,cud,rowId,saveGubn,newPaltNoSeq," +
+                        "instPlanYn,mobileTranYn," +
+
+                        "outCmpyCd,soTypeNm,instCtgrNm," +
+
+                        "acptEr,dcNm,addr1,paltNoxx,instEr,dlvyRqstMsg,custSpclTxt," +
+                        "cbm,prodNm,instCost,seq," +
+                        "tblUserMId,rqstDt,soNo," +
+                        "instTypeNm,instSeatTypeNm,mapFindAddr,mapY,mapX," +
+                        "mapIndex,instPlanId,instDt,cmpyCd,tblSoMId," +
+                        "agntCd,agntNm,soType,soStatCd," +
+                        "soStatNm,mallCd,postCd,addr2," +
+                        "instYn,instCtgr,instType,instSeatType,zoneType," +
+                        "zoneTypeNm,zoneCd,zoneNm,dcCd,ndlvyYn," +
+                        "qty,instStatCd,instCmpy,instPlanDt,cnfmTime," +
+                        "dlvyCost,smplAddr,totCnt,xtotCnt");
+                    myGrid2.setInitWidths("40,40,40,40,60," +
+                        "50,70," +
+
+                        "70,80,80," +
+
+                        "80,100,200,80,120,160,160," +
+                        "60,120,80,60," +
+                        "120,80,100," +
+                        "80,160,60,120,120," +
+                        "40,100,80,80,100," +
+                        "100,120,120,120," +
+                        "120,160,80,160," +
+                        "80,120,120,120,120," +
+                        "160,80,160,120,120," +
+                        "60,100,120,120,160," +
+                        "80,160,60,60");
+                    myGrid2.setColAlign("center,center,right,center,right," +
+                        "center,center," +
+
+                        "center,center,center," +
+
+                        "center,center,left,center,center,left,left," +
+                        "right,left,right,right," +
+                        "center,center,center," +
+                        "center,center,center,center,center," +
+                        "center,center,center,center,center," +
+                        "center,center,center,center," +
+                        "center,center,center,left," +
+                        "center,center,center,center,center," +
+                        "center,center,center,center,center," +
+                        "right,center,center,center,center," +
+                        "center,left,right,right");
+                    myGrid2.setColTypes("ch,ro,ro,ro,ro," +
+                        "ro,ro," +
+
+                        "ro,ro,ro," +
+
+                        "ro,ro,ro,ro,ro,ro,ro," +
+                        "ro,ro,ro,ro," +
+                        "ro,ro,ro," +
+                        "ro,ro,ro,ro,ro," +
+                        "ro,ro,ro,ro,ro," +
+                        "ro,ro,ro,ro," +
+                        "ro,ro,ro,ro," +
+                        "edn,ro,ed,ro,ro," +
+                        "ro,ro,ro,ro,ro," +
+                        "ro,ro,ro,ro,ro," +
+                        "ro,ro,ro,ro");
+                    myGrid2.setColSorting(",,,,," +
+                        "str,str," +
+
+                        ",str,,str," +
+
+                        ",str,str,str,str,str,str," +
+                        "str,str,str,str," +
+                        ",str,str," +
+                        "str,str,str,str,str," +
+                        "str,,,,," +
+                        ",,,," +
+                        ",,,," +
+                        ",,,,," +
+                        ",,,,," +
+                        ",,,,," +
+                        ",,,");
+
+
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("seq"), true);	//해당 오더 현장의 원래 팔렛트 순번
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("rowId"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("saveGubn"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("cud"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("instPlanId"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("instDt"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("cmpyCd"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("tblSoMId"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("agntCd"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("agntNm"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("soType"), true);
+                    //myGrid2.setColumnHidden(myGrid2.getColIndexById("soTypeNm"),true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("soStatCd"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("soStatNm"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("mallCd"), true);
+
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("postCd"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("addr2"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("instYn"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("instCtgr"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("instType"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("instSeatType"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("zoneType"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("zoneTypeNm"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("zoneCd"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("zoneNm"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("dcCd"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("ndlvyYn"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("qty"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("instStatCd"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("instCmpy"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("instPlanDt"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("cnfmTime"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("dlvyCost"), true);
+
+                    //myGrid2.setColumnHidden(myGrid2.getColIndexById("tblUserMId"),true);
+
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("mapY"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("mapX"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("mapIndex"), true);
+
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("smplAddr"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("totCnt"), true);
+                    myGrid2.setColumnHidden(myGrid2.getColIndexById("xtotCnt"), true);
+
+                    //var combobox = myGrid2.getCombo(41);
+                    //combobox.put("","");
+
+                    myGrid2.init();		//이걸써야 세팅한 그리드가 표시가 된다
+
+                    myGrid2.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+                    myGrid2.enablePreRendering(10);	//20220423 정연호 추가
+                    fnObj.gridOpen.setWidth();
+                    //그래야 진짜 화면에 보이는 높이가 만들어진다
+                    myGrid2.addRow(1, "");	//로우 추가
+                    myGrid2.deleteRow(1);
+
+
+                    myGrid2.enableEditEvents(true, false, false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+
+
+                    myGrid2.attachEvent("onRowSelect", function (rId, cInd) {
+                        var mapIndex;
+
+
+                        markers.forEach(function (marker, index) {
+                            if (markers[index].index == myGrid2.cellById(rId, myGrid2.getColIndexById("mapIndex")).getValue()) {
+                                mapIndex = index;
+                            }
+                        });
+                        var mapFindAddr = myGrid2.cellById(rId, myGrid2.getColIndexById("mapFindAddr")).getValue()
+
+                        if (mapFindAddr.trim() != "OK") {
+                            //alert("주소로 위치를 찾을수 없습니다.");
+                        } else {
+                            var rowY = myGrid2.cellById(rId, myGrid2.getColIndexById("mapY")).getValue()
+                            var rowX = myGrid2.cellById(rId, myGrid2.getColIndexById("mapX")).getValue()
+                            var rowLatlng = new kakao.maps.LatLng(rowY, rowX);
+
+                            map.setCenter(rowLatlng); 	//표시되는 마커를 지도의 중심으로 옮기기
+                        }
+
+                    })
+
+
+                },//grid2
+
+
+                setWidth: function () {
+                    //c_width =  top.myLayout.cells("c").getWidth();
+                    c_width = window.innerWidth;
+                    searchDiv_height = $("#searchDiv").height();
+                    searchDiv2nd_height = $("#searchDiv2nd").height();
+                    page_height = $("#page").height();
+                    page2_height = $("#page2").height();
+                    xhdr_height = $(".xhdr").height();
+
+                    myGrid.enableAutoWidth(true, (c_width) * 0.56, 100);
+                    myGrid2.enableAutoWidth(true, (c_width) * 0.56, 100);
+
+                    myGrid.enableAutoHeight(true, (window.innerHeight - searchDiv_height - searchDiv2nd_height - xhdr_height) * 0.5 - 30);	//그리드 자동높이
+                    myGrid2.enableAutoHeight(true, (window.innerHeight - searchDiv_height - searchDiv2nd_height - xhdr_height) * 0.3 - 30);	//그리드 자동높이
+
+                    $("#searchDiv").width(c_width - 25);
+                    $("#searchDiv2nd").width(c_width - 25);
+
+                    $("#centerLine").css("height", $("#mapdiv").height())
+
+                    $("#centerLine").css("width", (window.innerWidth - $("#mapdiv").width() - $("#gridDiv").width()) / 2);
+
+
+                },	//END of setWidth
+            },	//END of gridOpen
+            searchOpen: {
+
+                grid2Distance: function () {
+                    //거리표시 삭제하기
+                    if (distanceOverlay != undefined || distanceOverlay != null) {
+                        distanceOverlay.forEach(function (distance, i) {
+                            distanceOverlay[i].setMap(null);
+                        });
+                    }
+
+                    //직선표시 한거 삭제하기
+                    if (drawLine != undefined || drawLine != null) {
+                        drawLine.forEach(function (draw, i) {
+                            drawLine[i].setMap(null);
+                        });
+                    }
+                    //아래그리드를 대상으로 거리를 구함
+
+                    var samePaltNoxxs = [];
+                    myGrid2.forEachRow(function (pId) {
+                        var grid2RowId = myGrid2.cellById(pId, myGrid2.getColIndexById("rowId")).getValue();
+
+                        var grid2NewPaltNoSeq = myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).getValue();
+
+
+                        positions.forEach(function (position, index) {
+                            if (grid2RowId == position.rowId && position.rowId) {
+
+                                //position.newPaltNoSeq = grid2NewPaltNoSeq;
+                                var pos = position;
+                                pos.newPaltNoSeq = grid2NewPaltNoSeq;
+                                samePaltNoxxs.push(pos);
+                            }
+                        });
+                    });
+                    //팔렛트 번호에 맞는것만 모았으니까 순번seq 와 순서rowId 대로 정렬
+
+                    //console.log(samePaltNoxxs)
+                    samePaltNoxxs.sort(function (a, b) { // 오름차순
+                        return Number(a.newPaltNoSeq) < Number(b.newPaltNoSeq) ? -1 : Number(a.newPaltNoSeq) > Number(b.newPaltNoSeq) ? 1 : 0;
+
+                    });
+                    //console.log(samePaltNoxxs)
+
+
+                    //마커 사이의 선 그리기 및 거리 구하기
+                    var linePath;
+                    var lineLine = new daum.maps.Polyline();
+                    var distance;
+
+
+                    //$("#distance").val(distance+"");
+
+
+                    var totalDistance = 0;
+                    //반복하면서 마커 사이에 선을 그려주고 거리를 표시해줌
+                    samePaltNoxxs.forEach(function (samePaltNoxx, i) {
+
+                        if (i != 0) {
+                            linePath = [samePaltNoxxs[i - 1].latlng, samePaltNoxxs[i].latlng] //라인을 그리려면 두 점이 있어야하니깐 두 점을 지정했습니다
+                        }
+
+                        lineLine.setPath(linePath); // 선을 그릴 라인을 세팅합니다
+
+                        drawLine[i] = new daum.maps.Polyline({
+                            //map : map, // 선을 표시할 지도입니다
+                            endArrow: true,
+                            path: linePath,
+                            strokeWeight: 3, // 선의 두께입니다
+                            //strokeColor : '#db4040', // 선의 색깔입니다
+                            strokeColor: '#585858', // 선의 색깔입니다
+
+                            strokeOpacity: 0.5, // 선의 불투명도입니다 0에서 1 사이값이며 0에 가까울수록 투명합니다
+                            strokeStyle: 'solide' // 선의 스타일입니다
+                        });
+                        drawLine[i].setMap(map);
+
+                        distance = Math.round(lineLine.getLength());
+
+                        totalDistance = totalDistance + distance;
+
+                        displayCircleDot(samePaltNoxxs[i].latlng, distance, i);
+
+                    });
+                    $("#distance").val(Math.round(totalDistance / 1000) + " km");
+
+                },
+
+
+                grid2Delete: function () {
+
+
+                    var checked = myGrid2.getCheckedRows(myGrid2.getColIndexById("chk"));
+                    if (!checked) {
+                        alert("삭제대상을 체크하세요");
+                        return;
+                    }
+                    myGrid2.forEachRow(function (rId) {
+                        if (myGrid2.cellById(rId, myGrid2.getColIndexById("chk")).getValue() == "1") {
+                            var grid2MapIndex = myGrid2.cellById(rId, myGrid2.getColIndexById("mapIndex")).getValue();
+                            var grid2RowId = myGrid2.cellById(rId, myGrid2.getColIndexById("rowId")).getValue();
+                            var mapIndex2;
+                            markers.forEach(function (marker, index) {
+                                if (markers[index].index == myGrid.cellById(rId, myGrid.getColIndexById("mapIndex")).getValue()) {
+                                    mapIndex2 = index;
+                                }
+                            });
+
+                            if (mapIndex2 >= 0) {
+                                var rowY2 = myGrid2.cellById(rId, myGrid2.getColIndexById("mapY")).getValue()
+                                var rowX2 = myGrid2.cellById(rId, myGrid2.getColIndexById("mapX")).getValue()
+                                var rowLatlng2 = new kakao.maps.LatLng(rowY2, rowX2);
+                                map.setCenter(rowLatlng2); 	//표시되는 마커를 지도의 중심으로 옮기기
+
+
+                                markers[mapIndex2].clickYn = "N";
+                                markers[mapIndex2].setImage(markers[mapIndex2].normalImage);
+                                //myGrid.cellById(markers[mapIndex2].rowId,myGrid.getColIndexById("chk")).setValue("0");
+                            }
+
+                            myGrid.forEachRow(function (eId) {
+
+                                if (myGrid.cellById(eId, myGrid.getColIndexById("rowId")).getValue() == grid2RowId) {
+                                    myGrid.cellById(eId, myGrid.getColIndexById("chk")).setValue("0");
+                                    myGrid.selectRowById(eId);
+                                }
+
+                            });
+
+                            myGrid2.forEachRow(function (pId) {
+
+                                var oldP = Number(myGrid2.cellById(rId, myGrid2.getColIndexById("newPaltNoSeq")).getValue());
+                                var newP = Number(myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).getValue());
+                                if (newP > oldP) {
+                                    myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).setValue((newP - 1) + "")
+                                }
+
+                            });
+
+                            myGrid2.deleteRow(rId);
+
+                            //20211120 추가. 그리드2에 로우를 삭제하면 그리드1에 해당로우는 delChk를 활성화
+                            //myGrid.cellById(rId,myGrid.getColIndexById("delChk")).setDisabled(false);
+                            if (myGrid.cellById(rId, myGrid.getColIndexById("instPlanYn")).getValue() != "Y") {
+                                //20211120 추가. 그리드2에 로우를 삭제하면 그리드1에 해당로우는 delChk를 활성화
+                                myGrid.cellById(rId, myGrid.getColIndexById("delChk")).setDisabled(true);
+                            }
+                                //20211231 정연호 주석처리. SP에서 처리하므로 삭제유무 상관없음
+                            /* else if (myGrid.cellById(rId,myGrid.getColIndexById("mobileTranYn")).getValue() == "Y")
+                            {
+                                 myGrid.cellById(rId,myGrid.getColIndexById("delChk")).setDisabled(true);
+                            } */
+                            else {
+                                myGrid.cellById(rId, myGrid.getColIndexById("delChk")).setDisabled(false);
+                            }
+
+                            fnObj.searchOpen.grid2CbmSum();
+                            fnObj.searchOpen.grid2InstCostSum();
+                            fnObj.searchOpen.grid2Distance();
+
+
+                        }
+
+                    });
+
+
+                },
+
+
+                grid2CbmSum: function () {
+
+                    var cbmSum = 0;
+                    myGrid2.forEachRow(function (rId) {
+                        cbmSum = cbmSum + parseFloat(myGrid2.cellById(rId, myGrid2.getColIndexById("cbm")).getValue() == null || myGrid2.cellById(rId, myGrid2.getColIndexById("cbm")).getValue() == "" ? "0" : myGrid2.cellById(rId, myGrid2.getColIndexById("cbm")).getValue())
+
+                    });
+
+                    $("#cbmSumInput").val(cbmSum.toFixed(2) + "");
+                },
+                grid2InstCostSum: function () {
+
+                    var instCostSum = 0;
+                    myGrid2.forEachRow(function (rId) {
+
+                        instCostSum = instCostSum + parseFloat(myGrid2.cellById(rId, myGrid2.getColIndexById("instCost")).getValue() == null || myGrid2.cellById(rId, myGrid2.getColIndexById("instCost")).getValue() == "" ? "0" : myGrid2.cellById(rId, myGrid2.getColIndexById("instCost")).getValue())
+
+                    });
+
+                    $("#costSumInput").val(instCostSum.toFixed(0) + " 원");
+                },
+
+                instErSrch: function (rId, cmpyCd, dcCd, instEr) {
+
+                    var instErSrchData = new FormData();
+                    instErSrchData.append("cmpyCd", cmpyCd);		//회사코드
+                    instErSrchData.append("dcCd	", dcCd);			//물류센터코드
+                    instErSrchData.append("userNm", instEr);		//시공기사이름
+                    instErSrchData.append("useYn", "Y");			//사용여부
+
+
+                    var rtnVal = null;
+
+                    $.ajax({
+                        url: "/erp203001InstErSrch",
+                        processData: false,
+                        contentType: false,
+                        data: instErSrchData,
+                        type: "POST",
+                        datatype: "json",
+                        async: false,
+                        success: function (res) {
+
+                            //console.log(res)
+                            if (res && res.length == 1)	//결과가 있고, 단 1줄 일경우
+                            {
+                                //console.log("if")
+                                rtnVal = res[0];
+                            } else {
+                                //console.log("else")
+                                fnObj.winOpen.instErOpen(rId, cmpyCd, dcCd, instEr, "Y");
+                                rtnVal = null;
+                            }
+                        },
+                    });
+
+                    return rtnVal;
+
+
+                },
+
+                delChk: function () {			//그리드에서 팔렛트 초기화
+                    var delData = new FormData();
+
+
+                    var delChkData = [];
+                    var delChk = {};
+                    var cnt = 0;
+                    myGrid.forEachRow(function (RowId) {
+
+                        var delChkVal = myGrid.cellById(RowId, myGrid.getColIndexById("delChk")).getValue();
+                        if (delChkVal == "1") {
+                            cnt++;
+                            delChk = myGrid.getRowData(RowId);
+                            delChk.saveUser = /*[[${session.tblUserMId}]]*/
+                                delChkData.push(delChk);
+                            delChk = {};
+                        }
+
+                    });
+
+
+                    if (cnt == 0) {
+                        alert("팔렛트초기화 대상을 체크 하세요");
+                        return;
+                    }
+                    if (!confirm(cnt + "건을 팔렛트초기화 하시겠습니까?")) {
+                        return;
+                    }
+                    $.ajax({
+                        url: "/erp203001DelChk",
+                        processData: false,
+                        contentType: "application/json",
+                        data: JSON.stringify(delChkData),
+                        type: "POST",
+                        datatype: "json",
+                        success: function (res) {
+                            if (res) {
+
+                                var msg = "";
+                                for (var i = 0; i < res.length; i++) {
+                                    if (res[i].rtnYn == "Y") {
+                                        msg = msg + "→팔렛트초기화 성공 - 오더번호 : " + res[i].soNo + "\n";
+                                    } else {
+                                        msg = msg + "▶팔렛트초기화 실패 - 오더번호 : " + res[i].soNo + "\n";
+                                    }
+                                }
+                                alert(msg)
+
+                                fnObj.searchOpen.search();
+                            } else {
+                                alert("삭제 수행 결과 없음");
+                            }
+                        },
+                    });
+
+
+                },
+
+
+                search: function () {	//그리드 목록 조회하기
+                    myGrid.clearAll();
+                    myGrid2.clearAll();
+                    $("#totCnt").val("");
+                    $("#xtotCnt").val("");
+                    $("#cbmSumInput").val("");
+                    $("#costSumInput").val("");
+                    $("#distance").val("");
+                    $("#paltNoInput").val("");
+                    $("#instErName").val("");
+                    $("#tblUserMId").val("");
+
+                    if (distanceOverlay != undefined || distanceOverlay != null) {
+                        distanceOverlay.forEach(function (distance, i) {
+                            distanceOverlay[i].setMap(null);
+                        });
+                    }
+
+                    if (drawLine != undefined || drawLine != null) {
+                        drawLine.forEach(function (draw, i) {
+                            drawLine[i].setMap(null);
+                        });
+                    }
+
+
+                    if (!fnObj.searchOpen.searchChkVal.chkVal("search")) {
+                        alert(chkValMsg);
+                        return false;
+                        ;
+                    }
+
+
+                    var srchData = new FormData();
+                    srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+                    srchData.append("fromDt", $("#dateFrom").val().replace(/-/g, ""));		//검색 시작일
+                    srchData.append("toDt", $("#dateFrom").val().replace(/-/g, ""));		//검색종료일
+                    srchData.append("instCtgrList", myComboInstCapaCtgr.getChecked());			//시공카테고리 리스트
+                    srchData.append("instTypeList", myComboInstCapaType.getChecked());			//시공유형
+                    srchData.append("instSeatTypeList", myComboSeatType.getChecked());			//시공좌석분류 리스트
+                    srchData.append("instZoneTypeList", myComboZoneType.getChecked());		//권역유형
+                    srchData.append("instZoneCdList", myComboZone.getChecked());		//권역 리스트
+                    srchData.append("dcCd", myComboDcCd.getSelectedValue());		//권역 리스트
+                    srchData.append("instPlanYn", myComboUseYn.getSelectedValue());	//시공계획유무
+                    srchData.append("paltNoxx", $("#paltNoxx").val());	//팔렛트넘버
+                    srchData.append("instEr", $("#instEr").val());	//시공기사
+
+                    /* for (var pair of srchData.entries())
+                    {
+                        console.log(pair[0]+ ' :  ' + pair[1]);
+                    } */
+
+                    $.ajax({
+                        url: "/erp203001List",
+                        processData: false,
+                        contentType: false,
+                        data: srchData,
+                        type: "POST",
+                        datatype: "json",
+
+                        success: function (res) {
+
+                            if (res && res.length > 0) {
+
+                                $("#totCnt").val(res[0].totCnt);
+                                $("#xtotCnt").val(res[0].xtotCnt);
+
+                                var columns = myGrid.getColumnCount()
+                                for (var i = 0; i < res.length; i++) {
+
+                                    var jsonData = {};
+                                    for (var c = 0; c < columns; c++) {
+                                        if (myGrid.getColumnId(c) == "rowId") {
+                                            jsonData[myGrid.getColumnId(c)] = (i + 1);
+                                        } else {
+                                            jsonData[myGrid.getColumnId(c)] = res[i][myGrid.getColumnId(c)];
+                                        }
+                                    }
+
+                                    myGrid.addRow(i + 1, "");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+
+                                    myGrid.setRowData(i + 1, jsonData);
+
+                                    //시공계획이 안되어있는것만 삭제를 할수있다
+                                    if (myGrid.cellById(i + 1, myGrid.getColIndexById("instPlanYn")).getValue() != "Y") {
+                                        myGrid.cellById(i + 1, myGrid.getColIndexById("delChk")).setDisabled(true);
+                                    }
+                                    //20220423 정연호 추가. 판매오더상태코드가 9999 배송완료 라면 배송완료 글자를 라벤더 색으로 표시함
+                                    if (myGrid.cellById(i + 1, myGrid.getColIndexById("soStatCd")).getValue() == "9999") {
+                                        myGrid.cellById(i + 1, myGrid.getColIndexById("soStatNm")).setTextColor("#B100CC");
+
+                                        //.setTextColor('red')
+                                        //.setBgColor("#B100CC");
+                                    } else if (myGrid.cellById(i + 1, myGrid.getColIndexById("soStatCd")).getValue() == "8000") {	//미마감
+                                        myGrid.cellById(i + 1, myGrid.getColIndexById("soStatNm")).setTextColor("#F39C12");
+
+                                        //.setTextColor('red')
+                                        //.setBgColor("#B100CC");
+                                    } else {
+                                        myGrid.cellById(i + 1, myGrid.getColIndexById("delChk")).setDisabled(false);
+                                    }
+
+                                }
+
+
+                            } else {
+                                alert("조회 수행 결과 없음");
+                            }
+                            //그리드 내용을 지도에 마커 뿌려주기
+                            addr = [];
+                            myGrid.forEachRow(function (eachRId) {		//그리드 반복
+
+                                var arrdVal = {};
+                                arrdVal["seq"] = myGrid.cellById(eachRId, myGrid.getColIndexById("seq")).getValue();
+                                arrdVal["addr1"] = myGrid.cellById(eachRId, myGrid.getColIndexById("addr1")).getValue();
+                                arrdVal["addr2"] = myGrid.cellById(eachRId, myGrid.getColIndexById("addr2")).getValue();
+                                arrdVal["instPlanYn"] = myGrid.cellById(eachRId, myGrid.getColIndexById("instPlanYn")).getValue();	//시공계획
+
+                                arrdVal["rowId"] = myGrid.cellById(eachRId, myGrid.getColIndexById("rowId")).getValue();
+                                arrdVal["paltNoxx"] = myGrid.cellById(eachRId, myGrid.getColIndexById("paltNoxx")).getValue();
+                                arrdVal["mapFindAddr"] = myGrid.cellById(eachRId, myGrid.getColIndexById("mapFindAddr")).getValue();
+                                //20211120 시공좌석유형 추가 1인시공  2인시공
+                                arrdVal["instSeatType"] = myGrid.cellById(eachRId, myGrid.getColIndexById("instSeatType")).getValue();
+
+                                //20211231 정연호 추가. 상품목록 추가
+                                arrdVal["prodList"] = myGrid.cellById(eachRId, myGrid.getColIndexById("prodList")).getValue();
+
+                                //20220423 정연호 추가. 판매오더상태코드 추가
+                                arrdVal["soStatCd"] = myGrid.cellById(eachRId, myGrid.getColIndexById("soStatCd")).getValue();
+                                addr.push(arrdVal);
+
+                            });
+                            onLoadMap();
+                        },
+                    });
+                },	//END of search : function() {
+
+                /*************************
+                 search2 : function() {	//그리드2 목록 조회하기
+
+                 myGrid2.clearAll(false);
+
+                 var selRowId = myGrid.getSelectedRowId();
+
+                 var selRowCmpyCd = myGrid.cellById(selRowId,myGrid.getColIndexById("cmpyCd")).getValue();
+                 var selRowTblSoMId = myGrid.cellById(selRowId,myGrid.getColIndexById("tblSoMId")).getValue();
+
+                 var srchData2 = new FormData();
+                 srchData2.append("cmpyCd"			,	selRowCmpyCd		);
+                 srchData2.append("tblSoMId"			,	selRowTblSoMId		);
+
+                 $.ajax({
+                 url: "/erp203001List2",
+                 processData : false,
+                 contentType : false,
+                 data: srchData2,
+                 type:"POST",
+                 datatype:"json",
+
+                 success : function(res2){
+
+
+                 if(res2){
+
+                 $("#grid2").show();
+                 var columns2 = myGrid2.getColumnCount()
+                 for(var i=0;i<res2.length;i++){
+
+                 var jsonData2 = {};
+                 for (var c=0; c<columns2; c++){
+                 jsonData2[myGrid2.getColumnId(c)] = res2[i][myGrid2.getColumnId(c)];
+
+                 }
+
+                 myGrid2.addRow(i+1,"");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+
+                 myGrid2.setRowData(i+1,jsonData2);
+
+                 }
+
+                 }
+                 else{
+                 alert("조회 수행 결과 없음");
+                 }
+                 },
+                 });
+
+
+                 },	//END of search2 : function() {
+                 *****************************/
+
+                update: function () {	//저장 버튼
+
+                    if (myGrid2.getRowsNum() == 0) {
+                        alert("팔렛트를 지정할 데이터를 추가하세요.")
+                        return;
+                    }
+                    //아래그리드의 팔렛트 넘버 필수
+                    if (!$("#paltNoInput").val().trim()) {
+                        alert("팔렛트 번호가 없습니다.");
+                        return;
+                    }
+                    if (!$("#tblUserMId").val().trim()) {
+                        alert("시공기사를 검색하세요.");
+                        return;
+                    }
+                    var updateData = [];
+                    var myGrid2Data = get_json(myGrid2);		//그리드를 JSON형태로 받기
+
+
+                    for (var i = 0; i < myGrid2Data.length; i++) {
+
+                        myGrid2Data[i].instDt = $("#dateFrom").val().replace(/-/g, "");
+                        myGrid2Data[i].tblSoPId = "";	//공백넣음
+                        myGrid2Data[i].tblSoDId = "";	//공백넣음
+                        myGrid2Data[i].paltNoxx = $("#paltNoInput").val().trim();
+                        myGrid2Data[i].seq = myGrid2Data[i].newPaltNoSeq;
+                        myGrid2Data[i].tblUserMId = $("#tblUserMId").val().trim();
+                        myGrid2Data[i].useYn = "Y";	//강제로 Y를 넣음
+                        myGrid2Data[i].saveUser = /*[[${session.tblUserMId}]]*/
+                            updateData.push(myGrid2Data[i])
+
+                    }
+
+
+                    $.ajax({
+                        url: "/erp203001Save",
+                        processData: false,
+                        contentType: "application/json",	//데이터를 어레이 json으로 보낼때에는 contentType : "application/json" 를 붙인다
+                        data: JSON.stringify(updateData),
+                        type: "POST",
+                        datatype: "json",
+                        success: function (res) {
+                            if (res) {
+
+                                var rtnYnCnt = 0;
+                                for (var i = 0; i < res.length; i++) {
+                                    if (res[i].rtnYn == "Y") {
+                                        rtnYnCnt++;
+                                    }
+                                }
+                                //20211120 추가
+                                $("#prePaltNoInput").val($("#paltNoInput").val());
+
+                                alert(res.length + " 중 " + rtnYnCnt + " 건 성공");
+                                fnObj.searchOpen.search();
+                            } else {
+                                alert("저장 수행 결과 없음");
+                            }
+                        },
+                    });
+
+                },	//END of mappingBtn : function() {
+
+                searchChkVal: {
+                    chkVal: function (chkGubn) {
+                        chkValMsg = "";	//메세지 초기화
+                        var rtnVal = true;
+
+                        if (chkGubn == "search")	//조회 검색 조건
+                        {
+                            if (!myComboCmpyCd.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "회사코드를 선택하세요\n";
+                                rtnVal = false;
+                            }
+
+
+                            if (!$("#dateFrom").val()) {
+                                chkValMsg = chkValMsg + "날짜를 입력하세요.\n";
+                            }
+
+
+                            //물류센터를 선택하세요
+
+                            if (!myComboDcCd.getSelectedValue().trim()) {
+                                chkValMsg = chkValMsg + "물류센터를 선택하세요\n";
+                                rtnVal = false;
+                            }
+
+
+                        }
+                        return rtnVal;
+                    },	//END of chkVal : function(){
+                },	//END of searchChkVal
+            },	//END of searchOpen
+            keyOpen: {
+                enterKey: function (enterType) {
+
+                    if (enterType == 'instErName')	//시공기사이름 입력란에서 엔터키를 쳤을때
+                    {
+
+                        if (window.event.keyCode == 13) {
+
+                            $("#tblUserMId").val("");
+                            fnObj.winOpen.grid2InstErNameOpen(myComboCmpyCd.getSelectedValue()
+                                , $("#dateFrom").val().replace(/-/g, "")
+                                , myComboDcCd.getSelectedValue()
+                                , $("#instErName").val()
+                                , ''
+                            );
+                        }
+                    }
+                },
+                onKeyPressed: function (code, ctrl, shift) {
+                    if (code == 67 && ctrl) {
+                        myGrid.setCSVDelimiter("\t");
+                        myGrid.copyBlockToClipboard()
+                    }
+                    if (code == 86 && ctrl) {
+                        myGrid.pasteBlockFromClipboard()
+                    }
+                    return true;
+                },
+            }
+        }
+
+
+        //엑셀 헨들러
+        var excelHandler = {
+            getExcelFileName: function () {
+                return '시공계획관리.xlsx';		//엑셀파일명
+            },
+            getSheetName: function () {
+                return '시공계획관리';		//시트명
+            },
+            getExcelData: function () {
+                return get_json_for_excel(myGrid);		//그리드를 엑셀다운로드dyd json 으로 변경
+            },
+            getWorksheet: function () {
+                return XLSX.utils.json_to_sheet(this.getExcelData());
+            }
+        }
+
+        /***********************************
+         function searchPaging(page)
+         {
+
+         if($("#rowPerPage").val())
+         {
+         pagePerRow = parseInt($("#rowPerPage").val());
+         }
+
+         if(pagePerRow == 0)
+         {
+         pagePerRow = searchRes.length;
+
+         }
+
+         var pageRange	=	10;	//페이지범위를 몇개씩짜를것인가. 예) 23페이지 라면 1 2 3 4 5 6 7 8 9 10  이 한번 나오고 >> 누르면 11 12 13 14 15 16 17 18 19 20 나오고 >> 누르면 21 22 23 나옴
+
+         var totalPageCnt	=	searchRes.length % pagePerRow == 0 ? parseInt(searchRes.length / pagePerRow) : parseInt(searchRes.length / pagePerRow) + 1
+
+         var a="";
+
+         //패이징 처리
+         var start=(page-1);
+         var end  = (page-1)+pageRange;
+
+         if(start%pageRange != 0)
+         {
+         start = parseInt(start/pageRange)*pageRange ;
+         }
+
+         if(end%pageRange !=  0 || page == 1)
+         {
+         end = parseInt(end/pageRange)*pageRange;
+         }
+
+         if(start >= pageRange)
+         {
+         a=a +	"<input type='button' onclick='searchPaging("+1+");' value='<<'></input>";
+         a=a +	"<input type='button' onclick='searchPaging("+(start -1)+");' value='<'></input>";
+         }
+
+         var r=0;
+
+         for(r=start;r<end;r++)
+         {
+         if(r < totalPageCnt)
+         {
+         if(r+1 == page)		//현재페이지 강조
+         {
+         a=a+"<input type='button' onclick='searchPaging("+(r+1)+");' style='color:red;font-weight:bold;' value="+(r+1)+"></input>";
+         }
+         else
+         {
+         a=a+"<input type='button' onclick='searchPaging("+(r+1)+");' value="+(r+1)+"></input>";
+         }
+         }
+         }
+
+         if(end*pagePerRow  < searchRes.length )
+         {
+         a=a +	"<input type='button' onclick='searchPaging("+(end+1)+");' value='>'></input>";
+         a=a +	"<input type='button' onclick='searchPaging("+totalPageCnt+");' value='>>'></input>";
+         }
+
+         a=a+"&nbsp;&nbsp;<input type='number' maxlength=4 style='width:60px;' id='rowPerPage' value="+pagePerRow+"></input><input type='button' value='적용' onclick='searchPaging("+1+");'></input>";
+         a=a+"&nbsp;&nbsp;<i class='fa fa-calculator fa-lg' aria-hidden='true'></i>&nbsp;" + searchRes.length;
+         $("#page").html(a);
+
+         var is=(page-1)*pagePerRow;	//시작점
+         var ie=(page-1)*pagePerRow+pagePerRow;	//종료점
+
+         if(searchRes.length < ie)
+         {
+         ie = searchRes.length;
+
+         }
+
+
+         var columns = myGrid.getColumnCount()
+         for(var i=is;i<ie;i++){
+
+
+         var jsonData = {};
+         for (var c=0; c<columns; c++){
+         jsonData[myGrid.getColumnId(c)] = searchRes[i][myGrid.getColumnId(c)];
+         if(myGrid.getColumnId(c) == "rowId")
+         {
+         jsonData[myGrid.getColumnId(c)] = (i+1);
+         }
+
+         }
+
+         myGrid.addRow(i+1,"");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+
+         myGrid.setRowData(i+1,jsonData);
+
+
+         }
+
+         //그리드 내용을 지도에 마커 뿌려주기
+         addr=[];
+         myGrid.forEachRow(function(eachRId){		//그리드 반복
+
+         var arrdVal={};
+         arrdVal["seq"] = myGrid.cellById(eachRId,myGrid.getColIndexById("seq")).getValue();
+         arrdVal["addr1"] = myGrid.cellById(eachRId,myGrid.getColIndexById("addr1")).getValue();
+         arrdVal["addr2"] = myGrid.cellById(eachRId,myGrid.getColIndexById("addr2")).getValue();
+         arrdVal["instPlanYn"] = myGrid.cellById(eachRId,myGrid.getColIndexById("instPlanYn")).getValue();	//시공계획
+
+         arrdVal["rowId"] = myGrid.cellById(eachRId,myGrid.getColIndexById("rowId")).getValue();
+         arrdVal["paltNoxx"] = myGrid.cellById(eachRId,myGrid.getColIndexById("paltNoxx")).getValue();
+         arrdVal["mapFindAddr"] = myGrid.cellById(eachRId,myGrid.getColIndexById("mapFindAddr")).getValue();
+         //20211120 시공좌석유형 추가 1인시공  2인시공
+         arrdVal["instSeatType"] = myGrid.cellById(eachRId,myGrid.getColIndexById("instSeatType")).getValue();
+
+         //20211231 정연호 추가. 상품목록 추가
+         arrdVal["prodList"] = myGrid.cellById(eachRId,myGrid.getColIndexById("prodList")).getValue();
+
+         addr.push(arrdVal);
+
+         });
+         onLoadMap();
+         }
+         *****************************/
+        $(document).ready(function () {
+
+
+            if (pagePerRow == 0)	//페이지당 로우수가 0 이라면 페이징 처리 안하는걸로 처리해버린다
+            {
+                $("#page").hide();
+            }
+
+
+            myWins = new dhtmlXWindows();
+
+            myGrid = new dhtmlXGridObject('grid');	//그리드
+            myGrid2 = new dhtmlXGridObject('grid2');	//그리드
+
+
+            myCalendar = new dhtmlXCalendarObject([{input: "dateFrom", button: "dateFromIcon"}]);
+
+            var now = new Date()
+            var year = now.getFullYear() + "";
+            var month = (now.getMonth() + 1) + "";
+            var date = now.getDate() + "";
+            if (month.length == 1) {
+                month = "0" + month;
+            }
+            if (date.length == 1) {
+                date = "0" + date;
+            }
+
+            var today = year + "-" + month + "-" + date;
+
+            $("#dateFrom").val(today);
+
+
+            myCalendar.loadUserLanguage("ko");
+
+            fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+
+            fnObj.comboOpen.comboInstCapaCtgr();	//시공카테고리콤보 바인드
+            fnObj.comboOpen.comboInstCapaType();	//시공유형콤보 바인드
+
+            fnObj.comboOpen.comboZone();		//권역 콤보 바인드
+            fnObj.comboOpen.comboZoneType();		//권역유형 콤보 바인드
+            fnObj.comboOpen.comboUseYn();
+            fnObj.comboOpen.comboSeatType();	//시공좌석 콤보
+            fnObj.comboOpen.comboDcCd();	//물류센터 콤보
+
+            //myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue('A'));		//A고정
+
+
+            fnObj.gridOpen.grid()
+            fnObj.gridOpen.grid2()
+
+
+            window.onresize = function (event) {		//윈도우의 사이즈가 변경했을떄
+                fnObj.gridOpen.setWidth();
+                fnObj.gridOpen.setWidth();
+            };
+            //페이지 시작할때 자동으로 먼저 로딩
+            //$("#dateFrom").val("2021-09-30");
+            //myComboDcCd.selectOption(1)
+            //fnObj.searchOpen.search();
+
+
+            //20211128 정연호 추가 본인의 물류센터만 보임
+            sessionUserGrntCd =  /*[[${session.userGrntCd}]]*/
+                sessionUserGrdCd = /*[[${session.userGrdCd}]]*/
+                    sessionDcCd = /*[[${session.dcCd}]]*/
+                        sessionDcNm = /*[[${session.dcNm}]]*/
+
+
+                            /**
+                             if(sessionUserGrdCd == "2000" || sessionUserGrntCd == "6000")
+                             {
+                             console.log("sessionUserGrdCd : " + sessionUserGrdCd)
+                             console.log("sessionUserGrntCd : " + sessionUserGrntCd)
+                             console.log("sessionDcCd : " + sessionDcCd)
+
+                             myComboDcCd.selectOption(myComboDcCd.getIndexByValue(sessionDcCd));
+                             myComboDcCd.disable();
+                             }
+                             **/
+
+
+
+                            $("#btnExcelDown").mouseover(function () {
+                                $("#btnExcelDown").val("화면에 조회된 내용을 엑셀 다운로드");
+                            });
+            $("#btnExcelDown").mouseout(function () {
+                $("#btnExcelDown").val("엑셀다운로드");
+            });
+
+
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                showMethod: 'slideDown',
+                closeDuration: 0,
+                positionClass: "toast-top-right",
+                timeOut: 1000,
+                preventDuplicates: false
+
+            };
+
+
+            //이것은 그리드의 전체체크를 했는지 찾아내는법이다
+            /************
+             $("#grid").find("input:eq(0)").on("change",function(e){
+
+             if($("#grid").find("input:eq(0)").is(":checked") == true)	//전체체크를 했을때
+             {
+             //그리드를 한번 쭉 돌아서 모바일 전송유무가 단 1개라도 있으면 진행금지
+             var mCnt=0;
+             myGrid.forEachRow(function(RowId){
+
+             var mTranYn = 	myGrid.cellById(RowId,myGrid.getColIndexById("mobileTranYn")).getValue();
+
+             if(mTranYn == "Y")
+             {
+             mCnt++;
+             }
+
+             });
+
+
+             if(mCnt > 0)
+             {
+             alert("모바일 전송된 건이 "+mCnt+"건 있습니다.");
+             $("#grid").find("input:eq(0)").prop("checked",false);
+
+             return;
+
+             }
+
+             }
+
+
+             });
+
+             **************/
+
+
+        });
+
+
+        //20211226 정연호 추가. 키보드에서 F2 누르면 조회하기
+        $(document).keydown(function (event) {
+            if (event.keyCode == 113 || event.which == 113) {
+                fnObj.searchOpen.search()
+            }
+        });
+    </script>
+</head>
+<!-- top , left, bottom , right,  -->
+
+<body>
+<div id="mainDiv" style="height:100%;">
+    <div id="searchDiv" style="width:100%;font-size:12px;padding-bottom:5px;">
+        <div id="btnDiv1" style="width:100%;">
+            <div class="title-container">
+                    <span class="item-head title-text">
+                        시공 계획 관리
+                    </span>
+                <span class="sub-title">erp2030010</span>
+            </div>
+            <span class="btn-container">
+                    <span class="item-data">
+                        <input id="btnSearch" class="action-button primary" type="button"
+                               onclick="fnObj.searchOpen.search()" value="조회(F2)">
+                    </span>
+                    <span class="item-data" style="padding: 0 20px 0 20px;">
+                        <input id="btnReload" class="action-button" type="button" onclick="location.reload(true);"
+                               value="초기화">
+                    </span>
+                </span>
+        </div>
+        <div id="searchDiv1" style="width: 100%;">
+                <span class="cell" style="width: 220px; display: none;">
+                    <span class="item-head" style="width: 80px;">회사</span>
+                    <span class="item-data" style="width: 140px;">
+                        <div id="cmpyCd"></div>
+                    </span>
+                </span>
+
+
+            <span class="cell" style="width: 220;">
+                    <span class="item-head" style="width: 100px;">
+                        배송확정일<font size=1>(시공일)</font>
+                    </span>
+                    <span class="item-data" style="width: 120px;">
+                        <input type="text" id="dateFrom" style="height: 20px; width: 90px;" readonly>
+                        <i id="dateFromIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+                    </span>
+
+                </span>
+
+            <span class="cell" style="width: 220px;">
+                    <span class="item-head" style="width: 80px;">
+                        <b>물류센터<font color=red>*</font></b>
+                    </span>
+                    <span class="item-data" style="width: 140px;">
+                        <div id="dcCd"></div>
+                    </span>
+                </span>
+
+            <span class="cell" style="width: 240px;">
+                    <span class="item-head" style="width: 100px;">시공카테고리</span>
+                    <span class="item-data" style="width: 140px;">
+                        <div opt_type="checkbox" id="instCapaCtgr"></div>
+                    </span>
+                </span>
+            <span class="cell" style="width: 220px;">
+                    <span class="item-head" style="width: 80px;">시공유형</span>
+                    <span class="item-data" style="width: 140px;">
+                        <div opt_type="checkbox" id="instCapaType"></div>
+                    </span>
+                </span>
+
+            <span class="cell" style="width: 240px;">
+                    <span class="item-head" style="width: 100px;">시공좌석분류</span>
+                    <span class="item-data" style="width: 140px;">
+                        <div opt_type="checkbox" id="seatType"></div>
+                    </span>
+                </span>
+
+
+            <!-- 20220106 정연호 너비를 늘림 -->
+            <span class="cell" style="width: 280px;">
+                    <span class="item-head" style="width: 80px;">권역유형</span>
+                    <span class="item-data" style="width: 200px;">
+                        <div opt_type="checkbox" id="zoneType"></div>
+                    </span>
+                </span>
+
+            <span class="cell" style="width: 360px;">
+                    <span class="item-head" style="width: 80px;">권역</span>
+                    <span class="item-data" style="width: 280px;">
+                        <div opt_type="checkbox" id="zone"></div>
+                    </span>
+                </span>
+
+            <span class="cell" style="width: 220px;">
+                    <span class="item-head" style="width: 80px;">시공계획유무</span>
+                    <span class="item-data" style="width: 140px;">
+                        <div id="useYn"></div>
+                    </span>
+                </span>
+
+
+            <span class="cell" style="width: 220px; display: none;">
+                    <span class="item-head" style="width: 80px;">grid1RowId</span>
+                    <span class="item-data" style="width: 140px;">
+                        <input type="text" style="width: 132px; height: 20px;" id="grid1RowId"></input>
+                    </span>
+                </span>
+
+            <span class="cell" style="width: 220px;">
+                    <span class="item-head" style="width: 80px;">팔렛트넘버</span>
+                    <span class="item-data" style="width: 140px;">
+                        <input type="text" style="width: 132px; height: 20px;" id="paltNoxx"></input>
+                    </span>
+                </span>
+
+            <span class="cell" style="width: 220px;">
+                    <span class="item-head" style="width: 80px;">시공기사</span>
+                    <span class="item-data" style="width: 140px;">
+                        <input type="text" style="width: 132px; height: 20px;" id="instEr"></input>
+                    </span>
+                </span>
+
+
+        </div>
+
+
+    </div>
+
+    <!-- 저건 2번째 부분-아랫쪽. 가려놨음 -->
+    <div id="searchDiv2nd"
+         style="width: 100%; font-size: 12px; padding-bottom: 5px; background-color: papayawhip; display: none;">
+        <div id="btnDiv2nd1" style="width: 100%;">
+            <span class="cell" style="float: right;"> </span>
+        </div>
+        <div id="searchDiv2nd1" style="width: 100%;"></div>
+    </div>
+    <hr style="width: 100%; border: solid 2px darkgray;">
+    <!--  아래 내용 나오는 부분. 왼쪼은 지도, 오른쪽은 그리드 2개 -->
+    <div id="minaContents" style="width: 100%; height: 85%; font-size: 12px; padding-bottom: 5px;">
+        <div id="mapDiv" style="width: 40%; height: 100%; font-size: 12px; padding-bottom: 5px; float: left;">
+            <!--
+            <input type="checkbox" id="chkUseDistrict" onclick="setOverlayMapTypeId()" /> 지적편집도 정보
+            <input type="checkbox" id="chkTerrain" onclick="setOverlayMapTypeId()" /> 지형정보
+            <input type="checkbox" id="chkTraffic" onclick="setOverlayMapTypeId()" /> 교통정보
+            <input type="checkbox" id="chkBicycle" onclick="setOverlayMapTypeId()" /> 자전거도로 정보
+        <br> -->
+
+            <div id="map" style="width: 100%; height: 100%;"></div>
+            <script type="text/javascript"
+                    th:src="@{//dapi.kakao.com/v2/maps/sdk.js?appkey=4ca76d83b764efaae3a6970aed10e787&libraries=services(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}">
+            </script>
+            <!--				<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4ca76d83b764efaae3a6970aed10e787&libraries=services20250318">-->
+            <!--				</script>-->
+            <script>``
+            var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+                mapOption = {
+                    center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+                    level: 10 // 지도의 확대 레벨
+                };
+
+            // 지도를 생성합니다
+            var map = new kakao.maps.Map(mapContainer, mapOption);
+
+            ////////var distanceOverlay; // 선의 거리정보를 표시할 커스텀오버레이 입니다
+            var dots = {}; // 선이 그려지고 있을때 클릭할 때마다 클릭 지점과 거리를 표시하는 커스텀 오버레이 배열입니다.
+
+
+            // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
+            var mapTypeControl = new kakao.maps.MapTypeControl();
+
+            //지도 유형
+            var mapTypes = {
+                terrain: kakao.maps.MapTypeId.TERRAIN,
+                traffic: kakao.maps.MapTypeId.TRAFFIC,
+                bicycle: kakao.maps.MapTypeId.BICYCLE,
+                useDistrict: kakao.maps.MapTypeId.USE_DISTRICT
+            };
+
+            // 지도에 컨트롤을 추가해야 지도위에 표시됩니다
+            // kakao.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데 TOPRIGHT는 오른쪽 위를 의미합니다
+            map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+            // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
+            var zoomControl = new kakao.maps.ZoomControl();
+            map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+
+            var locPosition, message;
+            var lat, lon;
+            //HTML5의 geolocation으로 사용할 수 있는지 확인합니다
+            if (navigator.geolocation) {
+
+                // GeoLocation을 이용해서 접속 위치를 얻어옵니다
+                navigator.geolocation.getCurrentPosition(function (position) {
+
+                    lat = position.coords.latitude, // 위도
+                        lon = position.coords.longitude; // 경도
+
+                    locPosition = new kakao.maps.LatLng(lat, lon), // 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다
+                        //message = '<div style="padding:5px;">위치</div>'; // 인포윈도우에 표시될 내용입니다
+                        message = null;
+                    //displayMarker(locPosition, message);
+
+                    map.setCenter(locPosition);
+                });
+
+
+            } else { // HTML5의 GeoLocation을 사용할 수 없을때 마커 표시 위치와 인포윈도우 내용을 설정합니다
+
+                locPosition = new kakao.maps.LatLng(33.450701, 126.570667),
+                    message = '현재위치를 사용할수 없습니다';
+
+                //displayMarker(locPosition, message); 	//지도에 마커와 인포윈도우를 표시하는 함수입니다
+                map.setCenter(locPosition);      		//지도를 위치를 중심으로 이동
+            }
+
+
+            //지도에 마커와 인포윈도우를 표시하는 함수입니다
+            function displayMarker(locPosition, message) {
+
+                // 마커를 생성합니다
+                var marker = new kakao.maps.Marker({
+                    map: map,
+                    position: locPosition,
+                    clickable: true	//마커를 클릭할수있게
+                });
+
+                var iwContent = message, // 인포윈도우에 표시할 내용
+                    iwRemoveable = true;
+
+                // 인포윈도우를 생성합니다
+                var infowindow = new kakao.maps.InfoWindow({
+                    content: iwContent,
+                    removable: iwRemoveable
+                });
+
+                // 인포윈도우를 마커위에 표시합니다
+                if (message) {
+                    infowindow.open(map, marker);
+                }
+                // 지도 중심좌표를 접속위치로 변경합니다
+                map.setCenter(locPosition);
+            }
+
+
+            // 인포윈도우를 표시하는 클로저를 만드는 함수입니다
+            function makeOverListener(map, marker, infowindow) {
+                return function () {
+                    infowindow.open(map, marker);
+                };
+            }
+
+            // 인포윈도우를 닫는 클로저를 만드는 함수입니다
+            function makeOutListener(infowindow) {
+                return function () {
+                    infowindow.close();
+                };
+            }
+
+            //var selectedMarker = null;// 클릭한 마커를 담을 변수
+            var markers = [];
+            var positions = [];
+
+            function onLoadMap() {
+                positions = [];
+                // 주소-좌표 변환 객체를 생성합니다
+
+
+                var inner = {};
+                var geocoder = new kakao.maps.services.Geocoder();
+
+
+                for (var i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);	//지도에 표시한 마커 지우기
+                }
+                markers = [];	//마커가 들어갈 배열 초기화 하기
+
+
+                var infowindow;
+                var marker;
+
+                //////////반복 반복 반복 반복 그리드의 모든 주소를 반복
+                addr.forEach(function (address, index) {
+
+                    geocoder.addressSearch(addr[index].addr1, function (result, status) {
+
+                        myGrid.cellById(addr[index].rowId, myGrid.getColIndexById("mapFindAddr")).setValue(status);
+                        myGrid.cellById(addr[index].rowId, myGrid.getColIndexById("mapIndex")).setValue(index);
+
+                        if (status === kakao.maps.services.Status.OK) {
+                            if (result.length == 1) {
+                                var resultValue = result[0];
+                                myGrid.cellById(addr[index].rowId, myGrid.getColIndexById("mapY")).setValue(resultValue.y);
+                                myGrid.cellById(addr[index].rowId, myGrid.getColIndexById("mapX")).setValue(resultValue.x);
+                                inner.latlng = new kakao.maps.LatLng(resultValue.y, resultValue.x);
+
+                                //20220423 정연호 추가. 판매오더배송완료 9999 라면 첫번째줄에 배송완료 라고 표시하
+                                var soStat = "";
+                                if (addr[index].soStatCd == "9999") {
+                                    soStat = "<b>[배송완료]</b><br><br>";
+                                } else if (addr[index].soStatCd == "8000") {
+                                    soStat = "<b>[배송완료(미마감)]</b><br><br>";
+                                }
+                                //20211231 정연호 수정. 마커 표시에 주소 대신 상품목록 표시 변경
+                                //inner.content = "<div id='content"+index+"'style='width:150px;text-align:center;padding:6px 0;font-size:0.7em;'>시공계획:"+addr[index].instPlanYn+ ", 주소" + addr[index].addr1 + " " + addr[index].addr2 + "</div>";
+                                inner.content = "<div id='content" + index + "'style='width:300px;text-align:left;padding:6px 0;font-size:1em;'>" +
+                                    soStat + addr[index].prodList.replace(/\개\//g, "개<br>") +
+                                    "</div>";
+                                inner.zIndex = 15	//20220118 정연호		추가
+
+                                inner.paltNoxx = addr[index].paltNoxx;
+                                inner.mapFindAddr = addr[index].mapFindAddr
+                                inner.seq = addr[index].seq;
+                                inner.rowId = addr[index].rowId;
+                                var imageUrl = "";
+
+
+                                if (addr[index].instSeatType == "1111")//1인시공
+                                {
+                                    if (addr[index].instPlanYn == "N")	//시공 미계획 마커는 회색
+                                    {
+                                        imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker/gray/marker_completed_others.png'; // 회색
+                                    } else if (addr[index].instPlanYn == "Y")	//시공 계획
+                                    {
+                                        imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker/green/marker_ing_others.png'; // 녹색
+                                    }
+
+                                    //20220423 정연호추가. 판매오더배송상태 코드가 9999 배송완료라면 위에 꺼 무시하고 imageUrl을 재정의(라벤더)
+                                    if (addr[index].soStatCd == "9999") {
+                                        imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker/lavender/marker_9999_others.png'; // 라벤
+                                    } else if (addr[index].soStatCd == "8000") { //미마감
+                                        imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker/orange/marker_8000_others.png'; // 미마감은 오렌지색
+                                    }
+
+                                    imageSrc = imageUrl,
+
+                                        //imageSize = new kakao.maps.Size(30, 36), // 마커이미지의 크기입니다
+                                        imageSize = new kakao.maps.Size(20, 24), // 마커이미지의 크기입니다
+
+
+                                        //imageOption = {offset: new kakao.maps.Point(13, 36)}; // 마커이미지의 위치옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+                                        imageOption = {offset: new kakao.maps.Point(10, 24)}; // 마커이미지의 위치옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+                                    // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+                                    var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
+                                    inner.markerImage = markerImage;
+
+
+                                    //마커를 클릭했을때 바뀌는 마커이미지
+
+                                    clickImageSrc = "http://gloakoreahost.cdn3.cafe24.com/marker/red/marker_return_others.png",		//red
+                                        //clickImageSize = new kakao.maps.Size(30, 36),	//클릭시 커지는 이미지 크기를 마커의 이미지 크기와 같게한다
+                                        clickImageSize = new kakao.maps.Size(20, 24),	//클릭시 커지는 이미지 크기를 마커의 이미지 크기와 같게한다
+                                        //clickImageOption = {offset: new kakao.maps.Point(13, 36)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+                                        clickImageOption = {offset: new kakao.maps.Point(10, 24)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+
+                                } else if (addr[index].instSeatType == "2222")//2인시공
+                                {
+                                    if (addr[index].instPlanYn == "N")	//시공 미계획 마커는 회색
+                                    {
+                                        imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker2/marker_2_551401.png'; // 선지색
+                                    } else if (addr[index].instPlanYn == "Y")	//시공 계획
+                                    {
+                                        imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker2/marker_2_blue.png'; // 파랑
+                                    }
+
+                                    //20220423 정연호추가. 판매오더배송상태 코드가 9999 배송완료라면 위에 꺼 무시하고 imageUrl을 재정의(라벤더)
+                                    if (addr[index].soStatCd == "9999") {
+                                        imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker2/marker_2_lavender.png'; // 라벤더
+                                    } else if (addr[index].soStatCd == "8000") {
+                                        imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker2/marker_2_orange2.png'; //미마감은 오렌지색
+                                    }
+
+                                    imageSrc = imageUrl,
+
+                                        imageSize = new kakao.maps.Size(24, 24), // 마커이미지의 크기입니다
+
+                                        imageOption = {offset: new kakao.maps.Point(12, 24)}; // 마커이미지의 위치옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+                                    // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+                                    var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
+                                    inner.markerImage = markerImage;
+
+
+                                    //마커를 클릭했을때 바뀌는 마커이미지
+                                    clickImageSrc = "http://gloakoreahost.cdn3.cafe24.com/marker2/marker_2_red.png",		//red
+                                        clickImageSize = new kakao.maps.Size(24, 24),	//클릭시 커지는 이미지 크기를 마커의 이미지 크기와 같게한다
+                                        clickImageOption = {offset: new kakao.maps.Point(12, 24)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+
+                                }
+
+
+                                // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+                                var clickImage = new kakao.maps.MarkerImage(clickImageSrc, clickImageSize, clickImageOption);
+
+
+                                marker = new kakao.maps.Marker({
+
+                                    map: map, // 마커를 표시할 지도
+                                    position: inner.latlng,// 마커의 위치
+                                    image: inner.markerImage
+                                });
+
+
+                                marker.index = index;
+                                marker.rowId = addr[index].rowId;//그리드의 로우 정보를 담는다
+                                marker.normalImage = inner.markerImage;
+                                marker.clickImage = clickImage;
+                                marker.clickYn = "N";
+
+                                markers.push(marker);
+
+                                infowindow = new kakao.maps.InfoWindow({
+                                    content: inner.content // 인포윈도우에 표시할 내용
+                                    , zIndex: inner.zIndex	//20220118 정연호		추가
+                                });
+
+
+                                kakao.maps.event.addListener(marker, 'mouseover', makeOverListener(map, marker, infowindow));
+                                kakao.maps.event.addListener(marker, 'mouseout', makeOutListener(infowindow));
+
+
+                                markers.forEach(function (markerInfo, u) {
+
+                                    if (markerInfo.index == index) {
+                                        kakao.maps.event.addListener(markers[u], 'click', function () {
+
+                                            //해당마커가 클릭 안된상태
+                                            if (markers[u].clickYn == "N") {
+                                                if (myGrid.cellById(markers[u].rowId, myGrid.getColIndexById("instPlanYn")).getValue() == "Y") {
+                                                    /* if(!confirm("이미 팔렛트계획이 작성된 오더입니다. 팔렛트를 변경하시겠습니까 ?"))
+                                                            {
+                                                                //myGrid.cellById(markers[u].rowId,myGrid.getColIndexById("chk")).setValue("")
+                                                                return;
+                                                            } */
+                                                }
+
+                                                //20211129 정연호 모바일전송상태가 Y 일경우 못넣음
+                                                if (myGrid.cellById(markers[u].rowId, myGrid.getColIndexById("mobileTranYn")).getValue() == "Y") {
+                                                    //20220423 정연호 수정. 배송완료일경우에는 배송완료라고 메세지 표
+                                                    if (myGrid.cellById(markers[u].rowId, myGrid.getColIndexById("soStatCd")).getValue() == "9999") {
+                                                        toastr.error('이미 배송 완료 입니다.(지도 마커 클릭)');
+                                                    } else if (myGrid.cellById(markers[u].rowId, myGrid.getColIndexById("soStatCd")).getValue() == "8000") {
+                                                        toastr.error('이미 배송 완료 (미마감) 입니다.(지도 마커 클릭)');
+                                                    } else {
+                                                        toastr.error('이미 모바일 전송 완료 입니다.(지도 마커 클릭)');
+                                                    }
+                                                    //20220106 정연호 지도 마커 클릭 했을때 그리드의 항목 선택
+                                                    myGrid.selectRowById(markers[u].rowId);
+
+                                                    return;
+                                                }
+
+
+                                                //마커를 클릭한다
+                                                ////console.log("이미 클릭된 마커가 없고, 이미 클릭한 마커와 지금 클릭한 마커가 다르면 u : " + u);
+                                                markers[u].clickYn = "Y";
+                                                markers[u].setImage(markers[u].clickImage);
+
+                                                myGrid.cellById(markers[u].rowId, myGrid.getColIndexById("chk")).setValue("1");
+
+                                                myGrid.selectRowById(markers[u].rowId);
+
+
+                                                myGrid2.addRow(markers[u].rowId, "");
+                                                myGrid2.setRowData(markers[u].rowId, myGrid.getRowData(markers[u].rowId));
+
+
+                                                //20211120 추가. 그리드2에 로우를 넣으면 그리드1에 해당로우는 delChk를 비활성화
+                                                myGrid.cellById(markers[u].rowId, myGrid.getColIndexById("delChk")).setValue("0");
+                                                myGrid.cellById(markers[u].rowId, myGrid.getColIndexById("delChk")).setDisabled(true);
+
+
+                                                if (myGrid2.cellById(markers[u].rowId, myGrid2.getColIndexById("instPlanYn")).getValue() == "Y") {
+                                                    myGrid2.cellById(markers[u].rowId, myGrid2.getColIndexById("saveGubn")).setValue("UPDT");
+                                                } else {
+                                                    myGrid2.cellById(markers[u].rowId, myGrid2.getColIndexById("saveGubn")).setValue("INS");
+                                                }
+
+
+                                                var newPaltNo = 0;
+                                                myGrid2.forEachRow(function (pId) {
+
+
+                                                    if (Number(myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).getValue()) > newPaltNo) {
+                                                        newPaltNo = Number(myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).getValue())
+                                                    }
+
+                                                });
+                                                myGrid2.cellById(markers[u].rowId, myGrid2.getColIndexById("newPaltNoSeq")).setValue((newPaltNo + 1) + "")
+                                                myGrid2.cellById(markers[u].rowId, myGrid2.getColIndexById("chk")).setValue("")
+                                                fnObj.searchOpen.grid2CbmSum();
+                                                fnObj.searchOpen.grid2InstCostSum();
+                                                fnObj.searchOpen.grid2Distance();
+
+
+                                            }
+
+                                            //해당마커가 클릭이 되어있는상태
+                                            else if (markers[u].clickYn == "Y") {
+
+                                                //마커 해제
+                                                ////console.log("이미 클릭된 마커가 있고, 이미 클릭한 마커와 지금 클릭한 마커가 같으면 u : " + u);
+                                                markers[u].clickYn = "N";
+                                                markers[u].setImage(markers[u].normalImage);
+                                                myGrid.cellById(markers[u].rowId, myGrid.getColIndexById("chk")).setValue("0");
+                                                myGrid.selectRowById(markers[u].rowId);
+
+                                                myGrid2.forEachRow(function (pId) {
+
+                                                    var oldP = Number(myGrid2.cellById(markers[u].rowId, myGrid2.getColIndexById("newPaltNoSeq")).getValue());
+                                                    var newP = Number(myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).getValue());
+                                                    if (newP > oldP) {
+                                                        myGrid2.cellById(pId, myGrid2.getColIndexById("newPaltNoSeq")).setValue((newP - 1) + "")
+                                                    }
+
+                                                });
+                                                myGrid2.deleteRow(markers[u].rowId);
+
+                                                //20211120 추가. 그리드2에 로우를 삭제하면 그리드1에 해당로우는 delChk를 활성화
+                                                //myGrid.cellById(markers[u].rowId,myGrid.getColIndexById("delChk")).setDisabled(false);
+
+
+                                                if (myGrid.cellById(markers[u].rowId, myGrid.getColIndexById("instPlanYn")).getValue() != "Y") {
+                                                    //20211120 추가. 그리드2에 로우를 삭제하면 그리드1에 해당로우는 delChk를 활성화
+                                                    myGrid.cellById(markers[u].rowId, myGrid.getColIndexById("delChk")).setDisabled(true);
+                                                }
+                                                    //20211231 정연호 주석처리. SP에서 처리하므로 삭제유무 상관없음
+                                                /* else if (myGrid.cellById(markers[u].rowId,myGrid.getColIndexById("mobileTranYn")).getValue() == "Y")
+                                                        {
+                                                             myGrid.cellById(markers[u].rowId,myGrid.getColIndexById("delChk")).setDisabled(true);
+                                                        } */
+                                                else {
+                                                    myGrid.cellById(markers[u].rowId, myGrid.getColIndexById("delChk")).setDisabled(false);
+                                                }
+
+
+                                                fnObj.searchOpen.grid2CbmSum();
+                                                fnObj.searchOpen.grid2InstCostSum();
+                                                fnObj.searchOpen.grid2Distance();
+                                            }
+
+
+                                            //클릭 한 마커의 값에 해당하는걸 그리드에서 선택한것 처럼 해당로우를 돋보이게 해준다
+
+
+                                        });
+
+
+                                    }
+                                });
+
+                                if (index == 0) {
+                                    map.setCenter(inner.latlng);
+                                }
+                                //addr.push(inner);
+                                positions.push(inner);
+
+                                inner = {};
+
+
+                            }	//END of if(result.length == 1)
+
+                            else {
+                                myGrid.cellById(addr[index].rowId, myGrid.getColIndexById("mapFindAddr")).setValue(result.length + "개");
+                            }
+                        }	//END of  if (status === kakao.maps.services.Status.OK)
+
+                    });	//END of geocoder.addressSearch(addr[index].addr1, function(result, status)
+
+                });		//END of addr.forEach(function(address,index) ///반복 반복 반복 반복의 끝
+
+            }
+
+
+            // 체크 박스를 선택하면 호출되는 함수입니다
+            function setOverlayMapTypeId() {
+                var chkTerrain = document.getElementById('chkTerrain'),
+                    chkTraffic = document.getElementById('chkTraffic'),
+                    chkBicycle = document.getElementById('chkBicycle'),
+                    chkUseDistrict = document.getElementById('chkUseDistrict');
+
+                // 지도 타입을 제거합니다
+                for (var type in mapTypes) {
+                    map.removeOverlayMapTypeId(mapTypes[type]);
+                }
+
+                // 지적편집도정보 체크박스가 체크되어있으면 지도에 지적편집도정보 지도타입을 추가합니다
+                if (chkUseDistrict.checked) {
+                    map.addOverlayMapTypeId(mapTypes.useDistrict);
+                }
+
+                // 지형정보 체크박스가 체크되어있으면 지도에 지형정보 지도타입을 추가합니다
+                if (chkTerrain.checked) {
+                    map.addOverlayMapTypeId(mapTypes.terrain);
+                }
+
+                // 교통정보 체크박스가 체크되어있으면 지도에 교통정보 지도타입을 추가합니다
+                if (chkTraffic.checked) {
+                    map.addOverlayMapTypeId(mapTypes.traffic);
+                }
+
+                // 자전거도로정보 체크박스가 체크되어있으면 지도에 자전거도로정보 지도타입을 추가합니다
+                if (chkBicycle.checked) {
+                    map.addOverlayMapTypeId(mapTypes.bicycle);
+                }
+
+            }
+
+
+            function displayCircleDot(position, distance, i) {
+                if (distance > 0) {
+                    // 클릭한 지점까지의 그려진 선의 총 거리를 표시할 커스텀 오버레이를 생성합니다
+                    distanceOverlay[i] = new daum.maps.CustomOverlay(
+                        {
+                            content: '<div class="dotOverlay"  style="background:white;padding: 5px;background: white;background-color: rgba(255, 255, 255, 0.6); border-radius: 20px;">'
+                                + '<span class="number" style="    font-size: larger;font-weight: bold;">'
+                                + Math.round(distance / 1000) + ' km'
+                                + '</span>'
+                                + '</div>',
+                            position: position,
+
+                            xAnchor: 1.3,		//20220118 정연호 1을 1.3으로 변경
+                            yAnchor: 1.3,		//원래 1 //20220118 정연호 1을 1.3으로 변경
+                            zIndex: 1			//원래 2	//20220118 정연호 5를 1 로 변경
+                        });
+
+                    // 지도에 표시합니다
+                    distanceOverlay[i].setMap(map);
+                }
+            }
+
+
+            </script>
+
+        </div>
+
+        <!-- 세로라인 -->
+        <div id="centerLine"
+             style="width: 1%; height: 100%; float: left; border-right: solid 4px darkgray; margin-right: 10px;">
+        </div>
+
+        <div id="gridDiv"
+             style="width: 57%; height: 100%; font-size: 12px; padding-bottom: 5px; float: left; border: solid 0px black;">
+
+
+            <div style="width: 100%; border: solid 0px black; overflow: hidden">
+                <div id="notice" style="width: 100%; border: solid 0px black">
+                        <span class="cell" style="width: 480px;">
+
+                            <span class="item-head title-text">
+                                전체현황표
+                            </span>
+                            <span class="item-data" style="width: 20px;"></span>
+                            <span class="item-head" style="width: 80px;">총건수</span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px;" id="totCnt" readOnly
+                                       disabled></input>
+                            </span>
+                            <span class="item-head" style="width: 80px;">미확정건수</span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px;" id="xtotCnt" readOnly
+                                       disabled></input>
+                            </span>
+
+
+                        </span>
+                    <span class="cell" style="float: right;">
+                            <span class="item-data" style="padding: 0 0 0 20px;">
+                                <input id="btnDelChk" class="action-button warning" type="button"
+                                       onclick="fnObj.searchOpen.delChk()" value="팔렛트 초기화">
+                            </span>
+                        </span>
+
+                </div>
+                <div id="grid" style="width: 100%; height: 66%;"></div>
+
+                <hr style="width: 100%; border: solid 1px lightgray;">
+                <div id="notice2" style="width: 100%; border: solid 0px black">
+
+                        <span class="cell" style="width: 140px;">
+
+                            <span class="item-head" style="width: 80px;">CBM합계</span>
+                            <span class="item-data" style="width: 60px;">
+                                <input type="text" style="width: 52px; height: 20px;    text-align: right;"
+                                       id="cbmSumInput" readOnly disabled></input>
+                            </span>
+                        </span>
+                    <span class="cell" style="width: 140px;">
+                            <span class="item-head" style="width: 80px;">시공비합계</span>
+                            <span class="item-data" style="width: 60px;">
+                                <input type="text" style="width: 52px; height: 20px;    text-align: right;"
+                                       id="costSumInput" readOnly disabled></input>
+                            </span>
+                        </span>
+                    <span class="cell" style="width: 160px;">
+                            <span class="item-head" style="width: 80px;">거리합계</span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px;    text-align: right;"
+                                       id="distance" readOnly disabled></input>
+                            </span>
+                        </span>
+                    <span class="cell" style="width: 200px;">
+                            <span class="item-head" style="width: 120px;">최근팔렛트번호</span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px;" id="prePaltNoInput" readonly
+                                       disabled></input>
+                            </span>
+                        </span>
+                    <span class="cell" style="width: 180px;">
+                            <span class="item-head" style="width: 100px;"><b>팔렛트번호<font color="red">*</font></b></span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px;" id="paltNoInput"></input>
+                            </span>
+                        </span>
+                    <span class="cell" style="width: 180px;">
+                            <span class="item-head" style="width: 100px;"><b>시공기사이름<font color="red">*</font></b></span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px;" id="instErName"
+                                       onkeyup="fnObj.keyOpen.enterKey('instErName');"></input>
+                            </span>
+                        </span>
+                    <span class="cell" style="width: 200px;display:none;">
+                            <span class="item-head" style="width: 120px;"><b>시공기사고유ID<font color="red">*</font>
+                                </b></span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px;" id="tblUserMId" readOnly></input>
+                            </span>
+                        </span>
+
+                    <!-- </span> -->
+                </div>
+                <!-- <hr style="width: 100%; border: solid 1px lightgray;"> -->
+
+                <div id="btnDiv2" style="width: 100%;">
+                        <span class="cell" style="float: left;">
+                            <span class="item-data" style="padding: 0 0 0 0px;">
+                                <input id="btnDelete" class="action-button danger" type="button"
+                                       onclick="fnObj.searchOpen.grid2Delete()" value="삭제">
+                            </span>
+                        </span>
+                    <span class="cell" style="float: right;">
+
+                            <span class="item-data" style="padding: 0 0px 0 20px;">
+                                <input id="btnArchitecturalEngineer" class="action-button" type="button"
+                                       onclick="fnObj.winOpen.grid2InstErStatOpen()" value="시공기사 현황">
+                            </span>
+                            <span class="item-data" style="padding: 0 0px 0 20px;">
+                                <input id="btnSave" class="action-button success" type="button"
+                                       onclick="fnObj.searchOpen.update()" value="저장">
+                            </span>
+
+                            <span class="item-data" style="padding: 0 0 0 20px;display:none;">
+                                <input id="btnUpdate" type="button" onclick="fnObj.searchOpen.grid2Distance()"
+                                       value="거리">
+                            </span>
+                        </span>
+                </div>
+                <div id="grid2" style="width: 100%; height: 33%; overflow: hidden;"></div>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+</body>
+
+</html>

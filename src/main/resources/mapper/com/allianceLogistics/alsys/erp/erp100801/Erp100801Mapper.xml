@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper	namespace="com.allianceLogistics.alsys.erp.erp100801.mapper.Erp100801Mapper">
+
+	<!-- kpp에서 불러온 데이터를 얼라이언스 테이블에 저장하는 곳 -->
+	<select id="outCmpySave" statementType="CALLABLE"
+		parameterType="com.allianceLogistics.alsys.erp.erp100801.entity.Erp100801VO"
+		resultType="com.allianceLogistics.alsys.erp.erp100801.entity.Erp100801VO">
+		{
+			CALL sonictmsdev_mssql..USP_SO_OUT_CMPY_IF_SAVE (
+				#{trustCustCd		,mode=IN , jdbcType=VARCHAR},
+				#{dlvCustomerNm 	,mode=IN , jdbcType=VARCHAR},
+				#{trnDlvOrdType 	,mode=IN , jdbcType=VARCHAR},
+				#{buyedDt		 	,mode=IN , jdbcType=VARCHAR},
+				#{dlvInReqDt 		,mode=IN , jdbcType=VARCHAR},
+				#{dlvSetDt 			,mode=IN , jdbcType=VARCHAR},
+				#{salesCompanyNm 	,mode=IN , jdbcType=VARCHAR},
+				#{buyCustNm 		,mode=IN , jdbcType=VARCHAR},
+				#{dlvZip 			,mode=IN , jdbcType=VARCHAR},
+				#{dlvAddr 			,mode=IN , jdbcType=VARCHAR},
+				#{dlvCityNm 		,mode=IN , jdbcType=VARCHAR},
+				#{dlvPhone1 		,mode=IN , jdbcType=VARCHAR},
+				#{dlvPhone2 		,mode=IN , jdbcType=VARCHAR},
+				<!-- 20220706 정연호 수정. KPP에서 바꿔버려서 급하게 수정 -->
+				<!--  
+				#{dlvProductNm 		,mode=IN , jdbcType=VARCHAR},
+				#{dlvProductCd 		,mode=IN , jdbcType=VARCHAR},	 
+				-->
+				#{dlvProductNm1 		,mode=IN , jdbcType=VARCHAR},
+				#{dlvProductCd1 		,mode=IN , jdbcType=VARCHAR},
+				#{tempDlvProductNm 	,mode=IN , jdbcType=VARCHAR},
+				<!-- 20220706 정연호 수정. KPP에서 바꿔버려서 급하게 수정 -->
+				<!-- 
+				#{dlvQty 			,mode=IN , jdbcType=VARCHAR},
+				 -->
+				#{dlvQty1 				,mode=IN , jdbcType=VARCHAR},
+				#{orgOrdId 			,mode=IN , jdbcType=VARCHAR},
+				#{dlvOrdSeq			,mode=IN , jdbcType=VARCHAR},
+				#{etc1 				,mode=IN , jdbcType=VARCHAR},
+				#{etc2 				,mode=IN , jdbcType=VARCHAR},
+				#{dlvCompNm 		,mode=IN , jdbcType=VARCHAR},
+				#{reqDlvJoinNm 		,mode=IN , jdbcType=VARCHAR},
+				#{msgSndYn 			,mode=IN , jdbcType=VARCHAR},
+				#{msgSndDt 			,mode=IN , jdbcType=VARCHAR},
+				#{dlvSetTypeNm 		,mode=IN , jdbcType=VARCHAR},
+				#{reqDlvJoinTel 	,mode=IN , jdbcType=VARCHAR},
+				#{dlvOrdId 			,mode=IN , jdbcType=VARCHAR},
+				#{saveUser 			,mode=IN , jdbcType=VARCHAR},
+				#{dlvDtFrom 		,mode=IN , jdbcType=VARCHAR},
+				#{dlvDtTo 			,mode=IN , jdbcType=VARCHAR},
+				<!-- 20220427 정연호 추가  -->
+				#{wmsIfFlag 		,mode=IN , jdbcType=VARCHAR},
+				#{dlvOrdSubseq 		,mode=IN , jdbcType=VARCHAR},
+				<!-- 20220625 정연호 추가 -->
+				#{dlvReqDt	 		,mode=IN , jdbcType=VARCHAR},
+				#{memo 		,mode=IN , jdbcType=VARCHAR}
+			)
+		}
+	</select>
+	
+	<!-- kpp에서 불러온 데이터를 얼라이언스 테이블에 저장한것을 불러오는 부분 -->
+	<select id="erp100801OutCmpyList" statementType="CALLABLE"
+		parameterType="com.allianceLogistics.alsys.erp.erp100801.entity.Erp100801VO"
+		resultType="com.allianceLogistics.alsys.erp.erp100801.entity.Erp100801VO">
+		{
+			CALL sonictmsdev_mssql..USP_SO_OUT_CMPY_IF_LISTBYALL  (
+				#{cmpyCd 		,mode=IN , jdbcType=VARCHAR},
+				#{dtType 		,mode=IN , jdbcType=VARCHAR},
+				#{dlvDtFrom 	,mode=IN , jdbcType=VARCHAR},
+				#{dlvDtTo 		,mode=IN , jdbcType=VARCHAR},
+				#{outCmpyCd 	,mode=IN , jdbcType=VARCHAR},
+				#{refSoNoList 	,mode=IN , jdbcType=VARCHAR},
+				#{outSoNoList 	,mode=IN , jdbcType=VARCHAR},
+				#{transChkYn 	,mode=IN , jdbcType=VARCHAR}
+			)
+		}
+	</select>	
+	
+	<!-- 데이터 체크 -->
+	<select id="erp100801DataChk" statementType="CALLABLE"
+		parameterType="com.allianceLogistics.alsys.erp.erp100801.entity.Erp100801VO"
+		resultType="com.allianceLogistics.alsys.erp.erp100801.entity.Erp100801VO">
+		{
+			CALL sonictmsdev_mssql..USP_SO_OUT_CMPY_IF_DATACHK  (
+				#{cmpyCd 		,mode=IN , jdbcType=VARCHAR},
+				#{outCmpyCd 	,mode=IN , jdbcType=VARCHAR},
+				<!-- #{trustCustCd 	,mode=IN , jdbcType=VARCHAR}, -->
+				#{dlvDtFrom 	,mode=IN , jdbcType=VARCHAR},
+				#{dlvDtTo 		,mode=IN , jdbcType=VARCHAR},
+				#{refSoNoList 	,mode=IN , jdbcType=VARCHAR},
+				#{outSoNoList 	,mode=IN , jdbcType=VARCHAR},
+				<!-- 20220427 정연호 추가 -->
+				#{transChkYn 	,mode=IN , jdbcType=VARCHAR}
+			)
+		}
+	</select>
+
+	<!--테이블에 저장된 외부업체(KPP)의 정보를 얼라이언스의 오더로 입력하기 - 화면의 그리드 한줄한줄을 넘겨받아 한번씩 한번씩 입력한다 -->
+	<select id="erp100801AlOrdrSave" statementType="CALLABLE"
+		parameterType="com.allianceLogistics.alsys.erp.erp100801.entity.Erp100801VO"
+		resultType="com.allianceLogistics.alsys.erp.erp100801.entity.Erp100801VO">
+		{
+			CALL sonictmsdev_mssql..USP_SO_OUT_CMPY_SAVE_SO_CNFM  (
+				#{no			,mode=IN , jdbcType=VARCHAR},
+				#{outCmpyCd		,mode=IN , jdbcType=VARCHAR},
+				#{cmpyCd		,mode=IN , jdbcType=VARCHAR},
+				#{refSoNo		,mode=IN , jdbcType=VARCHAR},
+				#{orgnSoNo		,mode=IN , jdbcType=VARCHAR},
+				#{soType		,mode=IN , jdbcType=VARCHAR},
+				#{soStatCd		,mode=IN , jdbcType=VARCHAR},
+				#{agntCd		,mode=IN , jdbcType=VARCHAR},
+				#{mallCd		,mode=IN , jdbcType=VARCHAR},
+				#{brand			,mode=IN , jdbcType=VARCHAR},
+				#{ordrInptDt	,mode=IN , jdbcType=VARCHAR},
+				#{rcptDt		,mode=IN , jdbcType=VARCHAR},
+				#{rqstDt		,mode=IN , jdbcType=VARCHAR},
+				#{dlvyCnfmDt	,mode=IN , jdbcType=VARCHAR},
+				#{acptEr		,mode=IN , jdbcType=VARCHAR},
+				#{ordrEr		,mode=IN , jdbcType=VARCHAR},
+				#{acptTel1		,mode=IN , jdbcType=VARCHAR},
+				#{acptTel2		,mode=IN , jdbcType=VARCHAR},
+				#{postCd		,mode=IN , jdbcType=VARCHAR},
+				#{addr1			,mode=IN , jdbcType=VARCHAR},
+				#{addr2			,mode=IN , jdbcType=VARCHAR},
+				#{dlvyRqstMsg	,mode=IN , jdbcType=VARCHAR},
+				#{custSpclTxt	,mode=IN , jdbcType=VARCHAR},
+				#{costType		,mode=IN , jdbcType=VARCHAR},
+				#{rcptCost		,mode=IN , jdbcType=VARCHAR},
+				#{passCost		,mode=IN , jdbcType=VARCHAR},
+				#{prodCd		,mode=IN , jdbcType=VARCHAR},
+				#{prodNm		,mode=IN , jdbcType=VARCHAR},
+				#{qty			,mode=IN , jdbcType=VARCHAR},
+				#{dcCd			,mode=IN , jdbcType=VARCHAR},
+				#{useYn			,mode=IN , jdbcType=VARCHAR},
+				#{memo			,mode=IN , jdbcType=VARCHAR},
+				#{inptSys		,mode=IN , jdbcType=VARCHAR},
+				#{saveUser		,mode=IN , jdbcType=VARCHAR},
+				<!-- 20220427 정연호 추가 -->
+				#{dlvOrdId		,mode=IN , jdbcType=VARCHAR},
+				#{dlvOrdSeq		,mode=IN , jdbcType=VARCHAR},
+				#{dlvOrdSubseq	,mode=IN , jdbcType=VARCHAR},
+				#{ifId			,mode=IN , jdbcType=VARCHAR},
+				<!-- 20220625 정연호 추가 -->
+				#{dlvReqDt		,mode=IN , jdbcType=VARCHAR}
+			)
+		}
+	</select>
+</mapper>

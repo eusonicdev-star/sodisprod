@@ -1,0 +1,519 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>메뉴-권한관리(erp991002)</title>
+	<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+	<link rel="stylesheet" type="text/css"
+		href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/web/dhtmlx.css">
+	<link rel="stylesheet" type="text/css" href="/css/common.css">
+	<link rel="stylesheet" type="text/css" href="/css/erp-style.css">
+	<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+		integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="/js/common.js"></script>
+	<script type="text/javascript" src="/js/commCode.js"></script>
+
+
+	<script th:inline="javascript">
+		var pagePerRow =	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/
+	var oldVal;
+		var myGridnOCellChanged;
+		var myWins;
+		var myGrid;
+
+
+		fnObj = {
+			winOpen: {
+				grntAdd: function () {	//권한그룹 추가 window open
+					if (!myComboCmpyCd.getSelectedValue()) {
+						alert("회사를 선택하세요");
+						return false;
+					}
+
+					windowId = "grntAdd";
+					windowText = "권한그룹추가(erp991002p1)";
+					windowUrl = "/erp991002p1"
+					windowLeft = 0;
+					windowTop = 0;
+					windowWidth = 600;
+					windowHeight = 300;
+					windowsModal = true;
+					windowOnClose = function (windowId) {
+						alert("windowId : " + windowId);
+					};
+					windowSendObject = {
+						cmpyCd: myComboCmpyCd.getSelectedValue(),
+						cmpyNm: myComboCmpyCd.getSelectedText()
+					};
+
+					myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+					myWins.window(windowId).attachEvent("onClose", function (win) {
+						//alert("windowId : " + windowId);
+						return true;
+					});
+
+				},	//END of grntAdd
+				commSrch: function (title, cmpyCd, srchCtgr, srchInput) {		//공통코드 찾기 팝업
+					windowId = "commSrch";
+					windowText = title;
+					windowUrl = "/commSrch"
+					windowLeft = 0;
+					windowTop = 0;
+					windowWidth = 800;
+					windowHeight = 600;
+					windowsModal = true;
+					windowOnClose = function (windowId) {
+						alert("windowId : " + windowId);
+						return true;
+					};
+					windowSendObject = {
+						cmpyCd: cmpyCd,
+						srchCtgr: srchCtgr,
+						srchInput: srchInput,
+						windowId: windowId
+					};
+
+
+					myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+
+					myWins.window(windowId).attachEvent("onClose", function (win) {
+						//alert("windowId : " + windowId);
+						return true;
+					});
+				},	//END of commSrch : function(){
+				rtnObject: function (windowId, rtnObj, srchInput) {	//popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+					if (srchInput == "text") {
+						$("#srchCode").val(rtnObj[0].commCd);
+						$("#srchName").val(rtnObj[0].commNm);
+					}
+					else if (srchInput == "textArea") {
+						var areaContent = "";
+						for (var i = 0; i < rtnObj.length; i++) {
+							areaContent = areaContent + rtnObj[i].commCd;
+
+							if (i < rtnObj.length - 1) {
+								areaContent = areaContent + "\n";
+							}
+						}
+						$("#srchArea").val(areaContent);
+					}
+				},	//END of rtnObject : function(windowId,rtnObj){
+
+
+				report: function (report, title) {
+					window.open("/", "").location.href = "/report?report=" + report
+						+ "&cmpyCd=" + myComboCmpyCd.getSelectedValue()
+						+ "&sysCd=" + myComboSysCd.getSelectedValue()
+						+ "&userGrntCd=" + myComboUserGrntCd.getSelectedValue()
+						;
+				},
+			},	//END of winOpen
+			comboOpen: {
+				comboCmpyCd: function () {
+					myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+					comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', 'req');
+					myComboCmpyCd.readonly(true);
+					myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/));
+					myComboCmpyCd.setFontSize("12px", "12px");
+					myComboCmpyCd.attachEvent("onChange", function (value, text) {
+						myGrid.clearAll(false);
+					});
+					myComboCmpyCd.disable();
+				},
+
+				comboSysCd: function () {
+					myComboSysCd = new dhtmlXCombo("sysCd");
+					comboList(myComboSysCd, 'A', 'COMM', 'SYS_CD', '', 'Y', 'req');
+					myComboSysCd.selectOption(0);
+					myComboSysCd.readonly(true);
+					myComboSysCd.setFontSize("12px", "12px");
+					myComboSysCd.attachEvent("onChange", function (value, text) {
+						myGrid.clearAll(false);
+					});
+				},
+
+				comboUserGrntCd: function () {
+					myComboUserGrntCd = new dhtmlXCombo("userGrntCd");
+					comboList(myComboUserGrntCd, 'A', 'COMM', 'USER_GRNT_CD', '', 'Y', 'req');
+					myComboUserGrntCd.selectOption(0);
+					myComboUserGrntCd.readonly(true);
+					myComboUserGrntCd.setFontSize("12px", "12px");
+					myComboUserGrntCd.attachEvent("onChange", function (value, text) {
+						myGrid.clearAll(false);
+					});
+				},
+			},
+			gridOpen: {
+				grid: function () {
+					myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
+					myGrid.setHeader("#master_checkbox,CUD,메뉴권한ID,회사코드,회사명칭,사용자권한코드,사용자권한명칭,시스템코드,시스템명칭,메뉴ID,메뉴명칭LV1,메뉴명칭LV2,메뉴명칭LV3,메뉴명칭LV4,메뉴코드,메뉴레벨,URL,저장자,저장일,수정자,수정일");
+					myGrid.setColumnIds("chk,cud,tblMenuGrntMId,cmpyCd,cmpyNm,userGrntCd,userGrntNm,sysCd,sysNm,tblMenuMId,menuNm1,menuNm2,menuNm3,menuNm4,menuCd,menuLvl,url,saveUser,saveTime,updtUser,updtTime");
+					myGrid.setInitWidths("40,60,120,80,120,160,120,120,120,120,120,120,120,120,120,120,80,80,80,80,80");
+					myGrid.setColAlign("center,center,right,center,left,right,left,center,center,right,left,left,left,left,center,right,left,left,left,left,left");
+					myGrid.setColTypes("ch,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+					myGrid.setColSorting(",,,,,,,,,,,,,,,,,,,,,");
+					myGrid.attachHeader(",,,,,,,,,,#text_filter,#text_filter,#text_filter,#text_filter,,,,,,,,");
+					myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
+					myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+					myGrid.enablePreRendering(10);	//20220423 정연호 추가
+					fnObj.gridOpen.setWidth();
+					myGrid.addRow(1, "");	//로우 추가
+					myGrid.deleteRow(1);
+					myGrid.setColumnHidden(myGrid.getColIndexById("cud"), true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("userGrntCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("cmpyCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("sysCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("menuNm4"), true);	//컬럼 아이디로 해당 컬럼 가리기
+				},
+				setWidth: function () {
+					c_width = top.myLayout.cells("c").getWidth();
+					searchDiv_height = $("#searchDiv").height();
+					page_height = $("#page").height();
+					xhdr_height = $(".xhdr").height();
+
+					myGrid.enableAutoWidth(true, c_width - 40, 400);
+					myGrid.enableAutoHeight(true, window.innerHeight - searchDiv_height - page_height - xhdr_height - 30);	//그리드 자동높이
+					$("#searchDiv").width(c_width - 25);
+				},	//END of setWidth
+			},	//END of gridOpen
+			searchOpen: {
+				searchBtn: {	//검색영역의 버튼
+					search: function () {	//조회버튼
+
+						myGrid.clearAll(false);
+						myGrid.detachEvent(myGridnOCellChanged);
+
+						if (!fnObj.searchOpen.searchChkVal.chkVal()) {
+							alert(chkValMsg);
+							return false;
+						}
+
+						var srchData = new FormData();
+						srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+						srchData.append("sysCd", myComboSysCd.getSelectedValue());
+						srchData.append("userGrntCd", myComboUserGrntCd.getSelectedValue());
+
+						$.ajax({
+							url: "/erp991002List",
+							processData: false,
+							contentType: false,
+							data: srchData,
+							type: "POST",
+							datatype: "json",
+							async: false,
+							success: function (res) {
+								if (res) {
+									searchRes = res;
+									searchPaging(1);
+									myGridnOCellChanged = myGrid.attachEvent("onCellChanged", function (rId, cInd, nValue) {
+										var columnId = myGrid.getColumnId(cInd);
+										if (columnId == "chk") {	//컬럼 아이다가 체크면
+											if (myGrid.cellById(rId, 1).getValue("") == "U") {
+												myGrid.cellById(rId, 1).setValue("");
+											}
+											else {
+												myGrid.cellById(rId, 1).setValue("U");
+											}
+											if (myGrid.cellById(rId, 0).getValue() == "1") {	//체크가되어있으면
+												myGrid.cellById(rId, 5).setValue(myComboUserGrntCd.getSelectedValue());
+												myGrid.cellById(rId, 6).setValue(myComboUserGrntCd.getSelectedText());
+											}
+											else {
+												myGrid.cellById(rId, 5).setValue("");
+												myGrid.cellById(rId, 6).setValue("");
+											}
+										}
+									});
+								}
+								else {
+									alert("리스트 조회 수행 결과 없음");
+								}
+							},
+						});
+					},	//END of search : function() {
+					grntUpdt: function () {		//권한그룹 일괄적용버튼
+
+						if (!myGrid.getRowsNum()) {
+							alert("조회 수행하세요.");
+							return false;
+						}
+
+
+						var myGridData = get_cud_json(myGrid);
+						if (myGridData.length == 0) {
+							alert("권한변경을 수행하세요.");
+							return false;
+						}
+
+						$.ajax({
+							url: "/erp991002Updt",
+							processData: false,
+							contentType: "application/json",
+							data: JSON.stringify(myGridData),
+							type: "POST",
+							datatype: "json",
+							async: false,
+							success: function (res) {
+								if (res) {
+									alert("권한 일괄적용 완료");
+									fnObj.searchOpen.searchBtn.search()
+								}
+								else {
+									alert("권한 일괄적용 수행 결과 없음")
+								}
+							},
+						});
+
+					},	//END of grntUpdt : function(){
+
+				},	//END of searchBtn
+				searchChkVal: {
+					chkVal: function () {
+						chkValMsg = "";	//메세지 초기화
+						var rtnVal = true;
+						if (!myComboSysCd.getSelectedValue()) {
+							chkValMsg = chkValMsg + "시스템을 선택하세요\n";
+							rtnVal = false;
+						}
+						return rtnVal;
+					},	//END of chkVal : function(){
+				},	//END of searchChkVal
+			},	//END of searchOpen
+			keyOpen: {
+				enterKey: function () {
+					if (window.event.keyCode == 13) {
+						fnObj.winOpen.commSrch('화주', 'A', 'AGENCY', 'text');
+
+					}
+				},
+			},
+		};
+
+
+		function searchPaging(page) {
+
+			//pagePerRow	=	15;	//페이지당 몇줄을 보여줄것인가
+
+			if ($("#rowPerPage").val()) {
+				pagePerRow = parseInt($("#rowPerPage").val());
+			}
+
+			var pageRange = 10;	//페이지범위를 몇개씩짜를것인가. 예) 23페이지 라면 1 2 3 4 5 6 7 8 9 10  이 한번 나오고 >> 누르면 11 12 13 14 15 16 17 18 19 20 나오고 >> 누르면 21 22 23 나옴
+
+			var totalPageCnt = searchRes.length % pagePerRow == 0 ? parseInt(searchRes.length / pagePerRow) : parseInt(searchRes.length / pagePerRow) + 1
+
+			var a = "<div class='pagination-container'>";
+
+			//패이징 처리
+			var start = (page - 1);
+			var end = (page - 1) + pageRange;
+
+			if (start % pageRange != 0) {
+				start = parseInt(start / pageRange) * pageRange;
+			}
+
+			if (end % pageRange != 0 || page == 1) {
+				end = parseInt(end / pageRange) * pageRange;
+			}
+
+			if (start >= pageRange) {
+				a += "<input type='button' onclick='searchPaging(" + 1 + ");' value='<<' class='pagination-button'>";
+				a += "<input type='button' onclick='searchPaging(" + (start - 1) + ");' value='<' class='pagination-button'>";
+			}
+
+			var r = 0;
+
+			for (r = start; r < end; r++) {
+				if (r < totalPageCnt) {
+					if (r + 1 == page)		//현재페이지 강조
+					{
+						a += "<input type='button' onclick='searchPaging(" + (r + 1) + ");' value=" + (r + 1) + " class='pagination-button active'>";
+					} else {
+						a += "<input type='button' onclick='searchPaging(" + (r + 1) + ");' value=" + (r + 1) + " class='pagination-button'>";
+					}
+				}
+			}
+
+			if (end * pagePerRow < searchRes.length) {
+				a += "<input type='button' onclick='searchPaging(" + (end + 1) + ");' value='>' class='pagination-button'>";
+				a += "<input type='button' onclick='searchPaging(" + totalPageCnt + ");' value='>>' class='pagination-button'>";
+			}
+
+			a += "<div class='pagination-info'>";
+			a += "<input type='number' maxlength=4 id='rowPerPage' value=" + pagePerRow + ">";
+			a += "<input type='button' value='적용' onclick='searchPaging(" + 1 + ");' class='action-button'>";
+			a += "&nbsp;&nbsp;<i class='fa fa-calculator fa-lg' aria-hidden='true'></i>&nbsp;" + searchRes.length;
+			a += "</div></div>";
+			$("#page").html(a);
+
+			var is = (page - 1) * pagePerRow;	//시작점
+			var ie = (page - 1) * pagePerRow + pagePerRow;	//종료점
+
+			if (searchRes.length < ie) {
+				ie = searchRes.length;
+
+			}
+
+			myGrid.clearAll(false);
+			//myGrid.detachEvent(myGridnOCellChanged);
+
+			for (var i = is; i < ie; i++) {
+
+				myGrid.addRow(i + 1, "");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+				myGrid.setRowData(i + 1, {	//그 로우에 데이터 추가
+					"tblMenuGrntMId": searchRes[i].tblMenuGrntMId
+					, "cmpyCd": searchRes[i].cmpyCd
+					, "cmpyNm": searchRes[i].cmpyNm
+					, "userGrntCd": searchRes[i].userGrntCd == null ? '' : searchRes[i].userGrntCd	//값이 null 이면 공백을 아니면 원래값을 표시
+					, "userGrntNm": searchRes[i].userGrntNm == null ? '' : searchRes[i].userGrntNm	//값이 null 이면 공백을 아니면 원래값을 표시
+					, "sysCd": searchRes[i].sysCd
+					, "sysNm": searchRes[i].sysNm
+					, "tblMenuMId": searchRes[i].tblMenuMId
+					, "menuNm1": searchRes[i].menuNm1
+					, "menuNm2": searchRes[i].menuNm2
+					, "menuNm3": searchRes[i].menuNm3
+					, "menuNm4": searchRes[i].menuNm4
+					, "menuCd": searchRes[i].menuCd
+					, "menuLvl": searchRes[i].menuLvl
+					, "url": searchRes[i].url
+					, "saveUser": searchRes[i].saveUser
+					, "saveTime": searchRes[i].saveTime
+					, "updtUser": searchRes[i].updtUser
+					, "updtTime": searchRes[i].updtTime
+				});	//추가한 로우에 데이터 넣기
+
+				if (searchRes[i].tblMenuGrntMId && searchRes[i].userGrntCd && searchRes[i].userGrntNm) {		//메뉴권한아이디 , 사용자권한코드, 사용자권한명칭 다 있어야 권한이 있는것이다
+					myGrid.cellById((i + 1), 0).setValue("1");		//체크표시를 한다
+				}
+				myGrid.cellById((i + 1), 1).setValue("");
+
+
+			}
+		}
+
+
+
+
+		$(document).ready(function () {
+
+			myWins = new dhtmlXWindows();
+
+			myGrid = new dhtmlXGridObject('grid');	//그리드
+
+
+			fnObj.comboOpen.comboCmpyCd();
+			fnObj.comboOpen.comboSysCd();
+			fnObj.comboOpen.comboUserGrntCd();
+			fnObj.gridOpen.grid()
+
+
+			window.onresize = function (event) {		//윈도우의 사이즈가 변경했을떄
+				fnObj.gridOpen.setWidth();
+				fnObj.gridOpen.setWidth();
+			};
+
+
+
+		});
+
+
+
+		//20211226 정연호 추가. 키보드에서 F2 누르면 조회하기
+		$(document).keydown(function (event) {
+			if (event.keyCode == 113 || event.which == 113) {
+				fnObj.searchOpen.searchBtn.search()
+			}
+		});
+	</script>
+</head>
+
+<body>
+	<div id="mainDiv">
+		<div id="searchDiv">
+			<div id="btnDiv1">
+				<div class="title-container">
+					<span class="item-head title-text">메뉴-권한관리</span>
+					<span class="sub-title-text">erp991002</span>
+				</div>
+				<span class="btn-container">
+					<span class="item-data">
+						<input id="btnSearch" class="action-button primary" type="button"
+							onclick="fnObj.searchOpen.searchBtn.search()" value="조회(F2)">
+					</span>
+					<span class="item-data">
+						<input id="btnGrntUpdt" class="action-button success" type="button"
+							onclick="fnObj.searchOpen.searchBtn.grntUpdt()" value="권한그룹 일괄 적용">
+					</span>
+					<span class="item-data">
+						<input id="btnGrntAdd" class="action-button success" type="button"
+							onclick="fnObj.winOpen.grntAdd()" value="권한그룹 추가">
+					</span>
+					<span class="item-data" style="display:none;">
+						<input id="btnReport" type="button" onclick="fnObj.winOpen.report('test','메뉴 리스트 레포트')"
+							value="레포트">
+					</span>
+					<span class="item-data">
+						<input id="btnReload" class="action-button secondary" type="button"
+							onclick="location.reload(true);" value="초기화">
+					</span>
+				</span>
+			</div>
+			<div id="searchDiv1">
+
+				<span class="cell" style="display:none;">
+					<span class="item-head">회사</span>
+					<span class="item-data">
+						<div id="cmpyCd"></div>
+					</span>
+				</span>
+				<span class="cell">
+					<span class="item-head">
+						<b>시스템<font color=red>*</font></b>
+					</span>
+					<span class="item-data">
+						<div id="sysCd"></div>
+					</span>
+				</span>
+				<span class="cell">
+					<span class="item-head">권한그룹</span>
+					<span class="item-data">
+						<div id="userGrntCd"></div>
+					</span>
+				</span>
+
+			</div>
+
+			<div id="searchDiv2">
+				<span class="cell" style="display:none;">
+					<span class="item-head">지점(물류센터)</span>
+					<span class="item-data">
+						<input type="text" id="srchCode" readonly>
+						<i id="srchIcon" class="fa fa-search" aria-hidden="true"
+							onclick="fnObj.winOpen.commSrch('지점찾기(물류센터찾기) - text','A','DC','text')"></i></span>
+					<span class="item-data">
+						<input type="text" id="srchName" readonly>
+					</span>
+					<span class="item-data">
+						<textArea id="srchArea" readonly></textArea>
+						<i id="srchIcon2" class="fa fa-search" aria-hidden="true"
+							onclick="fnObj.winOpen.commSrch('지점찾기(물류센터찾기) - textArea','A','DC','textArea')"></i></span>
+				</span>
+			</div>
+		</div>
+
+		<div id="gridDiv">
+			<div id="grid"></div>
+		</div>
+		<div id="page">
+		</div>
+	</div>
+</body>
+
+</html>

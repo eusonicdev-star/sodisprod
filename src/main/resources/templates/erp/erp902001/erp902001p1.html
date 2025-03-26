@@ -1,0 +1,646 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <title>등록/수정(erp902001p1)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/popup.css"/>
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+
+    <script th:inline="javascript">
+        var srchInput;
+        //var myWins2;
+        var myWins;
+        var myCalendarInptdt;
+        var myCalendarOutdt;
+        var sendObject;
+        fnObj = {
+            winOpen: {
+                commSrch: function (title, cmpyCd, srchCtgr, srchInput) {		//공통코드 찾기 팝업
+                    windowId = "commSrch";
+                    windowText = title + " commSrch";
+                    windowUrl = "/commSrch"
+                    windowLeft = 0;
+                    windowTop = 0;
+                    windowWidth = 800;
+                    windowHeight = 600;
+                    windowsModal = false;
+                    windowOnClose = function (windowId) {
+                        //alert("windowId : " + windowId);
+                        return true;
+                    };
+                    windowSendObject = {
+                        cmpyCd: cmpyCd,
+                        srchCtgr: srchCtgr,
+                        srchInput: srchInput,
+                        windowId: windowId
+                    };
+
+                    /*
+                                        myWindowsOpen2(myWins2,windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+
+                                        myWins2.window(windowId).attachEvent("onClose", function(win){
+
+                                            return true;
+                                        });
+                    */
+                    myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+
+                    myWins.window(windowId).attachEvent("onClose", function (win) {
+
+                        return true;
+                    });
+                },	//END of commSrch : function(){
+                rtnObject: function (windowId, rtnObj, srchInput) {	//popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+
+                    if (rtnObj == null) {
+                        myWins.window(windowId).setPosition(0, 0);
+                        return;
+                    }
+
+
+                    if (windowId == "commSrch") {
+                        if (srchInput == "text") {
+                            $("#prDcCd").val(rtnObj[0].commCd);
+                            $("#prDcNm").val(rtnObj[0].commNm);
+                        } else if (srchInput == "textArea") {
+                            var areaContent = "";
+                            for (var i = 0; i < rtnObj.length; i++) {
+                                areaContent = areaContent + rtnObj[i].commCd;
+
+                                if (i < rtnObj.length - 1) {
+                                    areaContent = areaContent + "\n";
+                                }
+                            }
+                            $("#srchArea").val(areaContent);
+                        }
+                    }
+
+                },	//END of rtnObject : function(windowId,rtnObj){
+            },	//END of winOpen:{
+            comboOpen: {
+
+                comboCmpyCd: function () {
+                    myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+                    comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+                    myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${sendObject.cmpyCd}]]*/));
+                    myComboCmpyCd.setFontSize("12px", "12px");
+                    myComboCmpyCd.attachEvent("onChange", function (value, text) {
+                        //myGrid.clearAll(false);
+                    });
+                },
+                comboDcTypeCd: function () {
+                    myComboDcTypeCd = new dhtmlXCombo("dcTypeCd");
+                    comboList(myComboDcTypeCd, 'A', 'COMM', 'DC_TYPE_CD', '', 'Y', 'req');
+                    myComboDcTypeCd.selectOption(myComboDcTypeCd.getIndexByValue(/*[[${sendObject.cmpyCd}]]*/));
+                    myComboDcTypeCd.setFontSize("12px", "12px");
+                    myComboDcTypeCd.selectOption(0);
+                    myComboDcTypeCd.attachEvent("onChange", function (value, text) {
+                        //myGrid.clearAll(false);
+                    });
+                },
+                comboUseYn: function () {
+                    myComboUseYn = new dhtmlXCombo("useYn");
+                    myComboUseYn.addOption([{value: "Y", text: "사용"}]);
+                    myComboUseYn.addOption([{value: "N", text: "미사용"}]);
+
+                    myComboUseYn.selectOption(0);
+                    myComboUseYn.setFontSize("12px", "12px");
+
+                },
+            },	//END of comboOpen : {
+            gridOpen: {},		//ENd of gridOpen : {
+            searchOpen: {
+                searchBtn: {	//검색영역의 버튼
+                    comdDcSrch: function () {		//부모창에서 받은 지점공통ID 로 정보 찾는것
+
+                        var dcData = new FormData();
+
+                        dcData.append("tblLgstDcMId",	/*[[${sendObject.tblLgstDcMId}]]*/);
+
+
+                        $.ajax({
+                            url: "/erp902001p1comdDcSrch",
+                            processData: false,
+                            contentType: false,
+                            data: dcData,
+                            type: "POST",
+                            datatype: "json",
+                            async: false,
+                            success: function (res) {
+                                if (res) {
+                                    console.log(res)
+                                    /*
+
+                                             $("#commCd").attr("disabled","disabled");
+                                             $("#commNm").val(res.commNm);
+                                             $("#commNm").attr("disabled","disabled");
+                                             $("#commDesc").val(res.commDesc);
+                                             $("#commDesc").attr("disabled","disabled");
+                                             $("#comdCd").val(res.comdCd);
+                                             $("#comdNm").val(res.comdNm);
+                                             $("#comdDesc").val(res.comdDesc);
+                                             $("#seq").val(res.seq);
+                                             */
+
+                                    $("#dcCd").val(res.dcCd).attr("disabled", "disabled");
+                                    $("#dcNm").val(res.dcNm).attr("disabled", "disabled");
+                                    $("#commDupl").hide();
+                                    $("#rtnYn").val("Y");
+                                    $("#prDcCd").val(res.prDcCd);
+                                    $("#prDcNm").val(res.prDcNm);
+                                    $("#bossNm").val(res.bossNm);
+                                    $("#tel").val(res.tel);
+                                    $("#hp").val(res.hp);
+                                    $("#fax").val(res.fax);
+                                    $("#findAdd_postcode").val(res.postCd);
+                                    $("#findAdd_roadAddress").val(res.addr);
+                                    $("#findAdd_detailAddress").val(res.addrDtl);
+                                    $("#memo").val(res.memo);
+                                    myComboDcTypeCd.selectOption(myComboDcTypeCd.getIndexByValue(res.dcTypeCd));
+                                    myComboUseYn.selectOption(myComboUseYn.getIndexByValue(res.useYn));
+
+                                } else {
+                                    alert("지점(물류센터) 조회 수행 결과 없음")
+                                }
+                            },
+                        });
+                    },	//END of comdDcSrch : function() {
+                    comdSave: function () {
+                        if (!fnObj.searchOpen.searchChkVal.chkVal("commSave")) {
+                            alert(chkValMsg);
+                            return false;
+                        }
+                        //저장할 값 폼 형식으로 생성하기
+                        var saveData = new FormData();
+
+                        saveData.append("saveGubn",	/*[[${sendObject.saveGubn}]]*/);
+                        saveData.append("tblLgstDcMId",	/*[[${sendObject.tblLgstDcMId}]]*/);
+                        saveData.append("cmpyCd", $("#cmpyCd").val());
+                        saveData.append("prDcCd", $("#prDcCd").val());
+                        saveData.append("dcCd", $("#dcCd").val());
+                        saveData.append("dcNm", $("#dcNm").val());
+                        saveData.append("dcTypeCd", myComboDcTypeCd.getSelectedValue());
+                        saveData.append("bossNm", $("#bossNm").val());
+                        saveData.append("tel", $("#tel").val());
+                        saveData.append("hp", $("#hp").val());
+                        saveData.append("postCd", $("#findAdd_postcode").val());
+                        saveData.append("addr", $("#findAdd_roadAddress").val());
+                        saveData.append("addrDtl", $("#findAdd_detailAddress").val());
+                        saveData.append("fax", $("#fax").val());
+                        saveData.append("useYn", myComboUseYn.getSelectedValue());
+                        saveData.append("memo", $("#memo").val());
+                        saveData.append("saveUser",	/*[[${session.tblUserMId}]]*/);
+                        /*
+                            for(var pair of saveData.entries()) {
+                                   console.log(pair[0]+ ', '+ pair[1]);
+                                } */
+
+                        $.ajax({
+                            url: "/erp902001p1ComdSave",
+                            processData: false,
+                            contentType: false,
+                            data: saveData,
+                            type: "POST",
+                            datatype: "json",
+                            async: false,
+                            success: function (res) {
+                                if (res) {
+                                    if (res.rtnYn == "Y") {
+                                        alert("성공 : " + res.rtnMsg);
+                                        parent.fnObj.searchOpen.searchBtn.search();
+                                        parent.myWins.window(/*[[${sendObject.windowId}]]*/).close();
+                                    } else {
+                                        alert("실패 : " + res.rtnMsg);
+                                    }
+                                } else {
+                                    alert("등록/수정 수행 결과 없음")
+                                }
+                            },
+                        });
+
+
+                    },	//END of comdSave : function() {
+                    commDupl: function () {		//지점(물류센터)코드 중복확인 하기
+                        if (!fnObj.searchOpen.searchChkVal.chkVal("commDupl")) {
+                            alert(chkValMsg);
+                            return false;
+                        }
+                        //저장할 값 폼 형식으로 생성하기
+                        var duplData = new FormData();
+
+                        duplData.append("cmpyCd",	/*[[${sendObject.cmpyCd}]]*/);
+                        duplData.append("dcCd", $("#dcCd").val());
+
+
+                        $.ajax({
+                            url: "/erp902001p1CommDupl",
+                            processData: false,
+                            contentType: false,
+                            data: duplData,
+                            type: "POST",
+                            datatype: "json",
+                            async: false,
+                            success: function (res) {
+                                if (res) {
+                                    if (res.rtnYn == "Y") {
+                                        alert("성공 : " + res.rtnMsg);
+                                    } else {
+                                        alert("실패 : " + res.rtnMsg);
+                                    }
+                                    $("#rtnYn").val(res.rtnYn);
+                                } else {
+                                    alert("지점(물류센터)코드 중복조회 수행 결과 없음")
+                                }
+                            },
+                        });
+                    },	//END of commDupl : function() {
+                    prDcDel: function () {
+                        $("#prDcCd").val("");
+                        $("#prDcNm").val("");
+                    },	//END of prDcDel : function() {
+                },		//END of searchBtn : {
+                searchChkVal: {
+                    chkVal: function (chkGubn) {
+                        chkValMsg = "";	//메세지 초기화
+                        var rtnVal = true;
+
+                        if (chkGubn == "commDupl") {
+                            if (!$("#cmpyCd").val()) {
+                                chkValMsg = chkValMsg + "회사코드가 없습니다\n";
+                                rtnVal = false;
+                            }
+
+                            if (!$("#dcCd").val()) {
+                                chkValMsg = chkValMsg + "지점(물류센터)코드가 없습니다\n";
+                                rtnVal = false;
+                            }
+
+                            /* if($("#dcCd").val().length != 4){
+                                chkValMsg = chkValMsg + "지점(물류센터)코드는 숫자 4자리 입니다.\n";
+                                rtnVal = false;
+                            } */
+
+                            if (!Number($("#dcCd").val()) || ($("#dcCd").val().length < 2 || $("#dcCd").val().length > 5)) {
+                                chkValMsg = chkValMsg + "지점(물류센터)코드는 숫자 2자리 이상, 5자리 이하 입니다.\n";
+                                rtnVal = false;
+                            }
+
+
+                            if (!$("#dcNm").val()) {
+                                chkValMsg = chkValMsg + "지점(물류센터)명칭이 없습니다\n";
+                                rtnVal = false;
+                            }
+
+                        }
+                        if (chkGubn == "commSave") {
+
+                            if ($("#rtnYn").val() != "Y") {
+                                chkValMsg = chkValMsg + "지점 중복확인을 하세요\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#cmpyCd").val()) {
+                                chkValMsg = chkValMsg + "회사코드가 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#dcCd").val()) {
+                                chkValMsg = chkValMsg + "지점(물류센터)코드가 없습니다\n";
+                                rtnVal = false;
+                            }
+
+                            /* if($("#dcCd").val().length != 4){
+                                chkValMsg = chkValMsg + "지점(물류센터)코드는 숫자 4자리 입니다.\n";
+                                rtnVal = false;
+                            } */
+
+
+                            if (!Number($("#dcCd").val()) || ($("#dcCd").val().length < 2 || $("#dcCd").val().length > 5)) {
+                                chkValMsg = chkValMsg + "지점(물류센터)코드는 숫자 2자리 이상, 5자리 이하 입니다.\n";
+                                rtnVal = false;
+                            }
+
+                            if (!$("#dcNm").val()) {
+                                chkValMsg = chkValMsg + "지점(물류센터)명칭이 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#prDcCd").val()) {
+                                chkValMsg = chkValMsg + "상위지점코드가 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!myComboDcTypeCd.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "센터유형이 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#bossNm").val()) {
+                                chkValMsg = chkValMsg + "대표자명이 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#hp").val()) {
+                                chkValMsg = chkValMsg + "휴대전화번호가 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#findAdd_postcode").val()) {
+                                chkValMsg = chkValMsg + "우편번호가 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#findAdd_roadAddress").val()) {
+                                chkValMsg = chkValMsg + "주소1이 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#findAdd_detailAddress").val()) {
+                                chkValMsg = chkValMsg + "주소2가 없습니다\n";
+                                rtnVal = false;
+                            }
+                        }
+                        return rtnVal;
+                    },	//END of chkVal : function(){
+                },	//END of searchChkVal
+            },		//ENd of searchOpen : {
+
+
+        }	//END of fnObj
+
+        $(document).ready(function () {
+            console.log(pageUrl());
+
+            //windowOpen 정의
+            myWins = new dhtmlXWindows();
+            //myWins2 = new dhtmlXWindows();
+
+            fnObj.comboOpen.comboCmpyCd();
+            fnObj.comboOpen.comboUseYn();
+            fnObj.comboOpen.comboDcTypeCd();
+
+            sendObject = /*[[${sendObject}]]*/;
+
+            $("#cmpyCd").val(/*[[${sendObject.cmpyCd}]]*/);
+
+            //사용자 정보 조회 - 수정일 경우
+            console.log("sendObject.saveGubn : " + sendObject.saveGubn);
+            if (sendObject.saveGubn == "UPDT") {
+                //조회하기
+                fnObj.searchOpen.searchBtn.comdDcSrch();
+                $("#commSave").val("수정");
+                $("#srchIcon").hide();
+                $("#prDcDel").hide();
+                $("#dcYn").hide();
+                $("#prDcCd").prop("disabled", true);
+                $("#prDcNm").prop("disabled", true);
+
+
+            } else if (sendObject.saveGubn == "INS") {
+                $("#commSave").val("등록");
+                $("#prDcCd").prop("disabled", false);
+                $("#prDcNm").prop("disabled", false);
+
+
+            }
+
+        });
+    </script>
+</head>
+<body>
+<div id="mainDiv">
+    <div class="popup-header-container">
+        <div class="popup-header-text">
+            지점(물류센터) 등록
+        </div>
+
+        <div class="button-container">
+            <input id="commSave" class="action-button success" name="commSave"
+                   type="button"
+                   onclick="fnObj.searchOpen.searchBtn.comdSave()"
+                   value="등록">
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-item">
+            <span class="search-label">회사코드</span>
+            <input type="text" id="cmpyCd" class="search-input" name="cmpyCd" disabled>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">상위지점코드</span>
+            <input type="text" id="prDcCd" class="search-input" name="prDcCd" readOnly>
+            <i id="srchIcon" class="fa fa-search search-icon" aria-hidden="true"
+               onclick="fnObj.winOpen.commSrch('지점찾기(물류센터찾기)','A','DC','text')"></i>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">상위지점명칭</span>
+            <input type="text" id="prDcNm" class="search-input" name="prDcNm" readOnly>
+            <i id="prDcDel" class="fa fa-minus-circle search-icon" aria-hidden="true"
+               onclick="fnObj.searchOpen.searchBtn.prDcDel()"></i>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">지점(물류센터)코드</span>
+            <input type="text" id="dcCd" class="search-input" name="dcCd"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">지점(물류센터)명칭</span>
+            <input type="text" id="dcNm" class="search-input" name="dcNm">
+        </div>
+
+        <div id="dcYn" class="search-item">
+            <span class="search-label">지점코드사용가능</span>
+            <input type="text" id="rtnYn" class="search-input" name="rtnYn"
+                   readOnly>
+            <input type="button" id="commDupl" class="action-button"
+                   name="commDupl" value="중복확인"
+                   onclick="fnObj.searchOpen.searchBtn.commDupl()">
+        </div>
+
+
+        <div class="search-item">
+            <span class="search-label">센터유형</span>
+            <div id="dcTypeCd"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">대표자명</span>
+            <input type="text" id="bossNm" class="search-input" name="bossNm">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">일반전화번호</span>
+            <input type="text" minlength=14 maxlength=14
+                   id="tel" class="search-input" name="tel"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">휴대전화번호</span>
+            <input type="text" minlength=14 maxlength=14
+                   id="hp" class="search-input" name="hp"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">팩스번호</span>
+            <input type="text" minlength=14 maxlength=14
+                   id="fax" class="search-input" name="fax"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">우편번호</span>
+            <input type="text" id="findAdd_postcode" class="search-input"
+                   name="findAdd_postcode"
+
+                   readOnly>
+            <i class="fa fa-search search-icon" aria-hidden="true"
+               onclick="findAdd_execDaumPostcode();"></i>
+            <!-- 우편번호 레이어 팝업 -->
+            <!-- iOS에서는 position:fixed 버그가 있음, 적용하는 사이트에 맞게 position:absolute 등을 이용하여 top,left값 조정 필요 -->
+            <div id="layer"
+                 style="display:none;position:fixed;overflow:hidden;z-index:1;-webkit-overflow-scrolling:touch;">
+                <img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer"
+                     style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1"
+                     onclick="closeDaumPostcode()" alt="닫기 버튼">
+            </div>
+            <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+            <script>
+                // 우편번호 찾기 화면을 넣을 element
+                var element_layer = document.getElementById('layer');
+
+                function closeDaumPostcode() {
+                    // iframe을 넣은 element를 안보이게 한다.
+                    element_layer.style.display = 'none';
+                }
+
+                function findAdd_execDaumPostcode() {
+                    new daum.Postcode({
+                        oncomplete: function (data) {
+                            // 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+                            // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+                            // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                            var addr = ''; // 주소 변수
+                            var extraAddr = ''; // 참고항목 변수
+
+                            //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+                            if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                                addr = data.roadAddress;
+                            } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                                addr = data.jibunAddress;
+                            }
+
+                            // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+                            if (data.userSelectedType === 'R') {
+                                // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                                // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                                if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                                    extraAddr += data.bname;
+                                }
+                                // 건물명이 있고, 공동주택일 경우 추가한다.		--original source
+                                /*  if(data.buildingName !== '' && data.apartment === 'Y'){
+                                     extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                                 } */
+
+                                //20211192 정연호 변경. 아파트 이런거 상관없이 빌딩이름이 있으면 추가함
+                                if (data.buildingName !== '') {
+                                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                                }
+
+
+                                // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                                if (extraAddr !== '') {
+                                    extraAddr = ' (' + extraAddr + ')';
+                                }
+                                // 조합된 참고항목을 해당 필드에 넣는다.
+                                //document.getElementById("findAdd_extraAddress").value = extraAddr;
+
+                            } else {
+                                //document.getElementById("findAdd_extraAddress").value = '';
+                            }
+
+                            // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                            document.getElementById('findAdd_postcode').value = data.zonecode;
+
+                            //20220225 정연호 수정. 지번 도로명 둘다쓰니깐 addr 이 들어가게 수정해줌
+                            //document.getElementById("findAdd_roadAddress").value = data.roadAddress  + ' ' + extraAddr;
+                            document.getElementById("findAdd_roadAddress").value = addr + ' ' + extraAddr;
+
+                            //document.getElementById("findAdd_jibunAddress").value = data.jibunAddress;
+                            // 커서를 상세주소 필드로 이동한다.
+                            document.getElementById("findAdd_detailAddress").focus();
+
+                            // iframe을 넣은 element를 안보이게 한다.
+                            // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+                            element_layer.style.display = 'none';
+                        },
+                        width: '100%',
+                        height: '100%',
+                        maxSuggestItems: 5
+                    }).embed(element_layer);
+
+                    // iframe을 넣은 element를 보이게 한다.
+                    element_layer.style.display = 'block';
+
+                    // iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+                    initLayerPosition();
+                }
+
+                // 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
+                // resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
+                // 직접 element_layer의 top,left값을 수정해 주시면 됩니다.
+                function initLayerPosition() {
+                    var width = 400; //우편번호서비스가 들어갈 element의 width
+                    var height = 500; //우편번호서비스가 들어갈 element의 height
+                    var borderWidth = 1; //샘플에서 사용하는 border의 두께
+
+                    // 위에서 선언한 값들을 실제 element에 넣는다.
+                    element_layer.style.width = width + 'px';
+                    element_layer.style.height = height + 'px';
+                    element_layer.style.border = borderWidth + 'px solid';
+                    // 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
+                    element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width) / 2 - borderWidth) + 'px';
+                    element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height) / 2 - borderWidth) + 'px';
+                }
+            </script>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">주소1</span>
+            <input type="text" id="findAdd_roadAddress" class="search-input"
+                   name="findAdd_roadAddress" readOnly>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">주소2</span>
+            <input type="text" id="findAdd_detailAddress"
+                   class="search-input"
+                   name="findAdd_detailAddress">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">메모</span>
+            <input type="text" id="memo" class="search-input" name="memo">
+        </div>
+
+        <div class="search-item" style="width:270px;">
+            <span class="search-label">사용 여부</span>
+            <div id="useYn"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

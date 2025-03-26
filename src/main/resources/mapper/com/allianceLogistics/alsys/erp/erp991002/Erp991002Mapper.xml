@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.allianceLogistics.alsys.erp.erp991002.mapper.Erp991002Mapper">
+
+
+    <select id="erp991002List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp991002.entity.Erp991002VO" 	
+    															resultType		="com.allianceLogistics.alsys.erp.erp991002.entity.Erp991002VO">
+        {
+	      CALL sonictmsdev_mssql..USP_MENU_GRNT_LISTBYALL (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{sysCd			,mode=IN	,	jdbcType=VARCHAR},
+	      	#{userGrntCd	,mode=IN	,	jdbcType=VARCHAR}
+	      	
+	      )      
+      }
+
+    </select>
+
+    <select id="erp991002Updt"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp991002.entity.Erp991002VO" 	
+    															resultType		="com.allianceLogistics.alsys.erp.erp991002.entity.Erp991002VO">
+        {
+	      CALL sonictmsdev_mssql..USP_MENU_GRNT_SAVE (
+	      	#{chk			,mode=IN	,	jdbcType=VARCHAR},
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{userGrntCd	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{tblMenuMId	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      	
+	      )      
+      }
+
+    </select>
+    
+    <!-- 권한그룹 추가 팝업에서 간편 권한그룹 중복체크 -->
+    <select id="erp991002p1DoubleChk"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp991002.entity.Erp991002VO" 	
+																	resultType		="com.allianceLogistics.alsys.erp.erp991002.entity.Erp991002VO">
+        {
+	      CALL sonictmsdev_mssql..USP_COMM_M_DUP_CHK (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{commCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{comdCd		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+	<!-- 권한그룹 간편등록 -->
+	<select id="erp991002p1Save"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp991002.entity.Erp991002VO" 	
+    															resultType		="com.allianceLogistics.alsys.erp.erp991002.entity.Erp991002VO">
+        {
+	      CALL sonictmsdev_mssql..USP_COMM_M_EASY_SAVE (
+	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{tblCommMId	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{commCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{commNm		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{commDesc		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{comdCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{comdNm		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{comdDesc		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{useYn			,mode=IN	,	jdbcType=VARCHAR},
+	      	#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+
+    </select>
+</mapper>

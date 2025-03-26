@@ -1,0 +1,293 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>원오더 찾기 팝업 (erp101001p4)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/erp-style.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+
+    <script th:inline="javascript">
+        var pagePerRow =	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/
+        var myGrid;
+        var prodSrchRowId;
+        fnObj = {
+            winOpen: {},
+            comboOpen: {},	//END of comboOpen : {
+            gridOpen: {
+                grid: function () {
+                    myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
+                    myGrid.setHeader("주문헤더고유ID,회사코드,AL 오더,주문상태,시공카테<br>고리코드,시공카테<br>고리,고객<br>주문번호," +
+                        "타업체,시스템등록일,주문접수일,고객배송<br>요청일,배송확정일,화주사코드," +
+                        "화주사,쇼핑몰,수령인,수령인전화번호,품목,주소,상세주소");
+
+                    myGrid.setColumnIds("tblSoMId,cmpyCd,soNo,soStatNm,instCtgr,instCtgrNm,refSoNo," +
+                        "outCmpyCd,ordrInptDt,rcptDt,rqstDt,dlvyCnfmDt,agntCd," +
+                        "agntNm,mallCd,acptEr,acptTel2,prodNm,addr1,addr2");
+
+                    myGrid.setInitWidths("80,80,100,100,100,100,120," +
+                        "90,100,100,100,100,100,120," +
+                        "160,120,120,500,400,200");
+
+                    myGrid.setColAlign("center,center,center,center,center,center,center," +
+                        "center,center,center,center,center,center," +
+                        "center,center,center,center,left,left,left");
+
+                    myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro," +
+                        "ro,ro,ro,ro,ro,ro," +
+                        "ro,ro,ro,ro,ro,ro,ro");
+
+                    myGrid.setColSorting("str,str,str,str,str,str,str," +
+                        "str,str,str,str,int,str," +
+                        "str,str,str,str,str,str,str");
+
+                    myGrid.attachHeader(",,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
+                        "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,," +
+                        "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
+
+                    myGrid.setColumnHidden(myGrid.getColIndexById("rcptDt"), true);	//컬럼 아이디로 해당 컬럼 가리기
+                    myGrid.setColumnHidden(myGrid.getColIndexById("tblSoMId"), true);	//컬럼 아이디로 해당 컬럼 가리기
+                    myGrid.setColumnHidden(myGrid.getColIndexById("cmpyCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
+                    myGrid.setColumnHidden(myGrid.getColIndexById("agntCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
+
+                    //20220106 정연호 시공카테고리코드 가림
+                    myGrid.setColumnHidden(myGrid.getColIndexById("instCtgr"), true);
+
+                    myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
+
+                    myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+                    myGrid.enablePreRendering(10);
+                    fnObj.gridOpen.setWidth();
+                    myGrid.addRow(1, "");	//로우 추가
+                    myGrid.deleteRow(1);
+                    myGrid.enableBlockSelection(true);
+                    myGrid.attachEvent("onKeyPress", fnObj.keyOpen.onKeyPressed);
+                    myGrid.enableEditEvents(true, false, false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+                    myGrid.attachEvent("onRowDblClicked", function (rId, cInd) {
+
+
+                        rtnObj = [];
+                        rtnObj.push(myGrid.getRowData(rId));
+
+                        parent.fnObj.winOpen.rtnObject(/*[[${sendObject.windowId}]]*/, rtnObj, "");
+                        parent.myWins.window(/*[[${sendObject.windowId}]]*/).close();
+
+                    });
+
+
+                    window.onresize = function (event) {		//윈도우의 사이즈가 변경했을떄
+                        fnObj.gridOpen.setWidth();
+                    };
+                },		//ENd of grid : function(){}
+
+
+                setWidth: function () {
+                    searchDiv_height = 0;
+                    page_height = $("#page").height();
+                    xhdr_height = $(".xhdr").height();
+                    myGrid.enableAutoWidth(true, window.innerWidth - 20, 400);
+                    myGrid.enableAutoHeight(true, window.innerHeight - searchDiv_height - page_height - xhdr_height - 60);	//그리드 자동높이
+                },	//END of setWidth
+
+
+            },		//ENd of gridOpen : {
+            searchOpen: {
+                search: function () {	//배송확정일 가능 한 날 조회 - 오늘날짜부터 31일뒤 까지 중에서 불가능일 조사하기
+                    $("#noGridResult").hide();
+                    var srchData = new FormData();
+                    srchData.append("cmpyCd", sendObj.cmpyCd);
+                    srchData.append("dtType", sendObj.dtType);
+                    srchData.append("fromDt", sendObj.fromDt);
+                    srchData.append("toDt", sendObj.toDt);
+                    srchData.append("acptNm", sendObj.acptNm);		//고객명
+                    srchData.append("acptTel", sendObj.acptTel);		//전화번호
+                    srchData.append("agntCd", sendObj.agntCd);		//화주사코드
+                    srchData.append("mallNm", sendObj.mallNm);		//쇼핑몰
+                    srchData.append("soNo", sendObj.soNo);		//화주사코드
+                    srchData.append("refSoNo", sendObj.refSoNo);		//쇼핑몰
+                    srchData.append("srchAddr", sendObj.srchAddr);		//쇼핑몰
+
+                    //20220106 정연호 추가. 시공카테고리 추가
+                    srchData.append("srchInstCapaCtgr", sendObj.srchInstCapaCtgr);
+                    //20220106 정연호 추가. 시공카테고리 추가. 끝
+
+
+                    $.ajax({
+                        url: "/erp102001p1List",
+                        processData: false,
+                        contentType: false,
+                        data: srchData,
+                        type: "POST",
+                        datatype: "json",
+                        //async:false,
+                        success: function (res) {
+
+
+                            if (res && res.length > 0) {	//리턴값이 있고 그게 1건 이상일경우
+
+
+                                searchRes = res;
+                                searchPaging(1);
+
+
+                            } else {
+
+                                $("#noGridResult").show();
+                            }
+                        },
+                    });
+
+
+                },	//END of search : function() {
+
+
+                delSrchCode: function () {
+                    $("#srchCode").val("");
+                    $("#srchName").val("");
+                },	//END of delSrchCode : function(){
+
+            },		//ENd of searchOpen : {
+            keyOpen: {
+
+                onKeyPressed: function (code, ctrl, shift) {
+                    if (code == 67 && ctrl) {
+                        myGrid.setCSVDelimiter("\t");
+                        myGrid.copyBlockToClipboard()
+                    }
+                    if (code == 86 && ctrl) {
+                        myGrid.pasteBlockFromClipboard()
+                    }
+                    return true;
+                },
+            }
+        }	//END of fnObj
+
+
+        function searchPaging(page) {
+
+            //pagePerRow	=	15;	//페이지당 몇줄을 보여줄것인가
+
+            if ($("#rowPerPage").val()) {
+                pagePerRow = parseInt($("#rowPerPage").val());
+            }
+
+            var pageRange = 10;	//페이지범위를 몇개씩짜를것인가. 예) 23페이지 라면 1 2 3 4 5 6 7 8 9 10  이 한번 나오고 >> 누르면 11 12 13 14 15 16 17 18 19 20 나오고 >> 누르면 21 22 23 나옴
+
+            var totalPageCnt = searchRes.length % pagePerRow == 0 ? parseInt(searchRes.length / pagePerRow) : parseInt(searchRes.length / pagePerRow) + 1
+
+            var a = "<div class='pagination-container'>";
+
+            //패이징 처리
+            var start = (page - 1);
+            var end = (page - 1) + pageRange;
+
+            if (start % pageRange != 0) {
+                start = parseInt(start / pageRange) * pageRange;
+            }
+
+            if (end % pageRange != 0 || page == 1) {
+                end = parseInt(end / pageRange) * pageRange;
+            }
+
+            if (start >= pageRange) {
+                a += "<input type='button' onclick='searchPaging(" + 1 + ");' value='<<' class='pagination-button'>";
+                a += "<input type='button' onclick='searchPaging(" + (start - 1) + ");' value='<' class='pagination-button'>";
+            }
+
+            var r = 0;
+
+            for (r = start; r < end; r++) {
+                if (r < totalPageCnt) {
+                    if (r + 1 == page)		//현재페이지 강조
+                    {
+                        a += "<input type='button' onclick='searchPaging(" + (r + 1) + ");' value=" + (r + 1) + " class='pagination-button active'>";
+                    } else {
+                        a += "<input type='button' onclick='searchPaging(" + (r + 1) + ");' value=" + (r + 1) + " class='pagination-button'>";
+                    }
+                }
+            }
+
+            if (end * pagePerRow < searchRes.length) {
+                a += "<input type='button' onclick='searchPaging(" + (end + 1) + ");' value='>' class='pagination-button'>";
+                a += "<input type='button' onclick='searchPaging(" + totalPageCnt + ");' value='>>' class='pagination-button'>";
+            }
+
+            a += "<div class='pagination-info'>";
+            a += "<input type='number' maxlength=4 id='rowPerPage' value=" + pagePerRow + ">";
+            a += "<input type='button' value='적용' onclick='searchPaging(" + 1 + ");' class='action-button'>";
+            a += "&nbsp;&nbsp;<i class='fa fa-calculator fa-lg' aria-hidden='true'></i>&nbsp;" + searchRes.length;
+            a += "</div></div>";
+
+            $("#page").html(a);
+
+            var is = (page - 1) * pagePerRow;	//시작점
+            var ie = (page - 1) * pagePerRow + pagePerRow;	//종료점
+
+            if (searchRes.length < ie) {
+                ie = searchRes.length;
+
+            }
+
+            myGrid.clearAll(false);
+
+            var columns = myGrid.getColumnCount()
+            for (var i = is; i < ie; i++) {
+
+
+                var jsonData = {};
+                for (var c = 0; c < columns; c++) {
+
+                    jsonData[myGrid.getColumnId(c)] = searchRes[i][myGrid.getColumnId(c)];
+
+                }
+
+                myGrid.addRow(i + 1, "");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+                myGrid.setRowData(i + 1, jsonData);
+
+
+            }
+        }
+
+
+        $(document).ready(function () {
+            //console.log(pageUrl());
+            myGrid = new dhtmlXGridObject('grid');	//그리드
+            fnObj.gridOpen.grid();
+
+
+            sendObj = /*[[${sendObject}]]*/
+
+
+
+                fnObj.searchOpen.search();
+            fnObj.gridOpen.setWidth();
+            fnObj.gridOpen.setWidth();
+
+        });
+    </script>
+</head>
+<body>
+<div id="mainDiv">
+
+
+    <div id="gridDiv">
+        <div id="grid"></div>
+        <span id="noGridResult">
+			</span>
+    </div>
+    <div id="page"></div>
+</div>
+</body>
+</html>

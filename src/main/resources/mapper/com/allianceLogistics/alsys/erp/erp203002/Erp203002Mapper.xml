@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.allianceLogistics.alsys.erp.erp203002.mapper.Erp203002Mapper">
+
+	<!-- 그리드 목록 조회하기     -->
+    <select id="erp203002List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp203002.entity.Erp203002VO" 	
+    															resultType		="com.allianceLogistics.alsys.erp.erp203002.entity.Erp203002VO">
+        {
+	      CALL sonictmsdev_mssql..USP_INST_PLAN_CNFM_LISTBYALL (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},	
+			#{instDt		,mode=IN	,	jdbcType=VARCHAR},	
+			#{agntList		,mode=IN	,	jdbcType=VARCHAR},	
+			#{dcList		,mode=IN	,	jdbcType=VARCHAR},	
+			#{paltNoxxList	,mode=IN	,	jdbcType=VARCHAR},	
+			#{tblUserMList	,mode=IN	,	jdbcType=VARCHAR},	
+			#{soList		,mode=IN	,	jdbcType=VARCHAR},	
+			#{instPlanStat	,mode=IN	,	jdbcType=VARCHAR},
+			#{mobileTransYn	,mode=IN	,	jdbcType=VARCHAR}
+			
+	      )      
+      }
+    </select>
+
+         <!-- 체크한것들 확정/취소     --> 
+	<select id="erp203002rowCnfmCnsl"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp203002.entity.Erp203002VO" 	
+    															resultType		="com.allianceLogistics.alsys.erp.erp203002.entity.Erp203002VO">
+        {
+	      CALL sonictmsdev_mssql..USP_INST_PLAN_CNFM_SAVE_MOBILE_TRANS  (
+	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{instPlanId	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{valIdChkYn	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+
+    </select>
+   
+          <!-- 모바일확정 일괄 확정/취소 팝업에서 일괄 확정/취소 하기    --> 
+	<select id="erp203002allCnfmCnsl"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp203002.entity.Erp203002VO" 	
+    															resultType		="com.allianceLogistics.alsys.erp.erp203002.entity.Erp203002VO">
+        {
+	      CALL sonictmsdev_mssql..USP_INST_PLAN_CNFM_SAVEALL_MOBILE_TRANS  (
+	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{instDt		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{agntList		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{dcList		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+
+    </select> 
+
+</mapper>

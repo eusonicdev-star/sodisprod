@@ -1,0 +1,344 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" href="/css/favicon.ico" type="image/x-icon" sizes="16x16">
+    <title>얼라이언스</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/material/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/layout.css">
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script th:inline="javascript">
+        // ===== 세션 관련 전역 변수 선언 =====
+        var sessionUserId;      // 사용자 ID
+        var sessionUserNm;      // 사용자 이름
+        var sessionCmpyNm;      // 회사명
+        var sessionUserGrntNm;  // 사용자 권한명
+        var sessionUserIP;      // 사용자 IP
+
+        // 메뉴 트리 데이터를 저장할 전역 변수
+        var menuTreeList;
+
+        /**
+         * 로그아웃 처리 함수
+         * 사용자 확인 후 로그아웃 페이지로 이동
+         */
+        function btnLogOut() {
+            var resultConfirm = confirm("로그아웃 하시겠습니까?");
+            if (resultConfirm) {
+                top.location.href = './logout';
+            }
+        };
+
+        /**
+         * 메뉴 리스트 로드 함수
+         * @param cmpyCd - 회사 코드
+         * @param sysCd - 시스템 코드(ERP/MOBILE)
+         * @param userGrntCd - 사용자 권한 코드
+         */
+        function menuList(cmpyCd, sysCd, userGrntCd) {
+            var menuListForm = new FormData();
+            menuListForm.append("cmpyCd", cmpyCd);
+            menuListForm.append("sysCd", sysCd);
+            menuListForm.append("userGrntCd", userGrntCd);
+
+            $.ajax({
+                url: "/menuList",
+                processData: false,
+                contentType: false,
+                data: menuListForm,
+                type: "POST",
+                datatype: "json",
+                async: true,  // 비동기 요청
+                success: function (res) {
+                    if (!res || res.length === 0) {
+                        console.warn("서버에서 받은 메뉴 데이터가 없습니다.");
+                        return;
+                    }
+
+                    menuTreeList = res; // 전역 변수에 저장
+
+                    let parentIdMap = {}; // 부모 ID 저장용 객체
+
+                    res.forEach((menu, index) => {
+                        let parentId = parentIdMap[menu.menuLvl - 1] || "";
+                        myTreeView.addItem(menu.tblMenuMId, menu[`menuNm${menu.menuLvl}`], parentId, index + 1);
+
+                        if (menu.url) {
+                            myTreeView.setUserData(menu.tblMenuMId, "url", menu.url);
+                        }
+
+                        // 현재 메뉴 ID를 부모로 저장
+                        parentIdMap[menu.menuLvl] = menu.tblMenuMId;
+                    });
+                    // 메뉴 리스트 생성 후 자동으로 메뉴 열기
+                    menuOpen();
+                }
+            });
+        }
+
+
+        // DHTMLX 컴포넌트 전역 변수
+        var myTreeView;  // 좌측 메뉴 트리
+        var myLayout;    // 전체 페이지 레이아웃
+        var myTabbar;    // 탭바 컴포넌트
+
+        /**
+         * 페이지 로드 시 실행되는 초기화 함수
+         * - 레이아웃 구성
+         * - 메뉴 구성
+         * - 세션 정보 설정
+         */
+        function doOnLoad() {
+            // 세션에서 회사코드와 권한코드 가져오기
+            var sessionCmpyCd = /*[[${session.cmpyCd}]]*/
+            var sessionUserGrntCd = /*[[${session.userGrntCd}]]*/
+
+                // DHTMLX 레이아웃 초기화
+                myLayout = new dhtmlXLayoutObject({
+                    iconset: "font_awesome",
+                    parent: document.body,  // 부모 컨테이너 설정
+                    pattern: "3T"          // 3단 분할 레이아웃
+                });
+
+            // 상단 영역(a) 설정
+            myLayout.cells("a").hideHeader();
+            myLayout.cells("a").setHeight(40);
+            myLayout.cells("a").fixSize(false, true);
+
+            // 상단 메뉴바 HTML 구성 (로고, 메뉴버튼, 사용자정보 등)
+            myLayout.cells("a").attachHTMLString('<div id="menuInfo">'
+                +
+                '<img src="/img/logo.png" alt="로고">' +
+                '<a href="#" class="menu-action" onclick="menuOpen();"><i class="fa fa-plus" aria-hidden="true"></i><span>메뉴 열기</span></a>' +
+                '<a href="#" class="menu-action" onclick="menuClose();"><i class="fa fa-minus" aria-hidden="true"></i><span>메뉴 닫기</span></a>' +
+                '<a href="#" onclick="myTabbar.clearAll();"><i class="fa fa-times fa-1x ml-2" aria-hidden="true"></i><span>모든 탭 닫기</span></a>' +
+                '<span id="userInfo" style="font-size:12px;margin-left:10px;"></span>' +
+                '<div class="pull-right">' +
+                '<a href="#" onclick="btnLogOut();"><i class="fa fa-sign-out fa-1x" aria-hidden="true"></i><span>로그아웃</span></a>' +
+                '<a href="#"><i class="fa fa-history fa-1x" style="color:black;"></i>' +
+                '<span id="m" style="font-size:1.1em;font-weight:lighter;" onclick="sessionTimePlus();">000:00</span></a>' +
+                '</div></div>'
+            );
+
+            myLayout.cells("b").setText(/*[[${session.userGrntNm}]]*/);
+            myLayout.cells("b").setWidth(240);
+            myLayout.cells("b").fixSize(true, false);
+
+            myLayout.cells("c").hideHeader();
+            myLayout.cells("c").fixSize(true, false);
+            myLayout.cells("c").showInnerScroll();
+
+            myTreeView = myLayout.cells("b").attachTreeView({
+                skin: "material",  // Material 스킨으로 변경
+                iconset: "font_awesome",
+                multiselect: false,
+                checkboxes: false,
+                dnd: false,
+                context_menu: false,
+                onload: function () {
+                }
+            });
+
+            menuList(sessionCmpyCd, 'ERP', sessionUserGrntCd)
+
+            myTreeView.setSizes();
+
+            myTreeView.attachEvent("onClick", function (id) {
+                sessionTimePlus();
+                var ids = myTabbar.getAllTabs();
+                if (ids.length >= 15) {
+                    alert("창을 더 열 수 없습니다.(최대 15개)");
+                    return;
+                }
+                for (var q = 0; q < ids.length; q++) {
+                    if (ids[q] == id + "") {
+                        myTabbar.setTabInActive();
+                        myTabbar.tabs(id + "").setActive();
+                        return;
+                    }
+                }
+                if (myTreeView.getUserData(id, "url")) {	//url 이 있어야 탭을 오픈함
+                    myTabbar.setTabInActive();
+                    myTabbar.addTab(id + "", myTreeView.getItemText(id));
+                    myTabbar.tabs(id + "").attachURL(myTreeView.getUserData(id, "url"));
+                    myTabbar.tabs(id + "").setActive();
+                }
+            });
+
+            myTabbar = myLayout.cells("c").attachTabbar({
+                parent: "tabbarObj",    // id/object, container for tabbar
+                skin: "dhx_Material",  // string, optional, tabbar skin
+                mode: "top",          // string, optional, top or bottom tabs mode
+                align: "left",         // string, optional, left or right tabs align
+                close_button: true,           // boolean, opt., render Close button on tabs
+                content_zone: true,           // boolean, opt., enable/disable content zone
+                iconset: "font_awesome", // string, optional, sets the font-awesome icons
+                onload: function () {
+                },   // function, optional, callback for XML/JSON
+                arrows_mode: "auto",          // mode of showing tabs arrows (auto, always)
+            });
+
+            // 기본 탭 추가
+            myTabbar.addTab("welcome", "환영합니다");
+            myTabbar.tabs("welcome").attachHTMLString(`
+                    <div style="padding: 20px;">
+                        <h2>얼라이언스 시스템에 오신 것을 환영합니다</h2>
+                        <p>좌측 메뉴에서 원하시는 기능을 선택해주세요.</p>
+                    </div>
+                `);
+            myTabbar.tabs("welcome").setActive();
+
+            sessionUserId = /*[[${session.userId}]]*/
+                sessionUserNm = /*[[${session.userNm}]]*/
+
+            if (!sessionUserNm) {
+                sessionUserNm = "[]";
+            }
+            //회사코드
+            sessionCmpyCd = /*[[${session.cmpyCd}]]*/
+                sessionCmpyNm = /*[[${session.cmpyNm}]]*/
+            if (!sessionCmpyNm) {
+                sessionCmpyNm = "[]";
+            }
+
+            //사용자구분
+            sessionUserGrdCd = /*[[${session.userGrdCd}]]*/
+                sessionUserGrdNm = /*[[${session.userGrdNm}]]*/
+            if (!sessionUserGrdNm) {
+                sessionUserGrdNm = "[]";
+            }
+
+            //ERP시스템 권한
+            sessionUserGrntCd = /*[[${session.userGrntCd}]]*/
+                sessionUserGrntNm = /*[[${session.userGrntNm}]]*/
+            if (!sessionUserGrntNm) {
+                sessionUserGrntNm = "[]";
+            }
+
+            //물류센터	   	DC_CD
+            sessionDcCd =	/*[[${session.dcCd}]]*/
+                sessionDcNm =	/*[[${session.dcNm}]]*/
+            if (!sessionDcNm) {
+                sessionDcNm = "[]";
+            }
+
+            //소속된 화주사 agntCd
+            sessionAgntCd =	/*[[${session.agntCd}]]*/
+                sessionAgntNm =	/*[[${session.agntNm}]]*/
+            if (!sessionAgntNm) {
+                sessionAgntNm = "[]";
+            }
+
+            sessionUserIP = /*[[${session.userIp}]]*/
+
+                //USER_ID 의 고유ID
+                sessionUserTblUserMId =  /*[[${session.tblUserMId}]]*/
+
+
+        }	//END of doOnLoad()
+
+        //20190801 정연호 시간 카운트 다운
+
+        var defaultTime = 360 * 60;		// 세션아웃 타임 (분*초 니깐 분만 바꾼다)
+
+        var startTime = new Date();	//시간을 갱신;	//페이지 접속시의 시간 구함
+        var varPopup;
+
+        function msg_time() {
+            var endTime = new Date();
+            var gapTime = parseInt(Math.floor(endTime - startTime) / 1000);	//세션 종료예정 시간과 현재시간과의 차이
+            var sTime = (defaultTime - gapTime);
+
+            //세션 종료 초 와 (시간차이) 의 간격이
+            if (sTime < 0) {
+                clearInterval(tid);	//타이머 해제
+
+                if (varPopup != undefined) {
+                    varPopup.close();
+                }
+            } else {
+                var h = Math.floor(sTime / 60) + "";
+                if (h.length == 1) {
+                    h = '0' + h;
+                }
+                var mi = (sTime % 60) + "";
+                if (mi.length == 1) {
+                    mi = '0' + mi;
+                }
+                m = h + ":" + mi;	//남은시간
+
+                $("#m").attr("color", "#8C8C8C").html(m);
+
+                if (sTime < 60) {
+                    $("#m").attr("color", "red");
+                } else if (sTime < 180) {
+                    $("#m").attr("color", "blue");
+                } else {
+                    $("#m").attr("color", "#8C8C8C");
+                }
+            }
+        }
+
+
+        //메뉴트리 모두 열기
+        function menuOpen() {
+            if (!menuTreeList || menuTreeList.length === 0) {
+                return;
+            }
+
+            for (var i = 0; i < menuTreeList.length; i++) {
+                if (menuTreeList[i] && menuTreeList[i].tblMenuMId) {
+                    myTreeView.openItem(menuTreeList[i].tblMenuMId);
+                }
+            }
+        }
+
+        function menuClose() {
+            if (!menuTreeList || menuTreeList.length === 0) {
+                return;
+            }
+
+            for (var i = 0; i < menuTreeList.length; i++) {
+                if (menuTreeList[i] && menuTreeList[i].tblMenuMId) {
+                    myTreeView.closeItem(menuTreeList[i].tblMenuMId);
+                }
+            }
+        }
+
+        //단지 ap 서버 톰켓 찌르는 부분(AP서버의 세션타임도 갱신하기 위해 한번 엑세스해준다)
+        function sessionTimePlus() {
+            $.ajax({
+                url: "/sessionTimePlus",
+                method: "post",
+                success: function () {
+                    startTime = new Date();
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            doOnLoad();
+        });
+        window.onload = function TimeStart() {
+            tid = setInterval('msg_time()', 1000)
+        };		//타이머 설정
+    </script>
+
+</head>
+
+<body>
+<div class="loader" id="loader"></div>
+</body>
+
+</html>

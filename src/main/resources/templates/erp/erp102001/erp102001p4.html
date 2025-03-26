@@ -1,0 +1,540 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <title>알림톡보내기 팝업 (erp102001p4)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/popup.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+
+    <script th:inline="javascript">
+        var pagePerRow =	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/
+        var myGrid;
+
+        var today;
+        var myCalendar;
+        var prodSrchRowId;
+
+        fnObj = {
+            winOpen: {},	//END of winOpen:{
+
+            comboOpen: {
+                comboCmpyCd: function () {		//회사콤보목록
+                    myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+                    comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+                    myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(sendObj.cmpyCd));
+                    myComboCmpyCd.setFontSize("12px", "12px");
+                    myComboCmpyCd.attachEvent("onChange", function (value, text) {
+
+                    });
+                    myComboCmpyCd.disable();
+                },
+
+                comboSendTalkTmp: function () {		//템플릿 유형
+                    myComboSendTalkTmp = new dhtmlXCombo("talkTmp");
+                    comboList(myComboSendTalkTmp, 'A', 'ALRM_TMPLET', '', '', 'Y', 'req');
+                    myComboSendTalkTmp.selectOption(0);
+                    myComboSendTalkTmp.setFontSize("12px", "12px");
+                    myComboSendTalkTmp.attachEvent("onChange", function (value, text) {
+                        if (value == "ALSYS05_1") {
+                            $("#inputDiv4").show();
+                        } else {
+                            $("#inputDiv4").hide();
+                        }
+                    });
+                },
+            },	//END of comboOpen : {
+
+            gridOpen: {},		//ENd of gridOpen : {
+            searchOpen: {
+                search: function () {	//상담리스트 조회하기
+
+                    var srchData = new FormData();
+                    srchData.append("tblSoMId", sendObj.tblSoMId);
+
+                    $.ajax({
+                        url: "/erp102001p2List",
+                        processData: false,
+                        contentType: false,
+                        data: srchData,
+                        type: "POST",
+                        datatype: "json",
+                        success: function (res) {
+                            if (res && res.length > 0) {	//리턴값이 있고 그게 1건 이상일경우
+                                searchRes = res;
+                                searchPaging(1);
+                            } else {
+                                alert("조회 수행 결과 없음");
+                            }
+                        },
+                    });
+                },	//END of search : function() {
+
+                nowSend: function () {	//즉시보내기
+                    if (!myComboSendTalkTmp.getSelectedValue()) {
+                        alert("알림톡템플릿을 선택하세요.");
+                        return;
+                    }
+                    fnObj.searchOpen.loadAlrmTmp("nowSend");
+                },	//END of nowSend : function() {
+
+                bookSend: function () {	//예약보내기
+                    if (!myComboSendTalkTmp.getSelectedValue()) {
+                        alert("알림톡템플릿을 선택하세요.");
+                        return;
+                    }
+                    if ($("#sendDate").val().length != 8) {
+                        alert("예약날짜를 선택하세요.");
+                        return;
+                    }
+                    if ($("#sendTime").val().length != 4) {
+                        alert("예약시간-4자리 숫자-을 입력하세요.");
+                        return;
+                    }
+                    fnObj.searchOpen.loadAlrmTmp("bookSend");
+                },	//END of bookSend : function() {
+
+                loadAlrmTmp: function (gubn) {	//보낼 문자 불러오기
+                    var srchData = new FormData();
+                    srchData.append("cmpyCd", sendObj.cmpyCd);
+                    srchData.append("tblSoMId", sendObj.tblSoMId);
+                    srchData.append("tmplId", myComboSendTalkTmp.getSelectedValue());
+                    //20220308 정연호. 주문유형에따라 기사평가 알림톡을 보내고, 안보내고를 결정한다
+                    //1000	일반오더		O
+                    //2000	반품오더		O
+                    //3100	교환오더(일반)	O
+                    //3200	교환오더(반품)	X
+                    //4000	업체직출		X
+                    //5000	일반(고객지정)	O
+                    //6000	A/S오더		O
+                    //9901	일반(2인배송)	O
+                    //9902	익일			X
+                    //9903	익일(반품)		X
+                    //9904	반품(정품)		X
+                    //9906	택배반품		X
+                    //9907	기타			X
+                    //9905	택배			X
+                    //9908	익일(설치)		O
+                    //4200	업체직출(회수)	X
+                    $.ajax({
+                        url: "/erp102001p4LoadAlrmTmp",
+                        processData: false,
+                        contentType: false,
+                        data: srchData,
+                        type: "POST",
+                        async: false,	//20220221 정연호 추가.
+                        datatype: "json",
+
+                        success: function (res) {
+                            if (res != null) {
+                                res.gubn = gubn;
+                                res.cmpyCd = sendObj.cmpyCd;
+                                res.soNo = sendObj.soNo;
+
+                                //20220221 정연호 추가. ALSYS07 미마감 일 경우 전화번호가 , 가 찍혀온걸 배열로 해서 그 수만큼 반복한다
+                                if (myComboSendTalkTmp.getSelectedValue().toUpperCase() == "ALSYS07") {
+                                    var phnArray = res.phn.split(",");
+                                    for (var i = 0; i < phnArray.length; i++) {
+                                        var res07 = res;
+                                        res07.phn = phnArray[i];
+                                        fnObj.searchOpen.sendAlrmTmp(res07);
+                                    }
+                                } else if (myComboSendTalkTmp.getSelectedValue().toUpperCase() == "ALSYS10") {
+                                    if (sendObj.soStatCd == "9999") {
+                                        if (sendObj.soType == "1000" ||	//1000	일반오더		O
+                                            sendObj.soType == "2000" ||	//2000	반품오더		O
+                                            sendObj.soType == "3100" ||	//3100	교환오더(일반)	O
+                                            sendObj.soType == "5000" ||	//5000	일반(고객지정)	O
+                                            sendObj.soType == "6000" ||	//6000	A/S오더		O
+                                            sendObj.soType == "9901" ||	//9901	일반(2인배송)	O
+                                            sendObj.soType == "9908"		//9908	익일(설치)		O
+                                        ) {
+                                            fnObj.searchOpen.sendAlrmTmp(res);
+                                        } else {
+                                            alert("배송기사 평가(리멤버)는\n이미 발송된건," + sendObj.soTypeNm + "유형은 기사평가를 할 수 없습니다.");
+                                            return;
+                                        }
+                                    } else {
+                                        alert("배송기사 평가(리멤버)는 배송완료상태에서 보낼수 있습니다");
+                                        return;
+                                    }
+                                } else {
+                                    fnObj.searchOpen.sendAlrmTmp(res);
+                                }
+                                //20220221 정연호 추가. ALSYS07 미마감 일 경우 전화번호가 , 가 찍혀온걸 배열로 해서 그 수만큼 반복한다. 끝
+                            }
+                        },
+                    });
+                },
+
+                sendAlrmTmp: function (sendRes) {	//알림톡 보내기
+
+                    if (!sendRes.tmplId) {
+                        if (myComboSendTalkTmp.getSelectedValue().toUpperCase() == "ALSYS10") {
+                            alert("배송기사 평가(리멤버)는 배송완료이면서 최초발송을 만족 해야합니다.\n이미 발송건이 있어 발송할수 없습니다.");
+                        } else {
+                            alert("알림톡을 보낼수없습니다. 템플릿을 선택하세요");
+                        }
+                        return;
+                    }
+                    if (sendRes.tmplId == "ALSYS05_1")	//배송시간안내 1 일경우에는 배송예정일과 배송시간 필수
+                    {
+                        if ($("#sendRqstDt").val().trim().replace(/-/g, "").length != 8) {
+                            alert("배송예정일 날짜를 확인하세요.");
+                            return;
+                        }
+                        if ($("#sendRqstFromDt").val().trim().length != 2) {
+                            alert("배송 시작시간을 확인하세요.");
+                            return;
+                        }
+                        if ($("#sendRqstToDt").val().trim().length != 2) {
+                            alert("배송 종료시간을 확인하세요.");
+                            return;
+                        }
+
+
+                        if (parseInt($("#sendRqstFromDt").val().trim()) > parseInt($("#sendRqstToDt").val().trim())) {
+                            alert("배송 시작시간은 배송 종료시간보다 작거나 같아야 합니다.");
+                            return;
+                        }
+
+                        sendRes.alrmTalkTmp = sendRes.alrmTalkTmp.replace(/#{배송예정일}/g, dateTypeChange($("#sendRqstDt").val().trim(), 10));
+                        sendRes.alrmTalkTmp = sendRes.alrmTalkTmp.replace(/#{배송시간}/g, $("#sendRqstFromDt").val().trim() + "시 ~" + $("#sendRqstToDt").val().trim() + "시");
+
+
+                    }
+
+
+                    var reserveDtValu = "00000000000000";
+                    if (sendRes.gubn == "bookSend") {
+                        reserveDtValu = $("#sendDate").val() + $("#sendTime").val() + "00";
+                        if (reserveDtValu.length != 14) {
+                            alert("예약 날짜와 시간을 확인하세요");
+                            return;
+                        }
+                    }
+
+                    var sendData = [];
+                    var resData = {};
+                    var sendMsgSms = sendRes.alrmTalkTmp;
+                    resData.message_type = "AT";
+                    resData.phn = sendRes.phn;
+
+                    resData.profile = sendRes.profile;
+                    resData.talkReserveDt = reserveDtValu;
+                    resData.tmplId = sendRes.tmplId;
+                    resData.msg = sendRes.alrmTalkTmp;
+                    resData.smsKind = sendRes.smsKind;
+                    resData.msgSms = sendMsgSms;
+                    resData.smsSender = sendRes.smsSender;
+                    //resData.smsLmsTit		=	myComboSendTalkTmp.getSelectedText()	;
+                    resData.smsOnly = sendRes.smsOnly;
+                    resData.userid = sendRes.userid;
+                    if (sendRes.tmplId == "ALSYS01_1"		//배송접수 안내1
+                        || sendRes.tmplId == "ALSYS03_1"		//해피콜 재연락(부재중)1
+                        || sendRes.tmplId == "ALSYS04_1"		//배송기사확정1
+                        || sendRes.tmplId == "ALSYS02_3_2"		//ERP_배송일 확정 알림(피드백)
+
+                    ) {
+                        var button1Data = {};
+                        button1Data.name = "상담직원에게 메세지 보내기";
+                        button1Data.type = "WL";
+                        button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
+                        button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
+                        resData.button1 = button1Data;
+                    }
+
+                    //20220404 정연호. AS 안내및 확정 3 적용. 그런데 버튼명을 바꿔서 이부분을 새로 추가
+                    else if (
+                        sendRes.tmplId == "ALSYS03_AS3"		//20200404정연호 수정 AS 안내 및 확정3
+                    ) {
+                        var button1Data = {};
+                        button1Data.name = "상담원 문의";
+                        button1Data.type = "WL";
+                        button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
+                        button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
+                        resData.button1 = button1Data;
+                    } else if (
+                        //sendRes.tmplId == "ALSYS01_AS1"		//20220404 정연호 주석처리. 위에 새로 as 추가하면서 이부분 사용안함. AS 안내 및 확정1
+                        //||	sendRes.tmplId == "ALSYS01_EXCH1"	//교환 안내 및 확정1		//20220308 정연호 사용한함 변경됨 al_re_003
+                        sendRes.tmplId == "ALSYS01_RE1"		//반품일 안내 및 확정1
+                        || sendRes.tmplId == "ALSYS05_1"		//배송시간 안내2
+                    ) {
+                        var button1Data = {};
+                        button1Data.name = "상담사원에게 메세지 보내기";
+                        button1Data.type = "WL";
+                        button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
+                        button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
+                        resData.button1 = button1Data;
+
+                    } else if (sendRes.tmplId == "ALSYS02_3")	//배송일 안내 및 확정3
+                    {
+                        resData.msgSms = sendMsgSms + "\n\n배송일 확정 및 변경\n" +
+                            "http://www.alliance1.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
+                            "\n\n";
+
+                        var button1Data = {};
+                        button1Data.name = "배송일 확정 및 변경";
+                        button1Data.type = "WL";
+                        button1Data.url_mobile = "http://www.alliance1.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        button1Data.url_pc = "http://www.alliance1.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        resData.button1 = button1Data;
+
+                        var button2Data = {};
+                        button2Data.name = "상담직원에게 메세지 보내기";
+                        button2Data.type = "WL";
+                        button2Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
+                        button2Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
+                        resData.button2 = button2Data;
+
+                    } else if (sendRes.tmplId == "ALSYS10")	//배송기사 평가(리멤버)
+                    {
+                        resData.msgSms = sendMsgSms + "\n\n배송기사 평가하기\n" +
+                            "http://www.alliance1.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId +
+                            "\n\n";
+
+                        var button1Data = {};
+                        button1Data.name = "배송기사 평가하기";
+                        button1Data.type = "WL";
+                        button1Data.url_mobile = "http://www.alliance1.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
+                        button1Data.url_pc = "http://www.alliance1.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
+                        resData.button1 = button1Data;
+                    }
+                    //20220308 정연호 추가.얼라이언스 교환 템플릿 2
+                    else if (sendRes.tmplId == "al_re_003")	//얼라이언스 교환 템플릿 2
+                    {
+                        resData.msgSms = sendMsgSms + "\n\n교환일 확정 및 변경\n" +
+                            "http://www.alliance1.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
+                            "\n\n";
+
+                        var button1Data = {};
+                        button1Data.name = "교환일 확정 및 변경";
+                        button1Data.type = "WL";
+                        button1Data.url_mobile = "http://www.alliance1.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        button1Data.url_pc = "http://www.alliance1.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        resData.button1 = button1Data;
+
+                        var button2Data = {};
+                        button2Data.name = "상담사원에게 메세지 보내기";
+                        button2Data.type = "WL";
+                        button2Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
+                        button2Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
+                        resData.button2 = button2Data;
+
+                    }
+                    //20220308 정연호 추가.얼라이언스 교환 템플릿 2. 끝
+                    var sendD = {}
+                    sendD = resData;
+
+                    $.ajax({
+                        url: "/sendAlrmTalk",
+                        processData: false,
+                        contentType: "application/json",	//데이터를 어레이 json으로 보낼때에는 contentType : "application/json" 를
+                        data: JSON.stringify(resData),
+                        type: "POST",
+                        datatype: "json",
+
+                        success: function (res) {
+                            if (res != null && res.length == 1) {
+                                fnObj.searchOpen.saveAlrmTmpResult(sendD, res[0]);	//(발송한건, 리턴받은것)
+                            }
+                        },
+                    });
+                },
+
+
+                saveAlrmTmpResult: function (sendData, resultRes) {	//알림톡 결과값 저장하기 (발송한건, 리턴받은것)
+
+                    if (!resultRes.code == "success") {
+                        alert("알림톡 발송 실패.")
+                        return;
+
+                    }
+
+                    var resultData = new FormData();
+
+                    resultData.append("tblSoMId", sendObj.tblSoMId);
+                    resultData.append("code", resultRes.code);
+                    resultData.append("userid", sendData.userid);
+                    resultData.append("message_type", sendData.message_type);
+                    resultData.append("phn", sendData.phn);
+                    resultData.append("profile", sendData.profile);
+                    resultData.append("talkReserveDt", sendData.talkReserveDt);
+                    resultData.append("msg", sendData.msg);
+                    resultData.append("smsLmsTit", sendData.smsLmsTit);
+                    resultData.append("tmplId", sendData.tmplId);
+                    resultData.append("cmplMsgCd", resultRes.message);
+                    resultData.append("saveUser",/*[[${session.tblUserMId}]]*/);
+
+
+                    for (var pair of resultData.entries()) {
+                        console.log(pair[0] + ' :  ' + pair[1]);
+                    }
+
+                    $.ajax({
+                        url: "/saveAlrmTmpResult",
+                        processData: false,
+                        contentType: false,
+                        data: resultData,
+                        type: "POST",
+                        datatype: "json",
+
+                        success: function (res) {
+                            if (res != null) {
+                                if (res.rtnYn == "Y") {
+
+                                    if (sendData.tmplId.toUpperCase() == "ALSYS10") {
+                                        alert("알림톡 발송 성공\n(성공결과 저장 성공)");//\n배송기사 평가 알림톡은 이미 발송한 건,배송완료가 아닌건은\n발송 되지 않습니다.")
+                                    } else {
+
+                                        alert("알림톡 발송 성공\n(성공결과 저장 성공)");
+                                    }
+
+
+                                    //현재창 닫기
+                                    parent.myWins.window(/*[[${sendObject.windowId}]]*/).close();
+                                } else {
+                                    if (sendData.tmplId.toUpperCase() == "ALSYS10") {
+                                        alert("알림톡 발송 성공\n(성공결과 저장 실패)");//\n배송기사 평가 알림톡은 이미 발송한 건,배송완료가 아닌건은\n발송 되지 않습니다.")
+                                    } else {
+
+                                        alert("알림톡 발송 성공\n(성공결과 저장 실패)");
+                                    }
+
+                                }
+                            } else {
+                                alert("알림톡 발송 성공\n(성공결과 저장 실패...)");
+                            }
+                        },
+
+                    });
+                },
+            },		//ENd of searchOpen : {
+
+        }	//END of fnObj
+
+
+        $(document).ready(function () {
+
+            sendObj = /*[[${sendObject}]]*/;
+
+
+            myCalendar = new dhtmlXCalendarObject([{input: "sendDate", button: "sendDateIcon"}, {
+                input: "sendRqstDt",
+                button: "sendRqstDtIcon"
+            }]);
+
+            myCalendar.showToday();
+            myCalendar.loadUserLanguage("ko");
+            myCalendar.setDateFormat("%Y%m%d");
+            var now = new Date()
+            var year = now.getFullYear() + "";
+            var month = (now.getMonth() + 1) + "";
+            var date = now.getDate() + "";
+            if (month.length == 1) {
+                month = "0" + month;
+            }
+            if (date.length == 1) {
+                date = "0" + date;
+            }
+
+            today = year + month + date;
+
+            $("#sendDate").val(today);
+            $("#sendRqstDt").val(today);
+            //오더정보 콤보
+            fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+            fnObj.comboOpen.comboSendTalkTmp();
+
+        });
+    </script>
+</head>
+<body>
+<div id="mainDiv">
+    <div id="inputDiv1">
+        <div class="popup-header-container">
+            <div class="popup-header-text">
+                <span>알림톡 보내기</span>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <span class="cell" style="display:none;">
+                <span class="item-head">
+                    회사
+                </span>
+                <span class="item-data">
+                    <div id="cmpyCd"></div>
+                </span>
+            </span>
+
+            <div class="search-item">
+                <span class="search-label">알림톡 템플릿</span>
+                <div id="talkTmp" class="search-input" style="width: 200px"></div>
+            </div>
+
+            <div id="fromTo" class="search-item">
+                <span class="search-label">
+                    전송일(예약)
+                </span>
+                <input type="text" id="sendDate" class="search-input">
+                <i id="sendDateIcon" class="fa fa-calendar fa-lg search-icon" aria-hidden="true"></i>
+
+                <span class="search-label">
+                    전송시간(24시간)
+                </span>
+                <input type="text" id="sendTime" class="search-input" minlength="4" maxlength="4"
+                       placeholder="예) 오후 1시 15분이라면 1315"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');">
+            </div>
+
+        </div>
+        <div class="button-container">
+            <button id="btnBook" class="action-button primary" onclick="fnObj.searchOpen.bookSend();">
+                <i class="fa fa-pencil-square-o fa-lg" aria-hidden="true"></i>
+                예약 전송
+            </button>
+
+            <button id="btnNow" class="action-button warning" onclick="fnObj.searchOpen.nowSend();">
+                <i class="fa fa-pencil-square-o fa-lg" aria-hidden="true"></i>
+                즉시 전송
+            </button>
+        </div>
+    </div>
+
+    <div id="inputDiv4" style="width:100%;font-size:12px;display:none;">
+			<span id="sendRqst" class="cell" style="width:490px;">
+				<span class="item-head" style="width:130px;">배송예정일</span>
+				<span class="item-data" style="width:140px;"><input type="text" id="sendRqstDt"
+                                                                    style="height:20px;width:90px;"><i
+                        id="sendRqstDtIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i></span>
+				<span class="item-head" style="width:60px;">배송시간</span>
+				<span class="item-data" style="width:40px;"><input type="text" id="sendRqstFromDt"
+                                                                   style="height:20px;width:30px;" minlength="2"
+                                                                   maxlength="2"
+                                                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"></span>
+				~
+				<span class="item-data" style="width:40px;"><input type="text" id="sendRqstToDt"
+                                                                   style="height:20px;width:30px;" minlength="2"
+                                                                   maxlength="2"
+                                                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"></span>
+				<span class="item-head" style="width:80px;">예) 09~13</span>
+			</span>
+    </div>
+</div>
+</body>
+</html>
