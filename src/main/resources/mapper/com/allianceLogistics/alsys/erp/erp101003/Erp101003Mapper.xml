@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.erp.erp101003.mapper.Erp101003Mapper">
+<mapper namespace="com.sonictms.alsys.erp.erp101003.mapper.Erp101003Mapper">
 
 	<!-- 그리드 목록 조회하기 -->
-    <select id="erp101003List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp101003.entity.Erp101003VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp101003.entity.Erp101003VO">
+    <select id="erp101003List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO"
+    															resultType		="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_ALLUPDATE_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},		
@@ -32,8 +32,8 @@
     
     
         <!-- 체크한것들 삭제(일괄삭제)  -->
-	<select id="erp101003ChkDel"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp101003.entity.Erp101003VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp101003.entity.Erp101003VO">
+	<select id="erp101003ChkDel"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO"
+    															resultType		="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_ALLUPDATE_DEL (
 	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
@@ -46,8 +46,8 @@
   
   
         <!-- 체크한것들 변경(일괄변경)  -->
-	<select id="erp101003chkUpdt"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp101003.entity.Erp101003VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp101003.entity.Erp101003VO">
+	<select id="erp101003chkUpdt"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO"
+    															resultType		="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_ALLUPDATE_UPDT (
 	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
@@ -68,8 +68,8 @@
     </select>
     
     <!-- 20211226 정연호 추가.  체크한것들 주문복사  -->
-	<select id="erp101003chkCopy"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp101003.entity.Erp101003VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp101003.entity.Erp101003VO">
+	<select id="erp101003chkCopy"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO"
+    															resultType		="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_ALLUPDATE_COPY (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},

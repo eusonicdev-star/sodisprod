@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.erp.erp101004.mapper.Erp101004Mapper">
+<mapper namespace="com.sonictms.alsys.erp.erp101004.mapper.Erp101004Mapper">
 
 
 
 	<!-- 그리드 헤더 조회하기 -->
-    <select id="gridHeaderSrch101004"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp101004.entity.Erp101004VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp101004.entity.Erp101004VO">
+    <select id="gridHeaderSrch101004"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101004.entity.Erp101004VO"
+    															resultType		="com.sonictms.alsys.erp.erp101004.entity.Erp101004VO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_EXCL_TEMPLT_DOWNLOAD (
 	     	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
@@ -17,8 +17,8 @@
     </select>
 
  <!-- 엑셀데이터를 json으로 바꾼것을 체크하기  -->
-	<select id="erp101004ExcelUploadCheck"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp101004.entity.Erp101004VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp101004.entity.Erp101004VO">
+	<select id="erp101004ExcelUploadCheck"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101004.entity.Erp101004VO"
+    															resultType		="com.sonictms.alsys.erp.erp101004.entity.Erp101004VO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_EXCL_INS_OUT_CMPY_CHK (
 	      	#{exclRow		,mode=IN	,	jdbcType=VARCHAR},
@@ -60,8 +60,8 @@
    </select>
  
   <!-- 엑셀데이터를 json으로 바꾼것을 저장하기       -->
-	<select id="erp101004ExcelUploadJson"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp101004.entity.Erp101004VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp101004.entity.Erp101004VO">
+	<select id="erp101004ExcelUploadJson"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101004.entity.Erp101004VO"
+    															resultType		="com.sonictms.alsys.erp.erp101004.entity.Erp101004VO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_EXCL_INS_OUT_CMPY (
 	      	#{exclRow		,mode=IN	,	jdbcType=VARCHAR},

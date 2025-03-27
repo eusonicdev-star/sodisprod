@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.erp.erp901002.mapper.Erp901002Mapper">
+<mapper namespace="com.sonictms.alsys.erp.erp901002.mapper.Erp901002Mapper">
 
 	<!-- 그리드 목록 조회하기 -->
-    <select id="erp901002List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901002.entity.Erp901002VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp901002.entity.Erp901002VO">
+    <select id="erp901002List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO"
+    															resultType		="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO">
         {
 	      CALL sonictmsdev_mssql..USP_MTRL_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
@@ -23,8 +23,8 @@
     
   
  	<!-- 고유 ID 로 정보 찾기 -->
-    <select id="erp901002p1mtrlSrch"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901002.entity.Erp901002VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp901002.entity.Erp901002VO">
+    <select id="erp901002p1mtrlSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO"
+    															resultType		="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO">
         {
 	      CALL sonictmsdev_mssql..USP_MTRL_LOAD (
 	      	#{tblMtrlMId		,mode=IN	,	jdbcType=VARCHAR}
@@ -33,8 +33,8 @@
     </select>
        
   	<!-- 팝업 화주 등록/ 수정 하기 -->
-    <select id="erp901002p1ComdSave"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901002.entity.Erp901002VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp901002.entity.Erp901002VO">
+    <select id="erp901002p1ComdSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO"
+    															resultType		="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO">
         {
 	      CALL sonictmsdev_mssql..USP_MTRL_SAVE (
 	     	#{saveGubn			,mode=IN	,	jdbcType=VARCHAR},	
@@ -99,8 +99,8 @@
     
     
     	<!-- 상품관리 엑셀업로드 -->
-    <select id="erp901002p2ExcelUploadJson"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901002.entity.Erp901002ExcelVO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp901002.entity.Erp901002ExcelVO">
+    <select id="erp901002p2ExcelUploadJson"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901002.entity.Erp901002ExcelVO"
+    															resultType		="com.sonictms.alsys.erp.erp901002.entity.Erp901002ExcelVO">
         {
 	      CALL sonictmsdev_mssql..USP_MTRL_EXCL_SAVE (
 	     	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},					

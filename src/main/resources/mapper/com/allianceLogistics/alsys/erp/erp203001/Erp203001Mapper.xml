@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.erp.erp203001.mapper.Erp203001Mapper">
+<mapper namespace="com.sonictms.alsys.erp.erp203001.mapper.Erp203001Mapper">
 
 	<!-- 그리드 목록 조회하기 -->
-    <select id="erp203001List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO">
+    <select id="erp203001List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
+    															resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
         {
 	      CALL sonictmsdev_mssql..USP_INST_PLAN_INS_LISTBYALL (
 			#{cmpyCd			,mode=IN	,	jdbcType=VARCHAR},	
@@ -26,8 +26,8 @@
 
 
 	<!-- 리스트조회2 - 아래쪽 상세 그리드 조회 -->
-    <select id="erp203001List2"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO">
+    <select id="erp203001List2"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
+    															resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
         {
 	      CALL sonictmsdev_mssql..USP_INST_PLAN_INS_LOAD (
 			#{tblSoMId			,mode=IN	,	jdbcType=VARCHAR}
@@ -40,8 +40,8 @@
     
         
     <!-- 그리드에서 시공기사 찾기,조회하기 -->
-    <select id="erp203001InstErSrch"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO" 	
-    																resultType		="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO">
+    <select id="erp203001InstErSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
+    																resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
         {
 	      CALL sonictmsdev_mssql..USP_INST_USER_SRCH (
 			#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},	
@@ -54,8 +54,8 @@
     
          
     <!-- 그리드에서 시공기사 찾기,조회하기 2 -->
-    <select id="erp203001InstErSrch2"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO" 	
-    																resultType		="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO">
+    <select id="erp203001InstErSrch2"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
+    																resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
         {
 	      CALL sonictmsdev_mssql..USP_INST_PLAN_POPUP_INSTER_LISTBYALL (
 			#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},	
@@ -67,8 +67,8 @@
       }
     </select>
   	<!-- 그리드에서 시공기사 현황 3 -->
-    <select id="erp203001InstErSrch3"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO" 	
-    																resultType		="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO">
+    <select id="erp203001InstErSrch3"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
+    																resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
         {
 	      CALL sonictmsdev_mssql..USP_INST_PLAN_POPUP_INSTER_STATUS (
 			#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},	
@@ -79,8 +79,8 @@
       }
     </select>   
     <!-- 그리드에서 순번, 팔렛트, 시공기사 입력한것 저장 또는 수정 하기 -->
-    <select id="erp203001Save"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO">
+    <select id="erp203001Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
+    															resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
         {
 	      CALL sonictmsdev_mssql..USP_INST_PLAN_SAVE  (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
@@ -123,8 +123,8 @@
 	
     
     <!-- 권역매핑삭제하기 -->
-    <select id="erp203001Delete"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO">
+    <select id="erp203001Delete"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
+    															resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
         {
 	      CALL sonictmsdev_mssql..USP_DCPOST_DELETE (
 	      	#{tblLgstDcpostMId	,mode=IN	,	jdbcType=VARCHAR}
@@ -137,8 +137,8 @@
    
     	<!-- 체크한것들 삭제(일괄삭제) -->
 	<select id="erp203001DelChk" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp203001.entity.Erp203001VO">
+		parameterType="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
+		resultType="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
 		{
 		CALL sonictmsdev_mssql..USP_INST_PLAN_SO_DEL (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR},

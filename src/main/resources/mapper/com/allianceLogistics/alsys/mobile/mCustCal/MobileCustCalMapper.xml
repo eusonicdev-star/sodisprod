@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.mobile.mCustCal.mapper.MobileCustCalMapper">
+<mapper namespace="com.sonictms.alsys.mobile.mCustCal.mapper.MobileCustCalMapper">
 
 	<!-- 고객이 배송 가능/불가능 날짜 불러오기 -->
-    <select id="mCustCalDisableDay"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mCustCal.entity.MobileCustCalVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mCustCal.entity.MobileCustCalVO">
+    <select id="mCustCalDisableDay"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO"
+    															resultType		="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO">
         {
 	      CALL sonictmsdev_mssql..USP_INST_CAPA_SO_LISTBYALL_FOR_CUST (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -14,8 +14,8 @@
     </select>
     
     <!-- 배송날짜 저장하기 (실제는 CAPA_ID 저장하기)     -->
-    <select id="mCustCalSaveDate"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mCustCal.entity.MobileCustCalVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mCustCal.entity.MobileCustCalVO">
+    <select id="mCustCalSaveDate"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO"
+    															resultType		="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO">
         {
 	      CALL sonictmsdev_mssql..USP_INST_CAPA_SO_INS_FOR_CUST (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
@@ -27,8 +27,8 @@
     </select>
  
     <!-- 20220224 정연호 신규. 평가를 했나 안했나 조회하는것 -->
-    <select id="mFeedSrch"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mCustCal.entity.MobileCustCalVO" 	
-    														resultType		="com.allianceLogistics.alsys.mobile.mCustCal.entity.MobileCustCalVO">
+    <select id="mFeedSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO"
+    														resultType		="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO">
         {
 	      CALL sonictmsdev_mssql..USP_INST_EVAL_CHK (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -38,8 +38,8 @@
     </select>
     
     <!-- 20220224 정연호 신규. 평가 결과 저장하기     -->
-    <select id="mSaveFeedBack"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mCustCal.entity.MobileCustCalVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mCustCal.entity.MobileCustCalVO">
+    <select id="mSaveFeedBack"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO"
+    															resultType		="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO">
         {
 	      CALL sonictmsdev_mssql..USP_INST_EVAL_SAVE (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},

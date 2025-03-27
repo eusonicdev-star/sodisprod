@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.erp.erp991003.mapper.Erp991003Mapper">
+<mapper namespace="com.sonictms.alsys.erp.erp991003.mapper.Erp991003Mapper">
 
 	<!-- 사용자 목록 조회하기 -->
-    <select id="erp991003List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp991003.entity.Erp991003VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp991003.entity.Erp991003VO">
+    <select id="erp991003List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO"
+    															resultType		="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO">
         {
 	      CALL sonictmsdev_mssql..USP_USER_LISTBYALL (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -18,8 +18,8 @@
     </select>
     
     <!-- 회사코드와 사용자 아이디로 아이디 중복을 체크 -->
-    <select id="erp991003p1DoubleChk"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp991003.entity.Erp991003VO" 	
-																	resultType		="com.allianceLogistics.alsys.erp.erp991003.entity.Erp991003VO">
+    <select id="erp991003p1DoubleChk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO"
+																	resultType		="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO">
         {
 	      CALL sonictmsdev_mssql..USP_USER_DUP_CHK (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -30,8 +30,8 @@
     
     
     <!-- tblUserMId 로 사용자 정보 불러오기 -->
-    <select id="erp991003p1TblUserMId"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp991003.entity.Erp991003VO" 	
-																	resultType		="com.allianceLogistics.alsys.erp.erp991003.entity.Erp991003VO">
+    <select id="erp991003p1TblUserMId"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO"
+																	resultType		="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO">
         {
 	      CALL sonictmsdev_mssql..USP_USER_LOAD (
 	      	#{tblUserMId		,mode=IN	,	jdbcType=VARCHAR}
@@ -42,8 +42,8 @@
     
     
      <!-- 사용자 등록/수정 -->
-    <select id="erp991003p1ComdSave"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp991003.entity.Erp991003VO" 	
-																	resultType		="com.allianceLogistics.alsys.erp.erp991003.entity.Erp991003VO">
+    <select id="erp991003p1ComdSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO"
+																	resultType		="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO">
         {
 	      CALL sonictmsdev_mssql..USP_USER_SAVE (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},	
@@ -78,8 +78,8 @@
     
     
     <!-- 비밀번호 초기화 - 비밀번호를 아이디와 똑같게 만듦 -->
-    <select id="erp991003p1PwReset"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp991003.entity.Erp991003VO" 	
-																	resultType		="com.allianceLogistics.alsys.erp.erp991003.entity.Erp991003VO">
+    <select id="erp991003p1PwReset"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO"
+																	resultType		="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO">
         {
 	      CALL sonictmsdev_mssql..USP_USER_PW_RESET (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.menu.mapper.MenuMapper">
+<mapper namespace="com.sonictms.alsys.menu.mapper.MenuMapper">
 
 
-    <select id="menuList"  statementType="CALLABLE"  parameterType="com.allianceLogistics.alsys.menu.entity.MenuVO" 	resultType="com.allianceLogistics.alsys.menu.entity.MenuVO">
+    <select id="menuList" statementType="CALLABLE" parameterType="com.sonictms.alsys.menu.entity.MenuVO" resultType="com.sonictms.alsys.menu.entity.MenuVO">
         {
 	      CALL sonictmsdev_mssql..USP_MENU_LIST_BY_GRNT_R (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},

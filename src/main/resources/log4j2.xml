@@ -54,7 +54,7 @@
 		</logger>
 		
 		<!-- 애플리케이션 로그는 error로 설정 -->
-		<logger name="com.allianceLogistics.*" level="error"	additivity="false">
+		<logger name="com.sonictms.*" level="error" additivity="false">
 			<AppenderRef ref="console" />
 			<AppenderRef ref="file" />
 		</logger>

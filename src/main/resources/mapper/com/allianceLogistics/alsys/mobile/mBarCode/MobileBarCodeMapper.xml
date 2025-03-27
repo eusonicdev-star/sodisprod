@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.mobile.mBarCode.mapper.MobileBarCodeMapper">
+<mapper namespace="com.sonictms.alsys.mobile.mBarCode.mapper.MobileBarCodeMapper">
 
 	<!-- 모바일 바코드(판매오더번호) 로 상차조회 하기 -->
-    <select id="mBarCodeScan"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mBarCode.entity.MobileBarCodeVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mBarCode.entity.MobileBarCodeVO">
+    <select id="mBarCodeScan"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mBarCode.entity.MobileBarCodeVO"
+    															resultType		="com.sonictms.alsys.mobile.mBarCode.entity.MobileBarCodeVO">
         {
 	      CALL sonictmsdev_mssql..USP_MOBILE_LIFT_UPDT_SCAN (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
@@ -15,8 +15,8 @@
     </select>
     
     <!-- 모바일 바코드(판매오더번호) 로 상차변경 하기  -->
-    <select id="mBarCodeLiftChange"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mBarCode.entity.MobileBarCodeVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mBarCode.entity.MobileBarCodeVO">
+    <select id="mBarCodeLiftChange"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mBarCode.entity.MobileBarCodeVO"
+    															resultType		="com.sonictms.alsys.mobile.mBarCode.entity.MobileBarCodeVO">
         {
 	      CALL sonictmsdev_mssql..USP_MOBILE_LIFT_UPDT_SAVE (
 	      	#{instMobileMId	,mode=IN	,	jdbcType=VARCHAR},

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper
-	namespace="com.allianceLogistics.alsys.erp.erp101001.mapper.Erp101001Mapper">
+	namespace="com.sonictms.alsys.erp.erp101001.mapper.Erp101001Mapper">
 
 	<!-- 그리드 목록 조회하기 -->
 	<select id="erp101001List" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 			CALL sonictmsdev_mssql..USP_SO_LISTBYALL (
 				#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
@@ -34,8 +34,8 @@
 
 	<!-- 배송확정일 가능한 날짜 조회 -->
 	<select id="erp101001p1List" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_INST_ABLE_LISTBYALL (
 		#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
@@ -55,8 +55,8 @@
 
 	<!-- 헤더저장 -->
 	<select id="erp101001p1HeaderSave" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_M_INS (
 		#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
@@ -96,8 +96,8 @@
 
 	<!-- 상세저장 -->
 	<select id="erp101001p1DetailSave" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_P_INS (
 			#{tblSoMId 		,mode=IN , jdbcType=VARCHAR},
@@ -132,8 +132,8 @@
 
 	<!-- 주문수정 팝업에서 헤더 불러오기 헤더는 1줄만 불러옴 -->
 	<select id="erp101001p3HeaderList" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_M_LOAD (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
@@ -144,8 +144,8 @@
 
 	<!-- 주문수정 팝업에서 상세 불러오기 상세는 리스트 -->
 	<select id="erp101001p3DetailList" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_P_LOAD (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
@@ -156,8 +156,8 @@
 
 	<!-- 상세삭제 -->
 	<select id="erp101001p3DelDetail" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_P_DEL (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR},
@@ -173,8 +173,8 @@
 	
 	<!-- 20211226 정연호 추가. 상세수정(제품정보 그리드) 고객사주문번호, 착불비만 수정가능 -->
 	<select id="erp101001p3UpdtDetail" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_P_UPDT (
 		
@@ -196,8 +196,8 @@
 
 	<!-- 헤더수정 -->
 	<select id="erp101001p1HeaderUpdt" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_M_UPDT (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR},
@@ -240,8 +240,8 @@
 
 	<!-- 원오더찾기 팝업에서 리스트조회 -->
 	<select id="erp101001p4List" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 			CALL sonictmsdev_mssql..USP_SO_ETC_SOLIST (
 				#{cmpyCd 	,mode=IN , jdbcType=VARCHAR},
@@ -260,8 +260,8 @@
 
 	<!-- 반품등록 팝업에서 헤더 불러오기 헤더는 1줄만 불러옴 -->
 	<select id="erp101001p5HeaderList" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_M_LOAD_ETC (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
@@ -273,8 +273,8 @@
 
 	<!-- 반품등록 팝업에서 상세 불러오기 상세는 리스트 -->
 	<select id="erp101001p5DetailList" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_P_LOAD_ETC (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
@@ -285,8 +285,8 @@
 
 	<!-- 반품오더헤더저장 -->
 	<select id="erp101001p5HeaderSave" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_M_INS (
 		#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
@@ -326,8 +326,8 @@
 
 	<!-- 반품오더 상세저장 -->
 	<select id="erp101001p5DetailSave" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_P_INS (
 			#{tblSoMId 		,mode=IN , jdbcType=VARCHAR},
@@ -358,8 +358,8 @@
 
 	<!-- 우편번호로 물류센터 찾기 -->
 	<select id="erp101001p1PostCdDcCd" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_DC_SRCH (
 		#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
@@ -370,8 +370,8 @@
 	</select>
 	<!-- 체크한것들 삭제(일괄삭제) -->
 	<select id="erp101001ChkDel" statementType="CALLABLE"
-		parameterType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO"
-		resultType="com.allianceLogistics.alsys.erp.erp101001.entity.Erp101001VO">
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
 		CALL sonictmsdev_mssql..USP_SO_M_DEL (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR},

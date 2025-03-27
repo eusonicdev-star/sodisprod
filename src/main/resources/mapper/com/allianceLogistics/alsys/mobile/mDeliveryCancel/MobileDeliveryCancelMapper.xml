@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.mobile.mDeliveryCancel.mapper.MobileDeliveryCancelMapper">
+<mapper namespace="com.sonictms.alsys.mobile.mDeliveryCancel.mapper.MobileDeliveryCancelMapper">
 
     
 
-    <select id="mDeliveryCancelSave"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mDeliveryCancel.entity.MobileDeliveryCancelVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mDeliveryCancel.entity.MobileDeliveryCancelVO">
+    <select id="mDeliveryCancelSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mDeliveryCancel.entity.MobileDeliveryCancelVO"
+    															resultType		="com.sonictms.alsys.mobile.mDeliveryCancel.entity.MobileDeliveryCancelVO">
         {
 	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_CANCEL_SAVE (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
