@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.erp.erp104001.mapper.Erp104001Mapper">
+<mapper namespace="com.sonictms.alsys.erp.erp104001.mapper.Erp104001Mapper">
 
 	<!-- 그리드 목록 조회하기 -->
-    <select id="erp104001List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp104001.entity.Erp104001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp104001.entity.Erp104001VO">
+    <select id="erp104001List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO"
+    															resultType		="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_REPORT_SO_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},		
@@ -30,8 +30,8 @@
     </select>
 
 	<!-- 체크수정 하기  -->
-    <select id="erp104001Save"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp104001.entity.Erp104001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp104001.entity.Erp104001VO">
+    <select id="erp104001Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO"
+    															resultType		="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO">
         {
 	      CALL sonictmsdev_mssql..USP_INST_CAPA_SAVE (
 	      	#{saveGubn	,mode=IN	,	jdbcType=VARCHAR},
@@ -56,8 +56,8 @@
     
     
     <!-- 시공좌석 일괄생성 팝업창에서 일괄생성 저장하기 -->
-	<select id="erp104001p1Save"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp104001.entity.Erp104001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp104001.entity.Erp104001VO">
+	<select id="erp104001p1Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO"
+    															resultType		="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO">
         {
 	      CALL sonictmsdev_mssql..USP_INST_CAPA_CRT (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -83,8 +83,8 @@
     
     
     <!-- erp104001p2 좌석 점유 상제 조회 리스트 -->
-    <select id="erp104001p2List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp104001.entity.Erp104001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp104001.entity.Erp104001VO">
+    <select id="erp104001p2List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO"
+    															resultType		="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO">
         {
 	      CALL sonictmsdev_mssql..USP_INST_CAPA_CRT_POPUP_LOAD (
 	      	#{capaId		,mode=IN	,	jdbcType=VARCHAR}

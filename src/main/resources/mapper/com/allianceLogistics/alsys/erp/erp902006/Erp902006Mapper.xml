@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.erp.erp902006.mapper.Erp902006Mapper">
+<mapper namespace="com.sonictms.alsys.erp.erp902006.mapper.Erp902006Mapper">
 
 	<!-- 그리드 목록 조회하기 -->
-    <select id="erp902006List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp902006.entity.Erp902006VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp902006.entity.Erp902006VO">
+    <select id="erp902006List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902006.entity.Erp902006VO"
+    															resultType		="com.sonictms.alsys.erp.erp902006.entity.Erp902006VO">
         {
 	      CALL sonictmsdev_mssql..USP_WEEKDLVY_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
@@ -18,8 +18,8 @@
     </select>
 
 	<!-- 권역매핑저장하기 -->
-    <select id="erp902006Save"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp902006.entity.Erp902006VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp902006.entity.Erp902006VO">
+    <select id="erp902006Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902006.entity.Erp902006VO"
+    															resultType		="com.sonictms.alsys.erp.erp902006.entity.Erp902006VO">
         {
 	      CALL sonictmsdev_mssql..USP_WEEKDLVY_SAVE (
 	      	#{saveGubn				,mode=IN	,	jdbcType=VARCHAR},

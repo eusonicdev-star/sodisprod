@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.erp.erp901001.mapper.Erp901001Mapper">
+<mapper namespace="com.sonictms.alsys.erp.erp901001.mapper.Erp901001Mapper">
 
 	<!-- 그리드 목록 조회하기 -->
-    <select id="erp901001List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901001.entity.Erp901001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp901001.entity.Erp901001VO">
+    <select id="erp901001List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901001.entity.Erp901001VO"
+    															resultType		="com.sonictms.alsys.erp.erp901001.entity.Erp901001VO">
         {
 	      CALL sonictmsdev_mssql..USP_AGENCY_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
@@ -19,8 +19,8 @@
     
   
  	<!-- 고유 ID 로 정보 찾기 -->
-    <select id="erp901001p1agencySrch"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901001.entity.Erp901001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp901001.entity.Erp901001VO">
+    <select id="erp901001p1agencySrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901001.entity.Erp901001VO"
+    															resultType		="com.sonictms.alsys.erp.erp901001.entity.Erp901001VO">
         {
 	      CALL sonictmsdev_mssql..USP_AGENCY_LOAD (
 	      	#{tblAgencyMId		,mode=IN	,	jdbcType=VARCHAR}
@@ -29,8 +29,8 @@
     </select>
        
   	<!-- 팝업 화주 등록/ 수정 하기 -->
-    <select id="erp901001p1ComdSave"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901001.entity.Erp901001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp901001.entity.Erp901001VO">
+    <select id="erp901001p1ComdSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901001.entity.Erp901001VO"
+    															resultType		="com.sonictms.alsys.erp.erp901001.entity.Erp901001VO">
         {
 	      CALL sonictmsdev_mssql..USP_AGENCY_SAVE (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
@@ -60,8 +60,8 @@
     </select>
     
     <!-- 20220124 정연호. //20220124 정연호 알림톡 연락처  저장/수정하기 -->
-    <select id="erp901001p2DetailSave"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901001.entity.Erp901001DetailVO" 	
-    																	resultType		="com.allianceLogistics.alsys.erp.erp901001.entity.Erp901001DetailVO">
+    <select id="erp901001p2DetailSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901001.entity.Erp901001DetailVO"
+    																	resultType		="com.sonictms.alsys.erp.erp901001.entity.Erp901001DetailVO">
         {
 	      CALL sonictmsdev_mssql..USP_ALRM_AGNTLIST_SAVE (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
@@ -78,8 +78,8 @@
     
      
     <!-- 20220124 정연호. 화주사 코드로 알림톡 연락처 조회하기 -->
-    <select id="erp901001p2alrmTlkSrch"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901001.entity.Erp901001DetailVO" 	
-    																	resultType		="com.allianceLogistics.alsys.erp.erp901001.entity.Erp901001DetailVO">
+    <select id="erp901001p2alrmTlkSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901001.entity.Erp901001DetailVO"
+    																	resultType		="com.sonictms.alsys.erp.erp901001.entity.Erp901001DetailVO">
         {
 	      CALL sonictmsdev_mssql..USP_ALRM_AGNTLIST_LOAD (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},

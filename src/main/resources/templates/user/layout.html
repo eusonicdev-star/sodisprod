@@ -2,8 +2,8 @@
 <html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <link rel="icon" href="/css/favicon.ico" type="image/x-icon" sizes="16x16">
-    <title>얼라이언스</title>
+    <link rel="icon" href="/css/favicon2.ico" type="image/x-icon">
+    <title>유진소닉 TMS</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -126,6 +126,7 @@
                 '<span id="userInfo" style="font-size:12px;margin-left:10px;"></span>' +
                 '<div class="pull-right">' +
                 '<a href="#" onclick="btnLogOut();"><i class="fa fa-sign-out fa-1x" aria-hidden="true"></i><span>로그아웃</span></a>' +
+                '<a href="#" onclick="showMyInfo();"><i class="fa fa-user fa-1x" aria-hidden="true"></i><span>내 정보</span></a>' +
                 '<a href="#"><i class="fa fa-history fa-1x" style="color:black;"></i>' +
                 '<span id="m" style="font-size:1.1em;font-weight:lighter;" onclick="sessionTimePlus();">000:00</span></a>' +
                 '</div></div>'
@@ -325,6 +326,23 @@
                     startTime = new Date();
                 }
             });
+        }
+
+        // 내 정보 표시 함수
+        function showMyInfo() {
+            var ids = myTabbar.getAllTabs();
+            for (var q = 0; q < ids.length; q++) {
+                if (ids[q] == "myInfo") {
+                    myTabbar.setTabInActive();
+                    myTabbar.tabs("myInfo").setActive();
+                    return;
+                }
+            }
+            
+            myTabbar.setTabInActive();
+            myTabbar.addTab("myInfo", "내 정보");
+            myTabbar.tabs("myInfo").attachURL("/myInfo");
+            myTabbar.tabs("myInfo").setActive();
         }
 
         $(document).ready(function () {

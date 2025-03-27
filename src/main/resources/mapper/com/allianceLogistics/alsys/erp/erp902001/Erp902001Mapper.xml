@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.erp.erp902001.mapper.Erp902001Mapper">
+<mapper namespace="com.sonictms.alsys.erp.erp902001.mapper.Erp902001Mapper">
 
 	<!-- 왼쪽 마스터 공통 목록 조회하기 -->
-    <select id="erp902001List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp902001.entity.Erp902001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp902001.entity.Erp902001VO">
+    <select id="erp902001List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO"
+    															resultType		="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO">
         {
 	      CALL sonictmsdev_mssql..USP_DC_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
@@ -15,8 +15,8 @@
     </select>
 
 	<!-- 지점코드 중복조회하기 -->
-    <select id="erp902001p1CommDupl"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp902001.entity.Erp902001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp902001.entity.Erp902001VO">
+    <select id="erp902001p1CommDupl"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO"
+    															resultType		="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO">
         {
 	      CALL sonictmsdev_mssql..USP_DC_DUP_CHK (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
@@ -27,8 +27,8 @@
     
   
  	<!-- 지점(물류센터)고유 ID 로 정보 찾기 -->
-    <select id="erp902001p1comdDcSrch"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp902001.entity.Erp902001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp902001.entity.Erp902001VO">
+    <select id="erp902001p1comdDcSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO"
+    															resultType		="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO">
         {
 	      CALL sonictmsdev_mssql..USP_DC_LOAD (
 	      
@@ -38,8 +38,8 @@
     </select>
        
   	<!-- 팝업 지점 등록/ 수정 하기 -->
-    <select id="erp902001p1ComdSave"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp902001.entity.Erp902001VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp902001.entity.Erp902001VO">
+    <select id="erp902001p1ComdSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO"
+    															resultType		="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO">
         {
 	      CALL sonictmsdev_mssql..USP_DC_SAVE (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},

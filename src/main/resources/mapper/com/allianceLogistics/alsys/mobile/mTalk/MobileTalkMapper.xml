@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.mobile.mTalk.mapper.MobileTalkMapper">
+<mapper namespace="com.sonictms.alsys.mobile.mTalk.mapper.MobileTalkMapper">
 
 	<!-- 모바일 알림톡 불러오기 - 알림톡 보내기 전에 불러오기 -->
-    <select id="mSrchTalk"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mTalk.entity.MobileTalkVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mTalk.entity.MobileTalkVO">
+    <select id="mSrchTalk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO"
+    															resultType		="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO">
         {
 	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_LIST_DETAIL_HAPPYCALL_LOAD (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR}		
@@ -14,8 +14,8 @@
     </select>
     
     <!-- 모바일 알림톡 발송결과를 DB에 저장 -->
-    <select id="mSaveTalk"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mTalk.entity.MobileTalkVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mTalk.entity.MobileTalkVO">
+    <select id="mSaveTalk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO"
+    															resultType		="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO">
         {
 	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_LIST_DETAIL_HAPPYCALL_SAVE_TALK (
 	      	#{instMobileMId	,mode=IN	,	jdbcType=VARCHAR},
@@ -38,8 +38,8 @@
   
   
   <!-- 모바일 해피콜완료 4000 => 5000 으로 바꾸기 -->
-    <select id="mSaveStat"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mTalk.entity.MobileTalkVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mTalk.entity.MobileTalkVO">
+    <select id="mSaveStat"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO"
+    															resultType		="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO">
         {
 	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_LIST_DETAIL_HAPPYCALL_SAVE_STAT (
 	      	#{instMobileMId	,mode=IN	,	jdbcType=VARCHAR},

@@ -8,7 +8,7 @@ plugins {
     id 'war'
 }
 
-group = 'com.allianceLogistics'
+group = 'com.sonictms'
 version = '0.0.2-SNAPSHOT'            //0.0.1
 sourceCompatibility = '1.8'
 

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.mobile.mLogin.mapper.MobileLoginMapper">
+<mapper namespace="com.sonictms.alsys.mobile.mLogin.mapper.MobileLoginMapper">
 
 	<!-- 아이디로 아이디,암호 정보찾기 기존SP이용 -->
-    <select id="mLogin"  statementType="CALLABLE"  parameterType="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO" 	
-    resultType="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO">
+    <select id="mLogin"  statementType="CALLABLE"  parameterType="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    resultType="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
         {
 	      CALL sonictmsdev_mssql..USP_LOGIN_ID (
 	      	#{loginId		,mode=IN	,	jdbcType=VARCHAR}
@@ -13,8 +13,8 @@
     </select>
 
     <!-- 아이디로 사람정보 찾기 -->
-    <select id="mUserInfo"  statementType="CALLABLE"  parameterType="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO" 	
-    resultType="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO">
+    <select id="mUserInfo"  statementType="CALLABLE"  parameterType="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    resultType="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
         {
 	      CALL sonictmsdev_mssql..USP_USER_INFO_R (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -26,8 +26,8 @@
 
 
    <!-- 로그인 되었으면 히스토리를 저장한다 -->
-    <select  id="mUserHist"  statementType="CALLABLE"  parameterType="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO" 	
-    resultType="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO">
+    <select  id="mUserHist"  statementType="CALLABLE"  parameterType="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    resultType="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
         {
 	      CALL sonictmsdev_mssql..USP_USER_H_SAVE(
 	      	
@@ -43,8 +43,8 @@
     </select> 
 
 	<!-- 그리드 목록 조회하기 -->
-    <select id="mobileLoginList"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO">
+    <select id="mobileLoginList"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    															resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},		
@@ -65,8 +65,8 @@
     </select>
 
 	<!-- 배송확정일 가능한 날짜 조회 -->
-    <select id="mobileLoginp1List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO">
+    <select id="mobileLoginp1List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    															resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_INST_ABLE_LISTBYALL (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
@@ -83,8 +83,8 @@
     </select>
 
 	<!-- 헤더저장  -->
-    <select id="mobileLoginp1HeaderSave"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO">
+    <select id="mobileLoginp1HeaderSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    															resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_M_INS (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -122,8 +122,8 @@
     </select>
 
     <!-- 상세저장  -->
-    <select id="mobileLoginp1DetailSave"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO" 	
-    																	resultType		="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO">
+    <select id="mobileLoginp1DetailSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    																	resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_P_INS (
 	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
@@ -147,8 +147,8 @@
     </select>
 
     <!-- 주문수정 팝업에서 헤더 불러오기		헤더는 1줄만 불러옴 -->
-    <select id="mobileLoginp3HeaderList"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO">
+    <select id="mobileLoginp3HeaderList"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    															resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_M_LOAD  (
 	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}
@@ -158,8 +158,8 @@
     </select>
     
     <!-- 주문수정 팝업에서 상세 불러오기		상세는 리스트 -->
-    <select id="mobileLoginp3DetailList"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO">
+    <select id="mobileLoginp3DetailList"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    															resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_P_LOAD  (
 	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}
@@ -168,8 +168,8 @@
     </select>
     
      <!-- 상세삭제  -->
-    <select id="mobileLoginp3DelDetail"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO" 	
-    																	resultType		="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO">
+    <select id="mobileLoginp3DelDetail"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    																	resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_P_DEL (
 	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
@@ -183,8 +183,8 @@
     </select>
     
  	<!-- 헤더수정  -->
-    <select id="mobileLoginp1HeaderUpdt"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mLogin.entity.MobileLoginVO">
+    <select id="mobileLoginp1HeaderUpdt"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    															resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
         {
 	      CALL sonictmsdev_mssql..USP_SO_M_UPDT (
 	     	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},

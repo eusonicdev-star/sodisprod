@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.mobile.mYesCmpl.mapper.MobileYesCmplMapper">
+<mapper namespace="com.sonictms.alsys.mobile.mYesCmpl.mapper.MobileYesCmplMapper">
 
 	<!-- 모바일 배송완료 onCreate 조회 -->
-    <select id="mYesCmplOnCreate"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
+    <select id="mYesCmplOnCreate"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO"
+    															resultType		="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
         {
 	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_COMPLETE_LOAD (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR}
@@ -14,8 +14,8 @@
     
     
     <!-- 모바일 배송완료 처리 저장 SAVE   -->
-    <select id="mYesCmplSaveStat"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
+    <select id="mYesCmplSaveStat"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO"
+    															resultType		="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
         {
 	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_COMPLETE_SAVE_STAT (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
@@ -46,8 +46,8 @@
     </select>
     
     <!-- 모바일 배송완료 취소 처리 저장 DEL  -->
-    <select id="mYesCmplDel"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
+    <select id="mYesCmplDel"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO"
+    															resultType		="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
         {
 	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_COMPLETE_DEL (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
@@ -59,8 +59,8 @@
     
    
      <!-- 모바일 배송완료 알림톡 결과 저장   -->
-    <select id="mYesCmplSaveTalk"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO" 	
-    															resultType		="com.allianceLogistics.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
+    <select id="mYesCmplSaveTalk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO"
+    															resultType		="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
         {
 	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_COMPLETE_SAVE_TALK (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},

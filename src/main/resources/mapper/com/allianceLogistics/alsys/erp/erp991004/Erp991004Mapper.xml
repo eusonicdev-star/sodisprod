@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.erp.erp991004.mapper.Erp991004Mapper">
+<mapper namespace="com.sonictms.alsys.erp.erp991004.mapper.Erp991004Mapper">
 
 	<!-- 목록 조회하기 -->
-    <select id="erp991004List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp991004.entity.Erp991004VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp991004.entity.Erp991004VO">
+    <select id="erp991004List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991004.entity.Erp991004VO"
+    															resultType		="com.sonictms.alsys.erp.erp991004.entity.Erp991004VO">
         {
 	      CALL sonictmsdev_mssql..USP_USER_H_LISTBYALL (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},

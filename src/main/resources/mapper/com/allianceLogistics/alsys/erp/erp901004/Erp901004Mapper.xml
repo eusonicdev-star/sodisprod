@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.allianceLogistics.alsys.erp.erp901004.mapper.Erp901004Mapper">
+<mapper namespace="com.sonictms.alsys.erp.erp901004.mapper.Erp901004Mapper">
 
 	<!-- 그리드 목록 조회하기 -->
-    <select id="erp901004List"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901004.entity.Erp901004VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp901004.entity.Erp901004VO">
+    <select id="erp901004List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901004.entity.Erp901004VO"
+    															resultType		="com.sonictms.alsys.erp.erp901004.entity.Erp901004VO">
         {
 	      CALL sonictmsdev_mssql..USP_BOM_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
@@ -18,8 +18,8 @@
 	
   
  	<!-- 팝업 왼쪽 하위 품목 찾기 -->
-    <select id="erp901004p1ComdSrch"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901004.entity.Erp901004VO" 	
-    																resultType		="com.allianceLogistics.alsys.erp.erp901004.entity.Erp901004VO">
+    <select id="erp901004p1ComdSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901004.entity.Erp901004VO"
+    																resultType		="com.sonictms.alsys.erp.erp901004.entity.Erp901004VO">
         {
 	      CALL sonictmsdev_mssql..USP_BOM_LISTBYALL_C  (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -31,8 +31,8 @@
     
     
     <!-- 팝업  등록/ 수정 하기 -->
-    <select id="erp901004p1ComdSave"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901004.entity.Erp901004VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp901004.entity.Erp901004VO">
+    <select id="erp901004p1ComdSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901004.entity.Erp901004VO"
+    															resultType		="com.sonictms.alsys.erp.erp901004.entity.Erp901004VO">
         {
 	      CALL sonictmsdev_mssql..USP_BOM_SAVE (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
@@ -56,8 +56,8 @@
     
   
  	<!-- 고유 ID 로 정보 찾기 -->
-    <select id="erp901004prntMtrlList"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901004.entity.Erp901004VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp901004.entity.Erp901004VO">
+    <select id="erp901004prntMtrlList"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901004.entity.Erp901004VO"
+    															resultType		="com.sonictms.alsys.erp.erp901004.entity.Erp901004VO">
         {
 	      CALL sonictmsdev_mssql..USP_BOM_LOAD  (
 	      	#{mtrlCd		,mode=IN	,	jdbcType=VARCHAR}
@@ -66,8 +66,8 @@
     </select>
        
   	<!-- 로우삭제 
-    <select id="erp901004p1DelTblBomId"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901004.entity.Erp901004VO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp901004.entity.Erp901004VO">
+    <select id="erp901004p1DelTblBomId"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901004.entity.Erp901004VO"
+    															resultType		="com.sonictms.alsys.erp.erp901004.entity.Erp901004VO">
         {
 	      CALL sonictmsdev_mssql..USP_BOM_DELE  (
 	      	#{tblBomMId		,mode=IN	,	jdbcType=VARCHAR}
@@ -77,8 +77,8 @@
     -->
     
      <!-- 상품구성품관리(bom) 엑셀업로드 -->
-    <select id="erp901004p2ExcelUploadJson"  statementType="CALLABLE"		parameterType	="com.allianceLogistics.alsys.erp.erp901004.entity.Erp901004ExcelVO" 	
-    															resultType		="com.allianceLogistics.alsys.erp.erp901004.entity.Erp901004ExcelVO">
+    <select id="erp901004p2ExcelUploadJson"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901004.entity.Erp901004ExcelVO"
+    															resultType		="com.sonictms.alsys.erp.erp901004.entity.Erp901004ExcelVO">
         {
 	      CALL sonictmsdev_mssql..USP_BOM_EXCL_SAVE (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},	
