@@ -24,7 +24,7 @@ apply plugin: 'war'
 //}
 
 bootWar {
-    archiveFileName = "alliance.war"
+    archiveFileName = "sonictms.war"
 }
 
 configurations {
