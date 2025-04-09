@@ -357,7 +357,8 @@
                             if (res) {	//리턴값이 있음
                                 $("#dlvyInfoDiv").show();
 
-                                var url = "http://gloakoreaimage.cafe24.com/alliance/";
+                                // var url = "http://gloakoreaimage.cafe24.com/alliance/";
+                                var url = "http://sonictmsdevimg.cafe24.com/alliance/";
                                 $("#instPlanDt").val(res.instPlanDt);
                                 $("#instDt").val(res.instDt);
                                 $("#dlvyStatNm").val(res.dlvyStatNm);
@@ -366,54 +367,27 @@
                                 $("#instEr").val(res.instEr);
                                 $("#hp").val(res.hp);
                                 $("#seq").val(res.seq);
-
-
-                                // $("#dlvyStat9999").hide();
                                 $("#dlvyStat9999ImgContainer").hide();
                                 $("#dlvyStat9999Memo").hide();
-                                // $("#dlvyStat9999ImgTitle").hide();
-                                // $("#dlvyStat9999Img").hide();
-
-
                                 $("#dlvyStat8000ImgContainer").hide();
-                                // $("#dlvyStat8000").hide();
-                                // $("#dlvyStat8000ImgTitle").hide();
-                                // $("#dlvyStat8000Img").hide();
-
 
                                 //배송완료 상태 일때
                                 if (res.dlvyStatCd == "9999" || res.dlvyinfo == "DLVLY_CNFM")	//배송완료
                                 {
-                                    // $("#dlvyStat9999").show();
                                     $("#dlvyStat9999ImgContainer").show();
                                     $("#dlvyStat9999Memo").show();
-                                    // $("#dlvyStat9999ImgTitle").show();
-                                    // $("#dlvyStat9999Img").show();
-
                                     $("#dlvyStat8000ImgContainer").hide();
-                                    // $("#dlvyStat8000ImgTitle").hide();
-                                    // $("#dlvyStat8000Img").hide();
                                 }
                                 //미마감 상태 일때
                                 if (res.dlvyStatCd == "8000" || res.dlvyinfo == "X_CMPL")	//미마감
                                 {
                                     $("#dlvyStat9999ImgContainer").hide();
-                                    // $("#dlvyStat9999").hide();
-                                    // $("#dlvyStat9999Memo").hide();
-                                    // $("#dlvyStat9999ImgTitle").hide();
-                                    // $("#dlvyStat9999Img").hide();
-
                                     $("#dlvyStat8000ImgContainer").show();
-                                    // $("#dlvyStat8000").show();
-                                    // $("#dlvyStat8000ImgTitle").show();
-                                    // $("#dlvyStat8000Img").show();
                                 }
-
 
                                 //착불비
                                 $("#item01").val(res.dlvyCostClctNm);
                                 $("#item01Text").val(res.dlvyCostTxt);
-
 
                                 //양중비
                                 $("#item02").val(res.liftCostYn == "Y" ? "있음" : "없음");
@@ -428,9 +402,7 @@
                                 $("#item04Text").val(res.walFstnTxt);
 
                                 //메모
-
                                 $("#item05Memo").val(res.dlvyCnfmMemo);
-
 
                                 if (res.dlvyCnfmImg1) {
                                     $("#imgA01").show();
@@ -469,17 +441,11 @@
                                     $("#signImgA").attr("href", url + res.dlvyCnfmSign);
                                     $("#signImgSrc").attr("src", url + res.dlvyCnfmSign);
                                 }
-
-
                                 //미마감사유
-
                                 $("#xitem01Text").val(res.xcmplTypeNm);
 
-
                                 //메모
-
                                 $("#xitem05Memo").val(res.xcmplMemo);
-
 
                                 if (res.xcmplImg1) {
                                     $("#ximgA01").show();
@@ -522,24 +488,18 @@
 
                             } else {
                                 $("#dlvyInfoDiv").hide();
-
                                 $("#dlvyStat9999").hide();
                                 $("#dlvyStat9999Memo").hide();
                                 $("#dlvyStat9999ImgContainer").hide();
-
                                 $("#dlvyStat8000ImgContainer").hide();
                             }
                         },
                     });
-                },	//END of searchSoDlvyInfo : function() {
-
+                },
 
                 searchSoLoadD: function (param) {	//아래 주문정보의 상세(그리드부분)조회하기
-
-
                     var soDetailData = new FormData();
                     soDetailData.append("tblSoMId", param.tblSoMId);
-
                     $.ajax({
                         url: "/erp102001SoDetailSrch",
                         processData: false,
