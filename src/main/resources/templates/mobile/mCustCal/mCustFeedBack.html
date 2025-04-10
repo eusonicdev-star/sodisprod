@@ -81,20 +81,20 @@ textarea::placeholder {
 					//2번별 부터 5번별 까지 0점으로 돌림
 					for(var i=1;i<star.length;i++) {
 						star[i] = 0 ;
-						$("#star"+i+"img").attr("src","https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_default.png");
+						$("#star"+i+"img").attr("src","https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_default.png");
 						
 					}
 					if(star[starType] == 0) {
 						star[starType] = 1;
-						$("#star"+starType+"img").attr("src","https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_full.png");
+						$("#star"+starType+"img").attr("src","https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_full.png");
 					}
 					else if(star[starType] == 1) {
 						star[starType] = 0.5;
-						$("#star"+starType+"img").attr("src","https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_half.png");
+						$("#star"+starType+"img").attr("src","https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_half.png");
 					}
 					else if(star[starType] == 0.5) {
 						star[starType] = 0;
-						$("#star"+starType+"img").attr("src","https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_default.png");
+						$("#star"+starType+"img").attr("src","https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_default.png");
 					}
 					
 				}
@@ -112,25 +112,25 @@ textarea::placeholder {
 					//내가 누른것 다음꺼 부터 끝까지 0점으로 돌림
 					for(var i=(starType+1);i<star.length;i++) {
 						star[i] = 0 ;
-						$("#star"+i+"img").attr("src","https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_default.png");
+						$("#star"+i+"img").attr("src","https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_default.png");
 					}
 					//처음 부터 내가 누른것 전 까지 1점으로 바꿈
 					for(var j=0;j<starType;j++) {
 						star[j] = 1 ;
-						$("#star"+j+"img").attr("src","https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_full.png");
+						$("#star"+j+"img").attr("src","https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_full.png");
 					}
 					
 					if(star[starType] == 0) {
 						star[starType] = 1;
-						$("#star"+starType+"img").attr("src","https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_full.png");
+						$("#star"+starType+"img").attr("src","https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_full.png");
 					}
 					else if(star[starType] == 1) {
 						star[starType] = 0.5;
-						$("#star"+starType+"img").attr("src","https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_half.png");
+						$("#star"+starType+"img").attr("src","https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_half.png");
 					}
 					else if(star[starType] == 0.5) {
 						star[starType] = 1;
-						$("#star"+starType+"img").attr("src","https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_full.png");
+						$("#star"+starType+"img").attr("src","https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_full.png");
 					}
 				}
 				evalSpcl1 = 0;
@@ -315,27 +315,27 @@ $(document).ready(function() {
 				<br>
 				<span class="cell">
 					<span id="star0" onclick="fnObj.searchOpen.searchStar(0)">
-						<img id="star0img" width="52dp" height="52dp" src = "https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_default.png">
+						<img id="star0img" width="52dp" height="52dp" src = "https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_default.png">
 					</span>
 				</span>
 				<span class="cell">
 					<span id="star1" onclick="fnObj.searchOpen.searchStar(1)">
-						<img id="star1img" width="52dp" height="52dp" src = "https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_default.png">
+						<img id="star1img" width="52dp" height="52dp" src = "https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_default.png">
 					</span>
 				</span>
 				<span class="cell">
 					<span id="star2" onclick="fnObj.searchOpen.searchStar(2)">
-						<img id="star2img" width="52dp" height="52dp" src = "https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_default.png">
+						<img id="star2img" width="52dp" height="52dp" src = "https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_default.png">
 					</span>
 				</span>
 				<span class="cell">
 					<span id="star3" onclick="fnObj.searchOpen.searchStar(3)">
-						<img id="star3img" width="52dp" height="52dp" src = "https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_default.png">
+						<img id="star3img" width="52dp" height="52dp" src = "https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_default.png">
 					</span>
 				</span>
 				<span class="cell">
 					<span id="star4" onclick="fnObj.searchOpen.searchStar(4)">
-						<img id="star4img" width="52dp" height="52dp" src = "https://gloakoreahost.cdn3.cafe24.com/feedback/star/ic_star_default.png">
+						<img id="star4img" width="52dp" height="52dp" src = "https://eugenesonic.cdn1.cafe24.com/feedback/star/ic_star_default.png">
 					</span>
 				</span>
 				
@@ -363,7 +363,7 @@ $(document).ready(function() {
 											border-radius		:	5px	;
 											border				:	1px solid lightgray;
 										">
-										<img style="vertical-align:middle;" width="40dp" height="40dp" src = "https://gloakoreahost.cdn3.cafe24.com/feedback/good/ic_time.png">
+										<img style="vertical-align:middle;" width="40dp" height="40dp" src = "https://eugenesonic.cdn1.cafe24.com/feedback/good/ic_time.png">
 					시간 약속을 잘 지켜요
 				</button>
 				
@@ -378,7 +378,7 @@ $(document).ready(function() {
 											border-radius		:	5px	;
 											border				:	1px solid lightgray;
 										">
-										<img style="vertical-align:middle;" width="40dp" height="40dp" src = "https://gloakoreahost.cdn3.cafe24.com/feedback/good/ic_kind.png">
+										<img style="vertical-align:middle;" width="40dp" height="40dp" src = "https://eugenesonic.cdn1.cafe24.com/feedback/good/ic_kind.png">
 					친절하고 매너가 좋아요
 				</button>
 				<p style="margin-top: 10px;margin-bottom: 0px;"></p>
@@ -391,7 +391,7 @@ $(document).ready(function() {
 											border-radius		:	5px	;
 											border				:	1px solid lightgray;
 										">
-										<img style="vertical-align:middle;" width="40dp" height="40dp" src = "https://gloakoreahost.cdn3.cafe24.com/feedback/good/ic_clean.png">
+										<img style="vertical-align:middle;" width="40dp" height="40dp" src = "https://eugenesonic.cdn1.cafe24.com/feedback/good/ic_clean.png">
 					주변 정리를 잘 해주셨어요
 				</button>
 				<br>
