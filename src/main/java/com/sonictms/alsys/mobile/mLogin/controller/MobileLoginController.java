@@ -38,8 +38,6 @@ public class MobileLoginController {
 	@ResponseBody
 	public BaseVO checkSessionId(@RequestBody BaseVO baseVO, HttpServletRequest httpServletRequest) {
 		HttpSession session =httpServletRequest.getSession();
-		//log.info("어플세션 : " + session.getId());
-		//log.info("서버세션 : " + baseVO.getJsessionId());
 		if(session.getId().equals(baseVO.getJsessionId())) {
 			baseVO.setRtnYn("Y"); 
 		}

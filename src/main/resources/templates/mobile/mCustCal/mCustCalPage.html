@@ -311,8 +311,8 @@ body, html {
 				    var button1Data={};
 					button1Data.name="상담직원에게 메세지 보내기";
 					button1Data.type="WL";
-					button1Data.url_mobile	=	"http://pf.kakao.com/_ExbPtK/chat";
-					button1Data.url_pc		=	"http://pf.kakao.com/_ExbPtK/chat";
+					button1Data.url_mobile	=	"http://pf.kakao.com/_TkVwn/chat";
+					button1Data.url_pc		=	"http://pf.kakao.com/_TkVwn/chat";
 					resData.button1=	button1Data;
 					
 					var sendD = {}
@@ -391,7 +391,7 @@ body, html {
 					action_popup.confirm(	"선택한 배송일 <font color=red><b>"
 											+$("#selDate").text().substring(0,4)+"년 "+$("#selDate").text().substring(4,6)+"월 "+$("#selDate").text().substring(6,8)+"일"
 		    								+"</b></font><br><br>배송일을 확정하시겠습니까?"
-		    								+"<br>※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_ExbPtK/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다."
+		    								+"<br>※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_TkVwn/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다."
 		    								, function (res) 
 						{
 				            if (res) {
@@ -418,14 +418,14 @@ body, html {
 						ori_confirm_msg =	"지정된 배송일(<font color=red><b>"+$("#dlvyAsgnDtText").text()+"</b></font>)을 선택하였습니다.<br><br>"				
 										+	"선택한 배송일("+	$("#selDate").text().substring(0,4)+"년 "+$("#selDate").text().substring(4,6)+"월 "+$("#selDate").text().substring(6,8)+"일)이 있지만<br>"
 										+	"지정된 배송일(<font color=red><b>"+$("#dlvyAsgnDtText").text()+"</b></font>)을 선택하시겠습니까?<br>"
-										+	"※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_ExbPtK/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다."		
+										+	"※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_TkVwn/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다."
 					}
 					else
 					{
 						ori_confirm_msg = "지정된 배송일 <font color=red><b>"+		
 											$("#dlvyAsgnDtText").text()
 											+"</b></font><br><br>배송일을 확정하시겠습니까?<br><br>"
-											+"※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_ExbPtK/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다."
+											+"※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_TkVwn/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다."
 					}				
 
 					//20230329 정연호 수정. confirm modal 을 이용하여 클릭시 페이지 이동
@@ -514,7 +514,7 @@ body, html {
 				        	else{
 				        		
 				   				
-				        		action_popup.alert(res.rtnMsg.replace(/\./g,".<br>")+"<br>※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_ExbPtK/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다.",
+				        		action_popup.alert(res.rtnMsg.replace(/\./g,".<br>")+"<br>※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_TkVwn/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다.",
 				        			function (res) {
 					        			if (res)
 				        				{
@@ -704,7 +704,7 @@ $(document).ready(function() {
 
 		<div style="position: absolute; right: 15px; bottom: 20px;">
 			<font size=2px>배송일 확정 후 변경요청 : </font><a
-				href='http://pf.kakao.com/_ExbPtK/chat' target='_blank'
+				href='http://pf.kakao.com/_TkVwn/chat' target='_blank'
 				class='btn blue_btn btn_ok' style="border-radius: 5px;">&nbsp;&nbsp;고객센터&nbsp;&nbsp;</a>
 		</div>
 	</div>

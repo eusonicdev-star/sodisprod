@@ -13,11 +13,7 @@ public class MyRequestListener implements ServletRequestListener {
     public void requestInitialized(ServletRequestEvent sre) {
     }
 
-
     @Override
     public void requestDestroyed(ServletRequestEvent sre) {
-        //log.info("!!!요청정보 소멸!!!");
     }
-
-
 }

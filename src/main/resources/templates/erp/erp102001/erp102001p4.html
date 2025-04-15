@@ -86,7 +86,7 @@
 
                 nowSend: function () {	//즉시보내기
                     if (!myComboSendTalkTmp.getSelectedValue()) {
-                        alert("알림톡템플릿을 선택하세요.");
+                        alert("알림톡 템플릿을 선택하세요.");
                         return;
                     }
                     fnObj.searchOpen.loadAlrmTmp("nowSend");
@@ -94,7 +94,7 @@
 
                 bookSend: function () {	//예약보내기
                     if (!myComboSendTalkTmp.getSelectedValue()) {
-                        alert("알림톡템플릿을 선택하세요.");
+                        alert("알림톡 템플릿을 선택하세요.");
                         return;
                     }
                     if ($("#sendDate").val().length != 8) {
@@ -169,7 +169,7 @@
                                             return;
                                         }
                                     } else {
-                                        alert("배송기사 평가(리멤버)는 배송완료상태에서 보낼수 있습니다");
+                                        alert("배송기사 평가(리멤버)는 배송완료 상태에서 보낼수 있습니다");
                                         return;
                                     }
                                 } else {
@@ -187,7 +187,7 @@
                         if (myComboSendTalkTmp.getSelectedValue().toUpperCase() == "ALSYS10") {
                             alert("배송기사 평가(리멤버)는 배송완료이면서 최초발송을 만족 해야합니다.\n이미 발송건이 있어 발송할수 없습니다.");
                         } else {
-                            alert("알림톡을 보낼수없습니다. 템플릿을 선택하세요");
+                            alert("알림톡을 보낼 수 없습니다. 템플릿을 선택하세요");
                         }
                         return;
                     }
@@ -241,20 +241,19 @@
                     resData.smsKind = sendRes.smsKind;
                     resData.msgSms = sendMsgSms;
                     resData.smsSender = sendRes.smsSender;
-                    //resData.smsLmsTit		=	myComboSendTalkTmp.getSelectedText()	;
                     resData.smsOnly = sendRes.smsOnly;
                     resData.userid = sendRes.userid;
-                    if (sendRes.tmplId == "ALSYS01_1"		//배송접수 안내1
+                    if (sendRes.tmplId == ""		//배송접수 안내1
                         || sendRes.tmplId == "ALSYS03_1"		//해피콜 재연락(부재중)1
                         || sendRes.tmplId == "ALSYS04_1"		//배송기사확정1
                         || sendRes.tmplId == "ALSYS02_3_2"		//ERP_배송일 확정 알림(피드백)
 
                     ) {
                         var button1Data = {};
-                        button1Data.name = "상담직원에게 메세지 보내기";
+                        button1Data.name = "상담원에게 메세지 보내기";
                         button1Data.type = "WL";
-                        button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
-                        button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
+                        button1Data.url_mobile = "http://pf.kakao.com/_TkVwn/chat";
+                        button1Data.url_pc = "http://pf.kakao.com/_TkVwn/chat";
                         resData.button1 = button1Data;
                     }
 
@@ -265,8 +264,8 @@
                         var button1Data = {};
                         button1Data.name = "상담원 문의";
                         button1Data.type = "WL";
-                        button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
-                        button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
+                        button1Data.url_mobile = "http://pf.kakao.com/_TkVwn/chat";
+                        button1Data.url_pc = "http://pf.kakao.com/_TkVwn/chat";
                         resData.button1 = button1Data;
                     } else if (
                         //sendRes.tmplId == "ALSYS01_AS1"		//20220404 정연호 주석처리. 위에 새로 as 추가하면서 이부분 사용안함. AS 안내 및 확정1
@@ -275,64 +274,64 @@
                         || sendRes.tmplId == "ALSYS05_1"		//배송시간 안내2
                     ) {
                         var button1Data = {};
-                        button1Data.name = "상담사원에게 메세지 보내기";
+                        button1Data.name = "상담원에게 메세지 보내기";
                         button1Data.type = "WL";
-                        button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
-                        button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
+                        button1Data.url_mobile = "http://pf.kakao.com/_TkVwn/chat";
+                        button1Data.url_pc = "http://pf.kakao.com/_TkVwn/chat";
                         resData.button1 = button1Data;
 
                     } else if (sendRes.tmplId == "ALSYS02_3")	//배송일 안내 및 확정3
                     {
                         resData.msgSms = sendMsgSms + "\n\n배송일 확정 및 변경\n" +
-                            "http://www.alliance1.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
+                            "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
                             "\n\n";
 
                         var button1Data = {};
                         button1Data.name = "배송일 확정 및 변경";
                         button1Data.type = "WL";
-                        button1Data.url_mobile = "http://www.alliance1.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
-                        button1Data.url_pc = "http://www.alliance1.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        button1Data.url_mobile = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        button1Data.url_pc = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
                         resData.button1 = button1Data;
 
                         var button2Data = {};
-                        button2Data.name = "상담직원에게 메세지 보내기";
+                        button2Data.name = "상담원에게 메세지 보내기";
                         button2Data.type = "WL";
-                        button2Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
-                        button2Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
+                        button2Data.url_mobile = "http://pf.kakao.com/_TkVwn/chat";
+                        button2Data.url_pc = "http://pf.kakao.com/_TkVwn/chat";
                         resData.button2 = button2Data;
 
                     } else if (sendRes.tmplId == "ALSYS10")	//배송기사 평가(리멤버)
                     {
                         resData.msgSms = sendMsgSms + "\n\n배송기사 평가하기\n" +
-                            "http://www.alliance1.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId +
+                            "http://tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId +
                             "\n\n";
 
                         var button1Data = {};
                         button1Data.name = "배송기사 평가하기";
                         button1Data.type = "WL";
-                        button1Data.url_mobile = "http://www.alliance1.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
-                        button1Data.url_pc = "http://www.alliance1.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
+                        button1Data.url_mobile = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
+                        button1Data.url_pc = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
                         resData.button1 = button1Data;
                     }
                     //20220308 정연호 추가.얼라이언스 교환 템플릿 2
                     else if (sendRes.tmplId == "al_re_003")	//얼라이언스 교환 템플릿 2
                     {
                         resData.msgSms = sendMsgSms + "\n\n교환일 확정 및 변경\n" +
-                            "http://www.alliance1.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
+                            "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
                             "\n\n";
 
                         var button1Data = {};
                         button1Data.name = "교환일 확정 및 변경";
                         button1Data.type = "WL";
-                        button1Data.url_mobile = "http://www.alliance1.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
-                        button1Data.url_pc = "http://www.alliance1.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        button1Data.url_mobile = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        button1Data.url_pc = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
                         resData.button1 = button1Data;
 
                         var button2Data = {};
-                        button2Data.name = "상담사원에게 메세지 보내기";
+                        button2Data.name = "상담원에게 메세지 보내기";
                         button2Data.type = "WL";
-                        button2Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
-                        button2Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
+                        button2Data.url_mobile = "http://pf.kakao.com/_TkVwn/chat";
+                        button2Data.url_pc = "http://pf.kakao.com/_TkVwn/chat";
                         resData.button2 = button2Data;
 
                     }
