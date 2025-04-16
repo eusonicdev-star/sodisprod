@@ -1,21 +1,18 @@
 package com.sonictms.alsys.commCode.service;
 
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.sonictms.alsys.commCode.entity.CommCodeVO;
 import com.sonictms.alsys.commCode.entity.SendAlrmTalkVO;
 import com.sonictms.alsys.commCode.mapper.CommCodeMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@RequiredArgsConstructor
 @Service
 public class CommCodeService  {
 
-	@Autowired
-	private CommCodeMapper commCodeMapper;
-
+	private final CommCodeMapper commCodeMapper;
 
 	public List<CommCodeVO> comComboList(CommCodeVO commCodeVO) {
 		
@@ -30,7 +27,6 @@ public class CommCodeService  {
 
 	//알람톡 발송 결과를 성공일때만 저장
 	public SendAlrmTalkVO saveAlrmTmpResult(SendAlrmTalkVO sendAlrmTalkVO) {
-		
 		return commCodeMapper.saveAlrmTmpResult(sendAlrmTalkVO);
 	}
 	

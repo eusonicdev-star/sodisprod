@@ -106,7 +106,7 @@ public class Erp102001Controller {
         return erp102001VO;
     }
 
-    // 메인화면 오더정보 변경한것 수정하기
+    // 메인화면 오더정보 변경한 것 수정하기
     @RequestMapping(value = {"erp102001p1Updt"}, method = RequestMethod.POST)
     @ResponseBody
     public Erp102001VO erp102001p1Updt(@RequestBody Erp102001VO erp102001VO) {
@@ -160,11 +160,6 @@ public class Erp102001Controller {
     @ResponseBody
     public Erp102001VO erp101001DlvyCnfm(@RequestBody Erp102001VO erp102001VO) {
         erp102001VO = erp102001Service.erp101001DlvyCnfm(erp102001VO);
-
-        //20220517 정연호 kpp 오더상태값 변경 때문에 값 저장안할려고 - 테스트만하려고 - 강제롤백 추가함
-        //log.info("20220517 정연호 테스트용 저장안하려고 강제롤백발생 : TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()");
-        //TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
         return erp102001VO;
     }
 

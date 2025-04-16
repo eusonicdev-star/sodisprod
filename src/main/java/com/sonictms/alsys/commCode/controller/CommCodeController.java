@@ -295,7 +295,7 @@ public class CommCodeController {
 			}
 
 			vo.get(0).setTblSoMId(sendAlrmTalkVO.get(i).getTblSoMId());
-			vo.get(0).setUserid("alliance");
+			vo.get(0).setUserid("eusonicdev");
 			vo.get(0).setCode(vo.get(0).getCode());
 			vo.get(0).setMessage_type(vo.get(0).getData().getType());
 			vo.get(0).setPhn(vo.get(0).getData().getPhn());
@@ -303,11 +303,8 @@ public class CommCodeController {
 			vo.get(0).setTalkReserveDt(sendAlrmTalkVO.get(i).getTalkReserveDt());
 			vo.get(0).setMsgSms(sendAlrmTalkVO.get(i).getMsgSms());
 			vo.get(0).setSmsLmsTit(sendAlrmTalkVO.get(i).getSmsLmsTit());
-
 			vo.get(0).setTmplId(sendAlrmTalkVO.get(i).getTmplId());
-
 			vo.get(0).setCmplMsgCd(vo.get(0).getMessage());
-
 			vo.get(0).setSaveUser(sendAlrmTalkVO.get(i).getSaveUser());
 
 			SendAlrmTalkVO rtnVO = null;
