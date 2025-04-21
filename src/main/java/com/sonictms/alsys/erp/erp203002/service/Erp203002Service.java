@@ -20,13 +20,13 @@ public class Erp203002Service {
         return list;
     }
 
-    //체크한것들 확정
+    //체크한 것들 확정
     public Erp203002VO erp203002rowCnfm(Erp203002VO erp203002VO) {
         erp203002VO = erp203002Mapper.erp203002rowCnfmCnsl(erp203002VO); //확정/취소 같은 SP
         return erp203002VO;
     }
 
-    //체크한것들 취소
+    //체크한 것들 취소
     public Erp203002VO erp203002rowCnsl(Erp203002VO erp203002VO) {
         erp203002VO = erp203002Mapper.erp203002rowCnfmCnsl(erp203002VO);    //확정/취소 같은 SP
         return erp203002VO;

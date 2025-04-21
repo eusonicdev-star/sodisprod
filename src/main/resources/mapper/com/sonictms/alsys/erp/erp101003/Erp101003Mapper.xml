@@ -31,7 +31,7 @@
     
     
     
-        <!-- 체크한것들 삭제(일괄삭제)  -->
+        <!-- 체크한 것들 삭제(일괄삭제)  -->
 	<select id="erp101003ChkDel"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO"
     															resultType		="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO">
         {
@@ -45,7 +45,7 @@
     </select>
   
   
-        <!-- 체크한것들 변경(일괄변경)  -->
+        <!-- 체크한 것들 변경(일괄변경)  -->
 	<select id="erp101003chkUpdt"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO"
     															resultType		="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO">
         {
@@ -67,7 +67,7 @@
 
     </select>
     
-    <!-- 20211226 정연호 추가.  체크한것들 주문복사  -->
+    <!-- 20211226 정연호 추가.  체크한 것들 주문복사  -->
 	<select id="erp101003chkCopy"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO"
     															resultType		="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO">
         {

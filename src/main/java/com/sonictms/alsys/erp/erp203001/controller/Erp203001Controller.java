@@ -113,7 +113,7 @@ public class Erp203001Controller {
         return erp203001VO;
     }
 
-    // 체크한것들 삭제(일괄삭제)
+    // 체크한 것들 삭제(일괄삭제)
     @RequestMapping(value = {"erp203001DelChk"}, method = RequestMethod.POST)
     @ResponseBody
 

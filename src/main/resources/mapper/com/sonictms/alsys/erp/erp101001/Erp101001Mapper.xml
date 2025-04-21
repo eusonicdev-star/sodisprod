@@ -368,7 +368,7 @@
 		)
 		}
 	</select>
-	<!-- 체크한것들 삭제(일괄삭제) -->
+	<!-- 체크한 것들 삭제(일괄삭제) -->
 	<select id="erp101001ChkDel" statementType="CALLABLE"
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">

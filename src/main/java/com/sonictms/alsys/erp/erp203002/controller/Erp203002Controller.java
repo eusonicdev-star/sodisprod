@@ -33,7 +33,7 @@ public class Erp203002Controller {
         return erp203002Service.erp203002List(erp203002VO);
     }
 
-    // 체크한것들 확정
+    // 체크한 것들 확정
     @RequestMapping(value = {"erp203002rowCnfm"}, method = RequestMethod.POST)
     @ResponseBody
 
@@ -47,7 +47,7 @@ public class Erp203002Controller {
         return erp203002VO;
     }
 
-    // 체크한것들 취소
+    // 체크한 것들 취소
     @RequestMapping(value = {"erp203002rowCnsl"}, method = RequestMethod.POST)
     @ResponseBody
 

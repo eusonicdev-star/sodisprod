@@ -165,7 +165,7 @@
                                         ) {
                                             fnObj.searchOpen.sendAlrmTmp(res);
                                         } else {
-                                            alert("배송기사 평가(리멤버)는\n이미 발송된건," + sendObj.soTypeNm + "유형은 기사평가를 할 수 없습니다.");
+                                            alert("배송기사 평가(리멤버)는\n이미 발송된 건," + sendObj.soTypeNm + "유형은 기사평가를 할 수 없습니다.");
                                             return;
                                         }
                                     } else {
@@ -310,7 +310,7 @@
                         button1Data.name = "배송기사 평가하기";
                         button1Data.type = "WL";
                         button1Data.url_mobile = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
-                        button1Data.url_pc = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
+                        // button1Data.url_pc = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
                         resData.button1 = button1Data;
                     }
                     //20220308 정연호 추가.얼라이언스 교환 템플릿 2

@@ -21,7 +21,7 @@
       }
     </select>
 
-         <!-- 체크한것들 확정/취소     --> 
+         <!-- 체크한 것들 확정/취소     -->
 	<select id="erp203002rowCnfmCnsl"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203002.entity.Erp203002VO"
     															resultType		="com.sonictms.alsys.erp.erp203002.entity.Erp203002VO">
         {

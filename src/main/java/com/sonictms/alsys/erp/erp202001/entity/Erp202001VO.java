@@ -46,7 +46,7 @@ public class Erp202001VO extends commonVO{
 
 	private	String	instCtgr		;		//입력 시공카테고리 코드
 	private	String	instType		;		//입력 시공유형 코드
-	private	String	seatTypeList	;		//왼쪽 그리드 시공권역명 체크한것 리스트
+	private	String	seatTypeList	;		//왼쪽 그리드 시공권역명 체크한 것 리스트
 
 	private	String	capaCnt			;		//생성좌석수
 	

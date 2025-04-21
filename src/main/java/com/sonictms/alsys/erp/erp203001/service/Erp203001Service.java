@@ -51,7 +51,7 @@ public class Erp203001Service {
         return erp203001VO;
     }
 
-    // 체크한것들 삭제(일괄삭제)
+    // 체크한 것들 삭제(일괄삭제)
     public Erp203001VO erp203001DelChk(Erp203001VO erp203001VO) {
         erp203001VO = erp203001Mapper.erp203001DelChk(erp203001VO);
         return erp203001VO;

@@ -49,6 +49,7 @@ public class Erp991003Controller {
 
     public Erp991003VO erp991003p1ComdSave(Erp991003VO erp991003VO) {
         if (erp991003VO.getSaveGubn().equals("INS")) {
+            System.out.println(erp991003VO.getSaveGubn());
             erp991003VO.setUserPw(bCryptPasswordEncoder.encode(erp991003VO.getUserPw())); // 암호를 암호화해서 암호에 넣음
         }
 

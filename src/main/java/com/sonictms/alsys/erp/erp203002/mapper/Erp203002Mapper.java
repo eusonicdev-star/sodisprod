@@ -13,7 +13,7 @@ public interface Erp203002Mapper {
 	List<Erp203002VO> erp203002List( Erp203002VO erp203002VO);	
 	
 	
-	//체크한것들 확정/취소
+	//체크한 것들 확정/취소
 	Erp203002VO erp203002rowCnfmCnsl( Erp203002VO erp90100VO);		
 
 	
@@ -24,7 +24,7 @@ public interface Erp203002Mapper {
 	
 	/*	
 	
-	//체크한것들 삭제(일괄삭제)
+	//체크한 것들 삭제(일괄삭제)
 	Erp203002VO erp203002ChkDel( Erp203002VO erp90100VO);		
 				
 

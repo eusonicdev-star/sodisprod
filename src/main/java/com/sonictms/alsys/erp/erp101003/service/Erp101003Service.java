@@ -25,11 +25,11 @@ public class Erp101003Service {
         return erp101003Mapper.erp101003List(erp101003VO);
     }
 
-    // 체크한것들 삭제(일괄삭제)
+    // 체크한 것들 삭제(일괄삭제)
     public Erp101003VO erp101003ChkDel(Erp101003VO erp101003VO) {
         //20220517 정연호 kpp오더 라면 조회해서 api로 보낼 값 추출하기
         if (erp101003VO.getOutCmpyCd().equals("KPP")) {
-            log.info("체크한것 일괄 삭제 - kpp 오더입니다.");
+            log.info("체크한 것 일괄 삭제 - kpp 오더입니다.");
             ErpCommonVO erpCommonVO = new ErpCommonVO();
             erpCommonVO.setSoNoList(erp101003VO.getSoNo());
             erpCommonVO.setSoStatCd("0000");
@@ -52,11 +52,11 @@ public class Erp101003Service {
         return erp101003VO;
     }
 
-    // 체크한것들 변경(일괄변경)
+    // 체크한 것들 변경(일괄변경)
     public Erp101003VO erp101003chkUpdt(Erp101003VO erp101003VO) {
         //20220517 정연호 kpp오더 라면 조회해서 api로 보낼 값 추출하기
         if (erp101003VO.getOutCmpyCd().equals("KPP") && erp101003VO.getUpdtGubn().equals("1")) {
-            log.info("체크한것 일괄변경 - 주문상태 변경 - kpp 오더입니다.");
+            log.info("체크한 것 일괄변경 - 주문상태 변경 - kpp 오더입니다.");
             ErpCommonVO erpCommonVO = new ErpCommonVO();
             erpCommonVO.setSoNoList(erp101003VO.getSoNo());
             erpCommonVO.setSoStatCd(erp101003VO.getSoStatCd());
@@ -79,7 +79,7 @@ public class Erp101003Service {
         return erp101003VO;
     }
 
-    //20211226 정연호 추가.  체크한것들 주문복사
+    //20211226 정연호 추가.  체크한 것들 주문복사
     public Erp101003VO erp101003chkCopy(Erp101003VO erp101003VO) {
         erp101003VO = erp101003Mapper.erp101003chkCopy(erp101003VO);
         return erp101003VO;

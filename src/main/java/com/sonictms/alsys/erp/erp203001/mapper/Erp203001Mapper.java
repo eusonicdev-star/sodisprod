@@ -27,7 +27,7 @@ public interface Erp203001Mapper {
 	// 그리드에서 순번, 팔렛트, 시공기사 입력한것 저장 또는 수정 하기
 	Erp203001VO erp203001Save(Erp203001VO erp203001VO);
 
-	// 체크한것들 삭제(일괄삭제)
+	// 체크한 것들 삭제(일괄삭제)
 	Erp203001VO erp203001DelChk(Erp203001VO erp203001VO);
 
 }

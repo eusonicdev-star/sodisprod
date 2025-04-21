@@ -151,7 +151,7 @@
 					
 				//취할 조치 없음 버튼 누르면 이 팝업이 오픈됨
 				popup006 : function(){	
-					//20220605 정연호 체크한것이 없으면 오류 메세지
+					//20220605 정연호 체크한 것이 없으면 오류 메세지
 					if(myGrid.getCheckedRows(myGrid.getColIndexById("chk")) == 0)
 					{
 						alert("체크한 값이 없습니다.");
@@ -447,7 +447,7 @@
 			    	});
 					
 					myComboDcCd.attachEvent("onCheck", function(value, text){
-						//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+						//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
 						if(!value){
 							if(myComboDcCd.isChecked(0)){
 				    			var c=0;
@@ -513,7 +513,7 @@
 				    	}
 			    	});
 			    	myComboSoType.attachEvent("onCheck", function(value, text){
-			    		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+			    		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
 						if(!value){
 							if(myComboSoType.isChecked(0)){
 				    			var c=0;
@@ -579,7 +579,7 @@
 				    	}
 			    	});
 			    	myComboSoStat.attachEvent("onCheck", function(value, text){
-			    		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+			    		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
 						if(!value){
 							if(myComboSoStat.isChecked(0)){
 				    			var c=0;
@@ -651,7 +651,7 @@
 			    		}
 			    	});
 			    	myComboInstCapaCtgr.attachEvent("onCheck", function(value, text){
-			    		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+			    		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
 						if(!value){
 							if(myComboInstCapaCtgr.isChecked(0)){
 				    			var c=0;
@@ -726,7 +726,7 @@
 			    	});
 	    			
 	    			myComboMissCloseType.attachEvent("onCheck", function(value, text){
-						if(!value){		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+						if(!value){		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
 							if(myComboMissCloseType.isChecked(0)){
 				    			var c=0;
 				    			for(var i=1;i<myComboMissCloseType.getOptionsCount();i++){

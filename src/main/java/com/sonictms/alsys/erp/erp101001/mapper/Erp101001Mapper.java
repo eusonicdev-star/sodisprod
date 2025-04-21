@@ -54,6 +54,6 @@ public interface Erp101001Mapper {
 	/// 우편번호로 물류센터 찾기
 	Erp101001VO erp101001p1PostCdDcCd(Erp101001VO erp101001VO);
 
-	// 체크한것들 삭제(일괄삭제)
+	// 체크한 것들 삭제(일괄삭제)
 	Erp101001VO erp101001ChkDel(Erp101001VO erp90100VO);
 }

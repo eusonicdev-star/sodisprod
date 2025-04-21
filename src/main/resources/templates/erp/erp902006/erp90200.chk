@@ -116,7 +116,7 @@
 				    				cnt++;
 				    			}
 				    		}
-				    		console.log("체크한것 cnt : " + cnt);
+				    		console.log("체크한 것 cnt : " + cnt);
 				    		
 				    		
 				    		if((mycomboZoneCd.getOptionsCount()-1) == cnt)

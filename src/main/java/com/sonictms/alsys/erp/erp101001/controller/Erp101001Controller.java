@@ -147,7 +147,7 @@ public class Erp101001Controller {
         return erp101001VO;
     }
 
-    // 체크한것들 삭제(일괄삭제)
+    // 체크한 것들 삭제(일괄삭제)
     @PostMapping("erp101001ChkDel")
     @ResponseBody
     public List<Erp101001VO> erp101001ChkDel(@RequestBody List<Erp101001VO> erp101001VO) {

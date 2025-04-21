@@ -342,11 +342,11 @@ public class Erp101001Service {
         return erp101001VO;
     }
 
-    //체크한것들 삭제(일괄삭제)
+    //체크한 것들 삭제(일괄삭제)
     public Erp101001VO erp101001ChkDel(Erp101001VO erp101001VO) {
         //20220517 정연호 kpp오더 라면 조회해서 api로 보낼 값 추출하기
         if (erp101001VO.getOutCmpyCd().equals("KPP")) {
-            log.info("체크한것 일괄삭제 - 주문상태 변경 - kpp 오더입니다.");
+            log.info("체크한 것 일괄삭제 - 주문상태 변경 - kpp 오더입니다.");
             ErpCommonVO erpCommonVO = new ErpCommonVO();
             erpCommonVO.setSoNoList(erp101001VO.getSoNo());
             erpCommonVO.setSoStatCd("0000");        //0000 삭제

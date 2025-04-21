@@ -159,7 +159,7 @@
 					});
 					myComboDcCd.attachEvent("onCheck", function (value, text) {
 
-						if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+						if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
 						{
 							if (myComboDcCd.isChecked(0)) {
 
@@ -393,7 +393,7 @@
 
 
 
-					var ChkCnfmData = get_chk_json(myGrid);	//체크한것만 데이터에 담기
+					var ChkCnfmData = get_chk_json(myGrid);	//체크한 것만 데이터에 담기
 
 					ChkCnfmData.forEach(function (cnfm, index) {				//앞에거 : 그 한줄 한줄, 뒤에꺼 순번
 						cnfm.saveGubn = "CNFM";
@@ -441,7 +441,7 @@
 
 
 
-					var ChkCnfmData = get_chk_json(myGrid);	//체크한것만 데이터에 담기
+					var ChkCnfmData = get_chk_json(myGrid);	//체크한 것만 데이터에 담기
 
 					ChkCnfmData.forEach(function (cnfm, index) {				//앞에거 : 그 한줄 한줄, 뒤에꺼 순번
 						cnfm.saveGubn = "CNSL";
@@ -530,7 +530,7 @@
 								rtnVal = false;
 							}	 */
 
-							//1.그리드 반복돌면서 체크한것이 없으면 에러메세지
+							//1.그리드 반복돌면서 체크한 것이 없으면 에러메세지
 
 							//2.그리드 반복돌면서 모바일전송여부가 Y 를 카운트. 있으면에러, 시공기사고유ID가 없는것 카운트. 없는게 있으면 에러
 
@@ -540,7 +540,7 @@
 								rtnVal = false;
 							}
 
-							var chkCnt = 0;	//체크한것 카운트					0 이면 에러
+							var chkCnt = 0;	//체크한 것 카운트					0 이면 에러
 							var MoYCnt = 0;	//모바일전송이 Y인것 카운트			0보다 크면 에러
 							var userNullCnt = 0;	//시공기사 고유 ID 없는것 카운트 	0보다 크면 에러	
 							myGrid.forEachRow(function (rId) {
@@ -572,7 +572,7 @@
 						}
 
 						if (chkGubn == "rowCnsl") {
-							//1.그리드 반복돌면서 체크한것이 없으면 에러메세지
+							//1.그리드 반복돌면서 체크한 것이 없으면 에러메세지
 
 							//2.그리드 반복돌면서 모바일전송여부가 N 를 카운트. 있으면에러, 미확정 한것을 취소(미확정 상태로 변경) 한다는게 말이 안되니깐 에러다
 
@@ -582,7 +582,7 @@
 								rtnVal = false;
 							}
 
-							var chkCnt = 0;	//체크한것 카운트					0 이면 에러
+							var chkCnt = 0;	//체크한 것 카운트					0 이면 에러
 							var MoNCnt = 0;	//모바일전송이 N인것 카운트			0보다 크면 에러
 							var instStat = 0;	//시공계획상태가 300-모바일전송 이 아닌것 	0보다 크면 에러	 --모바일전송이 아닌것만 확정취소해야함
 
@@ -610,7 +610,7 @@
 								chkValMsg = chkValMsg + chkCnt + "건 중 " + MoNCnt + "건 모바일전송 미완료한 것이 있습니다.\n     ▶미완료건을 미완료상태로 변경할수 없습니다.\n";
 								rtnVal = false;
 							}
-							if (chkCnt != 0 && instStat > 0)		//체크한것이 있고 계획상태가 300이 아닌것이 있을때
+							if (chkCnt != 0 && instStat > 0)		//체크한 것이 있고 계획상태가 300이 아닌것이 있을때
 							{
 								chkValMsg = chkValMsg + chkCnt + "건 중 " + instStat + "건 계획상태가 모바일전송(코드:300) 인것만 취소할수있습니다.\n";
 								rtnVal = false;
@@ -634,7 +634,7 @@
 							});
 							if(chkCnt == 0)
 							{
-								chkValMsg = chkValMsg + "체크한것이 없습니다.\n";
+								chkValMsg = chkValMsg + "체크한 것이 없습니다.\n";
 								rtnVal = false;
 							}
 						} */

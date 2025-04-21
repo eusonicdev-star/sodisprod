@@ -561,10 +561,10 @@
                     //20211226 정연호 추가. 착불비 합계 계산하기
                     $("#mainRcptCost").val(sumMainRcptCost);
                 },
-                //체크한것 삭제(CUD 가 C 면 그냥 로우만 삭제, CUD 가 C 가 아니면 DB에서 읽었다는것-DB에서 삭제 & 로우에서삭제)
+                //체크한 것 삭제(CUD 가 C 면 그냥 로우만 삭제, CUD 가 C 가 아니면 DB에서 읽었다는것-DB에서 삭제 & 로우에서삭제)
                 delRowMyGrid: function () {
 
-                    //체크한것 몇개인지 체크
+                    //체크한 것 몇개인지 체크
                     var chkCnt = 0;
 
                     myGrid.forEachRow(function (chkRowId) {

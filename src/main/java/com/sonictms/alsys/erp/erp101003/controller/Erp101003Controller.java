@@ -38,7 +38,7 @@ public class Erp101003Controller {
         return erp101003Service.erp101003List(erp101003VO);
     }
 
-    // 체크한것들 삭제(일괄삭제)
+    // 체크한 것들 삭제(일괄삭제)
     @ResponseBody
     @PostMapping("erp101003ChkDel")
     public List<Erp101003VO> erp101003ChkDel(@RequestBody List<Erp101003VO> erp101003VO) {
@@ -50,7 +50,7 @@ public class Erp101003Controller {
         return erp101003VO;
     }
 
-    // 체크한것들 변경(일괄변경)
+    // 체크한 것들 변경(일괄변경)
     @ResponseBody
     @PostMapping("erp101003chkUpdt")
     public List<Erp101003VO> erp101003chkUpdt(@RequestBody List<Erp101003VO> erp101003VO) {
@@ -64,7 +64,7 @@ public class Erp101003Controller {
     }
 
 
-    //20211226 정연호 추가.  체크한것들 주문복사
+    //20211226 정연호 추가.  체크한 것들 주문복사
     @ResponseBody
     @PostMapping("erp101003chkCopy")
     public List<Erp101003VO> erp101003chkCopy(@RequestBody List<Erp101003VO> erp101003VO) {

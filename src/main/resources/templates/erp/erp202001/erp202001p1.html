@@ -345,7 +345,7 @@
 
 
 
-                    //왼쪽 시공권역 그리드에서 체크한것이 하나도 없을때
+                    //왼쪽 시공권역 그리드에서 체크한 것이 하나도 없을때
                     var leftChecked=myGrid.getCheckedRows(myGrid.getColIndexById("chk"));
                     if(!leftChecked)
                     {
@@ -353,7 +353,7 @@
                         rtnVal = false;
                     }
 
-                    //오른쪽 시공좌석유형 그리드에서 체크한것이 하나도 없을때
+                    //오른쪽 시공좌석유형 그리드에서 체크한 것이 하나도 없을때
                     var rightChecked=myGrid2.getCheckedRows(myGrid2.getColIndexById("chk"));
                     if(!rightChecked)
                     {
@@ -414,9 +414,9 @@
                     save.append("dtList"		,	myComboClndType.getSelectedValue() == "2" ?	$("#date").val().replace(/-/g,"") :	(myComboClndType.getSelectedValue() == "3" ? 	$("#dateFromTo").val().replace(/\n/g,",").replace(/-/g,"")	:	"")		);
                     save.append("instCtgr"		,	myComboInstCapaCtgr.getSelectedValue()					);		//시공카테고리
                     save.append("instType"		,	myComboInstCapaType.getSelectedValue()					);	//시공유형
-                    save.append("seatTypeList"  ,	seatTypeList											);		//왼쪽 그리드 체크한것 리스트
+                    save.append("seatTypeList"  ,	seatTypeList											);		//왼쪽 그리드 체크한 것 리스트
                     save.append("instZoneType"  ,	myComboZoneType.getSelectedValue()						);	//권역유형
-                    save.append("instZoneList"  ,	instZoneList											);		//오른쪽 그리드 체크한것 리스트
+                    save.append("instZoneList"  ,	instZoneList											);		//오른쪽 그리드 체크한 것 리스트
                     save.append("weekList"  		,	weekDay	);
                     save.append("capaCnt"  		,	$("#crtCapaCnt").val()									);
                     save.append("saveUser"  	,	/*[[${session.tblUserMId}]]*/	);

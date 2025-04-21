@@ -226,7 +226,7 @@
 			    	});
 					myComboDcCd.attachEvent("onCheck", function(value, text){
 
-						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+						if(!value)		//체크를 한 것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
 						{
 							if(myComboDcCd.isChecked(0))
 							{
@@ -318,7 +318,7 @@
 			    	});
 			    	myComboSoType.attachEvent("onCheck", function(value, text){
 
-						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
 						{
 							if(myComboSoType.isChecked(0))
 							{
@@ -408,7 +408,7 @@
 			    	});
 			    	myComboSoStat.attachEvent("onCheck", function(value, text){
 
-						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
 						{
 							if(myComboSoStat.isChecked(0))
 							{
@@ -561,7 +561,7 @@
 			    	});
 			    	myComboInstCapaCtgr.attachEvent("onCheck", function(value, text){
 
-						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
 						{
 							if(myComboInstCapaCtgr.isChecked(0))
 							{
@@ -602,7 +602,7 @@
 				    				cnt++;
 				    			}
 				    		}
-				    		//console.log("체크한것 cnt : " + cnt);
+				    		//console.log("체크한 것 cnt : " + cnt);
 				    		
 				    		
 				    		if((myComboInstCapaCtgr.getOptionsCount()-1) == cnt)
@@ -964,7 +964,7 @@
 				
 
 					
-				chkDel : function() {	//체크한것 일괄삭제 (일괄변경하던 말던 상관없다. 체크한것은 그냥 다 삭제)
+				chkDel : function() {	//체크한 것 일괄삭제 (일괄변경하던 말던 상관없다. 체크한 것은 그냥 다 삭제)
 					//myGrid.clearAll(false);
 	
 					if(!fnObj.searchOpen.searchChkVal.chkVal("chkDel"))
@@ -1045,7 +1045,7 @@
 					//일괄변경의 //공장출고일
 					if($("input[id=chkBoxGiLiftDt]:radio" ).is( ":checked") && $("#chkGiLiftDt").val()){ 
 						//20211119 수정사항.xlsx
-						//공장출고일을 바꾸려면 체크한것들중에 공장출고일이 이미 있을경우 물어본다
+						//공장출고일을 바꾸려면 체크한 것들중에 공장출고일이 이미 있을경우 물어본다
 						var cnt=0;
 						var chkCnt=0;
 						var giLiftDtCnt=0;
@@ -1180,7 +1180,7 @@
 					});
 				},
 				
-				chkUpdt : function() {	//체크한것 일괄변경(table에 저장)
+				chkUpdt : function() {	//체크한 것 일괄변경(table에 저장)
 					if(!fnObj.searchOpen.searchChkVal.chkVal("chkUpdt"))
 					{
 						alert(chkValMsg);
@@ -1191,7 +1191,7 @@
 					//일괄변경의 //공장출고일
 					if($("input[id=chkBoxGiLiftDt]:radio" ).is( ":checked") && $("#chkGiLiftDt").val()){ 
 						//20211119 수정사항.xlsx
-						//공장출고일을 바꾸려면 체크한것들중에 공장출고일이 이미 있을경우 물어본다
+						//공장출고일을 바꾸려면 체크한 것들중에 공장출고일이 이미 있을경우 물어본다
 						var cnt=0;
 						var chkCnt=0;
 						var giLiftDtCnt=0;
@@ -1214,7 +1214,7 @@
 						}
 					}
 					
-					var confirmMsg = "체크한것을 일괄변경 하시겠습니까?";
+					var confirmMsg = "체크한 것을 일괄변경 하시겠습니까?";
 					if(giMsg)
 					{
 						confirmMsg = giMsg + confirmMsg;
@@ -1381,14 +1381,14 @@
 					
 					
 				//20211226 정연호 추가. 주문 복사
-				chkCopy : function() {	//체크한것 주문복사
+				chkCopy : function() {	//체크한 것 주문복사
 					if(!fnObj.searchOpen.searchChkVal.chkVal("chkCopy"))
 					{
 						alert(chkValMsg);
 						return false;
 					}
 					
-					var confirmMsg = "체크한것을 주문복사 하시겠습니까?";
+					var confirmMsg = "체크한 것을 주문복사 하시겠습니까?";
 					
 					if(!confirm(confirmMsg))
 					{
@@ -1508,7 +1508,7 @@
 							});
 							if(chkCnt == 0)
 							{
-								chkValMsg = chkValMsg + "체크한것이 없습니다.\n";
+								chkValMsg = chkValMsg + "체크한 것이 없습니다.\n";
 								rtnVal = false;
 							}
 						}
@@ -1530,7 +1530,7 @@
 							});
 							if(chkUpdtCnt == 0)
 							{
-								chkValMsg = chkValMsg + "체크한것이 없습니다.\n";
+								chkValMsg = chkValMsg + "체크한 것이 없습니다.\n";
 								rtnVal = false;
 							}
 					
@@ -1614,7 +1614,7 @@
 							});
 							if(chkCopyCnt == 0)
 							{
-								chkValMsg = chkValMsg + "체크한것이 없습니다.\n";
+								chkValMsg = chkValMsg + "체크한 것이 없습니다.\n";
 								rtnVal = false;
 							}
 						}
