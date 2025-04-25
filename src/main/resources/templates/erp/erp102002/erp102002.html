@@ -340,7 +340,7 @@
                                     resData.smsKind = "L";		//res[i].smsKind;
                                     resData.msgSms = res[i].alrmTalkTmp
                                     //resData.smsSender = ;
-                                    resData.smsSender = "01032626945";			//res[i].smsSender;	//20230401 정연호. 0315269846을 0315269848 로 변경함
+                                    resData.smsSender = "0315269848";			//res[i].smsSender;	//20230401 정연호. 0315269846을 0315269848 로 변경함
                                     //resData.smsLmsTit = "배송일 확정 및 변경"	;		//res[i].smsLmsTit	;
 
                                     resData.smsOnly = "N";		//res[i].smsOnly	;
@@ -355,8 +355,8 @@
                                         var button1Data = {};
                                         button1Data.name = "상담원에게 메시지 보내기";
                                         button1Data.type = "WL";
-                                        button1Data.url_mobile = "http://pf.kakao.com/_TkVwn/chat";
-                                        button1Data.url_pc = "http://pf.kakao.com/_TkVwn/chat";
+                                        button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
+                                        button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
                                         resData.button1 = button1Data;
                                     }
                                     //20220404 정연호. AS 안내및 확정 3 적용. 그런데 버튼명을 바꿔서 이부분을 새로 추가
@@ -366,18 +366,18 @@
                                         var button1Data = {};
                                         button1Data.name = "상담원에게 메시지 보내기";
                                         button1Data.type = "WL";
-                                        button1Data.url_mobile = "http://pf.kakao.com/_TkVwn/chat";
-                                        button1Data.url_pc = "http://pf.kakao.com/_TkVwn/chat";
+                                        button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
+                                        button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
                                         resData.button1 = button1Data;
                                     } else if (
                                         res[i].tmplid == "ALSYS01_RE1"		//반품일 안내 및 확정1
                                         || res[i].tmplid == "ALSYS05_1"		//배송시간 안내2
                                     ) {
                                         var button1Data = {};
-                                        button1Data.name = "상담원에게 메시지 보내기";
+                                        button1Data.name = "상담사원에게 메세지 보내기";
                                         button1Data.type = "WL";
-                                        button1Data.url_mobile = "http://pf.kakao.com/_TkVwn/chat";
-                                        button1Data.url_pc = "http://pf.kakao.com/_TkVwn/chat";
+                                        button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
+                                        button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
                                         resData.button1 = button1Data;
 
                                     } else if (res[i].tmplid == "ALSYS02_3")	//배송일 안내 및 확정3
@@ -394,10 +394,10 @@
                                         resData.button1 = button1Data;
 
                                         var button2Data = {};
-                                        button2Data.name = "상담원에게 메시지 보내기";
+                                        button2Data.name = "상담직원에게 메세지 보내기";
                                         button2Data.type = "WL";
-                                        button2Data.url_mobile = "http://pf.kakao.com/_TkVwn/chat";
-                                        button2Data.url_pc = "http://pf.kakao.com/_TkVwn/chat";
+                                        button2Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
+                                        button2Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
                                         resData.button2 = button2Data;
 
                                     } else if (sendRes.tmplId == "ALSYS10")	//배송기사 평가(리멤버)
@@ -428,10 +428,10 @@
                                         resData.button1 = button1Data;
 
                                         var button2Data = {};
-                                        button2Data.name = "상담원에게 메시지 보내기";
+                                        button2Data.name = "상담사원에게 메시지 보내기";
                                         button2Data.type = "WL";
-                                        button2Data.url_mobile = "http://pf.kakao.com/_TkVwn/chat";
-                                        button2Data.url_pc = "http://pf.kakao.com/_TkVwn/chat";
+                                        button2Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
+                                        button2Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
                                         resData.button2 = button2Data;
 
                                     }

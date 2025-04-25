@@ -281,7 +281,7 @@ public class CommCodeController {
             }
 
             vo.get(0).setTblSoMId(alrmTalkVO.getTblSoMId());
-            vo.get(0).setUserid("eusonicdev");
+            vo.get(0).setUserid("alliance");
             vo.get(0).setCode(vo.get(0).getCode());
             vo.get(0).setMessage_type(vo.get(0).getData().getType());
             vo.get(0).setPhn(vo.get(0).getData().getPhn());
