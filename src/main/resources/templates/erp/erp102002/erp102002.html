@@ -383,14 +383,14 @@
 									} else if (res[i].tmplid == "ALSYS02_4")	//배송일 안내 및 확정3
                                     {
                                         resData.msgSms = res[i].alrmTalkTmp + "\n\n배송일 확정 및 변경\n" +
-                                            "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + res[i].cmpyCd + "&soNo=" + res[i].soNo +
+                                            "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + res[i].cmpyCd + "&soNo=" + res[i].soNo +
                                             "\n\n";
 
                                         var button1Data = {};
                                         button1Data.name = "배송일 확정 및 변경";
                                         button1Data.type = "WL";
-                                        button1Data.url_mobile = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + res[i].cmpyCd + "&soNo=" + res[i].soNo;
-                                        button1Data.url_pc = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + res[i].cmpyCd + "&soNo=" + res[i].soNo;
+                                        button1Data.url_mobile = "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + res[i].cmpyCd + "&soNo=" + res[i].soNo;
+                                        button1Data.url_pc = "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + res[i].cmpyCd + "&soNo=" + res[i].soNo;
                                         resData.button1 = button1Data;
 
                                         var button2Data = {};
@@ -403,28 +403,28 @@
                                     } else if (sendRes.tmplId == "ALSYS10")	//배송기사 평가(리멤버)
                                     {
                                         resData.msgSms = sendMsgSms + "\n\n배송기사 평가하기\n" +
-                                            "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId +
+                                            "http://tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId +
                                             "\n\n";
 
                                         var button1Data = {};
                                         button1Data.name = "배송기사 평가하기";
                                         button1Data.type = "WL";
-                                        button1Data.url_mobile = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
-                                        button1Data.url_pc = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
+                                        button1Data.url_mobile = "http://tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
+                                        button1Data.url_pc = "http://tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
                                         resData.button1 = button1Data;
                                     }
                                     //20220308 정연호 추가.얼라이언스 교환 템플릿 2
 									else if (sendRes.tmplId == "al_re_004")	//얼라이언스 교환 템플릿 2
                                     {
                                         resData.msgSms = sendMsgSms + "\n\n교환일 확정 및 변경\n" +
-                                            "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
+                                            "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
                                             "\n\n";
 
                                         var button1Data = {};
                                         button1Data.name = "교환일 확정 및 변경";
                                         button1Data.type = "WL";
-                                        button1Data.url_mobile = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
-                                        button1Data.url_pc = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                                        button1Data.url_mobile = "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                                        button1Data.url_pc = "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
                                         resData.button1 = button1Data;
 
                                         var button2Data = {};
