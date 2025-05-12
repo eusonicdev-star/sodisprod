@@ -498,12 +498,10 @@
             var year = now.getFullYear()+"";
             var month = (now.getMonth()+1)+"";
             var date = now.getDate()+"";
-            if(month.length == 1 )
-            {
+			if (month.length == 1) {
                 month = "0"+month;
             }
-            if(date.length == 1 )
-            {
+			if (date.length == 1) {
                 date = "0"+date;
             }
 
@@ -513,26 +511,12 @@
             $("#dateTo").val(today);
             $("#date").val(today);
             myCalendar.loadUserLanguage("ko");
-
-
             window.onresize = function(event) {		//윈도우의 사이즈가 변경했을떄
                 fnObj.gridOpen.setWidth();
                 fnObj.gridOpen.setWidth();
             };
-
-
         });
-
-
-
     </script>
-
-    <style>
-
-
-
-
-    </style>
 </head>
 
 <body>

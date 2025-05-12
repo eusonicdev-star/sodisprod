@@ -308,7 +308,7 @@
                         resData.button1 = button1Data;
                     } else if (
                         //sendRes.tmplId == "ALSYS01_AS1"		//20220404 정연호 주석처리. 위에 새로 as 추가하면서 이부분 사용안함. AS 안내 및 확정1
-                        //||	sendRes.tmplId == "ALSYS01_EXCH1"	//교환 안내 및 확정1		//20220308 정연호 사용한함 변경됨 al_re_003
+                        //||	sendRes.tmplId == "ALSYS01_EXCH1"	//교환 안내 및 확정1		//20220308 정연호 사용한함 변경됨 al_re_004
                         sendRes.tmplId == "ALSYS01_RE1"		//반품일 안내 및 확정1
                         || sendRes.tmplId == "ALSYS05_1"		//배송시간 안내2
                     ) {
@@ -319,7 +319,7 @@
                         button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
                         resData.button1 = button1Data;
 
-                    } else if (sendRes.tmplId == "ALSYS02_3")	//배송일 안내 및 확정3
+                    } else if (sendRes.tmplId == "ALSYS02_4")	//배송일 안내 및 확정3
                     {
                         resData.msgSms = sendMsgSms + "\n\n배송일 확정 및 변경\n" +
                             "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
@@ -328,8 +328,8 @@
                         var button1Data = {};
                         button1Data.name = "배송일 확정 및 변경";
                         button1Data.type = "WL";
-                        button1Data.url_mobile = "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
-                        button1Data.url_pc = "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        button1Data.url_mobile = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        button1Data.url_pc = "http://www.tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
                         resData.button1 = button1Data;
 
                         var button2Data = {};
@@ -355,7 +355,7 @@
                         //sendData.push(resData);
 
                     //20220308 정연호 추가.얼라이언스 교환 템플릿 2
-                    else if (sendRes.tmplId == "al_re_003")	//얼라이언스 교환 템플릿 2
+                    else if (sendRes.tmplId == "al_re_004")	//얼라이언스 교환 템플릿 2
                     {
                         resData.msgSms = sendMsgSms + "\n\n교환일 확정 및 변경\n" +
                             "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
@@ -512,7 +512,7 @@
 
         <div class="search-item">
             <span class="search-label">템플릿</span>
-            <div id="talkTmp" style="width: 170px"></div>
+            <div id="talkTmp" style="width: 250px"></div>
         </div>
 
         <div id="fromTo" class="search-item">

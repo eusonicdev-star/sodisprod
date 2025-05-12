@@ -89,7 +89,7 @@ window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
     alert('화면 오류 메세지 :\n' + errorMsg + '\n파일위치 : ' + url + '\n라인번호 : ' + lineNumber
         + '\n위치 : ' + column + '\n스텍추적 : ' + errorObj);
     $(top.document).find('#loader').hide();
-    return;
+
 }
 
 //그리드의 값을 체크한 것만 json 로 만들기
@@ -121,7 +121,7 @@ function get_chk_json(myGrid) {
         }
 
     }
-    ;
+
     return newArr;
 }
 
@@ -152,7 +152,6 @@ function get_cud_json(myGrid) {
             rowArr = {};
         }
     }
-    ;
     return newArr;
 }
 
@@ -213,7 +212,7 @@ function get_data(myGrid) {
         newArr.push(rowArr) //save save the row data as an element of the array with the data
         rowArr = []; // reset the row data array
     }
-    ;
+
     return newArr;
 }
 
@@ -230,7 +229,7 @@ function get_json(myGrid) {
         newArr.push(rowArr);
         rowArr = {};
     }
-    ;
+
     return newArr;
 }
 
@@ -247,7 +246,7 @@ function get_json_for_excel(myGrid) {
         newArr.push(rowArr);
         rowArr = {};
     }
-    ;
+
     return newArr;
 }
 
@@ -353,7 +352,7 @@ function get_json_res(myGrid, res) {
         newArr.push(rowArr);
         rowArr = {};
     }
-    ;
+
     return newArr;
 }
 
@@ -385,7 +384,7 @@ function get_json_res2(myGrid, res) {
         newArr.push(rowArr);
         rowArr = {};
     }
-    ;
+
 
     return newArr;
 }
@@ -491,10 +490,10 @@ var action_popup = {
     confirm: function (txt, callback) {
         if (txt == null || txt.trim() == "") {
             console.warn("confirm message is empty.");
-            return;
+
         } else if (callback == null || typeof callback != 'function') {
             console.warn("confirm callback is null or not function.");
-            return;
+
         } else {
             $(".type-confirm .btn_ok").on("click", function () {
                 $(this).unbind("click");
@@ -508,7 +507,7 @@ var action_popup = {
     alert: function (txt, callback) {
         if (txt == null || txt.trim() == "") {
             console.warn("alert message is empty.");
-            return;
+
         } else if (callback == null || typeof callback != 'function') {
             console.warn("alert callback is null or not function.");
             this.open("type-alert", txt);

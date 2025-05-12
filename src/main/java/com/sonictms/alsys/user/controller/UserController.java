@@ -3,10 +3,10 @@ package com.sonictms.alsys.user.controller;
 import com.sonictms.alsys.user.entity.Repw;
 import com.sonictms.alsys.user.entity.User;
 import com.sonictms.alsys.user.service.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,28 +22,28 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Slf4j
-@Controller
 @Transactional
+@RequiredArgsConstructor
+@Controller
 public class UserController {
 
-  @Autowired
-  private UserService userService;
+  private final UserService userService;
 
-  @GetMapping(value = { "/" })
+  @GetMapping(value = {"/"})
   public ModelAndView getIndex() {
     ModelAndView modelAndView = new ModelAndView();
     modelAndView.setViewName("user/layout");
     return modelAndView;
   }
 
-  @GetMapping(value = { "login" })
+  @GetMapping(value = {"login"})
   public ModelAndView getLoginPage() {
     ModelAndView modelAndView = new ModelAndView();
     modelAndView.setViewName("user/login");
     return modelAndView;
   }
 
-  @GetMapping(value = { "loginRe" })
+  @GetMapping(value = {"loginRe"})
   public ModelAndView getLoginPageRe() {
     ModelAndView modelAndView = new ModelAndView();
     modelAndView.setViewName("user/loginRe");
@@ -51,7 +51,7 @@ public class UserController {
   }
 
   // 인증문자 페이지
-  @GetMapping(value = { "repw" })
+  @GetMapping(value = {"repw"})
   public ModelAndView getRepwPage() {
     ModelAndView modelAndView = new ModelAndView();
     modelAndView.setViewName("user/repw");
@@ -67,28 +67,12 @@ public class UserController {
 
   // 비밀번호 변경을 위한 인증번호 요청하기
   @SuppressWarnings("unchecked")
-  @RequestMapping(value = { "repwReqSmsByPhoneNo" }, method = RequestMethod.POST)
+  @RequestMapping(value = {"repwReqSmsByPhoneNo"}, method = RequestMethod.POST)
   @ResponseBody
   public Repw repwReqSmsByPhoneNo(Repw param) {
     userService.repwReqSmsByPhoneNo(param);
 
-    JSONArray jsonarr = new JSONArray();
-
-    JSONObject data = new JSONObject();
-
-    data.put("message_type", "at");
-    data.put("phn", param.getPhoneNo());
-    data.put("profile", "a9edf1ad8d55c0b88b089bc48404cfbfb7912037");
-    data.put("reserveDt", "00000000000000");
-    data.put("tmplId", "ALLIANCE_CNFM_NO");
-    data.put("msg", "	얼라이언스 인증번호 안내\r\n" + param.getReqNo() + "\r\n" + "타인에게 노출하지 마세요.");
-    data.put("smsKind", "S");
-    data.put("msgSms", "얼라이언스 인증번호 안내\r\n" + param.getReqNo() + "\r\n" + "타인에게 노출하지 마세요.");
-    data.put("smsSender", "0315269848");      //20230401 정연호. 0315269846 을 0315269848 로 변경 
-    data.put("smsLmsTit", "인증번호");
-    data.put("smsOnly", "N");
-
-    jsonarr.add(data);
+    JSONArray jsonarr = getJsonArray(param);
 
     log.info("모바일 인증번호 알림톡 발송하기 : " + jsonarr.toString());
 
@@ -136,7 +120,7 @@ public class UserController {
       } else if (responseCode == 500) {
         log.info("모바일 인증번호 알림톡 발송하기 응답코드 500 : 서버 에러.");
       } else { // 정상 . 200 응답코드 . 기타 응답코드
-        log.info("모바일 인증번호 알림톡 발송하기 응답코드 "+ responseCode);
+        log.info("모바일 인증번호 알림톡 발송하기 응답코드 " + responseCode);
       }
 
     } catch (IOException ie) {
@@ -151,8 +135,29 @@ public class UserController {
     return param;
   }
 
+  private JSONArray getJsonArray(Repw param) {
+    JSONArray jsonArr = new JSONArray();
+
+    JSONObject data = new JSONObject();
+
+    data.put("message_type", "at");
+    data.put("phn", param.getPhoneNo());
+    data.put("profile", "a9edf1ad8d55c0b88b089bc48404cfbfb7912037");
+    data.put("reserveDt", "00000000000000");
+    data.put("tmplId", "ALLIANCE_CNFM_NO");
+    data.put("msg", "	얼라이언스 인증번호 안내\r\n" + param.getReqNo() + "\r\n" + "타인에게 노출하지 마세요.");
+    data.put("smsKind", "S");
+    data.put("msgSms", "얼라이언스 인증번호 안내\r\n" + param.getReqNo() + "\r\n" + "타인에게 노출하지 마세요.");
+    data.put("smsSender", "0315269848");      //20230401 정연호. 0315269846 을 0315269848 로 변경
+    data.put("smsLmsTit", "인증번호");
+    data.put("smsOnly", "N");
+
+    jsonArr.add(data);
+    return jsonArr;
+  }
+
   // 인증번호를 넣고 인증하기
-  @RequestMapping(value = { "repwSendReqNo" }, method = RequestMethod.POST)
+  @RequestMapping(value = {"repwSendReqNo"}, method = RequestMethod.POST)
   @ResponseBody
   public Repw repwSendReqNo(Repw param) {
     userService.repwSendReqNo(param);
@@ -160,7 +165,7 @@ public class UserController {
   }
 
   // 비밀번호변경하는 페이지 접속
-  @PostMapping(value = { "changePw" })
+  @PostMapping(value = {"changePw"})
   public ModelAndView getChangePw(@Valid Repw repw) {
     ModelAndView modelAndView = new ModelAndView();
     modelAndView.setViewName("user/changePw");
@@ -169,7 +174,7 @@ public class UserController {
   }
 
   // 비밀번호변경하는 작업 수행
-  @RequestMapping(value = { "changePwSend" }, method = RequestMethod.POST)
+  @RequestMapping(value = {"changePwSend"}, method = RequestMethod.POST)
   @ResponseBody
   public Repw changePwSend(Repw param) {
     userService.changePwSend(param);
@@ -177,14 +182,14 @@ public class UserController {
   }
 
   // 모바일비밀번호변경하는 작업 수행
-  @RequestMapping(value = { "mobile/mChangePwSend" }, method = RequestMethod.POST)
+  @RequestMapping(value = {"mobile/mChangePwSend"}, method = RequestMethod.POST)
   @ResponseBody
   public Repw mChangePwSend(@RequestBody Repw param) {
     userService.changePwSend(param);
     return param;
   }
 
-  @GetMapping(value = { "layout" })
+  @GetMapping(value = {"layout"})
   public ModelAndView getLayout(ModelAndView modelAndView) {
     modelAndView.setViewName("user/layout");
     return modelAndView;
@@ -214,7 +219,7 @@ public class UserController {
     User userExists = userService.findUserInfoByLoginId(user);
     if (userExists != null) {
       bindingResult.rejectValue("loginId", "error.loginId",
-          "There is already a user registered with the loginId provided");
+              "There is already a user registered with the loginId provided");
     }
     if (bindingResult.hasErrors()) {
       modelAndView.setViewName("user/registration");
