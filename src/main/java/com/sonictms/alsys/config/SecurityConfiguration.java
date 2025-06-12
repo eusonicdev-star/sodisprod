@@ -139,156 +139,149 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 //.successHandler(loginSuccessHandler())//로그인 성공 후 핸들러 (해당 핸들러를 생성하여 핸들링 해준다.)
                 //.failureHandler(loginFailureHandler())//로그인 실패 후 핸들러 (해당 핸들러를 생성하여 핸들링 해준다.)
 
-                .successHandler(new AuthenticationSuccessHandler() {
-                    @Override
-                    public void onAuthenticationSuccess(HttpServletRequest httpServletRequest,
-                                                        HttpServletResponse response,
+                .successHandler((httpServletRequest, response, authentication) -> {
 
-                                                        Authentication authentication) throws IOException, ServletException {
+                    UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
-                        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+                    //로그인 한 후에 회사코드와 아이디로 사용자 정보 찾아오기
+                    User user = new User();
+                    user.setCmpyCd(userPrincipal.getCmpyCd());
+                    user.setLoginId(userPrincipal.getLoginId());
 
-                        //로그인 한 후에 회사코드와 아이디로 사용자 정보 찾아오기
-                        User user = new User();
-                        user.setCmpyCd(userPrincipal.getCmpyCd());
-                        user.setLoginId(userPrincipal.getLoginId());
-
-                        try {
-                            user = userService.findUserInfoByLoginId(user);
-                        } catch (Exception e) {
-                            //e.printStackTrace();
-                            response.sendRedirect("/loginRe?error=userInfo");    //로그인 에러시 페이지 이동
-                            return;
-                        }
-
-                        //사용자 아이디로 사용자 정보를 찾을수 없거나 ERP시스템 권한이 없으면 에러페이지로 이동
-                        if (user == null || user.getUserGrntCd() == null || user.getUserGrntCd().equals("")) {
-                            response.sendRedirect("/loginRe?error=userInfo");    //로그인 에러시 페이지 이동
-                            return;
-                        }
-
-                        //세션리스너 가서 로그인 한 해당 아이디로 먼저 세션에 있는지 찾아서 만약있으면 그 세션 지워버림 (기존에 로그인되었던 사용자는 이제 뭔가 하려하면 튕기고 로그인하라고 나옴)
-
-                        //log.info("before create sessions.size() : " + SessionListener.sessions.size());
-                        //회사코드 비교
-                        log.info("회사코드 비교"); //0505
-                        log.info("     L> httpServletRequest cmpyCd : " + httpServletRequest.getParameter("cmpyCd")); //0505
-                        log.info("     L> userPrincipal      cmpyCd : " + userPrincipal.getCmpyCd()); //0505
-                        log.info("     L> sessionChkKey             : " + userPrincipal.getCmpyCd() + "_erp_" + user.getId()); //0505//20220213 정연호 _erp_ 추가. 모바일과 구별을 위해
-
-                        //로그인 화면에서 선택한 그 회사코드와 로그인 사용자 아이디로 검색한 그 회사코드가 같으면 (같은회사면) 기존에 사용자 ID 에
-                        if (!httpServletRequest.getParameter("cmpyCd").equals(userPrincipal.getCmpyCd())) {
-                            log.info("회사코드 비교 결과 다름"); //0505
-                            response.sendRedirect("/loginRe?error=cmpyCd");    //로그인 에러시 페이지 이동
-                            return;
-                        } else {
-                            log.info("회사코드 비교 결과 같음"); //0505
-                            log.info("     L> 사용자구분 코드 : " + user.getUserGrdCd()); //0505
-                            log.info("     L> 사용자구분 명칭 : " + user.getUserGrdNm()); //0505
-                            if (!user.getUserGrdCd().equals("9000")) {
-                                //만들어진 세션을 비교하고 같은게 있으면 세션삭제
-                                SessionListener.getSessionidCheck("sessionChkKey", userPrincipal.getCmpyCd() + "_erp_" + user.getId());    //20220213 정연호 _erp_ 추가. 모바일과 구별을 위해
-                                //그 후 그냥 로그인을 진행 (이전 사용자는 튕겨나감)
-                            }
-                        }
-
-                        User userH = new User();
-                        userH.setTblUserMId(Integer.toString(user.getId()));
-                        userH.setCmpyCd(userPrincipal.getCmpyCd());
-                        userH.setUserId(userPrincipal.getLoginId());
-                        userH.setCnntSysCd("ERP");
-                        userH.setCnntIp(etRemoteAddr(httpServletRequest));
-                        userH.setSaveUser(userPrincipal.getLoginId());
-
-                        User loginH = new User();
-                        try {
-                            loginH = userService.loginHistorySave(userH);
-                        } catch (Exception e) {
-                            //e.printStackTrace();
-                            response.sendRedirect("/loginRe?error=loginH");    //로그인 에러시 페이지 이동
-                            return;
-                        }
-
-                        HttpSession session = httpServletRequest.getSession();
-
-                        session.setAttribute("userIp", etRemoteAddr(httpServletRequest));    //사용자가 쓰는 피씨의 아이피 가져오기
-                        session.setAttribute("userId", userPrincipal.getLoginId());
-                        session.setAttribute("userNm", userPrincipal.getLoginName());
-                        session.setAttribute("userName", user.getCmpyCd() + "_erp_" + user.getId() + "_" + userPrincipal.getLoginName());    //20220315 정연호 추가
-                        session.setAttribute("isEnabled", userPrincipal.isEnabled());
-                        session.setAttribute("role", userPrincipal.getRole());
-                        session.setAttribute("useYn", user.getUseYn());
-                        session.setAttribute("cmpyCd", user.getCmpyCd());
-                        session.setAttribute("cmpyNm", user.getCmpyNm());
-
-                        //ERP권한
-                        session.setAttribute("userGrntCd", user.getUserGrntCd());
-                        session.setAttribute("userGrntNm", user.getUserGrntNm());
-
-                        //모바일 시스템 권한
-                        session.setAttribute("mobileGrntCd", user.getMobileGrntCd());
-                        session.setAttribute("mobileGrntNm", user.getMobileGrntNm());
-
-                        //사용자 구분
-                        session.setAttribute("userGrdCd", user.getUserGrdCd());
-                        session.setAttribute("userGrdNm", user.getUserGrdNm());
-
-                        //소속화주
-                        session.setAttribute("agntCd", user.getAgntCd());
-                        session.setAttribute("agntNm", user.getAgntNm());
-
-                        //소속지점
-                        session.setAttribute("dcCd", user.getDcCd());
-                        session.setAttribute("dcNm", user.getDcNm());
-
-                        session.setAttribute("system", "erp");
-                        session.setAttribute("tblUserMId", user.getId());
-
-                        //세션고유구별용 키
-                        session.setAttribute("sessionChkKey", user.getCmpyCd() + "_erp_" + user.getId());
-
-                        log.info("Login success - Session ID: " + session.getId());
-                        log.info("Login success - User IP: " + session.getAttribute("userIp"));
-                        log.info("Login success - User ID: " + session.getAttribute("userId"));
-                        log.info("Login success - User Name: " + session.getAttribute("userNm"));
-                        log.info("Login success - Company Code: " + session.getAttribute("cmpyCd"));
-                        log.info("Login success - Company Name: " + session.getAttribute("cmpyNm"));
-
-                        log.info("session.getId()                       : " + session.getId());        //브라우져 쿠키에 있는 세션아이디 JSSEIONID
-                        log.info("session.getAttribute(\"userIp\")        : " + session.getAttribute("userIp"));
-                        log.info("session.getAttribute(\"userId\")        : " + session.getAttribute("userId"));
-                        log.info("session.getAttribute(\"userNm\")        : " + session.getAttribute("userNm"));
-                        log.info("session.getAttribute(\"isEnabled\")     : " + session.getAttribute("isEnabled"));
-                        log.info("session.getAttribute(\"userRole\")      : " + session.getAttribute("role"));
-                        log.info("session.getAttribute(\"useYn\")         : " + session.getAttribute("useYn"));
-                        log.info("session.getAttribute(\"cmpyCd\")        : " + session.getAttribute("cmpyCd"));
-                        log.info("session.getAttribute(\"cmpyNm\")        : " + session.getAttribute("cmpyNm"));
-                        log.info("session.getAttribute(\"userGrntCd\")    : " + session.getAttribute("userGrntCd"));
-                        log.info("session.getAttribute(\"userGrntNm\")    : " + session.getAttribute("userGrntNm"));
-
-                        log.info("session.getAttribute(\"mobileGrntCd\")  : " + session.getAttribute("mobileGrntCd"));
-                        log.info("session.getAttribute(\"mobileGrntNm\")  : " + session.getAttribute("mobileGrntNm"));
-
-                        log.info("session.getAttribute(\"userGrdCd\")     : " + session.getAttribute("userGrdCd"));
-                        log.info("session.getAttribute(\"userGrdNm\")     : " + session.getAttribute("userGrdNm"));
-                        //소속화주
-                        log.info("session.getAttribute(\"agntCd\")        : " + session.getAttribute("agntCd"));
-                        log.info("session.getAttribute(\"agntNm\")        : " + session.getAttribute("agntNm"));
-                        //소속지점
-                        log.info("session.getAttribute(\"dcCd\")          : " + session.getAttribute("dcCd"));
-                        log.info("session.getAttribute(\"dcNm\")          : " + session.getAttribute("dcNm"));
-
-                        log.info("session.getAttribute(\"system\")        : " + session.getAttribute("system"));
-                        log.info("session.getAttribute(\"tblUserMId\")    : " + session.getAttribute("tblUserMId"));
-
-                        log.info("session.getAttribute(\"sessionChkKey\") : " + session.getAttribute("sessionChkKey"));
-
-
-                        SessionListener.sessions.put(session.getId(), session);    //위에서 구한 세션아이디(JSESSIONID) 와 세션정보를 담는다
-                        log.info("create sessions.size() : " + SessionListener.sessions.size());        //현재 살아있는 세션이 뭔지 구한다
-
-                        response.sendRedirect("/layout");    //로그인 성공시 페이지 이동
+                    try {
+                        user = userService.findUserInfoByLoginId(user);
+                    } catch (Exception e) {
+                        //e.printStackTrace();
+                        response.sendRedirect("/loginRe?error=userInfo");    //로그인 에러시 페이지 이동
+                        return;
                     }
+
+                    //사용자 아이디로 사용자 정보를 찾을수 없거나 ERP시스템 권한이 없으면 에러페이지로 이동
+                    if (user == null || user.getUserGrntCd() == null || user.getUserGrntCd().equals("")) {
+                        response.sendRedirect("/loginRe?error=userInfo");    //로그인 에러시 페이지 이동
+                        return;
+                    }
+
+                    //세션리스너 가서 로그인 한 해당 아이디로 먼저 세션에 있는지 찾아서 만약있으면 그 세션 지워버림 (기존에 로그인되었던 사용자는 이제 뭔가 하려하면 튕기고 로그인하라고 나옴)
+
+                    //회사코드 비교
+                    log.info("회사코드 비교"); //0505
+                    log.info("     L> httpServletRequest cmpyCd : " + httpServletRequest.getParameter("cmpyCd")); //0505
+                    log.info("     L> userPrincipal      cmpyCd : " + userPrincipal.getCmpyCd()); //0505
+                    log.info("     L> sessionChkKey             : " + userPrincipal.getCmpyCd() + "_erp_" + user.getId()); //0505//20220213 정연호 _erp_ 추가. 모바일과 구별을 위해
+
+                    //로그인 화면에서 선택한 그 회사코드와 로그인 사용자 아이디로 검색한 그 회사코드가 같으면 (같은회사면) 기존에 사용자 ID 에
+                    if (!httpServletRequest.getParameter("cmpyCd").equals(userPrincipal.getCmpyCd())) {
+                        log.info("회사코드 비교 결과 다름"); //0505
+                        response.sendRedirect("/loginRe?error=cmpyCd");    //로그인 에러시 페이지 이동
+                        return;
+                    } else {
+                        log.info("회사코드 비교 결과 같음"); //0505
+                        log.info("     L> 사용자구분 코드 : " + user.getUserGrdCd()); //0505
+                        log.info("     L> 사용자구분 명칭 : " + user.getUserGrdNm()); //0505
+                        if (!user.getUserGrdCd().equals("9000")) {
+                            //만들어진 세션을 비교하고 같은게 있으면 세션삭제
+                            SessionListener.getSessionidCheck("sessionChkKey", userPrincipal.getCmpyCd() + "_erp_" + user.getId());    //20220213 정연호 _erp_ 추가. 모바일과 구별을 위해
+                            //그 후 그냥 로그인을 진행 (이전 사용자는 튕겨나감)
+                        }
+                    }
+
+                    User userH = new User();
+                    userH.setTblUserMId(Integer.toString(user.getId()));
+                    userH.setCmpyCd(userPrincipal.getCmpyCd());
+                    userH.setUserId(userPrincipal.getLoginId());
+                    userH.setCnntSysCd("ERP");
+                    userH.setCnntIp(etRemoteAddr(httpServletRequest));
+                    userH.setSaveUser(userPrincipal.getLoginId());
+
+                    User loginH = new User();
+                    try {
+                        loginH = userService.loginHistorySave(userH);
+                    } catch (Exception e) {
+                        //e.printStackTrace();
+                        response.sendRedirect("/loginRe?error=loginH");    //로그인 에러시 페이지 이동
+                        return;
+                    }
+
+                    HttpSession session = httpServletRequest.getSession();
+
+                    session.setAttribute("userIp", etRemoteAddr(httpServletRequest));    //사용자가 쓰는 피씨의 아이피 가져오기
+                    session.setAttribute("userId", userPrincipal.getLoginId());
+                    session.setAttribute("userNm", userPrincipal.getLoginName());
+                    session.setAttribute("userName", user.getCmpyCd() + "_erp_" + user.getId() + "_" + userPrincipal.getLoginName());    //20220315 정연호 추가
+                    session.setAttribute("isEnabled", userPrincipal.isEnabled());
+                    session.setAttribute("role", userPrincipal.getRole());
+                    session.setAttribute("useYn", user.getUseYn());
+                    session.setAttribute("cmpyCd", user.getCmpyCd());
+                    session.setAttribute("cmpyNm", user.getCmpyNm());
+
+                    //ERP권한
+                    session.setAttribute("userGrntCd", user.getUserGrntCd());
+                    session.setAttribute("userGrntNm", user.getUserGrntNm());
+
+                    //모바일 시스템 권한
+                    session.setAttribute("mobileGrntCd", user.getMobileGrntCd());
+                    session.setAttribute("mobileGrntNm", user.getMobileGrntNm());
+
+                    //사용자 구분
+                    session.setAttribute("userGrdCd", user.getUserGrdCd());
+                    session.setAttribute("userGrdNm", user.getUserGrdNm());
+
+                    //소속화주
+                    session.setAttribute("agntCd", user.getAgntCd());
+                    session.setAttribute("agntNm", user.getAgntNm());
+
+                    //소속지점
+                    session.setAttribute("dcCd", user.getDcCd());
+                    session.setAttribute("dcNm", user.getDcNm());
+
+                    session.setAttribute("system", "erp");
+                    session.setAttribute("tblUserMId", user.getId());
+
+                    //세션고유구별용 키
+                    session.setAttribute("sessionChkKey", user.getCmpyCd() + "_erp_" + user.getId());
+
+                    log.info("Login success - Session ID: " + session.getId());
+                    log.info("Login success - User IP: " + session.getAttribute("userIp"));
+                    log.info("Login success - User ID: " + session.getAttribute("userId"));
+                    log.info("Login success - User Name: " + session.getAttribute("userNm"));
+                    log.info("Login success - Company Code: " + session.getAttribute("cmpyCd"));
+                    log.info("Login success - Company Name: " + session.getAttribute("cmpyNm"));
+
+                    log.info("session.getId()                       : " + session.getId());        //브라우져 쿠키에 있는 세션아이디 JSSEIONID
+                    log.info("session.getAttribute(\"userIp\")        : " + session.getAttribute("userIp"));
+                    log.info("session.getAttribute(\"userId\")        : " + session.getAttribute("userId"));
+                    log.info("session.getAttribute(\"userNm\")        : " + session.getAttribute("userNm"));
+                    log.info("session.getAttribute(\"isEnabled\")     : " + session.getAttribute("isEnabled"));
+                    log.info("session.getAttribute(\"userRole\")      : " + session.getAttribute("role"));
+                    log.info("session.getAttribute(\"useYn\")         : " + session.getAttribute("useYn"));
+                    log.info("session.getAttribute(\"cmpyCd\")        : " + session.getAttribute("cmpyCd"));
+                    log.info("session.getAttribute(\"cmpyNm\")        : " + session.getAttribute("cmpyNm"));
+                    log.info("session.getAttribute(\"userGrntCd\")    : " + session.getAttribute("userGrntCd"));
+                    log.info("session.getAttribute(\"userGrntNm\")    : " + session.getAttribute("userGrntNm"));
+
+                    log.info("session.getAttribute(\"mobileGrntCd\")  : " + session.getAttribute("mobileGrntCd"));
+                    log.info("session.getAttribute(\"mobileGrntNm\")  : " + session.getAttribute("mobileGrntNm"));
+
+                    log.info("session.getAttribute(\"userGrdCd\")     : " + session.getAttribute("userGrdCd"));
+                    log.info("session.getAttribute(\"userGrdNm\")     : " + session.getAttribute("userGrdNm"));
+                    //소속화주
+                    log.info("session.getAttribute(\"agntCd\")        : " + session.getAttribute("agntCd"));
+                    log.info("session.getAttribute(\"agntNm\")        : " + session.getAttribute("agntNm"));
+                    //소속지점
+                    log.info("session.getAttribute(\"dcCd\")          : " + session.getAttribute("dcCd"));
+                    log.info("session.getAttribute(\"dcNm\")          : " + session.getAttribute("dcNm"));
+
+                    log.info("session.getAttribute(\"system\")        : " + session.getAttribute("system"));
+                    log.info("session.getAttribute(\"tblUserMId\")    : " + session.getAttribute("tblUserMId"));
+
+                    log.info("session.getAttribute(\"sessionChkKey\") : " + session.getAttribute("sessionChkKey"));
+
+
+                    SessionListener.sessions.put(session.getId(), session);    //위에서 구한 세션아이디(JSESSIONID) 와 세션정보를 담는다
+                    log.info("create sessions.size() : " + SessionListener.sessions.size());        //현재 살아있는 세션이 뭔지 구한다
+
+                    response.sendRedirect("/layout");    //로그인 성공시 페이지 이동
                 })//로그인 성공 후 핸들러
 
                 .failureHandler(new AuthenticationFailureHandler() {

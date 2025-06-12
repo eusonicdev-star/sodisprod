@@ -1335,27 +1335,27 @@
 
                     $("#imgA01").removeAttr("href");
 
-                    $("#imgSrc01").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#imgSrc01").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#imgA02").removeAttr("href");
-                    $("#imgSrc02").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#imgSrc02").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
 
                     $("#imgA03").removeAttr("href");
-                    $("#imgSrc03").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#imgSrc03").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
 
                     $("#imgA04").removeAttr("href");
-                    $("#imgSrc04").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#imgSrc04").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#imgA05").removeAttr("href");
-                    $("#imgSrc05").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#imgSrc05").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#imgA06").removeAttr("href");
-                    $("#imgSrc06").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#imgSrc06").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#signImgA").removeAttr("href");
-                    $("#signImgSrc").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#signImgSrc").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
 
                     //미마감사유
@@ -1365,25 +1365,25 @@
                     $("#xitem05Memo").val("");
 
                     $("#ximgA01").removeAttr("href");
-                    $("#ximgSrc01").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#ximgSrc01").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#ximgA02").removeAttr("href");
-                    $("#ximgSrc02").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#ximgSrc02").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#ximgA03").removeAttr("href");
-                    $("#ximgSrc03").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#ximgSrc03").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#ximgA04").removeAttr("href");
-                    $("#ximgSrc04").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#ximgSrc04").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#ximgA05").removeAttr("href");
-                    $("#ximgSrc05").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#ximgSrc05").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#ximgA06").removeAttr("href");
-                    $("#ximgSrc06").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#ximgSrc06").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#xsignImgA").removeAttr("href");
-                    $("#xsignImgSrc").attr("src", "https://eugenesonic.cdn1.cafe24.com/noimage.png");
+					$("#xsignImgSrc").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $.ajax({
                         url: "/erp102001soDlvyInfoData",
@@ -1399,7 +1399,7 @@
                             if (res) {	//리턴값이 있음
                                 $("#dlvyInfoDiv").show();
 
-                                var url = "https://sonictmsdevimg.cafe24.com/alliance/";
+								var url = "https://sodisprodimg.cafe24.com/alliance/";
                                 //var	url = "http://145.122.24.222/alliance/";
                                 $("#instPlanDt").val(res.instPlanDt);
                                 $("#instDt").val(res.instDt);
@@ -2753,7 +2753,7 @@
 				<span class="item-head" style="width: 100px;">주소</span>
 				<span class="item-data" style="width: 40%">
 					<input type="text" id="findAdd_roadAddress" name="findAdd_roadAddress"
-                           style="width: 100%"
+						   style="width: 450px"
                            readOnly placeholder="주소">
 				</span>
             <!-- 100 byte -->
@@ -2765,18 +2765,18 @@
 				</span>
             <!-- 200 byte -->
 			</span>
-        <span class="cell" style="width: 100%; display: block;">
+		<span class="cell" style="width: 100%;">
 				<span class="item-head" style="width: 100px;">배송 메세지</span>
-				<span class="item-data" style="width: 80%">
+				<span class="item-data" style="width: 80%; height: 70px;">
 					<textarea id="dlvyRqstMsg" name="dlvyRqstMsg" style="width: 100%; height: 100%;"
                               onKeyUp="fnChkByte(this,'500')">
 					</textarea>
 				</span>
             <!-- 500 byte -->
 			</span>
-        <span class="cell" style="width: 100%; display: block;">
+		<span class="cell" style="width: 100%;">
 				<span class="item-head" style="width: 100px;">고객사 메세지</span>
-				<span class="item-data" style="width: 80%">
+				<span class="item-data" style="width: 80%; height: 70px;">
 					<textarea id="custSpclTxt" name="custSpclTxt" style="width: 100%; height: 100%;"
                               onKeyUp="javascript:fnChkByte(this,'500')"></textarea>
 				</span>
@@ -2948,6 +2948,7 @@
 						<span class="item-head" style="width: 90px; height: 20px; text-align: left;">최근 알림톡</span>
 					</span>
                 <br>
+				<div style="margin-bottom: 35px">
                 <span class="cell" style="width: 250px; ">
 						<span class="item-head" style="width: 80px;">템플릿</span>
 						<span class="item-data" style="width: 170px;">
@@ -2966,19 +2967,20 @@
 							<input type="text" id="talkTime" style="width: 150px; height: 20px;" disabled></input>
 						</span>
 					</span>
-                <br>
-
+				</div>
                 <span class="cell" style="width: 100%;">
+					<label for="talkTxt">
 						<span class="item-head" style="width: 80px; text-align: right;">
 							알림톡 내역
 						</span>
-						<span class="item-data" style="width: 100%; text-align: left;">
-							<textArea id="talkTxt" style="width: 95%; height: 40px; " disabled></textArea>
-						</span>
+					</label>
+					<span class="item-data" style="width: 100%; text-align: left;">
+						<textArea id="talkTxt" style="width: 95%; height: 100px; " disabled></textArea>
+					</span>
 					</span>
                 <br>
                 <br>
-                <span class="cell" id="happyCallSendBtn" style="float: right;">
+				<span class="cell" id="happyCallSendBtn" style="float: right; margin-top: 20px;">
 						<span class="item-data" style="padding: 0 20px 0 20px;">
 							<button class="action-button warning" onclick="fnObj.winOpen.talkSendPopup();">
 								<i class="fa fa-commenting-o fa-lg" aria-hidden="true">&nbsp;</i>
@@ -3121,14 +3123,14 @@
 						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>고객서명</center></span>
 					</span>
 				</span>
-            <span id="dlvyStat9999Img" class="cell" style="width: 100%; display:none;">
+			<span id="dlvyStat9999Img" class="cell" style="width: 100%; height: 100%; display:none;">
 					<span class="item-head" style="width: 80px;float:left;">시공사진</span>
-					<span class="item-data" style="width: 100%;">
+					<span class="item-data" style="width: 100%; height: 100%;">
 						<!-- <span style="float:left;">전면사진</span> -->
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
 								<a id="imgA01" href="" target="_blank">
-									<img id="imgSrc01" src="https://eugenesonic.cdn1.cafe24.com/noimage.png"
+									<img id="imgSrc01" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
 							</div>
@@ -3138,7 +3140,7 @@
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
 								<a id="imgA02" target="_blank">		<!-- style="display: none;" -->
-									<img id="imgSrc02" src="https://eugenesonic.cdn1.cafe24.com/noimage.png"
+									<img id="imgSrc02" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
 							</div>
@@ -3148,7 +3150,7 @@
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
 								<a id="imgA03" target="_blank">		<!-- style="display: none;" -->
-									<img id="imgSrc03" src="https://eugenesonic.cdn1.cafe24.com/noimage.png"
+									<img id="imgSrc03" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
 							</div>
@@ -3158,7 +3160,7 @@
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
 								<a id="imgA04" target="_blank">		<!-- style="display: none;" -->
-									<img id="imgSrc04" src="https://eugenesonic.cdn1.cafe24.com/noimage.png"
+									<img id="imgSrc04" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
 							</div>
@@ -3167,7 +3169,7 @@
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
 								<a id="imgA05" target="_blank">		<!-- style="display: none;" -->
-									<img id="imgSrc05" src="https://eugenesonic.cdn1.cafe24.com/noimage.png"
+									<img id="imgSrc05" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
 							</div>
@@ -3176,7 +3178,7 @@
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
 								<a id="imgA06" target="_blank">		<!-- style="display: none;" -->
-									<img id="imgSrc06" src="https://eugenesonic.cdn1.cafe24.com/noimage.png"
+									<img id="imgSrc06" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
 							</div>
@@ -3185,7 +3187,7 @@
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
 								<a id="signImgA" target="_blank">		<!-- style="display: none;" -->
-									<img id="signImgSrc" src="https://eugenesonic.cdn1.cafe24.com/noimage.png"
+									<img id="signImgSrc" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
 							</div>
@@ -3218,31 +3220,29 @@
 				</span>
             <!-- 여기는 상태가 배송완료이냐 미마감이냐 에따라서 내용보여주는부분.끝 -->
             <!-- 여기부터가 사진보여주는 곳 -->
-            <br><br>
-            <span id="dlvyStat8000ImgTitle" class="cell" style="width: 100%; border: 0px solid black;display:none;">
 
-					<span class="item-head" style="width: 80px;float:left;"></span>
-					<span class="item-data" style="width: 93%;">
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>전체사진</center></span>
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>하자부위</center></span>
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>하자부위(근접)</center></span>
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>개포상태(박스)</center></span>
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>시리얼번호</center></span>
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>기타</center></span>
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>고객서명</center></span>
-					</span>
+			<div>
+				<span id="dlvyStat8000ImgTitle" class="cell" style="width: 100%; height: 100%; display:none;">
+
+						<span class="item-head" style="width: 80px;float:left;"></span>
+						<span class="item-data" style="width: 93%;">
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>전체사진</center></span>
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>하자부위</center></span>
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>하자부위(근접)</center></span>
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>개포상태(박스)</center></span>
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>시리얼번호</center></span>
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>기타</center></span>
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>고객서명</center></span>
+						</span>
 				</span>
-            <span id="dlvyStat8000Img" class="cell" style="width: 100%; border: 0px solid black;display:none;">
-
-
-
+				<div id="dlvyStat8000Img" class="cell" style="width: 100%; height: 100%; display:none;">
 					<span class="item-head" style="width: 80px;float:left;">시공사진</span>
 
-					<span class="item-data" style="width: 100%;">
+					<span class="item-data" style="width: 100%; height: 100%;">
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
 								<a id="ximgA01" target="_blank" style="display: none;">
-									<img id="ximgSrc01" src="https://eugenesonic.cdn1.cafe24.com/noimage.png"
+									<img id="ximgSrc01" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
 							</div>
@@ -3250,7 +3250,7 @@
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
 								<a id="ximgA02" target="_blank">	<!-- style="display: none;" -->
-									<img id="ximgSrc02" src="https://eugenesonic.cdn1.cafe24.com/noimage.png"
+									<img id="ximgSrc02" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
 							</div>
@@ -3258,7 +3258,7 @@
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
 								<a id="ximgA03" target="_blank">		<!-- style="display: none;" -->
-									<img id="ximgSrc03" src="https://eugenesonic.cdn1.cafe24.com/noimage.png"
+									<img id="ximgSrc03" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
 							</div>
@@ -3268,7 +3268,7 @@
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
 								<a id="ximgA04" target="_blank">		<!-- style="display: none;" -->
-									<img id="ximgSrc04" src="https://eugenesonic.cdn1.cafe24.com/noimage.png"
+									<img id="ximgSrc04" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
 							</div>
@@ -3277,7 +3277,7 @@
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
 								<a id="ximgA05" target="_blank">		<!-- style="display: none;" -->
-									<img id="ximgSrc05" src="https://eugenesonic.cdn1.cafe24.com/noimage.png"
+									<img id="ximgSrc05" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
 							</div>
@@ -3285,8 +3285,8 @@
 						</figure>
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
-								<a id="ximgA06" target="_blank">		<!-- style="display: none;" -->
-									<img id="ximgSrc06" src="https://eugenesonic.cdn1.cafe24.com/noimage.png"
+								<a id="ximgA06" target="_blank">
+									<img id="ximgSrc06" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
 							</div>
@@ -3294,21 +3294,18 @@
 						</figure>
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
-								<a id="xsignImgA" href="" target="_blank">		<!-- style="display: none;" -->
+								<a id="xsignImgA" href="" target="_blank">		
 									<img id="xsignImgSrc" src="" class="the-image" width="20%" height="20%"
-                                         loading="lazy"/>
+										 loading="lazy" alt=""/>
 								</a>
 							</div>
 
 						</figure>
 
 					</span>
-				</span>
+				</div>
         </div>
-
-
     </div>
-
 </div>
 </div>
 </body>

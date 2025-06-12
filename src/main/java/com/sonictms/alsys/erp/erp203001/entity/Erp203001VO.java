@@ -1,7 +1,6 @@
 package com.sonictms.alsys.erp.erp203001.entity;
 
 import com.sonictms.alsys.common.entity.commonVO;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -86,9 +85,9 @@ public class Erp203001VO extends commonVO{
 	private	String	restYn;	//휴가우무
 	
 	private	String	hldyYn;	//휴가유무
-	
 	private	String	mobileTranYn;	//모바일 전송 여부
 	
 	//20211231 정연호. 품목 리스트 추가
-	private	String	prodList;	
+	private String prodList;
+	private String soList;
 }

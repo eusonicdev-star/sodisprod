@@ -11,6 +11,10 @@
     font-size: 1.2rem;
 }
 
+.popup-header-button {
+    display: flex;
+}
+
 .sub {
     font-size: 1rem;
 }
@@ -35,6 +39,11 @@
     margin: 3px;
 }
 
+.memo {
+    height: 100px;
+    width: 200px;
+}
+
 .search-label {
     font-weight: 500;
     font-size: 14px;
@@ -57,6 +66,10 @@
     min-width: 0;
     max-width: 100%;
     box-sizing: border-box;
+}
+
+.search-input .width {
+    width: 200px;
 }
 
 .search-input[readonly] {

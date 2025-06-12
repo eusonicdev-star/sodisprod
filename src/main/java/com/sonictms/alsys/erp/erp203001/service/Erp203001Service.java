@@ -18,6 +18,7 @@ public class Erp203001Service {
     // 그리드 불러오기
     public List<Erp203001VO> erp203001List(Erp203001VO erp203001VO) {
         List<Erp203001VO> list = erp203001Mapper.erp203001List(erp203001VO);
+        System.out.println("erp203001VO = " + erp203001VO.getSoList());
         return list;
     }
 

@@ -1842,11 +1842,6 @@
                                class="action-button primary">
 					</span>
 
-<!--					<span class="item-data">-->
-<!--						<input id="btnSave" type="button" onclick="fnObj.winOpen.soTypePopup()" value="등록"-->
-<!--                               class="action-button success">-->
-<!--					</span>-->
-
 					<span class="item-data">
 						<input id="btnExcelDown" type="button" onclick="excelDn();" value="엑셀 다운로드"
                                class="action-button">
@@ -1948,7 +1943,7 @@
 					</span>
 				</span>
 
-            <span class="cell">
+			<span class="cell al-order">
 					<span class="item-head">AL 오더</span>
 					<span class="item-data">
 						<textArea id="soNoList"></textArea>
@@ -1992,9 +1987,7 @@
 
             <span class="cell">
 					<span class="item-head">
-						<input type="radio" id="chkBoxSoStat" name="chkBox">
-						주문상태
-                        </input>
+						<input type="radio" id="chkBoxSoStat" name="chkBox"><label for="chkBoxSoStat">주문상태</label>
 					</span>
 					<span class="item-data">
 						<div id="chkSoStat"></div>
@@ -2004,9 +1997,7 @@
             <!--  20211226 정연호 추가. 일괄변경에 주문유형 추가 -->
             <span class="cell">
 					<span class="item-head">
-						<input type="radio" id="chkBoxSoType" name="chkBox">
-						주문유형
-                        </input>
+						<input type="radio" id="chkBoxSoType" name="chkBox"><label for="chkBoxSoType">주문유형</label>
 					</span>
 					<span class="item-data">
 						<div id="chkSoType"></div>
@@ -2015,22 +2006,19 @@
 
             <span class="cell">
 					<span class="item-head">
-						<input type="radio" id="chkBoxDcCd" name="chkBox">
-						물류센터
-                        </input>
-					</span>
+						<input type="radio" id="chkBoxDcCd" name="chkBox"><label for="chkBoxDcCd">물류센터</label>
+                        </span>
 					<span class="item-data">
 						<div id="chkDcCd"></div>
 					</span>
 				</span>
             <span class="cell">
 					<span class="item-head">
-						<input type="radio" id="chkBoxDlvyCnfmDt" name="chkBox">
-						배송확정일
-                        </input>
+						<input type="radio" id="chkBoxDlvyCnfmDt" name="chkBox"><label
+							for="chkBoxDlvyCnfmDt">배송확정일</label>
 					</span>
 					<span class="item-data">
-						<input type="text" id="chkDlvyCnfmDt" disabled>
+						<input style="width: 100px" type="text" id="chkDlvyCnfmDt" disabled>
 						<i id="chkDlvyCnfmDtIcon" class="fa fa-calendar fa-lg" aria-hidden="true"
                            style="display: none;"></i>
 					</span>
@@ -2041,12 +2029,11 @@
             <!--  공장출고일, 배송상태, 배송완료일 -->
             <span class="cell">
 					<span class="item-head">
-						<input type="radio" id="chkBoxGiLiftDt" name="chkBox">
-						공장출고일
-                        </input>
+						<input type="radio" id="chkBoxGiLiftDt" name="chkBox"><label for="chkBoxGiLiftDt">공장출고일</label>
 					</span>
 					<span class="item-data">
-						<input type="text" id="chkGiLiftDt" disabled>
+						<label for="chkGiLiftDt"></label><input style="width: 100px;" type="text" id="chkGiLiftDt"
+																disabled>
 						<i id="chkGiLiftDtIcon" class="fa fa-calendar fa-lg" aria-hidden="true"
                            style="display: none;"></i>
 					</span>
@@ -2054,9 +2041,8 @@
 				</span>
             <span class="cell">
 					<span class="item-head">
-						<input type="radio" id="chkBoxDlvyStatCd" name="chkBox">
-						배송상태
-                        </input>
+						<input type="radio" id="chkBoxDlvyStatCd" name="chkBox"><label
+							for="chkBoxDlvyStatCd">배송상태</label>
 					</span>
 					<span class="item-data">
 						<div id="chkDlvyStatCd"></div>
@@ -2064,12 +2050,11 @@
 				</span>
             <span class="cell">
 					<span class="item-head">
-						<input type="radio" id="chkBoxDlvyCmplDt" name="chkBox">
-						배송완료일
-                        </input>
+						<input type="radio" id="chkBoxDlvyCmplDt" name="chkBox"><label
+							for="chkBoxDlvyCmplDt">배송완료일</label>
 					</span>
 					<span class="item-data">
-						<input type="text" id="chkDlvyCmplDt" disabled>
+						<input style="width: 100px" type="text" id="chkDlvyCmplDt" disabled>
 						<i id="chkDlvyCmplDtIcon" class="fa fa-calendar fa-lg" aria-hidden="true"
                            style="display: none;"></i>
 					</span>
@@ -2080,9 +2065,8 @@
             <!-- 20211112 정연호 추가 -->
             <span class="cell">
 					<span class="item-head">
-						<input type="radio" id="chkBoxDlvyRqstMsg" name="chkBox">
-						배송요청메세지
-                        </input>
+						<input type="radio" id="chkBoxDlvyRqstMsg" name="chkBox"><label
+							for="chkBoxDlvyRqstMsg">배송요청메세지</label>
 					</span>
 					<span class="item-data">
 						<input type="text" id="chkDlvyRqstMsg" disabled onKeyUp="javascript:fnChkByte(this,'100')">

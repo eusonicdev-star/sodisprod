@@ -1,21 +1,41 @@
-<!DOCTYPE HTML>
-<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html
+        xmlns:sec="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymeleaf.org"
+>
 <head>
     <title>주문 수정 팝업 (erp101001p3)</title>
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo="/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <link rel="stylesheet" type="text/css" href="/css/common.css"/>
     <link rel="stylesheet" type="text/css" href="/css/popup.css"/>
-    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
-    <link rel="stylesheet" type="text/css"
-          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css"
+    />
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css"
+    />
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css"
+    />
 
-    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script
+            src="https://cdn.dhtmlx.com/edge/dhtmlx.js"
+            crossorigin="anonymous"
+    ></script>
+    <script
+            src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous"
+    ></script>
     <script type="text/javascript" src="/js/common.js"></script>
     <script type="text/javascript" src="/js/commCode.js"></script>
 
@@ -224,7 +244,7 @@
                             myGrid.cellById((rowNo + 1), myGrid.getColIndexById("instCost")).setValue(rtnObj[i].commDesc);
                             myGrid.cellById((rowNo + 1), myGrid.getColIndexById("instCostOrg")).setValue(rtnObj[i].commDesc);
 
-                            //20211226 정연호추가. 착불비는 기본 0원
+                            //20211226 정연호 추가. 착불비는 기본 0원
                             myGrid.cellById((rowNo + 1), myGrid.getColIndexById("rcptCost")).setValue("0");
 
                             myGrid.selectCell(myGrid.getRowIndex(firstRow), myGrid.getColIndexById("qty"), true, true);
@@ -1524,32 +1544,42 @@
 </head>
 <body>
 <div id="mainDiv">
-    <div id="searchDiv"><!-- 검색조건영역 -->
+    <div id="searchDiv">
+        <!-- 검색조건영역 -->
         <div id="inputDiv1">
             <div class="popup-header-container">
                 <div class="popup-header-text">
                     <span>오더정보</span>
                 </div>
-                <div>
-					<span class="item-data">
-						<input id="btnUpdate" class="action-button primary" type="button"
-                               onclick="fnObj.searchOpen.updtData();" value="수정">
-					</span>
+                <div class="button-container">
+              <span class="item-data">
+                <input
+                        id="btnUpdate"
+                        class="action-button primary"
+                        type="button"
+                        onclick="fnObj.searchOpen.updtData();"
+                        value="수정"
+                />
+              </span>
                     <span class="item-data">
-						<input id="btnClose" class="action-button danger" type="button"
-                               onclick="parent.myWins.window('erp101001p3').close();"
-                               value="닫기">
-					</span>
+                <input
+                        id="btnClose"
+                        class="action-button danger"
+                        type="button"
+                        onclick="parent.myWins.window('erp101001p3').close();"
+                        value="닫기"
+                />
+              </span>
                 </div>
             </div>
 
             <div class="search-container">
-				<span class="cell" style="display: none">
-					회사
-                    <span class="item-data">
-					    <div id="cmpyCd"></div>
-				    </span>
-				</span>
+            <span class="cell" style="display: none">
+              회사
+              <span class="item-data">
+                <div id="cmpyCd"></div>
+              </span>
+            </span>
 
                 <div class="search-item">
                     <span class="search-label">등록일</span>
@@ -1558,13 +1588,25 @@
 
                 <div class="search-item">
                     <span class="search-label">화주사</span>
-                    <input type="text" id="srchName" class="search-input"
-                           onkeyup="fnObj.keyOpen.enterKey('srchName');"/>
-                    <i id="srchIcon" class="fa fa-search search-icon" aria-hidden="true"
-                       onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text');"></i>
-                    <input type="text" id="srchCode" class="search-input" readonly>
-                    <i id="delIcon" class="fa fa-minus-circle" aria-hidden="true"
-                       onclick="fnObj.searchOpen.delSrchCode()"></i>
+                    <input
+                            type="text"
+                            id="srchName"
+                            class="search-input"
+                            onkeyup="fnObj.keyOpen.enterKey('srchName');"
+                    />
+                    <i
+                            id="srchIcon"
+                            class="fa fa-search search-icon"
+                            aria-hidden="true"
+                            onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text');"
+                    ></i>
+                    <input type="text" id="srchCode" class="search-input" readonly/>
+                    <i
+                            id="delIcon"
+                            class="fa fa-minus-circle"
+                            aria-hidden="true"
+                            onclick="fnObj.searchOpen.delSrchCode()"
+                    ></i>
                 </div>
 
                 <div class="search-item">
@@ -1584,53 +1626,90 @@
 
                 <div class="search-item">
                     <span class="search-label">고객사 주문번호</span>
-                    <input type="text" id="refSoNo" class="search-input" onKeyUp="javascript:fnChkByte(this,'100')">
+                    <input
+                            type="text"
+                            id="refSoNo"
+                            class="search-input"
+                            onKeyUp="javascript:fnChkByte(this,'100')"
+                    />
                 </div>
 
                 <div class="search-item">
                     <span class="search-label">쇼핑몰</span>
-                    <input type="text" id="mallCd" class="search-input" onKeyUp="javascript:fnChkByte(this,'50')">
+                    <input
+                            type="text"
+                            id="mallCd"
+                            class="search-input"
+                            onKeyUp="javascript:fnChkByte(this,'50')"
+                    />
                 </div>
 
                 <div class="search-item">
                     <span class="search-label">브랜드</span>
-                    <input type="text" id="brand" class="search-input" onKeyUp="javascript:fnChkByte(this,'50')">
+                    <input
+                            type="text"
+                            id="brand"
+                            class="search-input"
+                            onKeyUp="javascript:fnChkByte(this,'50')"
+                    />
                 </div>
 
                 <div class="search-item">
                     <span class="search-label">고객접수일</span>
-                    <input type="text" id="rcptDt" class="search-input">
-                    <i id="rcptDtIcon" class="fa fa-calendar search-icon" aria-hidden="true"></i>
+                    <input type="text" id="rcptDt" class="search-input"/>
+                    <i
+                            id="rcptDtIcon"
+                            class="fa fa-calendar search-icon"
+                            aria-hidden="true"
+                    ></i>
                 </div>
 
                 <div class="search-item">
                     <span class="search-label">고객배송요청일</span>
-                    <input type="text" id="rqstDt" class="search-input">
-                    <i id="rqstDtIcon" class="fa fa-calendar search-icon" aria-hidden="true"></i>
+                    <input type="text" id="rqstDt" class="search-input"/>
+                    <i
+                            id="rqstDtIcon"
+                            class="fa fa-calendar search-icon"
+                            aria-hidden="true"
+                    ></i>
                 </div>
 
                 <div class="search-item">
                     <span class="search-label">배송확정일</span>
-                    <input type="text" id="dlvyCnfmDt" class="search-input" readonly>
-                    <i id="dlvyCnfmDtIcon" class="fa fa-calendar search-icon" aria-hidden="true"></i>
+                    <input
+                            type="text"
+                            id="dlvyCnfmDt"
+                            class="search-input"
+                            readonly
+                    />
+                    <i
+                            id="dlvyCnfmDtIcon"
+                            class="fa fa-calendar search-icon"
+                            aria-hidden="true"
+                    ></i>
                 </div>
 
                 <div class="search-item">
                     <span class="search-label">시공 카테고리</span>
-                    <input type="text" class="search-input" id="instCapaCtgr" disabled>
+                    <input
+                            type="text"
+                            class="search-input"
+                            id="instCapaCtgr"
+                            disabled
+                    />
                 </div>
 
                 <div class="search-item" style="display: none">
                     <span class="search-label">타업체</span>
-                    <input type="text" class="search-input" id="outCmpyCd" disabled>
+                    <input type="text" class="search-input" id="outCmpyCd" disabled/>
                 </div>
 
-                <span class="cell" style="display:none;">
-					<span class="item-head">tblSoMId</span>
-					<span class="item-data">
-                        <input type="text" id="tblSoMId" disabled>
-                    </span>
-				</span>
+                <span class="cell" style="display: none">
+              <span class="item-head">tblSoMId</span>
+              <span class="item-data">
+                <input type="text" id="tblSoMId" disabled/>
+              </span>
+            </span>
             </div>
 
             <div class="popup-header-container">
@@ -1642,52 +1721,105 @@
             <div class="search-container">
                 <div class="search-item">
                     <span class="search-label">고객명 수취인</span>
-                    <input type="text" id="acptEr" class="search-input" onKeyUp="javascript:fnChkByte(this,'50')">
+                    <input
+                            type="text"
+                            id="acptEr"
+                            class="search-input"
+                            onKeyUp="javascript:fnChkByte(this,'50')"
+                    />
                 </div>
 
                 <div class="search-item">
                     <span class="search-label">주문자</span>
-                    <input type="text" id="ordrEr" class="search-input" onKeyUp="fnChkByte(this,'50')">
+                    <input
+                            type="text"
+                            id="ordrEr"
+                            class="search-input"
+                            onKeyUp="fnChkByte(this,'50')"
+                    />
                 </div>
 
                 <div class="search-item">
-                    <span class="search-label"><b>연락처<span class="stress">*</span></b></span>
-                    <input type="text" id="acptTel2" class="search-input"
-                           oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-                           onKeyUp="fnChkByte(this,'20')">
+              <span class="search-label"
+              ><b>연락처<span class="stress">*</span></b></span
+              >
+                    <input
+                            type="text"
+                            id="acptTel2"
+                            class="search-input"
+                            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                            onKeyUp="fnChkByte(this,'20')"
+                    />
                 </div>
 
                 <div class="search-item">
                     <span class="search-label">연락처(보조)</span>
-                    <input type="text" id="acptTel1" class="search-input"
-                           oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-                           onKeyUp="fnChkByte(this,'20')">
+                    <input
+                            type="text"
+                            id="acptTel1"
+                            class="search-input"
+                            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                            onKeyUp="fnChkByte(this,'20')"
+                    />
                 </div>
 
                 <div class="search-item">
                     <span class="search-label">착불비 합계</span>
-                    <input type="text" id="mainRcptCost" style="width: 122px; height: 20px;" disabled
-                           oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');">
+                    <input
+                            type="text"
+                            id="mainRcptCost"
+                            style="width: 122px; height: 20px"
+                            disabled
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"
+                    />
                 </div>
 
                 <div class="search-item">
-                    <span class="search-label"><b>우편번호<span class="stress">*</span></b></span>
-                    <input type="text" id="findAdd_postcode" class="search-input" readonly>
-                    <i class="fa fa-search search-icon" onclick="findAdd_execDaumPostcode();"></i>
-                    <div id="layer"
-                         style="display: none; position: fixed; overflow: hidden; z-index: 1; -webkit-overflow-scrolling: touch;">
-                        <img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer"
-                             style="cursor: pointer; position: absolute; right: -3px; top: -3px; z-index: 1"
-                             onclick="closeDaumPostcode()" alt="닫기 버튼">
+              <span class="search-label"
+              ><b>우편번호<span class="stress">*</span></b></span
+              >
+                    <input
+                            type="text"
+                            id="findAdd_postcode"
+                            class="search-input"
+                            readonly
+                    />
+                    <i
+                            class="fa fa-search search-icon"
+                            onclick="findAdd_execDaumPostcode();"
+                    ></i>
+                    <div
+                            id="layer"
+                            style="
+                  display: none;
+                  position: fixed;
+                  overflow: hidden;
+                  z-index: 1;
+                  -webkit-overflow-scrolling: touch;
+                "
+                    >
+                        <img
+                                src="//t1.daumcdn.net/postcode/resource/images/close.png"
+                                id="btnCloseLayer"
+                                style="
+                    cursor: pointer;
+                    position: absolute;
+                    right: -3px;
+                    top: -3px;
+                    z-index: 1;
+                  "
+                                onclick="closeDaumPostcode()"
+                                alt="닫기 버튼"
+                        />
                     </div>
                     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
                     <script>
                         // 우편번호 찾기 화면을 넣을 element
-                        var element_layer = document.getElementById('layer');
+                        var element_layer = document.getElementById("layer");
 
                         function closeDaumPostcode() {
                             // iframe을 넣은 element를 안보이게 한다.
-                            element_layer.style.display = 'none';
+                            element_layer.style.display = "none";
                         }
 
                         function findAdd_execDaumPostcode() {
@@ -1696,52 +1828,61 @@
                                     // 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
                                     // 각 주소의 노출 규칙에 따라 주소를 조합한다.
                                     // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
-                                    var addr = ''; // 주소 변수
-                                    var extraAddr = ''; // 참고항목 변수
+                                    var addr = ""; // 주소 변수
+                                    var extraAddr = ""; // 참고항목 변수
                                     //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
-                                    if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                                    if (data.userSelectedType === "R") {
+                                        // 사용자가 도로명 주소를 선택했을 경우
                                         addr = data.roadAddress;
-                                    } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                                    } else {
+                                        // 사용자가 지번 주소를 선택했을 경우(J)
                                         //20220225 정연호 지번을 사용하게 주석을 해제 해줌
                                         addr = data.jibunAddress;
                                     }
 
                                     // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
-                                    if (data.userSelectedType === 'R') {
+                                    if (data.userSelectedType === "R") {
                                         // 법정동명이 있을 경우 추가한다. (법정리는 제외)
                                         // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
-                                        if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                                        if (
+                                            data.bname !== "" &&
+                                            /[동|로|가]$/g.test(data.bname)
+                                        ) {
                                             extraAddr += data.bname;
                                         }
                                         // 건물명이 있고, 공동주택일 경우 추가한다.		--original source
                                         /*  if(data.buildingName !== '' && data.apartment === 'Y'){
-                                             extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                                         } */
+                                                             extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                                                         } */
 
                                         //20211192 정연호 변경. 아파트 이런거 상관없이 빌딩이름이 있으면 추가함
-                                        if (data.buildingName !== '') {
-                                            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                                        if (data.buildingName !== "") {
+                                            extraAddr +=
+                                                extraAddr !== ""
+                                                    ? ", " + data.buildingName
+                                                    : data.buildingName;
                                         }
 
                                         // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
-                                        if (extraAddr !== '') {
-                                            extraAddr = ' (' + extraAddr + ')';
+                                        if (extraAddr !== "") {
+                                            extraAddr = " (" + extraAddr + ")";
                                         }
                                         // 조합된 참고항목을 해당 필드에 넣는다.
                                         //document.getElementById("findAdd_extraAddress").value = extraAddr;
-
                                     } else {
                                         //document.getElementById("findAdd_extraAddress").value = '';
                                     }
 
                                     // 우편번호와 주소 정보를 해당 필드에 넣는다.
-                                    document.getElementById('findAdd_postcode').value = data.zonecode;
+                                    document.getElementById("findAdd_postcode").value =
+                                        data.zonecode;
 
-                                    fnObj.searchOpen.postChange(data.zonecode);	//20211031 정연호 추가
+                                    fnObj.searchOpen.postChange(data.zonecode); //20211031 정연호 추가
 
                                     //20220225 정연호 수정. 지번 도로명 둘다쓰니깐 addr 이 들어가게 수정해줌
                                     //document.getElementById("findAdd_roadAddress").value = data.roadAddress  + ' ' + extraAddr;
-                                    document.getElementById("findAdd_roadAddress").value = addr + ' ' + extraAddr;
+                                    document.getElementById("findAdd_roadAddress").value =
+                                        addr + " " + extraAddr;
 
                                     //document.getElementById("findAdd_jibunAddress").value = data.jibunAddress;
                                     // 커서를 상세주소 필드로 이동한다.
@@ -1749,15 +1890,15 @@
 
                                     // iframe을 넣은 element를 안보이게 한다.
                                     // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
-                                    element_layer.style.display = 'none';
+                                    element_layer.style.display = "none";
                                 },
-                                width: '100%',
-                                height: '100%',
-                                maxSuggestItems: 5
+                                width: "100%",
+                                height: "100%",
+                                maxSuggestItems: 5,
                             }).embed(element_layer);
 
                             // iframe을 넣은 element를 보이게 한다.
-                            element_layer.style.display = 'block';
+                            element_layer.style.display = "block";
 
                             // iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
                             initLayerPosition();
@@ -1772,25 +1913,51 @@
                             var borderWidth = 1; //샘플에서 사용하는 border의 두께
 
                             // 위에서 선언한 값들을 실제 element에 넣는다.
-                            element_layer.style.width = width + 'px';
-                            element_layer.style.height = height + 'px';
-                            element_layer.style.border = borderWidth + 'px solid';
+                            element_layer.style.width = width + "px";
+                            element_layer.style.height = height + "px";
+                            element_layer.style.border = borderWidth + "px solid";
                             // 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
-                            element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width) / 2 - borderWidth) + 'px';
-                            element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height) / 4 - borderWidth) + 'px';
+                            element_layer.style.left =
+                                ((window.innerWidth ||
+                                        document.documentElement.clientWidth) -
+                                    width) /
+                                2 -
+                                borderWidth +
+                                "px";
+                            element_layer.style.top =
+                                ((window.innerHeight ||
+                                        document.documentElement.clientHeight) -
+                                    height) /
+                                4 -
+                                borderWidth +
+                                "px";
                         }
                     </script>
                 </div>
 
                 <div class="search-item full-width">
-                    <span class="search-label"><b>주소<span class="stress">*</span></b></span>
-                    <input type="text" id="findAdd_roadAddress" class="search-input" readonly placeholder="주소">
+              <span class="search-label"
+              ><b>주소<span class="stress">*</span></b></span
+              >
+                    <input
+                            type="text"
+                            id="findAdd_roadAddress"
+                            class="search-input width"
+                            readonly
+                            placeholder="주소"
+                            style="width: 450px"
+                    />
                 </div>
 
                 <!-- 상세주소 -->
                 <div class="search-item full-width">
                     <span class="search-label">상세주소</span>
-                    <input type="text" id="findAdd_detailAddress" class="search-input" onKeyUp="fnChkByte(this,'200')">
+                    <input
+                            type="text"
+                            id="findAdd_detailAddress"
+                            class="search-input"
+                            onKeyUp="fnChkByte(this,'200')"
+                    />
                 </div>
 
                 <div class="search-item">
@@ -1801,13 +1968,21 @@
                 <!-- 배송메시지 -->
                 <div class="search-item full-width">
                     <span class="search-label">배송메시지</span>
-                    <textarea id="dlvyRqstMsg" class="textarea" onKeyUp="fnChkByte(this,'500')"></textarea>
+                    <textarea
+                            id="dlvyRqstMsg"
+                            class="textarea"
+                            onKeyUp="fnChkByte(this,'500')"
+                    ></textarea>
                 </div>
 
                 <!-- 고객사 메시지 -->
                 <div class="search-item full-width">
                     <span class="search-label">고객사메시지</span>
-                    <textarea id="custSpclTxt" class="textarea" onKeyUp="fnChkByte(this,'500')"></textarea>
+                    <textarea
+                            id="custSpclTxt"
+                            class="textarea"
+                            onKeyUp="fnChkByte(this,'500')"
+                    ></textarea>
                 </div>
             </div>
 
@@ -1825,38 +2000,55 @@
 
                 <div class="search-item">
                     <span class="search-label">착불비</span>
-                    <input type="text" id="rcptCost" class="search-input"
-                           oninput="this.value=this.value.replace(/[^0-9]/g, '')">
+                    <input
+                            type="text"
+                            id="rcptCost"
+                            class="search-input"
+                            oninput="this.value=this.value.replace(/[^0-9]/g, '')"
+                    />
                 </div>
 
                 <div class="search-item">
                     <span class="search-label">통행료</span>
-                    <input type="text" id="passCost" class="search-input"
-                           oninput="this.value=this.value.replace(/[^0-9]/g, '')">
+                    <input
+                            type="text"
+                            id="passCost"
+                            class="search-input"
+                            oninput="this.value=this.value.replace(/[^0-9]/g, '')"
+                    />
                 </div>
 
                 <div class="search-item">
                     <span class="search-label">시공비</span>
-                    <input type="text" id="instCost" class="search-input" disabled>
+                    <input type="text" id="instCost" class="search-input" disabled/>
                 </div>
             </div>
 
             <div class="popup-header-container">
                 <div class="popup-header-text sub">
-                    <span>제품정보
-                        <i id="rowPlusBtn" class="fa fa-plus-circle product-icon"
-                           onclick="fnObj.gridOpen.addRowMyGrid();">
-
-                        </i>
-                        <i id="rowMinusBtn" class="fa fa-minus-circle product-icon"
-                           onclick="fnObj.gridOpen.delRowMyGrid();">
-                        </i>
-                    </span>
+              <span
+              >제품정보
+                <i
+                        id="rowPlusBtn"
+                        class="fa fa-plus-circle product-icon"
+                        onclick="fnObj.gridOpen.addRowMyGrid();"
+                >
+                </i>
+                <i
+                        id="rowMinusBtn"
+                        class="fa fa-minus-circle product-icon"
+                        onclick="fnObj.gridOpen.delRowMyGrid();"
+                >
+                </i>
+              </span>
                 </div>
             </div>
 
-            <div id="grid" style="width:100%;height:240px;"></div>
-            <div id="grid2" style="width:100%;height:200px;display:none;"></div>
+            <div id="grid" style="width: 100%; height: 240px"></div>
+            <div
+                    id="grid2"
+                    style="width: 100%; height: 200px; display: none"
+            ></div>
         </div>
     </div>
 </div>

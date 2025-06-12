@@ -44,7 +44,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
 
     <script th:inline="javascript">
-      var pagePerRow =	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/
+      var pagePerRow = /*[[${@environment.getProperty('common.html.pagePerRow')}]]*/ 10;
       var myWins;
       var myGrid;
 
@@ -1219,24 +1219,16 @@
 
           $("#dateFrom").val(today);
           $("#dateTo").val(today);
-
           myCalendar.loadUserLanguage("ko");
-
           fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
           fnObj.comboOpen.comboDtType();	//달력유형콤보 바인드
-
           fnObj.comboOpen.comboDcCd();	//물류센터 콤보
           fnObj.comboOpen.comboSoType();	//주문유형
           fnObj.comboOpen.comboSoStat();	//주문상태
-
-
           //20220106 정연호 추가 시공카테고리 체크박스 콤보 추가
           fnObj.comboOpen.comboInstCapaCtgr();	//시공카테고리콤보 바인드
           //20220106 정연호 추가 시공카테고리 체크박스 콤보 추가. 끝
-
-
           fnObj.gridOpen.grid()
-
           window.onresize = function (event) {		//윈도우의 사이즈가 변경했을떄
               fnObj.gridOpen.setWidth();
               fnObj.gridOpen.setWidth();
@@ -1273,7 +1265,7 @@
       <div id="searchDiv">
         <div id="btnDiv1">
           <span class="title-container">
-            <span class="item-head title-text"> 주문등록</span>
+            <span class="item-head title-text">주문등록</span>
             <span class="sub-title">erp101001</span>
           </span>
           <span class="btn-container">
@@ -1434,7 +1426,7 @@
             </span>
           </span>
 
-          <span class="cell">
+          <span class="cell al-order">
             <span class="item-head">AL 오더</span>
             <span class="item-data">
               <textarea

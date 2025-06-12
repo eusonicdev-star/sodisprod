@@ -180,7 +180,7 @@ body, html {
 				        contentType : "application/json",
 				        data: JSON.stringify(srchData),
 				        type:"POST",
-				        datatype:"json",
+				        dataType:"json",
 				        success : function(res){
 				        	if(res && res.length > 0){
 				        		resultRes = res;
@@ -196,26 +196,26 @@ body, html {
 				        			}
 				        			else
 				        			{
-				        				myCalendar2.disableDays("year", res[i].instDt.substring(0,4)+"-"+res[i].instDt.substring(4,6)+"-"+res[i].instDt.substring(6,8)); 
+										myCalendar2.disableDays("year", res[i].instDt.substring(0, 4) + "-" + res[i].instDt.substring(4, 6) + "-" + res[i].instDt.substring(6, 8));
 				        			}
 				        			if(res[i].instDt == res[i].dlvyAsgnDt2)
 				        			{
 				        				$("#selDate").text(res[i].instDt);
-				        				
+
 				        				//20220220 정연호 버튼에 날짜 표시
 					        			$('#selectDate').html(
-        			        			"선택한 배송일 <font size='4'>("+resultRes[i].instDt.substring(0,4)+"-"+resultRes[i].instDt.substring(4,6)+"-"+resultRes[i].instDt.substring(6,8)+")</font> 에 받기"					
+												"선택한 배송일 <font size='4'>(" + resultRes[i].instDt.substring(0, 4) + "-" + resultRes[i].instDt.substring(4, 6) + "-" + resultRes[i].instDt.substring(6, 8) + ")</font> 에 받기"
         			        			);
 				        	    		$("#selCapaId").text(res[i].capaId);
-				        	    		
+
 										$("#oDate").text(res[i].instDt);
-				        				
+
 				        				//20220220 정연호 버튼에 날짜 표시
 					        			$('#oriDate').html(
-        			        			"지정된 배송일 <font size='4'>("+resultRes[i].instDt.substring(0,4)+"-"+resultRes[i].instDt.substring(4,6)+"-"+resultRes[i].instDt.substring(6,8)+")</font> 에 받기"					
+												"지정된 배송일 <font size='4'>(" + resultRes[i].instDt.substring(0, 4) + "-" + resultRes[i].instDt.substring(4, 6) + "-" + resultRes[i].instDt.substring(6, 8) + ")</font> 에 받기"
         			        			);
 				        	    		$("#oCapaId").text(res[i].capaId);
-	
+
 				        			}
 				        		}
 				        		if(disableDays.length > 0)
@@ -227,93 +227,93 @@ body, html {
 
 				        		//20211231 정연호 특정날짜 표시 - 지정된 배송일자 표시
 				        		myCalendar2.setHolidays(null);
-				        		
+
 				        		//20220220 정연호 지정된 배송일자가 없으면 표시안함
 				        		if(res[0].dlvyAsgnDt2)
 				        		{
 				        			$("#oDate").text(res[0].dlvyAsgnDt2);
 				        			//20220220 정연호 버튼에 날짜 표시
 				        			$('#oriDate').html(
-   				        			"지정된 배송일 <font size='4'>("+res[0].dlvyAsgnDt2.substring(0,4)+"-"+res[0].dlvyAsgnDt2.substring(4,6)+"-"+res[0].dlvyAsgnDt2.substring(6,8)+")</font> 에 받기"					
+											"지정된 배송일 <font size='4'>(" + res[0].dlvyAsgnDt2.substring(0, 4) + "-" + res[0].dlvyAsgnDt2.substring(4, 6) + "-" + res[0].dlvyAsgnDt2.substring(6, 8) + ")</font> 에 받기"
    				        			);
 				        			$("#oCapaId").text(res[0].dlvyAsgnCapaId);
 				        			myCalendar2.setHolidays(dateTypeChange(res[0].dlvyAsgnDt2,10));
 				        		}
 				        	}
 				        	else{
-				        		
+
 				        		myCalendar2.hide();
 				       			//alert("조회 수행 결과 없음");
 				       			action_popup.alert("조회 수행 결과 없음", function (res) {})	//20230330 정연호 수정. alert를 모달로 변경
 				        	}
 				        },
 					});
-					
+
 				},	//END of searchDisableDate : function() {
 
 				//20220221 정연호 추가. 고객이 선택한 배송일을 피드백 해주는 알림톡 내용을 불러서 바로 보냄
 				searchTalk : function() {
 
 					var srchTalk = new FormData();
-					srchTalk.append("cmpyCd",			resultRes[0].cmpyCd	);
-					srchTalk.append("tblSoMId",			resultRes[0].tblSoMId	);
-					srchTalk.append("tmplId",			"ALSYS02_3_2");
+					srchTalk.append("cmpyCd", resultRes[0].cmpyCd);
+					srchTalk.append("tblSoMId", resultRes[0].tblSoMId);
+					srchTalk.append("tmplId", "AL_DELIVERY_SCHEDULE_NOTICE_V1");
 
 					var tblSoMIdAjax = resultRes[0].tblSoMId;
 					var soNoAjax = paramSoNo;
 					var cmpyCdAjax = resultRes[0].cmpyCd;
-					
+
 					$.ajax({
-				        url: "/mobile/mCustTalk",	
+				        url: "/mobile/mCustTalk",
 				        processData : false,
 				        contentType : false,
 				        data: srchTalk,
 				        type:"POST",
-				        datatype:"json",
+				        dataType:"json",
 				        success : function(res){
-				        	if(res){
-					        	res.tblSoMId = tblSoMIdAjax;
-					        	res.soNo	= soNoAjax;
-					        	res.cmpyCd	= cmpyCdAjax;
-					        	fnObj.searchOpen.sendAlrmTmp(res);
-				        	}
+							if (res) {
+								res.tblSoMId = tblSoMIdAjax;
+								res.soNo = soNoAjax;
+								res.cmpyCd = cmpyCdAjax;
+								fnObj.searchOpen.sendAlrmTmp(res);
+							}
 				        },
-				        error : function(request, status, error) 
+						error: function (request, status, error)
 					   	{
-				        	
-					   	},
+						},
 					});
-					
+
 				},	//END of searchTalk : function() {
-				
+
 				//20220221 정연호 추가. 선택 날짜 피드백 알림톡 보내기
 				sendAlrmTmp : function(sendRes) {	//알림톡 보내기
 
 					var reserveDtValu="00000000000000";
+
 					var sendData=[];
 					var resData={};
 					var sendMsgSms = sendRes.alrmTalkTmp;
-					resData.message_type	=	"AT";
-					resData.phn				=	sendRes.phn	;
-					
-					resData.profile			=	sendRes.profile	;
-					resData.talkReserveDt	=	reserveDtValu	;
-					resData.tmplId			=	sendRes.tmplId	;
-					resData.msg				=	sendRes.alrmTalkTmp	;
-					resData.smsKind			=	sendRes.smsKind	;
-					resData.msgSms			=	sendMsgSms	;
-					resData.smsSender		=	sendRes.smsSender	;	
-					resData.smsOnly			=	sendRes.smsOnly	;
-					resData.userid			=	sendRes.userid	;
-					resData.tblSoMId		=	sendRes.tblSoMId		;
+					resData.message_type = "AT";
+					resData.phn = sendRes.phn;
 
-				    var button1Data={};
-					button1Data.name="상담직원에게 메세지 보내기";
-					button1Data.type="WL";
-					button1Data.url_mobile	=	"http://pf.kakao.com/_ExbPtK/chat";
-					button1Data.url_pc		=	"http://pf.kakao.com/_ExbPtK/chat";
-					resData.button1=	button1Data;
-					
+					resData.profile = sendRes.profile;
+					resData.talkReserveDt = reserveDtValu;
+					resData.tmplId = sendRes.tmplId;
+					resData.msg = sendRes.alrmTalkTmp;
+					resData.smsKind = sendRes.smsKind;
+					resData.msgSms = sendMsgSms;
+					resData.smsSender = sendRes.smsSender;
+					resData.smsOnly = sendRes.smsOnly;
+					resData.userid = sendRes.userid;
+					resData.tblSoMId = sendRes.tblSoMId;
+
+					var button1Data = {};
+					button1Data.name = "상담원에게 메시지 보내기";
+					button1Data.type = "WL";
+					button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
+					button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
+					resData.button1 = button1Data;
+
 					var sendD = {}
 					sendD = resData;
 
@@ -323,30 +323,29 @@ body, html {
 				        contentType : "application/json",
 				        data: JSON.stringify(resData),
 				        type:"POST",
-				        datatype:"json",
+				        dataType:"json",
 				        async:false,
 				        success : function(res){
-					        if(res != null && res.length == 1)
-					        {	
-					        	fnObj.searchOpen.saveAlrmTmpResult(sendD,res[0]);	//(발송한건, 리턴받은것)
-					        }
+							if (res != null && res.length == 1) {
+								fnObj.searchOpen.saveAlrmTmpResult(sendD, res[0]);	//(발송한건, 리턴받은것)
+							}
 				        },
-				        error : function(request, status, error) 
+				        error : function(request, status, error)
 					   	{
-				        	
+
 					   	},
 					});
 				},
-				
+
 				//20220221 정연호 추가. 알림톡 발송 결과를 DB에 저장하기
 				saveAlrmTmpResult : function(sendData,resultRes0) {	//알림톡 결과값 저장하기 (발송한건, 리턴받은것)
 					if(!resultRes0.code == "success")
 					{
 						return;
 					}
-					
+
 					var resultData = new FormData();
-				
+
 					resultData.append("tblSoMId"		,	sendData.tblSoMId			);
 					resultData.append("code"			,	resultRes0.code				);
 					resultData.append("userid"			,	sendData.userid				);
@@ -366,16 +365,16 @@ body, html {
 						contentType : false,
 				        data: resultData,
 				        type:"POST",
-				        datatype:"json",
+				        dataType:"json",
 				        async:false,
 				        success : function(res){
-				        	
+
 				        },
-				        error : function(request, status, error) 
+				        error : function(request, status, error)
 					   	{
-				        	
+
 					   	},
-					}); 
+					});
 				},
 				
 				selectDate : function(){	//배송일 선택하기 버튼을 누르면
@@ -570,12 +569,11 @@ $(document).ready(function() {
 	var oneMonthLaterYear = oneMonthLater.getFullYear()+"";
 	var oneMonthLaterMonth = (oneMonthLater.getMonth()+1)+"";
 	var oneMonthLaterDate = oneMonthLater.getDate()+"";
-	if(oneMonthLaterMonth.length == 1 )
-	{
+	if (oneMonthLaterMonth.length == 1) {
 		oneMonthLaterMonth = "0"+oneMonthLaterMonth;
 	}
-	if(oneMonthLaterDate.length == 1 )
-	{
+
+	if (oneMonthLaterDate.length == 1) {
 		oneMonthLaterDate = "0"+oneMonthLaterDate;
 	}
 	

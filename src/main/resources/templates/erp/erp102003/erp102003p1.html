@@ -163,7 +163,8 @@
                                     //20220220 정연호 추가
                                     res.cmpyCd = cmpyCdAjax;
                                     //20220221 정연호 추가. ALSYS07 미마감 일 경우 전화번호가 , 가 찍혀온걸 배열로 해서 그 수만큼 반복한다
-                                    if (myComboSendTalkTmp.getSelectedValue().toUpperCase() == "ALSYS07") {
+                                    // if (myComboSendTalkTmp.getSelectedValue().toUpperCase() == "ALSYS07") {
+                                    if (myComboSendTalkTmp.getSelectedValue().toUpperCase() == "AL_DELIVERY_UNCOMPLETE_V1") {
                                         var phnArray = res.phn.split(",");
                                         for (var i = 0; i < phnArray.length; i++) {
                                             var res07 = res;
@@ -172,7 +173,8 @@
                                                 fnObj.searchOpen.sendAlrmTmp(res07);
                                             }
                                         }
-                                    } else if (myComboSendTalkTmp.getSelectedValue().toUpperCase() == "ALSYS10") {
+                                        // } else if (myComboSendTalkTmp.getSelectedValue().toUpperCase() == "ALSYS10") {
+                                    } else if (myComboSendTalkTmp.getSelectedValue().toUpperCase() == "AL_DELIVERY_FEEDBACK_REQ_V1") {
                                         if (soStatCdAjax == "9999") {
                                             if (soTypeAjax == "1000" ||	//1000	일반오더		O
                                                 soTypeAjax == "2000" ||	//2000	반품오더		O
@@ -200,7 +202,8 @@
                         });
                     }
 
-                    if (myComboSendTalkTmp.getSelectedValue() == "ALSYS10") {
+                    // if (myComboSendTalkTmp.getSelectedValue() == "ALSYS10") {
+                    if (myComboSendTalkTmp.getSelectedValue() == "AL_DELIVERY_FEEDBACK_REQ_V1") {
 
                         //20220224 정연호 기존알림
                         /*
@@ -286,11 +289,11 @@
                     if (sendRes.tmplId == "ALSYS01_1"		//배송접수 안내1
                         || sendRes.tmplId == "ALSYS03_1"		//해피콜 재연락(부재중)1
                         || sendRes.tmplId == "ALSYS04_1"		//배송기사확정1
-                        || sendRes.tmplId == "ALSYS02_3_2"		//ERP_배송일 확정 알림(피드백)
+                        || sendRes.tmplId == "AL_DELIVERY_SCHEDULE_NOTICE_V1"		//ERP_배송일 확정 알림(피드백)
 
                     ) {
                         var button1Data = {};
-                        button1Data.name = "상담직원에게 메세지 보내기";
+                        button1Data.name = "상담원에게 메시지 보내기";
                         button1Data.type = "WL";
                         button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
                         button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
@@ -299,6 +302,7 @@
                     //20220404 정연호. AS 안내및 확정 3 적용. 그런데 버튼명을 바꿔서 이부분을 새로 추가
                     else if (
                         sendRes.tmplId == "ALSYS03_AS3"		//20200404정연호 수정 AS 안내 및 확정3
+                        || sendRes.tmplId == "AL_AS_NOTICE_V1"
                     ) {
                         var button1Data = {};
                         button1Data.name = "상담원에게 메시지 보내기";
@@ -308,64 +312,65 @@
                         resData.button1 = button1Data;
                     } else if (
                         //sendRes.tmplId == "ALSYS01_AS1"		//20220404 정연호 주석처리. 위에 새로 as 추가하면서 이부분 사용안함. AS 안내 및 확정1
-                        //||	sendRes.tmplId == "ALSYS01_EXCH1"	//교환 안내 및 확정1		//20220308 정연호 사용한함 변경됨 al_re_004
+                        //||	sendRes.tmplId == "ALSYS01_EXCH1"	//교환 안내 및 확정1		//20220308 정연호 사용한함 변경됨 AL_EXCHAGNE_SCHDULE_REQ_V1
                         sendRes.tmplId == "ALSYS01_RE1"		//반품일 안내 및 확정1
-                        || sendRes.tmplId == "ALSYS05_1"		//배송시간 안내2
+                        || sendRes.tmplId == "ALSYS05_1"	//배송시간 안내2
+                        || sendRes.tmplId == "AL_RETURN_SCHEDULE_REQ_V1"
                     ) {
                         var button1Data = {};
-                        button1Data.name = "상담사원에게 메세지 보내기";
+                        button1Data.name = "상담원에게 메시지 보내기";
                         button1Data.type = "WL";
                         button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
                         button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
                         resData.button1 = button1Data;
 
-                    } else if (sendRes.tmplId == "ALSYS02_4")	//배송일 안내 및 확정3
+                    } else if (sendRes.tmplId == "ALSYS02_4" || sendRes.tmplId == "AL_DELIVERY_SCHEDULE_REQ_V1")	//배송일 안내 및 확정3
                     {
                         resData.msgSms = sendMsgSms + "\n\n배송일 확정 및 변경\n" +
-                            "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
+                            "http://sodis.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
                             "\n\n";
 
                         var button1Data = {};
                         button1Data.name = "배송일 확정 및 변경";
                         button1Data.type = "WL";
-                        button1Data.url_mobile = "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
-                        button1Data.url_pc = "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        button1Data.url_mobile = "http://sodis.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        button1Data.url_pc = "http://sodis.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
                         resData.button1 = button1Data;
 
                         var button2Data = {};
-                        button2Data.name = "상담직원에게 메세지 보내기";
+                        button2Data.name = "상담원에게 메시지 보내기";
                         button2Data.type = "WL";
                         button2Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
                         button2Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
                         resData.button2 = button2Data;
 
-                    } else if (sendRes.tmplId == "ALSYS10")	//배송기사 평가(리멤버)
+                    } else if (sendRes.tmplId == "ALSYS10" || sendRes.tmplId == "AL_DELIVERY_FEEDBACK_REQ_V1")	//배송기사 평가(리멤버)
                     {
                         resData.msgSms = sendMsgSms + "\n\n배송기사 평가하기\n" +
-                            "http://tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId +
+                            "http://sodis.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId +
                             "\n\n";
 
                         var button1Data = {};
                         button1Data.name = "배송기사 평가하기";
                         button1Data.type = "WL";
-                        button1Data.url_mobile = "http://tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
-                        button1Data.url_pc = "http://tmsdev.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
+                        button1Data.url_mobile = "http://sodis.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
+                        button1Data.url_pc = "http://sodis.eugenesonic.co.kr/mobile/mCustFeedBack?cmpyCd=" + sendRes.cmpyCd + "&tblSoMId=" + sendRes.tblSoMId;
                         resData.button1 = button1Data;
                     }
                         //sendData.push(resData);
 
                     //20220308 정연호 추가.얼라이언스 교환 템플릿 2
-                    else if (sendRes.tmplId == "al_re_004")	//얼라이언스 교환 템플릿 2
+                    else if (sendRes.tmplId == "AL_EXCHAGNE_SCHDULE_REQ_V1")	//얼라이언스 교환 템플릿 2
                     {
                         resData.msgSms = sendMsgSms + "\n\n교환일 확정 및 변경\n" +
-                            "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
+                            "http://sodis.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo +
                             "\n\n";
 
                         var button1Data = {};
                         button1Data.name = "교환일 확정 및 변경";
                         button1Data.type = "WL";
-                        button1Data.url_mobile = "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
-                        button1Data.url_pc = "http://tmsdev.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        button1Data.url_mobile = "http://sodis.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
+                        button1Data.url_pc = "http://sodis.eugenesonic.co.kr/mobile/mCustCalPage?cmpyCd=" + sendRes.cmpyCd + "&soNo=" + sendRes.soNo;
                         resData.button1 = button1Data;
 
                         var button2Data = {};

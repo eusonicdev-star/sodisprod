@@ -1,0 +1,31 @@
+/* erp102001p3.css - 알림톡 이력보기 팝업 전용 스타일 */
+
+body {
+  margin: 0;
+  padding: 10px;
+  overflow: hidden;
+}
+
+#mainDiv {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#gridDiv {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+}
+
+#grid {
+  width: 100%;
+  height: 100%;
+}
+
+#page {
+  padding: 10px 0;
+  text-align: center;
+  flex-shrink: 0;
+}
