@@ -97,6 +97,27 @@
     box-shadow: none;
 }
 
+.profile-badge {
+    display: inline-block;
+    padding: 5px 5px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-right: 10px;
+    background-color: #333;
+    color: white;
+}
+
+.profile-badge.prod {
+    background-color: #600c8c;
+    color: white;
+}
+
+.profile-badge.dev {
+    background-color: #28a745;
+    color: white;
+}
+
 /* DHTMLX 레이아웃 테두리 제거 */
 .dhxlayout_base_material .dhx_cell_layout {
     border: none !important;

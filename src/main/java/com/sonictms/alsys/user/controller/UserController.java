@@ -3,6 +3,7 @@ package com.sonictms.alsys.user.controller;
 import com.sonictms.alsys.user.entity.Repw;
 import com.sonictms.alsys.user.entity.User;
 import com.sonictms.alsys.user.service.UserService;
+import com.sonictms.alsys.config.ProfileConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -28,11 +29,13 @@ import java.net.URL;
 public class UserController {
 
   private final UserService userService;
+  private final ProfileConfig profileConfig;
 
   @GetMapping(value = {"/"})
   public ModelAndView getIndex() {
     ModelAndView modelAndView = new ModelAndView();
     modelAndView.setViewName("user/layout");
+    modelAndView.addObject("activeProfile", profileConfig.getProfileDisplayName());
     return modelAndView;
   }
 
@@ -192,6 +195,7 @@ public class UserController {
   @GetMapping(value = {"layout"})
   public ModelAndView getLayout(ModelAndView modelAndView) {
     modelAndView.setViewName("user/layout");
+    modelAndView.addObject("activeProfile", profileConfig.getProfileDisplayName());
     return modelAndView;
   }
 
