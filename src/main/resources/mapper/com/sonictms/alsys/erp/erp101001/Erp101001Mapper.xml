@@ -8,7 +8,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_LISTBYALL (
+			CALL ${schema}..USP_SO_LISTBYALL (
 				#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
 				#{dtType ,mode=IN , jdbcType=VARCHAR},
 				#{fromDt ,mode=IN , jdbcType=VARCHAR},
@@ -37,7 +37,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_INST_ABLE_LISTBYALL (
+		CALL ${schema}..USP_SO_INST_ABLE_LISTBYALL (
 		#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
 		#{dcCd ,mode=IN , jdbcType=VARCHAR},
 		#{fromDt ,mode=IN , jdbcType=VARCHAR},
@@ -58,7 +58,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_M_INS (
+		CALL ${schema}..USP_SO_M_INS (
 		#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
 		#{soNo ,mode=IN , jdbcType=VARCHAR},
 		#{refSoNo ,mode=IN , jdbcType=VARCHAR},
@@ -99,7 +99,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_P_INS (
+		CALL ${schema}..USP_SO_P_INS (
 			#{tblSoMId 		,mode=IN , jdbcType=VARCHAR},
 			#{soNo 			,mode=IN , jdbcType=VARCHAR},
 			#{agntCd 		,mode=IN , jdbcType=VARCHAR},
@@ -135,7 +135,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_M_LOAD (
+		CALL ${schema}..USP_SO_M_LOAD (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
 
 		)
@@ -147,7 +147,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_P_LOAD (
+		CALL ${schema}..USP_SO_P_LOAD (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
 
 		)
@@ -159,7 +159,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_P_DEL (
+		CALL ${schema}..USP_SO_P_DEL (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR},
 		#{tblSoPId ,mode=IN , jdbcType=VARCHAR},
 		#{useYn ,mode=IN , jdbcType=VARCHAR},
@@ -176,7 +176,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_P_UPDT (
+		CALL ${schema}..USP_SO_P_UPDT (
 		
 		#{tblSoPId 		,mode=IN , jdbcType=VARCHAR},
 		#{refSoNo 		,mode=IN , jdbcType=VARCHAR},
@@ -199,7 +199,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_M_UPDT (
+		CALL ${schema}..USP_SO_M_UPDT (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR},
 		#{refSoNo ,mode=IN , jdbcType=VARCHAR},
 		#{orgnSoNo ,mode=IN , jdbcType=VARCHAR},
@@ -243,7 +243,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_ETC_SOLIST (
+			CALL ${schema}..USP_SO_ETC_SOLIST (
 				#{cmpyCd 	,mode=IN , jdbcType=VARCHAR},
 				#{dtType 	,mode=IN , jdbcType=VARCHAR},
 				#{fromDt 	,mode=IN , jdbcType=VARCHAR},
@@ -263,7 +263,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_M_LOAD_ETC (
+		CALL ${schema}..USP_SO_M_LOAD_ETC (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
 
 		)
@@ -276,7 +276,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_P_LOAD_ETC (
+		CALL ${schema}..USP_SO_P_LOAD_ETC (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
 
 		)
@@ -288,7 +288,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_M_INS (
+		CALL ${schema}..USP_SO_M_INS (
 		#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
 		#{soNo ,mode=IN , jdbcType=VARCHAR},
 		#{refSoNo ,mode=IN , jdbcType=VARCHAR},
@@ -329,7 +329,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_P_INS (
+		CALL ${schema}..USP_SO_P_INS (
 			#{tblSoMId 		,mode=IN , jdbcType=VARCHAR},
 			#{soNo 			,mode=IN , jdbcType=VARCHAR},
 			#{agntCd 		,mode=IN , jdbcType=VARCHAR},
@@ -361,7 +361,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_DC_SRCH (
+		CALL ${schema}..USP_SO_DC_SRCH (
 		#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
 		#{postCd ,mode=IN , jdbcType=VARCHAR}
 
@@ -373,7 +373,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
 		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
 		{
-		CALL sonictmsdev_mssql..USP_SO_M_DEL (
+		CALL ${schema}..USP_SO_M_DEL (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR},
 		#{saveUser ,mode=IN , jdbcType=VARCHAR}
 		)

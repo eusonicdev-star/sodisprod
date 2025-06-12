@@ -6,7 +6,7 @@
 <!-- 공통코드 콤보목록 불러오기 -->
 <select id="comComboList" statementType="CALLABLE" parameterType="com.sonictms.alsys.commCode.entity.CommCodeVO" resultType="com.sonictms.alsys.commCode.entity.CommCodeVO">
 	{
-	      CALL sonictmsdev_mssql..USP_COM_COMBO_LIST (
+		CALL ${schema}..USP_COM_COMBO_LIST(
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{comboType		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{commCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -16,11 +16,10 @@
 	}
     </select>
   
-  
 <!--  공통코드 그리드 리스트 불러오기   -->
  <select id="commSrchList" statementType="CALLABLE" parameterType="com.sonictms.alsys.commCode.entity.CommCodeVO" resultType="com.sonictms.alsys.commCode.entity.CommCodeVO">
 	{
-	      CALL sonictmsdev_mssql..USP_COM_LISTBYALL (
+		CALL ${schema}..USP_COM_LISTBYALL(
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{srchCtgr		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{srchType		,mode=IN	,	jdbcType=VARCHAR},
@@ -30,15 +29,12 @@
 	      )      
 	}
     </select>   
-    
-    
-    
-    
+
     <!--  알람톡 발송 결과를 성공일때만 저장   -->
  	<select id="saveAlrmTmpResult"  statementType="CALLABLE" parameterType="com.sonictms.alsys.commCode.entity.SendAlrmTalkVO"
  														resultType="com.sonictms.alsys.commCode.entity.SendAlrmTalkVO">
 	{
-	      CALL sonictmsdev_mssql..USP_SO_CNSL_STATUS_ALRMTALK_SEND_SAVE (
+		CALL ${schema}..USP_SO_CNSL_STATUS_ALRMTALK_SEND_SAVE (
 	      	#{tblSoMId			,mode=IN	,	jdbcType=VARCHAR},		
 	      	<!-- #{msg				,mode=IN	,	jdbcType=VARCHAR},	 -->		
 			#{code				,mode=IN	,	jdbcType=VARCHAR},
@@ -68,7 +64,7 @@
  	<select id="sendScdlAlrmResult"  statementType="CALLABLE" parameterType="com.sonictms.alsys.commCode.entity.SendAlrmTalkVO"
  														resultType="com.sonictms.alsys.commCode.entity.SendAlrmTalkVO">
 	{
-	      CALL sonictmsdev_mssql..USP_ALRM_SCDL_EXEC_SAVE (
+		CALL ${schema}..USP_ALRM_SCDL_EXEC_SAVE (
 	      	#{tblSoMId			,mode=IN	,	jdbcType=VARCHAR},		
 			#{code				,mode=IN	,	jdbcType=VARCHAR}, <!-- 알림톡의 success, fail 결과코드 -->
 			#{userid			,mode=IN	,	jdbcType=VARCHAR},

@@ -8,7 +8,7 @@
     <select id="gridHeaderSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101002.entity.Erp101002VO"
     															resultType		="com.sonictms.alsys.erp.erp101002.entity.Erp101002VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_EXCL_TEMPLT_DOWNLOAD (
+	      CALL ${schema}..USP_SO_EXCL_TEMPLT_DOWNLOAD (
 	     	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
 			#{agntCd		,mode=IN	,	jdbcType=VARCHAR},	
 			#{exclTmplType	,mode=IN	,	jdbcType=VARCHAR}
@@ -20,7 +20,7 @@
 	<select id="erp101002ExcelUploadCheck"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101002.entity.Erp101002VO"
     															resultType		="com.sonictms.alsys.erp.erp101002.entity.Erp101002VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_EXCL_INS_CHK (
+	      CALL ${schema}..USP_SO_EXCL_INS_CHK (
 	      	#{exclRow		,mode=IN	,	jdbcType=VARCHAR},
 			#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 			#{refSoNo		,mode=IN	,	jdbcType=VARCHAR},
@@ -62,7 +62,7 @@
 	<select id="erp101002ExcelUploadJson"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101002.entity.Erp101002VO"
     															resultType		="com.sonictms.alsys.erp.erp101002.entity.Erp101002VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_EXCL_INS (
+	      CALL ${schema}..USP_SO_EXCL_INS (
 	      	#{exclRow		,mode=IN	,	jdbcType=VARCHAR},
 			#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 			#{refSoNo		,mode=IN	,	jdbcType=VARCHAR},

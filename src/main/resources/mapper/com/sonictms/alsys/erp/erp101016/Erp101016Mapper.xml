@@ -8,7 +8,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO"
 		resultType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_MISS_COMPLETE_LISTBYALL (
+			CALL ${schema}..USP_SO_MISS_COMPLETE_LISTBYALL (
 				#{cmpyCd	            ,mode=IN , jdbcType=VARCHAR},	        
 				#{dtType		        ,mode=IN , jdbcType=VARCHAR},
 				#{fromDt		        ,mode=IN , jdbcType=VARCHAR},
@@ -33,7 +33,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO"
 		resultType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_MISS_COMPLETE_HIST_LOAD (
+			CALL ${schema}..USP_SO_MISS_COMPLETE_HIST_LOAD (
 				#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
 			)
 		}
@@ -44,7 +44,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO"
 		resultType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_MISS_COMPLETE_CLOSE_SAVE (
+			CALL ${schema}..USP_SO_MISS_COMPLETE_CLOSE_SAVE (
 				#{tblSoMId ,mode=IN , jdbcType=VARCHAR},
 				#{missCloseType ,mode=IN , jdbcType=VARCHAR},
 				#{saveUser ,mode=IN , jdbcType=VARCHAR}
@@ -57,7 +57,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO"
 		resultType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_M_LOAD_ETC_MISS (
+			CALL ${schema}..USP_SO_M_LOAD_ETC_MISS (
 				#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
 			)
 		}
@@ -68,7 +68,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO"
 		resultType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_P_LOAD_ETC_MISS (
+			CALL ${schema}..USP_SO_P_LOAD_ETC_MISS (
 				#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
 			)
 		}
@@ -79,7 +79,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO"
 		resultType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_M_INS_MISS (
+			CALL ${schema}..USP_SO_M_INS_MISS (
 				#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
 				#{soNo ,mode=IN , jdbcType=VARCHAR},
 				#{refSoNo ,mode=IN , jdbcType=VARCHAR},
@@ -119,7 +119,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO"
 		resultType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_MISS_COMPLETE_INS (
+			CALL ${schema}..USP_SO_MISS_COMPLETE_INS (
 				#{orgnSoMId		,mode=IN , jdbcType=VARCHAR},
 				#{tblSoMId		,mode=IN , jdbcType=VARCHAR},
 				#{soType		,mode=IN , jdbcType=VARCHAR},
@@ -135,7 +135,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO"
 		resultType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_P_INS_MISS (
+			CALL ${schema}..USP_SO_P_INS_MISS (
 				#{tblSoMId 		,mode=IN , jdbcType=VARCHAR},
 				#{soNo 			,mode=IN , jdbcType=VARCHAR},
 				#{agntCd 		,mode=IN , jdbcType=VARCHAR},
@@ -165,7 +165,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO"
 		resultType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_DC_SRCH_MISS (
+			CALL ${schema}..USP_SO_DC_SRCH_MISS (
 				#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
 				#{postCd ,mode=IN , jdbcType=VARCHAR}
 			)
@@ -177,7 +177,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO"
 		resultType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_INST_ABLE_LISTBYALL_MISS (
+			CALL ${schema}..USP_SO_INST_ABLE_LISTBYALL_MISS (
 				#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
 				#{dcCd ,mode=IN , jdbcType=VARCHAR},
 				#{fromDt ,mode=IN , jdbcType=VARCHAR},
@@ -195,7 +195,7 @@
 		parameterType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO"
 		resultType="com.sonictms.alsys.erp.erp101016.entity.Erp101016VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_ETC_SOLIST_MISS (
+			CALL ${schema}..USP_SO_ETC_SOLIST_MISS (
 				#{cmpyCd 	,mode=IN , jdbcType=VARCHAR},
 				#{dtType 	,mode=IN , jdbcType=VARCHAR},
 				#{fromDt 	,mode=IN , jdbcType=VARCHAR},

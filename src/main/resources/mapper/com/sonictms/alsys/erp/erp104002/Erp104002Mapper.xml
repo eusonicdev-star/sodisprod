@@ -6,7 +6,7 @@
     <select id="erp104002List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp104002.entity.Erp104002VO"
     															resultType		="com.sonictms.alsys.erp.erp104002.entity.Erp104002VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_REPORT_ITEM_LISTBYALL (
+	      CALL ${schema}..USP_SO_REPORT_ITEM_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
 			#{dtType	,mode=IN	,	jdbcType=VARCHAR},
 			#{fromDt	,mode=IN	,	jdbcType=VARCHAR},
@@ -35,7 +35,7 @@
     <select id="erp104002Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp104002.entity.Erp104002VO"
     															resultType		="com.sonictms.alsys.erp.erp104002.entity.Erp104002VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_CAPA_SAVE (
+	      CALL ${schema}..USP_INST_CAPA_SAVE (
 	      	#{saveGubn	,mode=IN	,	jdbcType=VARCHAR},
 			#{capaId	,mode=IN	,	jdbcType=VARCHAR},
 			#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
@@ -61,7 +61,7 @@
 	<select id="erp104002p1Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp104002.entity.Erp104002VO"
     															resultType		="com.sonictms.alsys.erp.erp104002.entity.Erp104002VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_CAPA_CRT (
+	      CALL ${schema}..USP_INST_CAPA_CRT (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{dtType		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{fromDt		,mode=IN	,	jdbcType=VARCHAR},
@@ -88,7 +88,7 @@
     <select id="erp104002p2List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp104002.entity.Erp104002VO"
     															resultType		="com.sonictms.alsys.erp.erp104002.entity.Erp104002VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_CAPA_CRT_POPUP_LOAD (
+	      CALL ${schema}..USP_INST_CAPA_CRT_POPUP_LOAD (
 	      	#{capaId		,mode=IN	,	jdbcType=VARCHAR}
 	      	
 	      )      

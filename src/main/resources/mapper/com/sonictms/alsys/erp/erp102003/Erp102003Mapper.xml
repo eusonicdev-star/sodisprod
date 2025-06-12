@@ -6,7 +6,7 @@
     <select id="erp102003List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102003.entity.Erp102003VO"
     															resultType		="com.sonictms.alsys.erp.erp102003.entity.Erp102003VO">
         {
-	      CALL sonictmsdev_mssql..USP_ALRM_SEND_MNG_LISTBYALL (
+	      CALL ${schema}..USP_ALRM_SEND_MNG_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{dtType	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{fromDt	,mode=IN	,	jdbcType=VARCHAR},
@@ -26,7 +26,7 @@
     <select id="erp102003p1ComdSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102003.entity.Erp102003VO"
     																resultType		="com.sonictms.alsys.erp.erp102003.entity.Erp102003VO">
         {
-	      CALL sonictmsdev_mssql..USP_ALRM_SCDL_SAVE (
+	      CALL ${schema}..USP_ALRM_SCDL_SAVE (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{tblAlrmScdlId	,mode=IN	,	jdbcType=VARCHAR},
       		#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -48,7 +48,7 @@
     <select id="erp102003p1AlrmSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102003.entity.Erp102003VO"
     															resultType		="com.sonictms.alsys.erp.erp102003.entity.Erp102003VO">
         {
-	      CALL sonictmsdev_mssql..USP_ALRM_SCDL_LOAD    (
+	      CALL ${schema}..USP_ALRM_SCDL_LOAD    (
 	      	#{tblAlrmScdlId		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
       }

@@ -7,7 +7,7 @@
 		parameterType="com.sonictms.alsys.erp.erp100801.entity.Erp100801VO"
 		resultType="com.sonictms.alsys.erp.erp100801.entity.Erp100801VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_OUT_CMPY_IF_SAVE (
+			CALL ..USP_SO_OUT_CMPY_IF_SAVE (
 				#{trustCustCd		,mode=IN , jdbcType=VARCHAR},
 				#{dlvCustomerNm 	,mode=IN , jdbcType=VARCHAR},
 				#{trnDlvOrdType 	,mode=IN , jdbcType=VARCHAR},
@@ -63,7 +63,7 @@
 		parameterType="com.sonictms.alsys.erp.erp100801.entity.Erp100801VO"
 		resultType="com.sonictms.alsys.erp.erp100801.entity.Erp100801VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_OUT_CMPY_IF_LISTBYALL  (
+			CALL ..USP_SO_OUT_CMPY_IF_LISTBYALL  (
 				#{cmpyCd 		,mode=IN , jdbcType=VARCHAR},
 				#{dtType 		,mode=IN , jdbcType=VARCHAR},
 				#{dlvDtFrom 	,mode=IN , jdbcType=VARCHAR},
@@ -81,7 +81,7 @@
 		parameterType="com.sonictms.alsys.erp.erp100801.entity.Erp100801VO"
 		resultType="com.sonictms.alsys.erp.erp100801.entity.Erp100801VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_OUT_CMPY_IF_DATACHK  (
+			CALL ..USP_SO_OUT_CMPY_IF_DATACHK  (
 				#{cmpyCd 		,mode=IN , jdbcType=VARCHAR},
 				#{outCmpyCd 	,mode=IN , jdbcType=VARCHAR},
 				<!-- #{trustCustCd 	,mode=IN , jdbcType=VARCHAR}, -->
@@ -100,7 +100,7 @@
 		parameterType="com.sonictms.alsys.erp.erp100801.entity.Erp100801VO"
 		resultType="com.sonictms.alsys.erp.erp100801.entity.Erp100801VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_OUT_CMPY_SAVE_SO_CNFM  (
+			CALL ..USP_SO_OUT_CMPY_SAVE_SO_CNFM  (
 				#{no			,mode=IN , jdbcType=VARCHAR},
 				#{outCmpyCd		,mode=IN , jdbcType=VARCHAR},
 				#{cmpyCd		,mode=IN , jdbcType=VARCHAR},

@@ -6,7 +6,7 @@
     <select id="erp102001p1List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     															resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_CNSL_STATUS_SOLIST (
+	      CALL ${schema}..USP_SO_CNSL_STATUS_SOLIST (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},		
 			#{dtType	,mode=IN	,	jdbcType=VARCHAR},	
 			#{fromDt	,mode=IN	,	jdbcType=VARCHAR},	
@@ -29,7 +29,7 @@
     <select id="erp102001SoHeadSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     																resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_CNSL_STATUS_LOAD_M (
+	      CALL ${schema}..USP_SO_CNSL_STATUS_LOAD_M (
 	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}	
 		
 	      )      
@@ -39,7 +39,7 @@
     <select id="erp102001SoDetailSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_CNSL_STATUS_LOAD_D (
+	      CALL ${schema}..USP_SO_CNSL_STATUS_LOAD_D (
 	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}	
 	      )      
       }
@@ -49,7 +49,7 @@
     <select id="erp102001HappyCallSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_CNSL_STATUS_HAPPYCALL_LOAD (
+	      CALL ${schema}..USP_SO_CNSL_STATUS_HAPPYCALL_LOAD (
 	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}	
 	      )      
       }
@@ -61,7 +61,7 @@
     <select id="erp102001CnslSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_CNSL_STATUS_HAPPYCALL_INS (
+	      CALL ${schema}..USP_SO_CNSL_STATUS_HAPPYCALL_INS (
 	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
 			#{soNo			,mode=IN	,	jdbcType=VARCHAR},
 			#{cnslEr		,mode=IN	,	jdbcType=VARCHAR},
@@ -77,7 +77,7 @@
     <select id="erp102001p2List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     															resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_CNSL_STATUS_HAPPYCALL_LOAD_HIST (
+	      CALL ${schema}..USP_SO_CNSL_STATUS_HAPPYCALL_LOAD_HIST (
 	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}		
 	      )      
       }
@@ -92,7 +92,7 @@
     <select id="erp102001p1Updt"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_CNSL_STATUS_SAVE (
+	      CALL ${schema}..USP_SO_CNSL_STATUS_SAVE (
 	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
 			#{acptTel1		,mode=IN	,	jdbcType=VARCHAR},
 			#{acptTel2		,mode=IN	,	jdbcType=VARCHAR},
@@ -112,7 +112,7 @@
     <select id="erp102001talkCallSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
      {
-	      CALL sonictmsdev_mssql..USP_SO_CNSL_STATUS_ALRMTALK_LOAD (
+	      CALL ${schema}..USP_SO_CNSL_STATUS_ALRMTALK_LOAD (
 	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}	
 	      )      
       }
@@ -126,7 +126,7 @@
     <select id="erp102001p4LoadAlrmTmp"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
      {
-	      CALL sonictmsdev_mssql..USP_SO_CNSL_STATUS_ALRMTALK_SEND_LOAD (
+	      CALL ${schema}..USP_SO_CNSL_STATUS_ALRMTALK_SEND_LOAD (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},	
 	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR},	
 	      	#{tmplId	,mode=IN	,	jdbcType=VARCHAR}	
@@ -141,7 +141,7 @@
     <select id="erp102001p3List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     															resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_CNSL_STATUS_ALRMTALK_LOAD_HIST (
+	      CALL ${schema}..USP_SO_CNSL_STATUS_ALRMTALK_LOAD_HIST (
 	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}		
 	      )      
       }
@@ -153,7 +153,7 @@
     <select id="erp102001soDlvyInfoData"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_CNSL_STATUS_DLVYINFO_LOAD (
+	      CALL ${schema}..USP_SO_CNSL_STATUS_DLVYINFO_LOAD (
 	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}		
 	      )      
       }
@@ -164,7 +164,7 @@
     <select id="erp101001DlvyCnfm"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_CNSL_DLVYCNFMDT_INS (
+	      CALL ${schema}..USP_SO_CNSL_DLVYCNFMDT_INS (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},    	
 			#{dlvyCnfmDt	,mode=IN	,	jdbcType=VARCHAR},
@@ -177,7 +177,7 @@
     <select id="erp102001p5List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     															resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
         {
-	      CALL sonictmsdev_mssql..USP_CNSL_STATUS_HISTORY_LOAD (
+	      CALL ${schema}..USP_CNSL_STATUS_HISTORY_LOAD (
 	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}		
 	      )      
       }
@@ -189,7 +189,7 @@
     <select id="erp102001UpdtRcptCost"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
     																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_M_RCPT_COST_UPDT_ERP102001 (
+	      CALL ${schema}..USP_SO_M_RCPT_COST_UPDT_ERP102001 (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
 			#{rcptCost		,mode=IN	,	jdbcType=VARCHAR},

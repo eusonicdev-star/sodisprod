@@ -8,7 +8,7 @@
     <select id="gridHeaderSrch101004"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101004.entity.Erp101004VO"
     															resultType		="com.sonictms.alsys.erp.erp101004.entity.Erp101004VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_EXCL_TEMPLT_DOWNLOAD (
+	      CALL ${schema}..USP_SO_EXCL_TEMPLT_DOWNLOAD (
 	     	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
 			#{agntCd		,mode=IN	,	jdbcType=VARCHAR},	
 			#{exclTmplType	,mode=IN	,	jdbcType=VARCHAR}
@@ -20,7 +20,7 @@
 	<select id="erp101004ExcelUploadCheck"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101004.entity.Erp101004VO"
     															resultType		="com.sonictms.alsys.erp.erp101004.entity.Erp101004VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_EXCL_INS_OUT_CMPY_CHK (
+	      CALL ${schema}..USP_SO_EXCL_INS_OUT_CMPY_CHK (
 	      	#{exclRow		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{outCmpyCd		,mode=IN	,	jdbcType=VARCHAR},	<!-- 20220320 정연호 추가. 외부업체 코드 -->
 			#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -63,7 +63,7 @@
 	<select id="erp101004ExcelUploadJson"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101004.entity.Erp101004VO"
     															resultType		="com.sonictms.alsys.erp.erp101004.entity.Erp101004VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_EXCL_INS_OUT_CMPY (
+	      CALL ${schema}..USP_SO_EXCL_INS_OUT_CMPY (
 	      	#{exclRow		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{outCmpyCd		,mode=IN	,	jdbcType=VARCHAR},	<!-- 20220320 정연호 추가. 외부업체 코드 -->
 			#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},

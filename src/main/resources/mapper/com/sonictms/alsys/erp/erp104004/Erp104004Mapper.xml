@@ -6,7 +6,7 @@
 	    <select id="erp104004List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp104004.entity.Erp104004VO"
     																resultType		="com.sonictms.alsys.erp.erp104004.entity.Erp104004VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_PRINT_PICK_LISTBYALL  (
+	      CALL ${schema}..USP_SO_PRINT_PICK_LISTBYALL  (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 			#{dtType		,mode=IN	,	jdbcType=VARCHAR},
 			#{fromDt		,mode=IN	,	jdbcType=VARCHAR},

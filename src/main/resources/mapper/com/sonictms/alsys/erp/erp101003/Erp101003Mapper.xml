@@ -6,7 +6,7 @@
     <select id="erp101003List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO"
     															resultType		="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_ALLUPDATE_LISTBYALL (
+	      CALL ${schema}..USP_SO_ALLUPDATE_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},		
 			#{dtType	,mode=IN	,	jdbcType=VARCHAR},	
 			#{fromDt	,mode=IN	,	jdbcType=VARCHAR},	
@@ -35,7 +35,7 @@
 	<select id="erp101003ChkDel"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO"
     															resultType		="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_ALLUPDATE_DEL (
+	      CALL ${schema}..USP_SO_ALLUPDATE_DEL (
 	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{delResn		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
@@ -49,7 +49,7 @@
 	<select id="erp101003chkUpdt"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO"
     															resultType		="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_ALLUPDATE_UPDT (
+	      CALL ${schema}..USP_SO_ALLUPDATE_UPDT (
 	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{updtGubn		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{soStatCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -71,7 +71,7 @@
 	<select id="erp101003chkCopy"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO"
     															resultType		="com.sonictms.alsys.erp.erp101003.entity.Erp101003VO">
         {
-	      CALL sonictmsdev_mssql..USP_SO_ALLUPDATE_COPY (
+	      CALL ${schema}..USP_SO_ALLUPDATE_COPY (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
