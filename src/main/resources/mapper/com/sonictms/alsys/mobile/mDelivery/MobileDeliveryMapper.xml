@@ -6,7 +6,7 @@
     <select id="mDeliveryList"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mDelivery.entity.MobileDeliveryVO"
     															resultType		="com.sonictms.alsys.mobile.mDelivery.entity.MobileDeliveryVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_LIST_LISTBYALL (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_LIST_LISTBYALL (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
 			#{instDt		,mode=IN	,	jdbcType=VARCHAR},	
 			#{tblUserMId	,mode=IN	,	jdbcType=VARCHAR},	
@@ -20,7 +20,7 @@
     <select id="mDeliverySeqUpdate"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mDelivery.entity.MobileDeliveryVO"
     															resultType		="com.sonictms.alsys.mobile.mDelivery.entity.MobileDeliveryVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_SEQ_UPDT (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_SEQ_UPDT (
 	      	#{instMobileMId	,mode=IN	,	jdbcType=VARCHAR},		
 			#{seq			,mode=IN	,	jdbcType=VARCHAR},	
 			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
@@ -32,7 +32,7 @@
     <select id="mDeliveryTelUpdate"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mDelivery.entity.MobileDeliveryVO"
     															resultType		="com.sonictms.alsys.mobile.mDelivery.entity.MobileDeliveryVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_TELCNT_UPDT (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_TELCNT_UPDT (
 	      	#{instMobileMId	,mode=IN	,	jdbcType=VARCHAR},		
 			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
@@ -45,7 +45,7 @@
     <select id="mDeliveryDetailSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mDelivery.entity.MobileDeliveryVO"
     															resultType		="com.sonictms.alsys.mobile.mDelivery.entity.MobileDeliveryVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_LIST_DETAIL_LISTBYALL (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_LIST_DETAIL_LISTBYALL (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR}	,
 	      	#{tblUserMId		,mode=IN	,	jdbcType=VARCHAR}	,
 	      	#{mobileGrntCd		,mode=IN	,	jdbcType=VARCHAR}	
@@ -60,7 +60,7 @@
     <select id="mDeliveryLiftSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mDelivery.entity.MobileDeliveryVO"
     															resultType		="com.sonictms.alsys.mobile.mDelivery.entity.MobileDeliveryVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_LIST_DETAIL_LIFT_SAVE (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_LIST_DETAIL_LIFT_SAVE (
 	      	#{saveGubn			,mode=IN	,	jdbcType=VARCHAR},
 			#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
 			#{instMobileDId		,mode=IN	,	jdbcType=VARCHAR},
@@ -74,7 +74,7 @@
     <select id="mDeliveryLiftCancel"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mDelivery.entity.MobileDeliveryVO"
     															resultType		="com.sonictms.alsys.mobile.mDelivery.entity.MobileDeliveryVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_LIST_DETAIL_LIFT_SAVE (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_LIST_DETAIL_LIFT_SAVE (
 	      	#{saveGubn			,mode=IN	,	jdbcType=VARCHAR},
 			#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
 			#{instMobileDId		,mode=IN	,	jdbcType=VARCHAR},

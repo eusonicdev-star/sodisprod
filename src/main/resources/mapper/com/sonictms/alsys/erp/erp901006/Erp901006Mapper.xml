@@ -6,7 +6,7 @@
     <select id="erp901006List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901006.entity.Erp901006VO"
     															resultType		="com.sonictms.alsys.erp.erp901006.entity.Erp901006VO">
         {
-	      CALL sonictmsdev_mssql..USP_COMM_TEMPLT_LISTBYALL (
+	      CALL ${schema}..USP_COMM_TEMPLT_LISTBYALL (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
 			#{agntCd		,mode=IN	,	jdbcType=VARCHAR},	
 			#{exclTmplType	,mode=IN	,	jdbcType=VARCHAR}
@@ -22,7 +22,7 @@
 	<select id="erp901006p1Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901006.entity.Erp901006VO"
     															resultType		="com.sonictms.alsys.erp.erp901006.entity.Erp901006VO">
         {
-	      CALL sonictmsdev_mssql..USP_COMM_TEMPLT_SAVE (
+	      CALL ${schema}..USP_COMM_TEMPLT_SAVE (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{tmplId		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -64,7 +64,7 @@
     <select id="erp901006p2List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901006.entity.Erp901006VO"
     															resultType		="com.sonictms.alsys.erp.erp901006.entity.Erp901006VO">
         {
-	      CALL sonictmsdev_mssql..USP_COMM_TEMPLT_LOAD (
+	      CALL ${schema}..USP_COMM_TEMPLT_LOAD (
 	      	#{tmplId		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
       }

@@ -6,7 +6,7 @@
     <select id="erp902004List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902004.entity.Erp902004VO"
     															resultType		="com.sonictms.alsys.erp.erp902004.entity.Erp902004VO">
         {
-	      CALL sonictmsdev_mssql..USP_DCPOST_LISTBYALL (
+	      CALL ${schema}..USP_DCPOST_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{dcCd		,mode=IN	,	jdbcType=VARCHAR},
 	      
@@ -22,7 +22,7 @@
     <select id="erp902004Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902004.entity.Erp902004VO"
     															resultType		="com.sonictms.alsys.erp.erp902004.entity.Erp902004VO">
         {
-	      CALL sonictmsdev_mssql..USP_DCPOST_SAVE (
+	      CALL ${schema}..USP_DCPOST_SAVE (
 	      	#{tblLgstDcpostMId	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{cmpyCd				,mode=IN	,	jdbcType=VARCHAR},
 	      	#{dcCd					,mode=IN	,	jdbcType=VARCHAR},
@@ -37,7 +37,7 @@
     <select id="erp902004Delete"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902004.entity.Erp902004VO"
     															resultType		="com.sonictms.alsys.erp.erp902004.entity.Erp902004VO">
         {
-	      CALL sonictmsdev_mssql..USP_DCPOST_DELETE (
+	      CALL ${schema}..USP_DCPOST_DELETE (
 	      	#{tblLgstDcpostMId	,mode=IN	,	jdbcType=VARCHAR}
 	      	
 	      )      

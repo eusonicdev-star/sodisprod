@@ -6,7 +6,7 @@
     														resultType		="com.sonictms.alsys.common.entity.ErrorMsgVO">
     							
         {																				
-	      CALL sonictmsdev_mssql..USP_ERROR_INS (
+	      CALL ${schema}..USP_ERROR_INS (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
 			#{tblUserMId	,mode=IN	,	jdbcType=VARCHAR},	
 			#{msg			,mode=IN	,	jdbcType=VARCHAR},

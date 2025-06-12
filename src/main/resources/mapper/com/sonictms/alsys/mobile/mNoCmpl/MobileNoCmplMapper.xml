@@ -6,7 +6,7 @@
     <select id="mNoCmplOnCreate"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO"
     															resultType		="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_X_COMPLETE_LOAD (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_X_COMPLETE_LOAD (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
       }
@@ -17,7 +17,7 @@
     <select id="mNoCmplSaveStat"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO"
     															resultType		="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_X_COMPLETE_SAVE_STAT (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_X_COMPLETE_SAVE_STAT (
 	      	#{instMobileMId				,mode=IN	,	jdbcType=VARCHAR},
 	      	#{mobileXCmplType			,mode=IN	,	jdbcType=VARCHAR},
 			#{mobileXCmplTxt			,mode=IN	,	jdbcType=VARCHAR},
@@ -43,7 +43,7 @@
     <select id="mNoCmplDel"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO"
     															resultType		="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_X_COMPLETE_DEL (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_X_COMPLETE_DEL (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{saveUser			,mode=IN	,	jdbcType=VARCHAR}
 	      )      
@@ -57,7 +57,7 @@
     <select id="mNoCmplSaveTalk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO"
     															resultType		="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_X_COMPLETE_SAVE_TALK (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_X_COMPLETE_SAVE_TALK (
 	      	#{instMobileMId				,mode=IN	,	jdbcType=VARCHAR},
 	      	#{sendComplete				,mode=IN	,	jdbcType=VARCHAR},
 			#{alrmTalkUserid			,mode=IN	,	jdbcType=VARCHAR},

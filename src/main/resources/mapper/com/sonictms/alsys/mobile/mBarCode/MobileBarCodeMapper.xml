@@ -6,7 +6,7 @@
     <select id="mBarCodeScan"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mBarCode.entity.MobileBarCodeVO"
     															resultType		="com.sonictms.alsys.mobile.mBarCode.entity.MobileBarCodeVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_LIFT_UPDT_SCAN (
+	      CALL ${schema}..USP_MOBILE_LIFT_UPDT_SCAN (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
 	      	#{barcode		,mode=IN	,	jdbcType=VARCHAR}	
 			
@@ -18,7 +18,7 @@
     <select id="mBarCodeLiftChange"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mBarCode.entity.MobileBarCodeVO"
     															resultType		="com.sonictms.alsys.mobile.mBarCode.entity.MobileBarCodeVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_LIFT_UPDT_SAVE (
+	      CALL ${schema}..USP_MOBILE_LIFT_UPDT_SAVE (
 	      	#{instMobileMId	,mode=IN	,	jdbcType=VARCHAR},
 			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
 	      	

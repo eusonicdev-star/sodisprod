@@ -6,7 +6,7 @@
     <select id="mCustCalDisableDay"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO"
     															resultType		="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_CAPA_SO_LISTBYALL_FOR_CUST (
+	      CALL ${schema}..USP_INST_CAPA_SO_LISTBYALL_FOR_CUST (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{soNo		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
@@ -17,7 +17,7 @@
     <select id="mCustCalSaveDate"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO"
     															resultType		="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_CAPA_SO_INS_FOR_CUST (
+	      CALL ${schema}..USP_INST_CAPA_SO_INS_FOR_CUST (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{soNo		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{capaId	,mode=IN	,	jdbcType=VARCHAR}
@@ -30,7 +30,7 @@
     <select id="mFeedSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO"
     														resultType		="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_EVAL_CHK (
+	      CALL ${schema}..USP_INST_EVAL_CHK (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
@@ -41,7 +41,7 @@
     <select id="mSaveFeedBack"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO"
     															resultType		="com.sonictms.alsys.mobile.mCustCal.entity.MobileCustCalVO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_EVAL_SAVE (
+	      CALL ${schema}..USP_INST_EVAL_SAVE (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 			#{tblSoMId	    ,mode=IN	,	jdbcType=VARCHAR},
 			#{soNo		    ,mode=IN	,	jdbcType=VARCHAR},

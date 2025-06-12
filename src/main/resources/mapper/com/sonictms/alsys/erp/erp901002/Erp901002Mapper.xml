@@ -6,7 +6,7 @@
     <select id="erp901002List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO"
     															resultType		="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO">
         {
-	      CALL sonictmsdev_mssql..USP_MTRL_LISTBYALL (
+	      CALL ${schema}..USP_MTRL_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{agntCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{mtrlCd	,mode=IN	,	jdbcType=VARCHAR},
@@ -26,7 +26,7 @@
     <select id="erp901002p1mtrlSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO"
     															resultType		="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO">
         {
-	      CALL sonictmsdev_mssql..USP_MTRL_LOAD (
+	      CALL ${schema}..USP_MTRL_LOAD (
 	      	#{tblMtrlMId		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
       }
@@ -36,7 +36,7 @@
     <select id="erp901002p1ComdSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO"
     															resultType		="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO">
         {
-	      CALL sonictmsdev_mssql..USP_MTRL_SAVE (
+	      CALL ${schema}..USP_MTRL_SAVE (
 	     	#{saveGubn			,mode=IN	,	jdbcType=VARCHAR},	
 			#{tblMtrlMId		,mode=IN	,	jdbcType=VARCHAR},
 			#{cmpyCd			,mode=IN	,	jdbcType=VARCHAR},
@@ -102,7 +102,7 @@
     <select id="erp901002p2ExcelUploadJson"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901002.entity.Erp901002ExcelVO"
     															resultType		="com.sonictms.alsys.erp.erp901002.entity.Erp901002ExcelVO">
         {
-	      CALL sonictmsdev_mssql..USP_MTRL_EXCL_SAVE (
+	      CALL ${schema}..USP_MTRL_EXCL_SAVE (
 	     	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},					
 			#{agntCd		,mode=IN	,	jdbcType=VARCHAR},	
 			#{mtrlType		,mode=IN	,	jdbcType=VARCHAR},	

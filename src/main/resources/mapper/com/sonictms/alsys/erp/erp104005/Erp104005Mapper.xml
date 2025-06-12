@@ -8,7 +8,7 @@
 		parameterType="com.sonictms.alsys.erp.erp104005.entity.Erp104005VO"
 		resultType="com.sonictms.alsys.erp.erp104005.entity.Erp104005VO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_HISTORY_LISTBYALL (
+			CALL ${schema}..USP_SO_HISTORY_LISTBYALL (
 				#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
 				#{soNo ,mode=IN , jdbcType=VARCHAR},
 				#{refSoNo ,mode=IN , jdbcType=VARCHAR}

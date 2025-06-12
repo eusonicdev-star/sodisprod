@@ -7,7 +7,7 @@
 		parameterType="com.sonictms.alsys.common.entity.ErpCommonVO"
 		resultType="com.sonictms.alsys.common.entity.ErpCommonVO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_OUT_CMPY_IF_SO_STAT_UPDT_LISTBYALL (
+			CALL ${schema}..USP_SO_OUT_CMPY_IF_SO_STAT_UPDT_LISTBYALL (
 				#{soNoList 		,mode=IN , jdbcType=VARCHAR},
 				#{soStatCd		,mode=IN , jdbcType=VARCHAR},
 				#{delResn	 	,mode=IN , jdbcType=VARCHAR}
@@ -20,7 +20,7 @@
 		parameterType="com.sonictms.alsys.common.entity.ErpCommonVO"
 		resultType="com.sonictms.alsys.common.entity.ErpCommonVO">
 		{
-			CALL sonictmsdev_mssql..USP_SO_OUT_CMPY_IF_SO_STAT_UPDT_LISTBYALL_FOR_MOBILE (
+			CALL ${schema}..USP_SO_OUT_CMPY_IF_SO_STAT_UPDT_LISTBYALL_FOR_MOBILE (
 				#{instMobileMId	,mode=IN , jdbcType=VARCHAR},
 				#{soStatCd		,mode=IN , jdbcType=VARCHAR},
 				#{delResn	 	,mode=IN , jdbcType=VARCHAR}

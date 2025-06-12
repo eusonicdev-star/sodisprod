@@ -6,7 +6,7 @@
     <select id="erp203002List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203002.entity.Erp203002VO"
     															resultType		="com.sonictms.alsys.erp.erp203002.entity.Erp203002VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_PLAN_CNFM_LISTBYALL (
+	      CALL ${schema}..USP_INST_PLAN_CNFM_LISTBYALL (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},	
 			#{instDt		,mode=IN	,	jdbcType=VARCHAR},	
 			#{agntList		,mode=IN	,	jdbcType=VARCHAR},	
@@ -25,7 +25,7 @@
 	<select id="erp203002rowCnfmCnsl"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203002.entity.Erp203002VO"
     															resultType		="com.sonictms.alsys.erp.erp203002.entity.Erp203002VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_PLAN_CNFM_SAVE_MOBILE_TRANS  (
+	      CALL ${schema}..USP_INST_PLAN_CNFM_SAVE_MOBILE_TRANS  (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{instPlanId	,mode=IN	,	jdbcType=VARCHAR},
@@ -41,7 +41,7 @@
 	<select id="erp203002allCnfmCnsl"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203002.entity.Erp203002VO"
     															resultType		="com.sonictms.alsys.erp.erp203002.entity.Erp203002VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_PLAN_CNFM_SAVEALL_MOBILE_TRANS  (
+	      CALL ${schema}..USP_INST_PLAN_CNFM_SAVEALL_MOBILE_TRANS  (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{instDt		,mode=IN	,	jdbcType=VARCHAR},

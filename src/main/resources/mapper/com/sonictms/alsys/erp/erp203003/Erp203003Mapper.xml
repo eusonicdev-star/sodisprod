@@ -6,7 +6,7 @@
     <select id="erp203003List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203003.entity.Erp203003VO"
     															resultType		="com.sonictms.alsys.erp.erp203003.entity.Erp203003VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_EVAL_LISTBYALL (
+	      CALL ${schema}..USP_INST_EVAL_LISTBYALL (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},	
 			#{dtType		,mode=IN	,	jdbcType=VARCHAR},	
 			#{fromDt		,mode=IN	,	jdbcType=VARCHAR},	
@@ -23,7 +23,7 @@
     <select id="erp203003List2"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203003.entity.Erp203003VO"
     															resultType		="com.sonictms.alsys.erp.erp203003.entity.Erp203003VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_EVAL_LISTBYALL_RESPONSE_RATE (
+	      CALL ${schema}..USP_INST_EVAL_LISTBYALL_RESPONSE_RATE (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},	
 			#{dtType		,mode=IN	,	jdbcType=VARCHAR},	
 			#{fromDt		,mode=IN	,	jdbcType=VARCHAR},	

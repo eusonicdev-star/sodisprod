@@ -6,7 +6,7 @@
 	<!-- 스프링 부트 시큐리티 입력한 아이디로 로그인정보 찾기-로그인하기 -->
     <select id="loadUserByUsername" statementType="CALLABLE" parameterType="com.sonictms.alsys.user.entity.User" resultType="com.sonictms.alsys.user.entity.User">
         {
-	      CALL sonictmsdev_mssql..USP_LOGIN_ID (
+	      CALL ${schema}..USP_LOGIN_ID (
 	      	#{loginId		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
       }
@@ -15,7 +15,7 @@
     <!-- 로그인 후 아이디로 사용자 정보 찾기 -->
     <select id="findUserInfoByLoginId" statementType="CALLABLE" parameterType="com.sonictms.alsys.user.entity.User" resultType="com.sonictms.alsys.user.entity.User">
         {
-	      CALL sonictmsdev_mssql..USP_USER_INFO_R (
+	      CALL ${schema}..USP_USER_INFO_R (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{loginId		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
@@ -25,7 +25,7 @@
 	<!-- 비밀번호 변경을 위한 인증번호 요청하기 -->
     <select id="repwReqSmsByPhoneNo" statementType="CALLABLE" parameterType="com.sonictms.alsys.user.entity.Repw" resultType="com.sonictms.alsys.user.entity.Repw">
         {
-	      CALL sonictmsdev_mssql..USP_REQ_SMS (
+	      CALL ${schema}..USP_REQ_SMS (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{loginId		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{phoneNo		,mode=IN	,	jdbcType=VARCHAR},
@@ -39,7 +39,7 @@
     <!-- 인증번호를 넣고 인증하기 -->
     <select id="repwSendReqNo" statementType="CALLABLE" parameterType="com.sonictms.alsys.user.entity.Repw" resultType="com.sonictms.alsys.user.entity.Repw">
         {
-	      CALL sonictmsdev_mssql..USP_REQ_CHK (
+	      CALL ${schema}..USP_REQ_CHK (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{loginId		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{phoneNo		,mode=IN	,	jdbcType=VARCHAR},
@@ -53,7 +53,7 @@
     <!-- 비밀번호변경하는 작업 수행 -->
     <select id="changePwSend" statementType="CALLABLE" parameterType="com.sonictms.alsys.user.entity.Repw" resultType="com.sonictms.alsys.user.entity.Repw">
         {
-	      CALL sonictmsdev_mssql..USP_CHANGE_PW_U(
+	      CALL ${schema}..USP_CHANGE_PW_U(
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{loginId		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{phoneNo		,mode=IN	,	jdbcType=VARCHAR},
@@ -80,7 +80,7 @@
      <!-- 로그인했을때 인증 정보 넣기 -->
     <select id="loginHistorySave" statementType="CALLABLE" parameterType="com.sonictms.alsys.user.entity.User" resultType="com.sonictms.alsys.user.entity.User">
         {
-	      CALL sonictmsdev_mssql..USP_USER_H_SAVE(
+	      CALL ${schema}..USP_USER_H_SAVE(
 	      	
 	      	#{tblUserMId	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -95,12 +95,12 @@
 
 	<select id="findPasswordByUserId" resultType="String">
 		SELECT USER_PW
-		FROM sonictmsdev_mssql.dbo.TBL_USER_M
+		FROM ${schema}.dbo.TBL_USER_M
 		WHERE USER_ID = #{userId}
 	</select>
 
 	<update id="updatePassword">
-		UPDATE sonictmsdev_mssql.dbo.TBL_USER_M
+		UPDATE ${schema}.dbo.TBL_USER_M
 		SET USER_PW    = #{newPassword},
 			PW_UPDT_DT = FORMAT(GETDATE(), 'yyyyMMdd'),
 			UPDT_TIME  = GETDATE()

@@ -6,7 +6,7 @@
     <select id="mSrchTalk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO"
     															resultType		="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_LIST_DETAIL_HAPPYCALL_LOAD (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_LIST_DETAIL_HAPPYCALL_LOAD (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR}		
 			
 	      )      
@@ -17,7 +17,7 @@
     <select id="mSaveTalk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO"
     															resultType		="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_LIST_DETAIL_HAPPYCALL_SAVE_TALK (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_LIST_DETAIL_HAPPYCALL_SAVE_TALK (
 	      	#{instMobileMId	,mode=IN	,	jdbcType=VARCHAR},
 			#{sendComplete	,mode=IN	,	jdbcType=VARCHAR},
 			#{userid		,mode=IN	,	jdbcType=VARCHAR},	
@@ -41,7 +41,7 @@
     <select id="mSaveStat"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO"
     															resultType		="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_LIST_DETAIL_HAPPYCALL_SAVE_STAT (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_LIST_DETAIL_HAPPYCALL_SAVE_STAT (
 	      	#{instMobileMId	,mode=IN	,	jdbcType=VARCHAR},
 			#{dlvyDt		,mode=IN	,	jdbcType=VARCHAR},	
 			#{fromDlvyTime	,mode=IN	,	jdbcType=VARCHAR},

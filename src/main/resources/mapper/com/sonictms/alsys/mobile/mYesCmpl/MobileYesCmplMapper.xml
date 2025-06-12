@@ -6,7 +6,7 @@
     <select id="mYesCmplOnCreate"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO"
     															resultType		="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_COMPLETE_LOAD (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_COMPLETE_LOAD (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
       }
@@ -17,7 +17,7 @@
     <select id="mYesCmplSaveStat"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO"
     															resultType		="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_COMPLETE_SAVE_STAT (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_COMPLETE_SAVE_STAT (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
 			#{dlvyCostClct		,mode=IN	,	jdbcType=VARCHAR},
 			#{dlvyCostTxt		,mode=IN	,	jdbcType=VARCHAR},
@@ -49,7 +49,7 @@
     <select id="mYesCmplDel"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO"
     															resultType		="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_COMPLETE_DEL (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_COMPLETE_DEL (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{saveUser			,mode=IN	,	jdbcType=VARCHAR}
 	      )      
@@ -62,7 +62,7 @@
     <select id="mYesCmplSaveTalk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO"
     															resultType		="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_COMPLETE_SAVE_TALK (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_COMPLETE_SAVE_TALK (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
 			#{sendComplete		,mode=IN	,	jdbcType=VARCHAR},
 			#{cmplUserid		,mode=IN	,	jdbcType=VARCHAR},

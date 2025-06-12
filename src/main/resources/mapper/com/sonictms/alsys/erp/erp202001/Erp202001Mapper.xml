@@ -6,7 +6,7 @@
     <select id="erp202001List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp202001.entity.Erp202001VO"
     															resultType		="com.sonictms.alsys.erp.erp202001.entity.Erp202001VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_CAPA_LISTBYALL (
+	      CALL ${schema}..USP_INST_CAPA_LISTBYALL (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{dtType		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{fromDt		,mode=IN	,	jdbcType=VARCHAR},
@@ -27,7 +27,7 @@
     <select id="erp202001Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp202001.entity.Erp202001VO"
     															resultType		="com.sonictms.alsys.erp.erp202001.entity.Erp202001VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_CAPA_SAVE (
+	      CALL ${schema}..USP_INST_CAPA_SAVE (
 	      	#{saveGubn	,mode=IN	,	jdbcType=VARCHAR},
 			#{capaId	,mode=IN	,	jdbcType=VARCHAR},
 			#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
@@ -50,7 +50,7 @@
     <select id="erp202001End"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp202001.entity.Erp202001VO"
     															resultType		="com.sonictms.alsys.erp.erp202001.entity.Erp202001VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_CAPA_CLOSE (
+	      CALL ${schema}..USP_INST_CAPA_CLOSE (
 			#{capaId	,mode=IN	,	jdbcType=VARCHAR},
 			#{saveUser	,mode=IN	,	jdbcType=VARCHAR}
 	      )      
@@ -62,7 +62,7 @@
 	<select id="erp202001p1Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp202001.entity.Erp202001VO"
     															resultType		="com.sonictms.alsys.erp.erp202001.entity.Erp202001VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_CAPA_CRT (
+	      CALL ${schema}..USP_INST_CAPA_CRT (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{dtType		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{fromDt		,mode=IN	,	jdbcType=VARCHAR},
@@ -89,7 +89,7 @@
     <select id="erp202001p2List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp202001.entity.Erp202001VO"
     															resultType		="com.sonictms.alsys.erp.erp202001.entity.Erp202001VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_CAPA_CRT_POPUP_LOAD (
+	      CALL ${schema}..USP_INST_CAPA_CRT_POPUP_LOAD (
 	      	#{capaId		,mode=IN	,	jdbcType=VARCHAR}
 	      	
 	      )      

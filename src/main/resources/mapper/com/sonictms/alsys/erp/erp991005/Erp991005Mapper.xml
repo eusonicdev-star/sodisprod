@@ -6,7 +6,7 @@
     <select id="erp991005LCommList"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991005.entity.Erp991005VO"
     															resultType		="com.sonictms.alsys.erp.erp991005.entity.Erp991005VO">
         {
-	      CALL sonictmsdev_mssql..USP_COMM_M_LISTBYALL_L (
+	      CALL ${schema}..USP_COMM_M_LISTBYALL_L (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{commNm	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{comdNm	,mode=IN	,	jdbcType=VARCHAR}
@@ -19,7 +19,7 @@
     <select id="erp991005RComdList"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991005.entity.Erp991005VO"
     																resultType		="com.sonictms.alsys.erp.erp991005.entity.Erp991005VO">
         {
-	      CALL sonictmsdev_mssql..USP_COMM_M_LISTBYALL_R (
+	      CALL ${schema}..USP_COMM_M_LISTBYALL_R (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{commCd	,mode=IN	,	jdbcType=VARCHAR}
 	      )      
@@ -30,7 +30,7 @@
     <select id="erp991005p1ComdSearch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991005.entity.Erp991005VO"
     																resultType		="com.sonictms.alsys.erp.erp991005.entity.Erp991005VO">
         {
-	      CALL sonictmsdev_mssql..USP_COMM_M_LOAD (
+	      CALL ${schema}..USP_COMM_M_LOAD (
 	      	#{tblCommMId	,mode=IN	,	jdbcType=VARCHAR}
 	      )      
       }
@@ -40,7 +40,7 @@
     <select id="erp991005p1ComdSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991005.entity.Erp991005VO"
     																resultType		="com.sonictms.alsys.erp.erp991005.entity.Erp991005VO">
         {
-	      CALL sonictmsdev_mssql..USP_COMM_M_SAVE (
+	      CALL ${schema}..USP_COMM_M_SAVE (
 	     	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{tblCommMId	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},

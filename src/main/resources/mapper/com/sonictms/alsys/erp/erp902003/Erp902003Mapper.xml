@@ -6,7 +6,7 @@
     <select id="erp902003List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO"
     															resultType		="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO">
         {
-	      CALL sonictmsdev_mssql..USP_ZONEPOST_LISTBYALL (
+	      CALL ${schema}..USP_ZONEPOST_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{zoneType	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{zoneCd	,mode=IN	,	jdbcType=VARCHAR},
@@ -22,7 +22,7 @@
     <select id="erp902003Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO"
     															resultType		="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO">
         {
-	      CALL sonictmsdev_mssql..USP_ZONEPOST_SAVE (
+	      CALL ${schema}..USP_ZONEPOST_SAVE (
 	      	#{tblLgstZonepostMId	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{cmpyCd				,mode=IN	,	jdbcType=VARCHAR},
 	      	#{zoneType				,mode=IN	,	jdbcType=VARCHAR},
@@ -38,7 +38,7 @@
     <select id="erp902003Delete"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO"
     															resultType		="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO">
         {
-	      CALL sonictmsdev_mssql..USP_ZONEPOST_DELETE (
+	      CALL ${schema}..USP_ZONEPOST_DELETE (
 	      	#{tblLgstZonepostMId	,mode=IN	,	jdbcType=VARCHAR}
 	      	
 	      )      
@@ -50,7 +50,7 @@
     <select id="erp902003p1DoubleChk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO"
 																	resultType		="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO">
         {
-	      CALL sonictmsdev_mssql..USP_COMM_M_DUP_CHK (
+	      CALL ${schema}..USP_COMM_M_DUP_CHK (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{commCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{comdCd		,mode=IN	,	jdbcType=VARCHAR}
@@ -63,7 +63,7 @@
 	<select id="erp902003p1Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO"
     															resultType		="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO">
         {
-	      CALL sonictmsdev_mssql..USP_COMM_M_EASY_SAVE (
+	      CALL ${schema}..USP_COMM_M_EASY_SAVE (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{tblCommMId	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},

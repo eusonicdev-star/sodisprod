@@ -6,7 +6,7 @@
     <select id="erp991004List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991004.entity.Erp991004VO"
     															resultType		="com.sonictms.alsys.erp.erp991004.entity.Erp991004VO">
         {
-	      CALL sonictmsdev_mssql..USP_USER_H_LISTBYALL (
+	      CALL ${schema}..USP_USER_H_LISTBYALL (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{userId	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{userNm		,mode=IN	,	jdbcType=VARCHAR}

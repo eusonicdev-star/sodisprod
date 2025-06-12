@@ -3,22 +3,8 @@
 
 	<Properties>
 		<Property name="logFileName">logFile</Property>
-		<!-- <Property name="consoleLayout">%style{%d{ISO8601}}{black} %highlight{%-5level}[%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}:%msg%n%throwable</Property> -->
-		
-		<!-- <Property name="fileLayout">%d [%t] %-5level %c(%M:%L) - %m%n</Property> -->
-		
-		<!-- <Property name="consoleLayout">%style{%d}{black} %highlight{%-5level}[%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}:%msg%n%throwable</Property> -->
-		<!-- <Property name="consoleLayout">	%d %-5level %-30t %X{tblUserMId} %X{userNm} %X{cmpyNm} %c(%M:%L) - %m%n</Property>
-		<Property name="fileLayout">	%d %-5level %-30t %X{tblUserMId} %X{userNm} %X{cmpyNm} %c(%M:%L) - %m%n</Property> -->
-		
-		<!-- <Property name="consoleLayout">	%d %-5level %-30t %X %c(%M:%L) - %m%n</Property>
-		<Property name="fileLayout">	%d %-5level %-30t %X %c(%M:%L) - %m%n</Property> -->
-		
-		
 		<Property name="consoleLayout">	%d %-5level %-25t %X %F(%M:%L) - %m%n</Property>
 		<Property name="fileLayout">	%d %-5level %-25t %X %F(%M:%L) - %m%n</Property>
-		
-		
 	</Properties>
 
 	<Appenders>
@@ -26,16 +12,10 @@
 			<PatternLayout pattern="${consoleLayout}" />
 		</Console>
 		<RollingFile name="file" fileName="${catalina.home}/logs/${logFileName}.log"	filePattern="${sys:catalina.base}/logs/${logFileName}.%d{yyyy-MM-dd}.log.zip">
-		<!-- <RollingFile name="file" fileName="../logs/${logFileName}.log"	filePattern="../logs/${logFileName}.%d{yyyy-MM-dd}.log.zip"> -->
 			<PatternLayout pattern="${fileLayout}" />
 			<Policies>
-				<!-- <SizeBasedTriggeringPolicy size="10MB" /> --> <!-- 10MB 용량이 초과시 DefaultRolloverStrategy 정책만큼 넘버링 -->      
-				<TimeBasedTriggeringPolicy modulate="true"	interval="1" /><!-- filePattern 가 hh 시 단위인데 interval 2라면 2시간마다 파일생김 -->
+				<TimeBasedTriggeringPolicy modulate="true"	interval="1" />
 			</Policies>
-			
-			<!-- <DefaultRolloverStrategy max="168" fileIndex="min" /> -->
-			<!-- 롤링 파일 max값 까지 생성. 이 설정이 없으면 default 8 -->
-			
 		</RollingFile>
 	</Appenders>
 
@@ -59,7 +39,7 @@
 			<AppenderRef ref="file" />
 		</logger>
 
-		<!-- SQL Logger -->
+		<!-- SQL Logger - PROD 환경에서는 비활성화 -->
 		<logger name="jdbc.sqlonly" level="error" additivity="false">
 			<AppenderRef ref="console" />
 			<AppenderRef ref="file" />
@@ -90,4 +70,4 @@
 			<AppenderRef ref="file" />
 		</logger>
 	</Loggers>
-</Configuration>
+</Configuration> 

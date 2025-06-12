@@ -6,7 +6,7 @@
     <select id="erp991003List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO"
     															resultType		="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO">
         {
-	      CALL sonictmsdev_mssql..USP_USER_LISTBYALL (
+	      CALL ${schema}..USP_USER_LISTBYALL (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{srchUser		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{dcCd			,mode=IN	,	jdbcType=VARCHAR},
@@ -21,7 +21,7 @@
     <select id="erp991003p1DoubleChk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO"
 																	resultType		="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO">
         {
-	      CALL sonictmsdev_mssql..USP_USER_DUP_CHK (
+	      CALL ${schema}..USP_USER_DUP_CHK (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{userId		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
@@ -33,7 +33,7 @@
     <select id="erp991003p1TblUserMId"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO"
 																	resultType		="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO">
         {
-	      CALL sonictmsdev_mssql..USP_USER_LOAD (
+	      CALL ${schema}..USP_USER_LOAD (
 	      	#{tblUserMId		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
       }
@@ -45,7 +45,7 @@
     <select id="erp991003p1ComdSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO"
 																	resultType		="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO">
         {
-	      CALL sonictmsdev_mssql..USP_USER_SAVE (
+	      CALL ${schema}..USP_USER_SAVE (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},	
 			#{tblUserMId	,mode=IN	,	jdbcType=VARCHAR},
 			#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},	
@@ -81,7 +81,7 @@
     <select id="erp991003p1PwReset"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO"
 																	resultType		="com.sonictms.alsys.erp.erp991003.entity.Erp991003VO">
         {
-	      CALL sonictmsdev_mssql..USP_USER_PW_RESET (
+	      CALL ${schema}..USP_USER_PW_RESET (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{userId		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{userPw		,mode=IN	,	jdbcType=VARCHAR}

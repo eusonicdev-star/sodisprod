@@ -5,7 +5,7 @@
 
     <select id="menuList" statementType="CALLABLE" parameterType="com.sonictms.alsys.menu.entity.MenuVO" resultType="com.sonictms.alsys.menu.entity.MenuVO">
         {
-	      CALL sonictmsdev_mssql..USP_MENU_LIST_BY_GRNT_R (
+	      CALL ${schema}..USP_MENU_LIST_BY_GRNT_R (
 	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{sysCd			,mode=IN	,	jdbcType=VARCHAR},
 	      	#{userGrntCd	,mode=IN	,	jdbcType=VARCHAR}

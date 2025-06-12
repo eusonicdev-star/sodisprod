@@ -6,7 +6,7 @@
     <select id="erp902001List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO"
     															resultType		="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO">
         {
-	      CALL sonictmsdev_mssql..USP_DC_LISTBYALL (
+	      CALL ${schema}..USP_DC_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{dcCd		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{useYn		,mode=IN	,	jdbcType=VARCHAR}
@@ -18,7 +18,7 @@
     <select id="erp902001p1CommDupl"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO"
     															resultType		="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO">
         {
-	      CALL sonictmsdev_mssql..USP_DC_DUP_CHK (
+	      CALL ${schema}..USP_DC_DUP_CHK (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{dcCd		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
@@ -30,7 +30,7 @@
     <select id="erp902001p1comdDcSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO"
     															resultType		="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO">
         {
-	      CALL sonictmsdev_mssql..USP_DC_LOAD (
+	      CALL ${schema}..USP_DC_LOAD (
 	      
 	      	#{tblLgstDcMId		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
@@ -41,7 +41,7 @@
     <select id="erp902001p1ComdSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO"
     															resultType		="com.sonictms.alsys.erp.erp902001.entity.Erp902001VO">
         {
-	      CALL sonictmsdev_mssql..USP_DC_SAVE (
+	      CALL ${schema}..USP_DC_SAVE (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{tblLgstDcMId	,mode=IN	,	jdbcType=VARCHAR},
       		#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},

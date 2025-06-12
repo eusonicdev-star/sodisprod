@@ -6,7 +6,7 @@
     <select id="erp902006List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902006.entity.Erp902006VO"
     															resultType		="com.sonictms.alsys.erp.erp902006.entity.Erp902006VO">
         {
-	      CALL sonictmsdev_mssql..USP_WEEKDLVY_LISTBYALL (
+	      CALL ${schema}..USP_WEEKDLVY_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{zoneType	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{zoneList	,mode=IN	,	jdbcType=VARCHAR},
@@ -21,7 +21,7 @@
     <select id="erp902006Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902006.entity.Erp902006VO"
     															resultType		="com.sonictms.alsys.erp.erp902006.entity.Erp902006VO">
         {
-	      CALL sonictmsdev_mssql..USP_WEEKDLVY_SAVE (
+	      CALL ${schema}..USP_WEEKDLVY_SAVE (
 	      	#{saveGubn				,mode=IN	,	jdbcType=VARCHAR},
 	      	#{tblLgstWeekdlvyMId	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{cmpyCd				,mode=IN	,	jdbcType=VARCHAR},

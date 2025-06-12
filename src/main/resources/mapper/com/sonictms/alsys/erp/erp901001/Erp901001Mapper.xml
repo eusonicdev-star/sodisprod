@@ -6,7 +6,7 @@
     <select id="erp901001List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901001.entity.Erp901001VO"
     															resultType		="com.sonictms.alsys.erp.erp901001.entity.Erp901001VO">
         {
-	      CALL sonictmsdev_mssql..USP_AGENCY_LISTBYALL (
+	      CALL ${schema}..USP_AGENCY_LISTBYALL (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{agntCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{agntNm	,mode=IN	,	jdbcType=VARCHAR},
@@ -22,7 +22,7 @@
     <select id="erp901001p1agencySrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901001.entity.Erp901001VO"
     															resultType		="com.sonictms.alsys.erp.erp901001.entity.Erp901001VO">
         {
-	      CALL sonictmsdev_mssql..USP_AGENCY_LOAD (
+	      CALL ${schema}..USP_AGENCY_LOAD (
 	      	#{tblAgencyMId		,mode=IN	,	jdbcType=VARCHAR}
 	      )      
       }
@@ -32,7 +32,7 @@
     <select id="erp901001p1ComdSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901001.entity.Erp901001VO"
     															resultType		="com.sonictms.alsys.erp.erp901001.entity.Erp901001VO">
         {
-	      CALL sonictmsdev_mssql..USP_AGENCY_SAVE (
+	      CALL ${schema}..USP_AGENCY_SAVE (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{tblAgencyMId	,mode=IN	,	jdbcType=VARCHAR},
       		#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -63,7 +63,7 @@
     <select id="erp901001p2DetailSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901001.entity.Erp901001DetailVO"
     																	resultType		="com.sonictms.alsys.erp.erp901001.entity.Erp901001DetailVO">
         {
-	      CALL sonictmsdev_mssql..USP_ALRM_AGNTLIST_SAVE (
+	      CALL ${schema}..USP_ALRM_AGNTLIST_SAVE (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
 	      	#{alrmAgntlistId,mode=IN	,	jdbcType=VARCHAR},
       		#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -81,7 +81,7 @@
     <select id="erp901001p2alrmTlkSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901001.entity.Erp901001DetailVO"
     																	resultType		="com.sonictms.alsys.erp.erp901001.entity.Erp901001DetailVO">
         {
-	      CALL sonictmsdev_mssql..USP_ALRM_AGNTLIST_LOAD (
+	      CALL ${schema}..USP_ALRM_AGNTLIST_LOAD (
 	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
 	      	#{agntCd	,mode=IN	,	jdbcType=VARCHAR}
 	      )      

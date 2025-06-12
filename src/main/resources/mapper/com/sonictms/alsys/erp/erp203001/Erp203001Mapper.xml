@@ -5,23 +5,24 @@
 	<!-- 그리드 목록 조회하기 -->
     <select id="erp203001List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
     															resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
-        {
-	      CALL sonictmsdev_mssql..USP_INST_PLAN_INS_LISTBYALL (
-			#{cmpyCd			,mode=IN	,	jdbcType=VARCHAR},	
-			#{fromDt			,mode=IN	,	jdbcType=VARCHAR},
-			#{toDt				,mode=IN	,	jdbcType=VARCHAR},
-			#{instCtgrList		,mode=IN	,	jdbcType=VARCHAR},
-			#{instTypeList		,mode=IN	,	jdbcType=VARCHAR},
-			#{instSeatTypeList  ,mode=IN	,	jdbcType=VARCHAR},
-			#{instZoneTypeList	,mode=IN	,	jdbcType=VARCHAR},
-			#{instZoneCdList	,mode=IN	,	jdbcType=VARCHAR},
-			#{dcCd				,mode=IN	,	jdbcType=VARCHAR},
-			#{instPlanYn		,mode=IN	,	jdbcType=VARCHAR},
-			#{paltNoxx			,mode=IN	,	jdbcType=VARCHAR},
-			#{instEr			,mode=IN	,	jdbcType=VARCHAR}
-	      )      
-      }
-    </select>
+		{
+			CALL ${schema}..USP_INST_PLAN_INS_LISTBYALL(
+				#{cmpyCd			,mode=IN	,	jdbcType=VARCHAR},
+				#{fromDt			,mode=IN	,	jdbcType=VARCHAR},
+				#{toDt				,mode=IN	,	jdbcType=VARCHAR},
+				#{instCtgrList		,mode=IN	,	jdbcType=VARCHAR},
+				#{instTypeList		,mode=IN	,	jdbcType=VARCHAR},
+				#{instSeatTypeList  ,mode=IN	,	jdbcType=VARCHAR},
+				#{instZoneTypeList	,mode=IN	,	jdbcType=VARCHAR},
+				#{instZoneCdList	,mode=IN	,	jdbcType=VARCHAR},
+				#{dcCd				,mode=IN	,	jdbcType=VARCHAR},
+				#{instPlanYn		,mode=IN	,	jdbcType=VARCHAR},
+				#{paltNoxx			,mode=IN	,	jdbcType=VARCHAR},
+				#{instEr			,mode=IN	,	jdbcType=VARCHAR},
+				#{soList            ,mode=IN    ,   jdbcType=VARCHAR}
+				 )
+			}
+	</select>
     
 
 
@@ -29,7 +30,7 @@
     <select id="erp203001List2"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
     															resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_PLAN_INS_LOAD (
+	      CALL ${schema}..USP_INST_PLAN_INS_LOAD (
 			#{tblSoMId			,mode=IN	,	jdbcType=VARCHAR}
 		
 	      )      
@@ -43,7 +44,7 @@
     <select id="erp203001InstErSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
     																resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_USER_SRCH (
+	      CALL ${schema}..USP_INST_USER_SRCH (
 			#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},	
 			#{dcCd		,mode=IN	,	jdbcType=VARCHAR},
 			#{userNm	,mode=IN	,	jdbcType=VARCHAR},
@@ -57,7 +58,7 @@
     <select id="erp203001InstErSrch2"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
     																resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_PLAN_POPUP_INSTER_LISTBYALL (
+	      CALL ${schema}..USP_INST_PLAN_POPUP_INSTER_LISTBYALL (
 			#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},	
 			#{instDt	,mode=IN	,	jdbcType=VARCHAR},
 			#{dcCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -70,7 +71,7 @@
     <select id="erp203001InstErSrch3"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
     																resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_PLAN_POPUP_INSTER_STATUS (
+	      CALL ${schema}..USP_INST_PLAN_POPUP_INSTER_STATUS (
 			#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},	
 			#{instDt	,mode=IN	,	jdbcType=VARCHAR},
 			#{dcCd		,mode=IN	,	jdbcType=VARCHAR}
@@ -82,7 +83,7 @@
     <select id="erp203001Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
     															resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
         {
-	      CALL sonictmsdev_mssql..USP_INST_PLAN_SAVE  (
+	      CALL ${schema}..USP_INST_PLAN_SAVE  (
 	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
 			#{instPlanId	,mode=IN	,	jdbcType=VARCHAR},
 			#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
@@ -126,7 +127,7 @@
     <select id="erp203001Delete"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
     															resultType		="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
         {
-	      CALL sonictmsdev_mssql..USP_DCPOST_DELETE (
+	      CALL ${schema}..USP_DCPOST_DELETE (
 	      	#{tblLgstDcpostMId	,mode=IN	,	jdbcType=VARCHAR}
 	      	
 	      )      
@@ -140,7 +141,7 @@
 		parameterType="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO"
 		resultType="com.sonictms.alsys.erp.erp203001.entity.Erp203001VO">
 		{
-		CALL sonictmsdev_mssql..USP_INST_PLAN_SO_DEL (
+		CALL ${schema}..USP_INST_PLAN_SO_DEL (
 		#{tblSoMId ,mode=IN , jdbcType=VARCHAR},
 		#{saveUser ,mode=IN , jdbcType=VARCHAR}
 		)

@@ -7,7 +7,7 @@
     <select id="mDeliveryCancelSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mDeliveryCancel.entity.MobileDeliveryCancelVO"
     															resultType		="com.sonictms.alsys.mobile.mDeliveryCancel.entity.MobileDeliveryCancelVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_CANCEL_SAVE (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_CANCEL_SAVE (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
 			#{tblSoMId			,mode=IN	,	jdbcType=VARCHAR},
 			#{dlvyCnclResn		,mode=IN	,	jdbcType=VARCHAR},

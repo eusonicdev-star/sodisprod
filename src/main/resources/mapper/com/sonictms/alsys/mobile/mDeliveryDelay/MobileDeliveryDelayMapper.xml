@@ -7,7 +7,7 @@
     <select id="mDeliveryDelayList"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mDeliveryDelay.entity.MobileDeliveryDelayVO"
     																resultType		="com.sonictms.alsys.mobile.mDeliveryDelay.entity.MobileDeliveryDelayVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_POSTPONE_SEATCAPA_LOAD (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_POSTPONE_SEATCAPA_LOAD (
 	      	#{cmpyCd			,mode=IN	,	jdbcType=VARCHAR},
 			#{tblSoMId			,mode=IN	,	jdbcType=VARCHAR}
 			
@@ -21,7 +21,7 @@
     <select id="mDeliveryDelaySave"  statementType="CALLABLE"	parameterType	="com.sonictms.alsys.mobile.mDeliveryDelay.entity.MobileDeliveryDelayVO"
     															resultType		="com.sonictms.alsys.mobile.mDeliveryDelay.entity.MobileDeliveryDelayVO">
         {
-	      CALL sonictmsdev_mssql..USP_MOBILE_DELIVERY_POSTPONE_SAVE (
+	      CALL ${schema}..USP_MOBILE_DELIVERY_POSTPONE_SAVE (
 	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
 			#{tblSoMId			,mode=IN	,	jdbcType=VARCHAR},
 			#{capaId			,mode=IN	,	jdbcType=VARCHAR},
