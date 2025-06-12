@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    jdbc-url: jdbc:log4jdbc:sqlserver://192.168.211.203:1431;encrypt=true;trustServerCertificate=true
+    username: sodisproddb_mssql
+    password: sonicdb*3415
+
+logging:
+  config: classpath:log4j2-local.xml
+
+common:
+  java:
+    kppApiSearch: https://52.79.206.98:5201/restv2/WINUS.PAH:PAH_DLV_RR/PAH/DLV_ORDER
+    kppApiStatus: https://52.79.206.98:5201/restv2/WINUS.PAH:PAH_DLV_RR/PAH/DLV_RTN_INSERT
+    kppApiUsername: pahuser01
+    kppApiUserpass: pahuser01
+    bizMsgUrl: https://alimtalk-api.bizmsg.kr/v2/sender/send
+    bizMsgUserid: alliance
+
+mybatis:
+  configuration-properties:
+    schema: sodisproddb_mssql
