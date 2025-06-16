@@ -473,7 +473,8 @@
                     srchData.append("dtType", myComboDtType.getSelectedValue());
                     srchData.append("fromDt", $("#dateFrom").val().replace(/-/g, ""));
                     srchData.append("toDt", $("#dateTo").val().replace(/-/g, ""));
-                    srchData.append("agntList", $("#srchTextArea").val().replace(/\n/g, ","));
+                    srchData.append("agntCd", $("#srchCode").val());
+                    srchData.append("agntNm", $("#srchName").val());
                     srchData.append("soList", $("#soTextArea").val().replace(/\n/g, ","));
                     srchData.append("soTypeList", myComboSoType.getChecked());
                     srchData.append("soStatList", myComboSoStat.getChecked());
@@ -691,12 +692,14 @@
 
             },	//END of searchOpen
             keyOpen: {
-                enterKey: function () {
+                enterKey: function (enterType) {
                     if (window.event.keyCode == 13) {
-
-                        // alert("엔터키");
-                        fnObj.winOpen.commSrch('화주', 'A', 'AGENCY', 'text');
-
+                        if (enterType == 'srchName') {
+                            $("#srchName").blur();
+                            $("#srchCode").blur();
+                            $("#srchCode").val("");
+                            fnObj.winOpen.commSrch('화주','A','AGENCY','text');
+                        }
                     }
                 },
                 onKeyPressed: function (code, ctrl, shift) {
@@ -918,17 +921,42 @@
 						<input type="text" id="dateTo">
 						<i id="dateToIcon" class="fa fa-calendar fa-lg" aria-hidden="true"> </i>
 					</span>
-				</span>
+			</span>
 
-            <span class="cell">
-					<span class="item-head">화주사</span>
-					<span class="item-data">
-						<textArea id="srchTextArea"></textArea>
-						<i id="srchIcon" class="fa fa-search" aria-hidden="true"
-                           onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','textArea')"></i>
-					</span>
+			<span class="cell">
+            <span class="item-head">화주사</span>
+            <span class="item-data margin-right-5">
+              <input
+					  type="text"
+					  id="srchName"
+					  onkeyup="fnObj.keyOpen.enterKey('srchName');"
+			  />
+              <i
+					  id="srchIcon"
+					  class="fa fa-search"
+					  aria-hidden="true"
+					  onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"
+			  ></i>
+            </span>
+            <span class="item-data">
+              <input type="text" id="srchCode" readonly/>
+              <i
+					  id="delIcon"
+					  class="fa fa-minus-circle"
+					  aria-hidden="true"
+					  onclick="fnObj.searchOpen.delSrchCode('srchName')"
+			  ></i>
+            </span>
+          </span>
 
-				</span>
+			<!--            <span class="cell">-->
+			<!--				<span class="item-head">화주사</span>-->
+			<!--				<span class="item-data">-->
+			<!--					<textArea id="srchTextArea"></textArea>-->
+			<!--					<i id="srchIcon" class="fa fa-search" aria-hidden="true"-->
+			<!--                           onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','textArea')"></i>-->
+			<!--				</span>-->
+			<!--			</span>-->
 
             <span class="cell">
 					<span class="item-head">수령인</span>

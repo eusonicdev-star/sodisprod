@@ -586,7 +586,7 @@
 						{
 							if(myComboSeatType.isChecked(0))
 							{
-								console.log("전체 에 체크를 했을때");	
+								console.log("전체에 체크를 했을때");
 				    			var c=0;
 				    			for(var i=1;i<myComboSeatType.getOptionsCount();i++)
 					    		{
@@ -599,7 +599,7 @@
 							}
 							if(!myComboSeatType.isChecked(0))		//전체에 체크를 안했을때
 				    		{
-			    				console.log("전체 에 체크를 안했을때");	
+								console.log("전체에 체크를 안했을때");
 			    				var c=0;
 				    			for(var i=1;i<myComboSeatType.getOptionsCount();i++)
 					    		{
@@ -623,9 +623,7 @@
 				    				cnt++;
 				    			}
 				    		}
-				    		console.log("체크한 것 cnt : " + cnt);
-				    		
-				    		
+
 				    		if((myComboSeatType.getOptionsCount()-1) == cnt)
 				    		{
 				    			myComboSeatType.setChecked(0,true);
@@ -636,10 +634,7 @@
 				    		}
 				    		
 				    		myComboSeatType.updateOption("","",cnt+"개 선택","");
-				    		//myComboSeatType.selectOption(0);
 				    		myComboSeatType.openSelect();
-	
-							
 			    			return;
 						}
 			    		
