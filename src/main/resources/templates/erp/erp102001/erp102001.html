@@ -1,9 +1,16 @@
-<!DOCTYPE HTML>
-<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+</body>
+</html><!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>주문상담&알림톡 관리 (erp102001)</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -12,33 +19,24 @@
           href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
     <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/erp-style.css"/>
     <link rel="stylesheet" type="text/css"
           href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-
-
     <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="/js/common.js"></script>
     <script type="text/javascript" src="/js/commCode.js"></script>
     <script src=" https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-
-    <!-- 엑셀 다운로드 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
 
     <script th:inline="javascript">
-
         var myWins;
         var srchMyCalendar;
         var srchMyCalendar2;
-
         var today;
-
-
         var myGridOnCellChanged;
-
         var myGrid;
         var myGrid2;	//20211231
         var myCalendar;
@@ -72,7 +70,6 @@
                         srchCd: $("#srchSrchCode").val(),
                         srchNm: $("#srchSrchName").val()
                     };
-
 
                     myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
 
@@ -123,18 +120,12 @@
                         alert(errMsg);
                         return;
                     }
-
-
                     myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
-
                     myWins.window(windowId).attachEvent("onClose", function (win) {
-                        //alert("windowId : " + windowId);
                         return true;
                     });
                 },	//END of prodCommSrch : function(){
                 prodCommSrchGrid: function (rowId, title, cmpyCd, srchCtgr, srchInput, nValue) {		//공통코드 찾기 팝업
-
-
                     windowId = "prodCommSrchGrid";
                     windowText = title + " prodSrch";
                     windowUrl = "/prodSrch"
@@ -149,7 +140,6 @@
                     };
                     windowSendObject = {
                         windowId: windowId,
-
                         cmpyCd: cmpyCd,				//A
                         srchCtgr: srchCtgr,			//MTRL_SO
                         srchInput: srchInput,			//text
@@ -158,7 +148,6 @@
                         srchArea: $("#srchCode").val(), 	//화주코드 8013
                         agntCd: $("#srchCode").val(),
                         agntNm: $("#srchName").val()
-                        //nValue : nValue
                     };
                     prodSrchRowId = rowId;
                     var errMsg = "";
@@ -176,19 +165,12 @@
                         alert(errMsg);
                         return;
                     }
-
-
                     myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
-
                     myWins.window(windowId).attachEvent("onClose", function (win) {
-
                         return true;
                     });
                 },	//END of prodCommSrchGrid : function(){
-                //20211231 정연호 추가. 끝
-                //주문유형선택 팝업
                 soListPopup: function () {		//공통코드 찾기 팝업
-
                     windowId = "erp102001p1";
                     windowText = "주문리스트 팝업 erp102001p1";
                     windowUrl = "/erp102001p1"
@@ -225,7 +207,6 @@
                     });
                 },	//END of soListPopup : function(){
 
-
                 //해피콜상세리스트 팝업
                 cnslListPopup: function () {		//해피콜상세리스트 팝업
 
@@ -258,12 +239,10 @@
 
                 //주문이력보기 팝업
                 soLogPopup: function () {
-
                     if (!$("#cnslTblSoMId").val()) {
                         alert("조회를 먼저 하세요")
                         return
                     }
-
                     windowId = "erp102001p5";
                     windowText = "주문이력보기 팝업 erp102001p5";
                     windowUrl = "/erp102001p5"
@@ -363,7 +342,6 @@
                     //20211231 정연호 추가. 끝
                     if (windowId == "erp102001p4") {
                     }
-
                     if (windowId == "srchCommSrch") {
 
                         if (rtnObj == null) {
@@ -447,29 +425,6 @@
                     //20211231 정연호 추가. 끝
                     if (windowId == "erp102001p1") {
 
-                        //console.log(rtnObj[0])
-                        /*
-                            //모든 입력란을 초기화
-                            $("input").val("");
-                            $("textArea").val("");
-                            myGrid.clearAll();
-
-                            srchMyComboCmpyCd.selectOption(0);	//회사콤보 바인드
-                            myComboSrchDtSpan.selectOption(0);	//달력유형콤보 바인드
-                            srchMyComboDtType.selectOption(0);	//달력유형콤보 바인드
-
-                            //오더정보 콤보
-                            myComboCmpyCd.selectOption(0);	//회사콤보 바인드
-                            myComboSoType.selectOption(0);	//주문유형 콤보
-                            myComboSoStat.selectOption(0);	//주문상태 콤보
-                            myComboDcCd.selectOption(0);
-                            myComboDlvyCostType.selectOption(0);
-
-                            $("#srchDateFrom").val(today);
-                            $("#srchDateTo").val(today);
-                             */
-
-
                         fnObj.searchOpen.searchSoLoadM(rtnObj[0]);
                     }
                 },	//END of rtnObject : function(windowId,rtnObj){
@@ -520,11 +475,8 @@
                     srchMyComboDtType.readonly(true);
                     srchMyComboDtType.setFontSize("12px", "12px");
                     srchMyComboDtType.attachEvent("onChange", function (value, text) {
-
-
                     });
                 },
-
 
                 //20220106 정연호 추가 시공카테고리 체크박스 콤보 추가하기
                 srchComboInstCapaCtgr: function () {		//시공카테고리 콤보
@@ -532,10 +484,6 @@
                     comboList(srchMyComboInstCapaCtgr, 'A', 'COMM', 'INST_CAPA_CTGR', '', 'Y', 'req');
                     srchMyComboInstCapaCtgr.readonly(true);
                     srchMyComboInstCapaCtgr.selectOption(0);
-                    //srchMyComboInstCapaCtgr.setChecked(1,true);
-                    //srchMyComboInstCapaCtgr.updateOption("","",1+"개 선택","");
-
-
                     var c = 0;
                     for (var i = 0; i < srchMyComboInstCapaCtgr.getOptionsCount(); i++) {
                         srchMyComboInstCapaCtgr.setChecked(i, true);
@@ -1005,17 +953,6 @@
                             errMsg = errMsg + "순번 : " + delSeq + " 삭제 성공\n";
                             myGrid2.cellById(delRowId, myGrid2.getColIndexById("cud")).setValue("D");
 
-                            /* //table에서 삭제
-
-							if(fnObj.searchOpen.delDetail(myGrid.getRowData(delRowId)))	//결과가 true 면 그리드에서 로우 삭제
-							{
-								myGrid.deleteRow(delRowId,"");
-								errMsg = errMsg + "순번 : " + delSeq + " 삭제 성공\n";
-							}
-							else	//결과가 false 실패 면 로우 삭제 안함
-							{
-								errMsg = errMsg + "순번 : " + delSeq + " 삭제 실패\n";
-							} */
                         } else if (delChk == "1" && !delTblSoPId) //체크를 했는데  delTblSoPId가 없음 (화면에서 + 눌러서 그리드에 새로 한줄 추가한것)
                         {
                             myGrid.deleteRow(delRowId, "");
@@ -1024,7 +961,6 @@
                         }
                     });
 
-                    ////alert(errMsg);
                     var sumMainRcptCost = 0;	//20211226 정연호 추가. 착불비 합계 계산하기
                     myGrid.forEachRow(function (eachRowId) {
                         sumMainRcptCost = sumMainRcptCost + parseInt(myGrid.cellById(eachRowId, myGrid.getColIndexById("rcptCost")).getValue());
@@ -1399,27 +1335,27 @@
 
                     $("#imgA01").removeAttr("href");
 
-                    $("#imgSrc01").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#imgSrc01").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#imgA02").removeAttr("href");
-                    $("#imgSrc02").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#imgSrc02").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
 
                     $("#imgA03").removeAttr("href");
-                    $("#imgSrc03").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#imgSrc03").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
 
                     $("#imgA04").removeAttr("href");
-                    $("#imgSrc04").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#imgSrc04").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#imgA05").removeAttr("href");
-                    $("#imgSrc05").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#imgSrc05").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#imgA06").removeAttr("href");
-                    $("#imgSrc06").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#imgSrc06").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#signImgA").removeAttr("href");
-                    $("#signImgSrc").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#signImgSrc").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
 
                     //미마감사유
@@ -1429,25 +1365,25 @@
                     $("#xitem05Memo").val("");
 
                     $("#ximgA01").removeAttr("href");
-                    $("#ximgSrc01").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#ximgSrc01").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#ximgA02").removeAttr("href");
-                    $("#ximgSrc02").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#ximgSrc02").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#ximgA03").removeAttr("href");
-                    $("#ximgSrc03").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#ximgSrc03").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#ximgA04").removeAttr("href");
-                    $("#ximgSrc04").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#ximgSrc04").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#ximgA05").removeAttr("href");
-                    $("#ximgSrc05").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#ximgSrc05").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#ximgA06").removeAttr("href");
-                    $("#ximgSrc06").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#ximgSrc06").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $("#xsignImgA").removeAttr("href");
-                    $("#xsignImgSrc").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
+					$("#xsignImgSrc").attr("src", "https://sodisprod.cdn1.cafe24.com/noimage.png");
 
                     $.ajax({
                         url: "/erp102001soDlvyInfoData",
@@ -1463,7 +1399,7 @@
                             if (res) {	//리턴값이 있음
                                 $("#dlvyInfoDiv").show();
 
-                                var url = "https://sodisprodimg.cafe24.com/alliance/";
+								var url = "https://sodisprodimg.cafe24.com/alliance/";
                                 //var	url = "http://145.122.24.222/alliance/";
                                 $("#instPlanDt").val(res.instPlanDt);
                                 $("#instDt").val(res.instDt);
@@ -2380,124 +2316,112 @@
 </head>
 <!-- top , left, bottom , right,  -->
 <body>
-<div id="mainDiv" style="padding: 10px 10px 0 10px;">
-    <div id="searchDiv" style="width: 100%; font-size: 12px; padding-bottom: 5px;">
-        <div id="btnDiv1" style="width: 100%;">
-				<span class="cell" style="float: right;">
-					<span class="item-data" style="padding: 0 0 0 20px;">
-						<button id="btnSearch" onclick="fnObj.searchOpen.search()">
-							<i class="fa fa-search fa-lg" aria-hidden="true">&nbsp;</i>
-							조회(F2)
-						</button>
-					</span>
-					<span class="item-data" style="padding: 0 20px 0 20px;"><input id="btnReload" type="button"
-                                                                                   onclick="location.reload(true);"
-                                                                                   value="초기화"></span>
-				</span>
+<div id="mainDiv">
+    <div id="searchDiv">
+        <div id="btnDiv1">
+            <div class="title-container">
+                <span class="item-head title-text">주문상담 & 알림톡 관리</span>
+                <span class="sub-title">erp102001</span>
+            </div>
+            <div class="btn-container">
+                <button id="btnSearch" class="action-button primary" onclick="fnObj.searchOpen.search()">
+                    조회(F2)
+                </button>
+                <input id="btnReload" class="action-button" type="button"
+                       onclick="location.reload(true);"
+                       value="초기화">
+            </div>
         </div>
-        <div id="searchDiv1" style="width: 100%;">
-				<span class="cell" style="width: 320px;">
-					<span class="item-head"
-                          style="font-size: 14px; font-weight: bold; color: darkblue; text-align: left; padding: 0 0 10px 0;">
-						주문상담&알림톡 관리 <font size=2 color=black>erp102001</font>
-					</span>
-				</span>
-            <br>
-            <span class="cell" style="width: 220px; display: none;">
-					<span class="item-head" style="width: 80px;">회사</span>
-					<span class="item-data" style="width: 140px;">
+        <div id="searchDiv1">
+            <span class="cell" style=" display: none;">
+					<span class="item-head">회사</span>
+					<span class="item-data">
 						<div id="srchCmpyCd"></div>
 					</span>
-				</span>
-            <span class="cell" style="width: 300px;">
-					<span class="item-head" style="width: 80px;">달력유형</span>
-					<span class="item-data" style="width: 80px;">
+			</span>
+            <span class="cell">
+					<span class="item-head">달력유형</span>
+					<span class="item-data">
 						<div id="srchSrchDtSpan"></div>
 					</span>
-					<span class="item-data" style="width: 140px;">
+					<span class="item-data">
 						<div id="srchDtType"></div>
 					</span>
-				</span>
-
-
-            <span id="fromTo" class="cell" style="width: 360px;">
-					<span class="item-head" style="width: 80px;">달력</span>
-					<span class="item-data" style="width: 140px;">
-						<input type="text" id="srchDateFrom" style="height: 20px; width: 90px;" readonly>
+			</span>
+            <span id="fromTo" class="cell">
+					<span class="item-head">달력</span>
+					<span class="item-data icon-cell">
+						<input type="text" id="srchDateFrom" readonly>
 						<i id="srchDateFromIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
 					</span>
-					<span class="item-data" style="width: 140px;">
-						<input type="text" id="srchDateTo" style="height: 20px; width: 90px;" readonly>
+					<span class="item-data">
+						<input type="text" id="srchDateTo" readonly>
 						<i id="srchDateToIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
 					</span>
-				</span>
-            <span class="cell" style="width: 220px;">
-					<span class="item-head" style="width: 80px;">고객명</span>
-					<span class="item-data" style="width: 140px;">
-						<input type="text" id="srchAcptNm" style="height: 20px; width: 132px;">
+			</span>
+            <span class="cell">
+					<span class="item-head">고객명</span>
+					<span class="item-data">
+						<input type="text" id="srchAcptNm">
 					</span>
-				</span>
-
-
-            <span class="cell" style="width: 220px;">
-					<span class="item-head" style="width: 80px;">주소검색</span>
-					<span class="item-data" style="width: 140px;">
-						<input type="text" id="srchAddr" style="height: 20px; width: 132px;">
+			</span>
+            <span class="cell">
+					<span class="item-head">주소검색</span>
+					<span class="item-data">
+						<input type="text" id="srchAddr">
 					</span>
-				</span>
+			</span>
 
-            <span class="cell" style="width: 220px;">
-					<span class="item-head" style="width: 80px;">전화번호</span>
-					<span class="item-data" style="width: 140px;">
-						<input type="text" id="srchAcptTel" style="height: 20px; width: 132px;"
+            <span class="cell">
+					<span class="item-head">전화번호</span>
+					<span class="item-data">
+						<input type="text" id="srchAcptTel"
                                oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/>
 					</span>
 				</span>
-            <span class="cell" style="width: 220;">
-					<span class="item-head" style="width: 80px;">쇼핑몰</span>
-					<span class="item-data" style="width: 140px;">
-						<input type="text" id="srchMallNm" style="width: 132px;"></input>
+            <span class="cell">
+					<span class="item-head">쇼핑몰</span>
+					<span class="item-data">
+						<input type="text" id="srchMallNm">
 					</span>
 				</span>
 
-            <span class="cell" style="width: 380px;">
-					<span class="item-head" style="width: 80px;">화주사</span>
-					<span class="item-data" style="width: 160px;">
-						<input type="text" id="srchSrchName" style="width: 112px;"
-                               onkeyup="fnObj.keyOpen.enterKey('srchSrchName');"></input>
+            <span class="cell">
+					<span class="item-head">화주사</span>
+					<span class="item-data icon-cell">
+						<input type="text" id="srchSrchName"
+                               onkeyup="fnObj.keyOpen.enterKey('srchSrchName');">
 						<i id="srchIcon" class="fa fa-search" aria-hidden="true"
                            onclick="fnObj.winOpen.srchCommSrch('화주','A','AGENCY','text')"></i>
 					</span>
-					<span class="item-data" style="width: 140px;">
-						<input type="text" id="srchSrchCode" style="width: 102px;" readonly></input>
+					<span class="item-data">
+						<input type="text" id="srchSrchCode" readonly>
 						<i id="delIcon" class="fa fa-minus-circle" aria-hidden="true"
                            onclick="fnObj.searchOpen.srchDelSrchCode()"></i>
 					</span>
 				</span>
 
 
-            <span class="cell" style="width: 220;">
-					<span class="item-head" style="width: 80px;">AL오더</span>
+            <span class="cell">
+					<span class="item-head">AL오더</span>
                 <!-- 20211226 정연호 수정. 오더번호를 AL오더 로 변경 -->
-					<span class="item-data" style="width: 140px;">
-						<input type="text" id="srchSoNo" style="width: 132px;"></input>
+					<span class="item-data">
+						<input type="text" id="srchSoNo">
 					</span>
 				</span>
-            <span class="cell" style="width: 260;">
-					<span class="item-head" style="width: 120px;">고객사 주문번호</span>
-					<span class="item-data" style="width: 140px;">
-						<input type="text" id="srchRefSoNo" style="width: 132px;"></input>
+            <span class="cell">
+					<span class="item-head">고객사 주문번호</span>
+					<span class="item-data">
+						<input type="text" id="srchRefSoNo"></input>
 					</span>
 				</span>
             <!-- 20220106 정연호 추가 시공카테고리 추가 -->
-            <span class="cell" style="width:220px;">
-					<span class="item-head" style="width:80px;">시공카테고리</span>
-					<span class="item-data" style="width:140px;"><div opt_type="checkbox"
-                                                                      id="srchInstCapaCtgr"></div></span>
+            <span class="cell">
+					<span class="item-head">시공카테고리</span>
+					<span class="item-data">
+						<div opt_type="checkbox" id="srchInstCapaCtgr"></div>
+					</span>
 				</span>
-            <!-- 20220106 정연호 추가 시공카테고리 추가.끝 -->
-
-
         </div>
     </div>
     <div id="searchDiv2nd"
@@ -2507,27 +2431,25 @@
         </div>
         <div id="searchDiv2nd1" style="width: 100%;"></div>
     </div>
-    <!-- <hr style="width:100%;height:1px;color:lightgray;background-color:lightgray"> -->
+
     <hr style="width: 100%; border: solid 1px lightgray;">
-
-    <!-- <div id="gridDiv"  style="width:100%;font-size:12px;padding-bottom:5px;">
-        <div id="grid" style="width:100%;height:100%;"></div>
-    </div> -->
-
 
     <!-- 여기부터 주문정보 보여주기 -->
     <div id="inputDiv1" style="width: 100%; font-size: 12px;">
 			<span class="cell" style="float: right;">
 				<span class="item-data" style="padding: 0 0 0 20px;">
-					<button id="btnSrch" onclick="fnObj.searchOpen.updtData();">
-						<i class="fa fa-pencil-square-o fa-lg" aria-hidden="true">&nbsp;</i>
+					<button id="btnUpdate" class="action-button primary" onclick="fnObj.searchOpen.updtData();">
 						주문정보 변경
 					</button>
+				</span>
+				<span class="item-data" style="width: 100px;">
+					<button id="btnConfirm" class="action-button primary" onclick="fnObj.searchOpen.dlvyCnfmDtBtn();"
+                            style="width: 100px;">배송일 확정</button>
 				</span>
 			</span>
         <span class="cell" style="width: 320px;">
 				<span class="item-head"
-                      style="font-size: 14px; font-weight: bold; color: darkblue; text-align: left; padding: 0 0 10px 0;">오더정보</span>
+                      style="font-size: 14px; font-weight: bold; color: #333; text-align: left; padding: 0 0 10px 0;">오더 정보</span>
 			</span>
         <br>
 
@@ -2617,7 +2539,7 @@
 				</span>
 			</span>
         <span class="cell" style="width: 220px;">
-				<span class="item-head" style="width: 80px;">배송확정일</span>
+				<span class="item-head" style="width: 80px;">배송 확정일</span>
 				<span class="item-data" style="width: 140px;">
 					<input type="text" id="dlvyCnfmDt"
                            style="height: 20px; width: 90px; border: solid 1px gray; border-radius: 2px; background-color: yellow;"
@@ -2628,7 +2550,7 @@
 
         <!-- 20220106 정연호 추가 시공카테고리 추가 -->
         <span class="cell" style="width:200px;">
-				<span class="item-head" style="width:100px;">시공카테고리</span>
+				<span class="item-head" style="width:100px;">시공 카테고리</span>
 				<span class="item-data" style="width:100px;">
 					<input type="text" id="instCapaCtgr" style="height: 20px;width: 100px;" disabled></input>
 				</span>
@@ -2645,19 +2567,10 @@
 			</span>
         <!-- 20220517 정연호 추가 타업체 추가.끝 -->
 
-
-        <span class="cell" style="width: 100px; float: right;">
-				<span class="item-data" style="width: 100px;">
-					<button id="btnSrch" onclick="fnObj.searchOpen.dlvyCnfmDtBtn();"
-                            style="width: 100px;">배송일확정</button>
-
-				</span>
-			</span>
-
         <hr style="width: 100%; border: solid 1px lightgray;">
         <span class="cell" style="width: 320px;">
 				<span class="item-head"
-                      style="font-size: 14px; font-weight: bold; color: darkblue; text-align: left; padding: 0 0 10px 0;">고객정보(수령인)</span>
+                      style="font-size: 14px; font-weight: bold; color: #333; text-align: left; padding: 0 0 10px 0;">고객정보(수령인)</span>
 			</span>
         <br>
         <span class="cell" style="width: 220px;">
@@ -2699,17 +2612,17 @@
         <!--  20211226 정연호 추가. 착불비 합계를 추가함 -->
 
         <span class="cell" style="width: 220px;border:0px solid black;">
-					<span class="item-head" style="width: 80px;">착불비합계</span>
+					<span class="item-head" style="width: 80px;">착불비 합계</span>
 					<span class="item-data" style="width: 140px;">
-						<input type="text" id="mainRcptCost" style="width: 122px; height: 20px;" disabled
-                               oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"></input>
+						<input type="text" id="mainRcptCost" style="width: 122px;" disabled
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');">
 					</span>
 				</span>
         <br>
         <span class="cell" style="width: 240px;">
 				<span class="item-head" style="width: 100px;">우편번호</span>
 				<span class="item-data" style="width: 120px;">
-					<input type="text" id="findAdd_postcode" name="findAdd_postcode" style="width: 112px; height: 20px;"
+					<input type="text" id="findAdd_postcode" name="findAdd_postcode" style="width: 112px;"
                            readOnly></input>
 				</span>
 				<span class="item-data" style="width: 20px;">
@@ -2836,41 +2749,46 @@
 			</span>
 
         <br>
-        <span class="cell" style="width: 100%;">
+        <span class="cell" style="width: 100%; display: block; margin-bottom: 10px;">
 				<span class="item-head" style="width: 100px;">주소</span>
-				<span class="item-data" style="width: 50%;">
+				<span class="item-data" style="width: 40%">
 					<input type="text" id="findAdd_roadAddress" name="findAdd_roadAddress"
-                           style="width: 100%; height: 20px;" readOnly placeholder="주소"></input>
+						   style="width: 450px"
+                           readOnly placeholder="주소">
 				</span>
             <!-- 100 byte -->
-				<span class="item-data" style="width: 50%;">
+				<span class="item-data" style="width: 40%">
 					<input type="text" id="findAdd_detailAddress" name="findAdd_detailAddress"
-                           style="width: 100%; height: 20px;" placeholder="상세주소"
-                           onKeyUp="javascript:fnChkByte(this,'200')"></input>
+                           placeholder="상세주소"
+                           style="width: 100%"
+                           onKeyUp="fnChkByte(this,'200')">
 				</span>
             <!-- 200 byte -->
 			</span>
-        <span class="cell" style="width: 100%;">
-				<span class="item-head" style="width: 100px;">배송메세지</span>
-				<span class="item-data" style="width: 100%;">
-					<textarea id="dlvyRqstMsg" name="dlvyRqstMsg" style="width: 100%; height: 80px;"
-                              onKeyUp="javascript:fnChkByte(this,'500')"></textarea>
+		<span class="cell" style="width: 100%;">
+				<span class="item-head" style="width: 100px;">배송 메세지</span>
+				<span class="item-data" style="width: 80%; height: 70px;">
+					<textarea id="dlvyRqstMsg" name="dlvyRqstMsg" style="width: 100%; height: 100%;"
+                              onKeyUp="fnChkByte(this,'500')">
+					</textarea>
 				</span>
             <!-- 500 byte -->
 			</span>
-        <span class="cell" style="width: 100%;">
-				<span class="item-head" style="width: 100px;">고객사메세지</span>
-				<span class="item-data" style="width: 100%;">
-					<textarea id="custSpclTxt" name="custSpclTxt" style="width: 100%; height: 80px;"
+		<span class="cell" style="width: 100%;">
+				<span class="item-head" style="width: 100px;">고객사 메세지</span>
+				<span class="item-data" style="width: 80%; height: 70px;">
+					<textarea id="custSpclTxt" name="custSpclTxt" style="width: 100%; height: 100%;"
                               onKeyUp="javascript:fnChkByte(this,'500')"></textarea>
 				</span>
             <!-- 500 byte -->
 			</span>
 
-        <hr style="width: 100%; border: solid 1px lightgray;">
+        <div>
+            <hr style="width: 100%; border: solid 1px lightgray;">
+        </div>
         <span class="cell" style="width: 320px;">
 				<span class="item-head"
-                      style="font-size: 14px; font-weight: bold; color: darkblue; text-align: left; padding: 0 0 10px 0;">운임정보</span>
+                      style="font-size: 14px; font-weight: bold; color: #333; text-align: left; padding: 0 0 10px 0;">운임정보</span>
 			</span>
         <br>
         <span class="cell" style="width: 220px;">
@@ -2902,13 +2820,13 @@
 			</span>
         <hr style="width: 100%; border: solid 1px lightgray;">
         <!-- <span class="cell" style="width: 320px;">
-            <span class="item-head" style="font-size: 14px; font-weight: bold; color: darkblue; text-align: left; padding: 0 0 10px 0;">
+            <span class="item-head" style="font-size: 14px; font-weight: bold; color: #333; text-align: left; padding: 0 0 10px 0;">
             제품정보</span>
         </span> -->
         <!-- 20211231 정연호 제품정보 추가 삭제 -->
         <span class="cell" style="width:160px;">
 				<span class="item-head"
-                      style="width:160px;text-align:left;font-size:14px;color:darkblue;font-weight:bold;">
+                      style="width:160px;text-align:left;font-size:14px;color:#333;font-weight:bold;">
 					제품정보&nbsp;&nbsp;&nbsp;
 					<i id=rowPlusBtn class="fa fa-plus-circle fa-lg" aria-hidden="true"
                        style="font-size:18px;color:black;font-weight:bold;" onclick="fnObj.gridOpen.addRowMyGrid()"
@@ -2919,8 +2837,8 @@
                        ;></i>
 				</span>
 			</span>
-        <span class="item-data" style="width:90px;"><input id="btnSrch" type="button"
-                                                           onclick="fnObj.searchOpen.updtDataGrid();" value="품목수정"
+        <span class="item-data" style="width:90px;"><input id="btnSrch" class="action-button primary" type="button"
+                                                           onclick="fnObj.searchOpen.updtDataGrid();" value="품목 수정"
                                                            style="width:70px;float: right;"></span>
         <br><br>
         <div id="grid" style="width: 660px; height: 400px;"></div>
@@ -2928,13 +2846,13 @@
         <hr style="width: 100%; border: solid 1px lightgray;">
         <span class="cell" style="width: 320px;">
 				<span class="item-head"
-                      style="font-size: 14px; font-weight: bold; color: darkblue; text-align: left; padding: 0 0 10px 0;">상담정보</span>
+                      style="font-size: 14px; font-weight: bold; color: #333; text-align: left; padding: 0 0 10px 0;">상담정보</span>
 			</span>
         <br>
 
         <div style="width: 100%; display: inline-flex;">
             <!-- 왼쪽 : 상담정보-해피콜 -->
-            <div style="width: 49%; border-right: 1px solid black;">
+            <div style="width: 49%; border-right: 1px solid lightgray;">
 
 					<span class="cell" style="width: 170px;">
 						<span class="item-head" style="width: 130px; text-align: left;">해피콜 이력정보 : </span>
@@ -2943,39 +2861,37 @@
 
                 <span class="cell" style="height: 20px; float: right; padding: 0 0 0 0;">
 						<span class="item-data" style="padding: 0 0 0 20px;">
-							<button onclick="fnObj.winOpen.cnslListPopup();">
-								<i class="fa fa-file-text-o fa-lg" aria-hidden="true">&nbsp;</i>
-								이력상세보기
+							<button class="action-button primary" onclick="fnObj.winOpen.cnslListPopup();">
+								이력 상세
 							</button>
 						</span>
 						<span class="item-data" style="padding: 0 0 0 20px;">
-							<button onclick="fnObj.inputOpen.hpInput();">
-								<i class="fa fa-pencil-square-o fa-lg" aria-hidden="true">&nbsp;</i>
+							<button class="action-button primary" onclick="fnObj.inputOpen.hpInput();">
 								신규상담등록
 							</button>
 						</span>
 						<span class="item-data" style="padding: 0 0 0 20px;">
-							<button onclick="fnObj.winOpen.soLogPopup();">
-								<i class="fa fa-file-text-o fa-lg" aria-hidden="true">&nbsp;</i>
+							<button class="action-button primary" onclick="fnObj.winOpen.soLogPopup();">
 								주문이력보기
 							</button>
 						</span>
 					</span>
                 <br>
                 <input type="text" id="cnslTblSoMId" style="width: 150px; height: 20px; display: none;"
-                       disabled></input>
-                <input type="text" id="cnslSoNo" style="width: 150px; height: 20px; display: none;" disabled></input>
-                <span class="cell" style="width: 130px; margin-top:20px;border: 0px solid black">
+                       disabled>
+                <input type="text" id="cnslSoNo" style="width: 150px; height: 20px; display: none;"
+                       disabled>
+                <span class="cell" style="width: 130px; margin-top:20px;">
 						<span class="item-head" style="width: 130px; height: 20px; text-align: left;">최근 해피콜 정보</span>
 					</span>
                 <br>
-                <span class="cell" style="width: 250px; border: 0px solid black">
+                <span class="cell" style="width: 250px; ">
 						<span class="item-head" style="width: 80px;">상 담 사</span>
 						<span class="item-data" style="width: 170px;">
 							<input type="text" id="cnslEr" style="width: 150px; height: 20px;" disabled></input>
 						</span>
 					</span>
-                <span class="cell" style="width: 250px; border: 0px solid black">
+                <span class="cell" style="width: 250px; ">
 						<span class="item-head" style="width: 80px;">상담등록시간</span>
 						<span class="item-data" style="width: 170px;">
 							<input type="text" id="cnslTime" style="width: 150px; height: 20px;" disabled></input>
@@ -2984,15 +2900,12 @@
 
                 <br>
 
-                <span class="cell" style="width: 100%;">
-						<!-- <span class="item-head" style="width: 130px; text-align: left;"></span> -->
+                <span class="cell" style="width: 95%;">
 						<span class="item-head" style="width: 80px; text-align: right;">
 							상담내역
-							<br>
-							<font size=1>한글150자</font>
 						</span>
 						<span class="item-data" style=" width: 100%;text-align: left;">
-							<textArea id="cnslTxt" style="width: 95%; height: 100px; resize: yes;" disabled
+							<textArea id="cnslTxt" style="width: 95%; height: 40px;" disabled
                                       onKeyUp="javascript:fnChkByte(this,'300')"></textArea>
 						</span>
 					</span>
@@ -3019,8 +2932,7 @@
 
                 <span class="cell" style="height: 20px; float: right; padding: 0 20px 0 0;">
 						<span class="item-data" style="padding: 0 0 20px;">
-							<button onclick="fnObj.winOpen.talkListPopup();">
-								<i class="fa fa-file-text-o fa-lg" aria-hidden="true">&nbsp;</i>
+							<button class="action-button primary" onclick="fnObj.winOpen.talkListPopup();">
 								알림톡 이력 보기
 							</button>
 						</span>
@@ -3029,50 +2941,50 @@
                 <br>
                 <input type="text" id="talkTblSoMId" style="width: 150px; height: 20px; display: none;"
                        disabled>
-                <input type="text" id="talkSoNo" style="width: 150px; height: 20px; display: none;" disabled></input>
+                <input type="text" id="talkSoNo" style="width: 150px; height: 20px; display: none;"
+                       disabled>
                 <br>
-                <span class="cell" style="width: 90px; border: 0 solid black;">
+                <span class="cell" style="width: 90px;">
 						<span class="item-head" style="width: 90px; height: 20px; text-align: left;">최근 알림톡</span>
 					</span>
                 <br>
-                <span class="cell" style="width: 250px; border: 0px solid black;">
+				<div style="margin-bottom: 35px">
+                <span class="cell" style="width: 250px; ">
 						<span class="item-head" style="width: 80px;">템플릿</span>
 						<span class="item-data" style="width: 170px;">
 							<input type="text" id="talkTmp" style="width: 152px; height: 20px;" disabled></input>
 						</span>
 					</span>
-                <span class="cell" style="width: 250px; border: 0px solid black;">
+                <span class="cell" style="width: 250px; ">
 						<span class="item-head" style="width: 80px;">전송자</span>
 						<span class="item-data" style="width: 170px;">
 							<input type="text" id="talkEr" style="width: 90px; height: 20px;" disabled></input>
 						</span>
 					</span>
-                <span class="cell" style="width: 250px; border: 0px solid black;">
+                <span class="cell" style="width: 250px; ;">
 						<span class="item-head" style="width: 80px;">전송시간</span>
 						<span class="item-data" style="width: 170px;">
 							<input type="text" id="talkTime" style="width: 150px; height: 20px;" disabled></input>
 						</span>
 					</span>
-                <br>
-
+				</div>
                 <span class="cell" style="width: 100%;">
-						<!-- <span class="item-head" style="width: 90px; text-align: left;"></span> -->
+					<label for="talkTxt">
 						<span class="item-head" style="width: 80px; text-align: right;">
-							알림톡
-							<br>
-							내역
+							알림톡 내역
 						</span>
-						<span class="item-data" style="width: 100%; text-align: left;">
-							<textArea id="talkTxt" style="width: 95%; height: 100px; resize: yes;" disabled></textArea>
-						</span>
+					</label>
+					<span class="item-data" style="width: 100%; text-align: left;">
+						<textArea id="talkTxt" style="width: 95%; height: 100px; " disabled></textArea>
+					</span>
 					</span>
                 <br>
                 <br>
-                <span class="cell" id="happyCallSaveBtn" style="float: right;">
+				<span class="cell" id="happyCallSendBtn" style="float: right; margin-top: 20px;">
 						<span class="item-data" style="padding: 0 20px 0 20px;">
-							<button onclick="fnObj.winOpen.talkSendPopup();">
+							<button class="action-button warning" onclick="fnObj.winOpen.talkSendPopup();">
 								<i class="fa fa-commenting-o fa-lg" aria-hidden="true">&nbsp;</i>
-								알림톡 보내기
+								알림톡 전송
 							</button>
 						</span>
 					</span>
@@ -3082,17 +2994,17 @@
         <div id="dlvyInfoDiv" style="width: 100%;">
 				<span class="cell" style="width: 320px;">
 					<span class="item-head"
-                          style="font-size: 14px; font-weight: bold; color: darkblue; text-align: left; padding: 0 0 10px 0;">배송정보</span>
+                          style="font-size: 14px; font-weight: bold; color: #333; text-align: left; padding: 0 0 10px 0;">배송정보</span>
 				</span>
             <br>
-            <span class="cell" style="width: 220px; border: 0px solid black;">
+            <span class="cell" style="width: 220px; ">
 					<span class="item-head" style="width: 100px;">배송계획일자</span>
 					<span class="item-data" style="width: 120px;">
 						<input type="text" id="instPlanDt" style="width: 112px; height: 20px;" disabled
                                oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"></input>
 					</span>
 				</span>
-            <span class="cell" style="width: 220px; border: 0px solid black;">
+            <span class="cell" style="width: 220px; ">
 					<span class="item-head" style="width: 100px; padding: 5px 1px 0 1px;">
 						시공일<font size=1>(고객배송일)</font>
 					</span>
@@ -3101,14 +3013,14 @@
                                oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"></input>
 					</span>
 				</span>
-            <span class="cell" style="width: 220px; border: 0px solid black;">
+            <span class="cell" style="width: 220px; ">
 					<span class="item-head" style="width: 100px;">배송상태</span>
 					<span class="item-data" style="width: 120px;">
 						<input type="text" id="dlvyStatNm" style="width: 112px; height: 20px;" disabled
                                oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"></input>
 					</span>
 				</span>
-            <span class="cell" style="width: 220px; border: 0px solid black;">
+            <span class="cell" style="width: 220px; ">
 					<span class="item-head" style="width: 100px;">팔렛트번호</span>
 					<span class="item-data" style="width: 120px;">
 						<input type="text" id="paltNoxx" style="width: 112px; height: 20px;" disabled
@@ -3155,8 +3067,8 @@
 
             <!-- 배송완료 -->
 
-            <span id="dlvyStat9999" class="cell" style="width: 100%; border: 0px solid black;display:none;">
-					<span class="cell" style="width: 320px; border: 0px solid black;">
+            <span id="dlvyStat9999" class="cell" style="width: 100%; display:none;">
+					<span class="cell" style="width: 320px; ">
 						<span class="item-head" style="width: 100px;">착불비</span>
 						<span class="item-data" style="width: 220px;">
 							<input type="text" readonly id="item01" style="width:52px;"></input>
@@ -3186,7 +3098,7 @@
 						</span>
 					</span>
 				</span>
-            <span id="dlvyStat9999Memo" class="cell" style="width: 100%; border: 0px solid black;display:none;">
+            <span id="dlvyStat9999Memo" class="cell" style="width: 100%; display:none;">
 					<span class="cell" style="width: 840px; ">
 						<span class="item-head" style="width: 110px;">메모&nbsp;</span>
 							<span class="item-data" style="width: 730px;">
@@ -3198,7 +3110,7 @@
             <!-- 여기는 상태가 배송완료이냐 미마감이냐 에따라서 내용보여주는부분.끝 -->
             <!-- 여기부터가 사진보여주는 곳 -->
             <br><br>
-            <span id="dlvyStat9999ImgTitle" class="cell" style="width: 100%; border: 0px solid black;display:none;">
+            <span id="dlvyStat9999ImgTitle" class="cell" style="width: 100%; display:none;">
 
 					<span class="item-head" style="width: 80px;float:left;"></span>
 					<span class="item-data" style="width: 93%;">
@@ -3211,13 +3123,13 @@
 						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>고객서명</center></span>
 					</span>
 				</span>
-            <span id="dlvyStat9999Img" class="cell" style="width: 100%; border: 0px solid black;display:none;">
+			<span id="dlvyStat9999Img" class="cell" style="width: 100%; height: 100%; display:none;">
 					<span class="item-head" style="width: 80px;float:left;">시공사진</span>
-					<span class="item-data" style="width: 100%;">
+					<span class="item-data" style="width: 100%; height: 100%;">
 						<!-- <span style="float:left;">전면사진</span> -->
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
-								<a id="imgA01" href="" target="_blank">		<!-- style="display: none;" -->
+								<a id="imgA01" href="" target="_blank">
 									<img id="imgSrc01" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
@@ -3308,27 +3220,25 @@
 				</span>
             <!-- 여기는 상태가 배송완료이냐 미마감이냐 에따라서 내용보여주는부분.끝 -->
             <!-- 여기부터가 사진보여주는 곳 -->
-            <br><br>
-            <span id="dlvyStat8000ImgTitle" class="cell" style="width: 100%; border: 0px solid black;display:none;">
 
-					<span class="item-head" style="width: 80px;float:left;"></span>
-					<span class="item-data" style="width: 93%;">
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>전체사진</center></span>
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>하자부위</center></span>
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>하자부위(근접)</center></span>
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>개포상태(박스)</center></span>
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>시리얼번호</center></span>
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>기타</center></span>
-						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>고객서명</center></span>
-					</span>
+			<div>
+				<span id="dlvyStat8000ImgTitle" class="cell" style="width: 100%; height: 100%; display:none;">
+
+						<span class="item-head" style="width: 80px;float:left;"></span>
+						<span class="item-data" style="width: 93%;">
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>전체사진</center></span>
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>하자부위</center></span>
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>하자부위(근접)</center></span>
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>개포상태(박스)</center></span>
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>시리얼번호</center></span>
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>기타</center></span>
+							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>고객서명</center></span>
+						</span>
 				</span>
-            <span id="dlvyStat8000Img" class="cell" style="width: 100%; border: 0px solid black;display:none;">
-
-
-
+				<div id="dlvyStat8000Img" class="cell" style="width: 100%; height: 100%; display:none;">
 					<span class="item-head" style="width: 80px;float:left;">시공사진</span>
 
-					<span class="item-data" style="width: 100%;">
+					<span class="item-data" style="width: 100%; height: 100%;">
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
 								<a id="ximgA01" target="_blank" style="display: none;">
@@ -3375,7 +3285,7 @@
 						</figure>
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
-								<a id="ximgA06" target="_blank">		<!-- style="display: none;" -->
+								<a id="ximgA06" target="_blank">
 									<img id="ximgSrc06" src="https://sodisprod.cdn1.cafe24.com/noimage.png"
                                          class="the-image" width="20%" height="20%" loading="lazy"/>
 								</a>
@@ -3384,21 +3294,19 @@
 						</figure>
 						<figure class="card" style="margin-left: 10px; margin-right: 10px; float: left;">
 							<div class="ratio-box">
-								<a id="xsignImgA" href="" target="_blank">		<!-- style="display: none;" -->
+								<a id="xsignImgA" href="" target="_blank">		
 									<img id="xsignImgSrc" src="" class="the-image" width="20%" height="20%"
-                                         loading="lazy"/>
+										 loading="lazy" alt=""/>
 								</a>
 							</div>
 
 						</figure>
 
 					</span>
-				</span>
+				</div>
         </div>
-
-
     </div>
-
+</div>
 </div>
 </body>
 </html>

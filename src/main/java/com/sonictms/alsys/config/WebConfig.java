@@ -25,12 +25,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(logInterceptor)
-        //.excludePathPatterns(EXCLUDE_PATHS) //인터셉터에 포함되지 않음
-        //.addPathPatterns("/test/**") //인터셉터에 포함됨
-        ;
+        registry.addInterceptor(logInterceptor);
     }
-    //20220115 정연호 로그 인터셉트. 끝
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -39,13 +35,11 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/img/**").addResourceLocations("classpath:static/img/");
         registry.addResourceHandler("/fonts/**").addResourceLocations("classpath:static/fonts/");
         registry.addResourceHandler("/plugin/**").addResourceLocations("classpath:static/plugin/");
-
     }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        return bCryptPasswordEncoder;
+        return new BCryptPasswordEncoder();
     }
 
     //jasper
@@ -60,6 +54,4 @@ public class WebConfig implements WebMvcConfigurer {
     public JdbcTemplate jdbcTemplate(@Qualifier("db") DataSource ds) {
         return new JdbcTemplate(ds);
     }
-
-
 }

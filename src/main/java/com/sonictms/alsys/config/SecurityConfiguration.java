@@ -1,6 +1,5 @@
 package com.sonictms.alsys.config;
 
-//spring boot 보안 설정
 
 import com.sonictms.alsys.user.domain.UserPrincipal;
 import com.sonictms.alsys.user.entity.User;
@@ -67,7 +66,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public ServletListenerRegistrationBean<HttpSessionEventPublisher> httpSessionEventPublisher() {
-        //log.info("ServletListenerRegistrationBean");
         return new ServletListenerRegistrationBean<HttpSessionEventPublisher>(new HttpSessionEventPublisher());
     }
 
@@ -78,11 +76,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         log.info("SessionRegistry");
         return new SessionRegistryImpl();
     }
-
-    /*
-     * @Override protected void configure(AuthenticationManagerBuilder auth) {
-     * auth.authenticationProvider(authenticationProvider(userService)); }
-     */
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -135,23 +128,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .usernameParameter("loginId")//아이디 파라미터명 설정
                 .passwordParameter("password")//패스워드 파라미터명 설정
                 .loginProcessingUrl("/loginRe")//로그인 Form Action Url
-
-                //.successHandler(loginSuccessHandler())//로그인 성공 후 핸들러 (해당 핸들러를 생성하여 핸들링 해준다.)
-                //.failureHandler(loginFailureHandler())//로그인 실패 후 핸들러 (해당 핸들러를 생성하여 핸들링 해준다.)
-
                 .successHandler((httpServletRequest, response, authentication) -> {
-
                     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-
-                    //로그인 한 후에 회사코드와 아이디로 사용자 정보 찾아오기
                     User user = new User();
                     user.setCmpyCd(userPrincipal.getCmpyCd());
                     user.setLoginId(userPrincipal.getLoginId());
-
                     try {
                         user = userService.findUserInfoByLoginId(user);
                     } catch (Exception e) {
-                        //e.printStackTrace();
                         response.sendRedirect("/loginRe?error=userInfo");    //로그인 에러시 페이지 이동
                         return;
                     }
@@ -313,12 +297,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
 
         ;
-    }
-
-    @Override
-    public void configure(WebSecurity web) {
-        //web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations()).antMatchers("/css/**", "/js/**", "/img/**","/favicon.ico","/error","/page/**","/plugin/**");
-
     }
 
     public static String etRemoteAddr(HttpServletRequest request) {

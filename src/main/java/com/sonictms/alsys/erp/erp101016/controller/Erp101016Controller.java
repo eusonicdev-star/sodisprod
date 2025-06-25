@@ -47,8 +47,7 @@ public class Erp101016Controller {
     @RequestMapping(value = {"erp101016p3List"}, method = RequestMethod.POST)
     @ResponseBody
     public List<Erp101016VO> erp101016p3List(Erp101016VO erp101016VO) {
-        List<Erp101016VO> list = erp101016Service.erp101016p3List(erp101016VO);
-        return list;
+        return erp101016Service.erp101016p3List(erp101016VO);
     }
 
     //취할 조치 없음 팝업 화면 열기
@@ -64,11 +63,6 @@ public class Erp101016Controller {
     @ResponseBody
     public Erp101016VO erp101016p6Save(@RequestBody Erp101016VO erp101016VO) {
         erp101016VO = erp101016Service.erp101016p6Save(erp101016VO);
-
-        //20220517 정연호 추가 강제롤백
-        //log.info("테스트용 저장안하려고 강제롤백발생 : TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()");
-        //TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
         return erp101016VO;
     }
 
@@ -133,11 +127,6 @@ public class Erp101016Controller {
     @ResponseBody
     public Erp101016VO erp101016p1Save(@RequestBody Erp101016VO erp101016VO) {
         erp101016VO = erp101016Service.erp101016p1Save(erp101016VO);
-
-        //20220604 정연호 추가 강제롤백
-        //////////log.info("미마감 주문 - 테스트용 저장안하려고 강제롤백발생 : TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()");
-        //////////TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
         return erp101016VO;
     }
 

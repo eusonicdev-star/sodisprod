@@ -1,709 +1,681 @@
 <!DOCTYPE HTML>
 <html xmlns:sec="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org">
 <head>
-<title></title>
-<link rel="icon" href="data:;base64,iVBORw0KGgo=">
-<meta charset="UTF-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title></title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <meta charset="UTF-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<meta name="viewport"
-	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 
-<!-- <meta http-equiv="Cache-Control" content="no-cache">
-	<meta http-equiv="Pragma" content="no-cache">
-	<meta http-equiv="Expires" content="0"> -->
-<!-- 안드로이드 홈화면추가시 상단 주소창 제거 -->
-<!-- <meta name="mobile-web-app-capable" content="yes"> -->
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js"
+            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
 
-<!-- 아이폰 홈화면추가시 상단 주소창 제거 -->
-<!-- <meta name="apple-mobile-web-app-capable" content="yes"> -->
+    <style>
+        body {
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .dhtmlxcalendar_dhx_terrace div.dhtmlxcalendar_month_cont ul.dhtmlxcalendar_line li.dhtmlxcalendar_cell.dhtmlxcalendar_month_hdr {
+            font-size: 18px;
+        }
+
+        /* 20230329 정연호 추가. css.  modal 을 쓰기위한 부분 */
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body, html {
+            height: 100%;
+        }
+
+        .modal .btn {
+            cursor: pointer;
+            border: 1px solid #999999;
+            text-align: center;
+            border-radius: 5px;
+            outline: none;
+            font-weight: 500;
+        }
+
+        .dimLayer {
+            display: block;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            position: fixed;
+            left: 0;
+            top: 0px;
+            margin: 0;
+            padding: 0;
+            z-index: 9998;
+        }
+
+        .modal {
+            width: 90%;
+            height: auto;
+            border-radius: 5px;
+            padding: 15px 15px 15px 15px;
+            box-sizing: border-box;
+            text-align: left;
+        }
+
+        /* 20230330 정연호 수정. text-align 을 center 에서 left로 변경함*/
+        .modal-section {
+            background: #ffffff;
+            box-sizing: border-box;
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 9999;
+        }
+
+        .menu_msg {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .enroll_box p {
+            padding-bottom: 26px;
+        }
+
+        .gray_btn {
+            width: 60px;
+            background: #ffffff;
+            color: #999999;
+            height: 27px;
+            line-height: 2px;
+            transition: 0.5s;
+            font-size: 16px;
+        }
+
+        .blue_btn {
+            width: 60px;
+            background: #3079fb;
+            color: #ffffff;
+            height: 27px;
+            line-height: 2px;
+            transition: 0.5s;
+            font-size: 16px;
+            border: none;
+        }
+
+        /* 20230329 정연호 추가. css.  modal 을 쓰기위한 부분. 끝 */
+    </style>
+
+    <script th:inline="javascript">
+
+        var paramCmpyCd = /*[[${param.cmpyCd[0]}]]*/
+        var paramSoNo = /*[[${param.soNo[0]}]]*/
+
+        var pagePerRow =	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/
+        var myWins;
+        var myGrid;
+
+        var myCalendar;
+        var myCalendar2;
+        var dlvyCnfmDtRange = 89;	//배송확정일 가능/불가능 날짜 구하는 범위 31 일이면 오늘부터 31일 후 까지 중에 가능 / 불가능 표시
+        var rtnSoType = "";
+        var resultRes;
+
+        var defaultCapaId;		//원래 지정된 배송일 의 카파 아이디
+
+        fnObj = {
+            winOpen: {},	//END of winOpen
+            comboOpen: {},	//END of comboOpen
+            gridOpen: {
+
+                setWidth: function () {
+
+                },	//END of setWidth
+            },	//END of gridOpen
+            searchOpen: {
+
+                searchDisableDate: function () {	//배송확정일 가능 한 날 조회 - 오늘날짜부터 31일뒤 까지 중에서 불가능일 조사하기
+
+                    var srchData = {};
+                    srchData.cmpyCd = paramCmpyCd;
+                    srchData.soNo = paramSoNo;
+
+                    $.ajax({
+                        url: "/mobile/mCustCalDisableDay",	//선택 불가능한 날짜를 불러오는 SP
+                        processData: false,
+                        contentType: "application/json",
+                        data: JSON.stringify(srchData),
+                        type: "POST",
+                        dataType: "json",
+                        success: function (res) {
+                            if (res && res.length > 0) {
+                                resultRes = res;
+                                $("#dlvyAsgnDtText").text(res[0].dlvyAsgnDt);
+                                myCalendar2.hideToday();
+                                var disableDays = [];
+                                defaultCapaId = res[0].dlvyAsgnCapaId;
+                                for (var i = 0; i < res.length; i++) {
+                                    if (res[i].ableYn != "Y" || res[i].capaId == 0) //사용할수 없는 날짜
+                                    {
+                                        disableDays.push(res[i].instDt.substring(0, 4) + "-" + res[i].instDt.substring(4, 6) + "-" + res[i].instDt.substring(6, 8))
+                                    } else {
+                                        myCalendar2.disableDays("year", res[i].instDt.substring(0, 4) + "-" + res[i].instDt.substring(4, 6) + "-" + res[i].instDt.substring(6, 8));
+                                    }
+                                    if (res[i].instDt == res[i].dlvyAsgnDt2) {
+                                        $("#selDate").text(res[i].instDt);
+
+                                        //20220220 정연호 버튼에 날짜 표시
+                                        $('#selectDate').html(
+                                            "선택한 배송일 <font size='4'>(" + resultRes[i].instDt.substring(0, 4) + "-" + resultRes[i].instDt.substring(4, 6) + "-" + resultRes[i].instDt.substring(6, 8) + ")</font> 에 받기"
+                                        );
+                                        $("#selCapaId").text(res[i].capaId);
+
+                                        $("#oDate").text(res[i].instDt);
+
+                                        //20220220 정연호 버튼에 날짜 표시
+                                        $('#oriDate').html(
+                                            "지정된 배송일 <font size='4'>(" + resultRes[i].instDt.substring(0, 4) + "-" + resultRes[i].instDt.substring(4, 6) + "-" + resultRes[i].instDt.substring(6, 8) + ")</font> 에 받기"
+                                        );
+                                        $("#oCapaId").text(res[i].capaId);
+
+                                    }
+                                }
+                                if (disableDays.length > 0) {
+                                    myCalendar2.disableDays("year", JSON.stringify(disableDays));
+                                }
+                                //테스트용도
+                                //myCalendar2.disableDays("year", ["2021-09-14","2021-09-16","2021-09-18","2021-09-19","2021-09-21","2021-09-22","2021-09-26","2021-09-27","2021-09-28"]);
+
+                                //20211231 정연호 특정날짜 표시 - 지정된 배송일자 표시
+                                myCalendar2.setHolidays(null);
+
+                                //20220220 정연호 지정된 배송일자가 없으면 표시안함
+                                if (res[0].dlvyAsgnDt2) {
+                                    $("#oDate").text(res[0].dlvyAsgnDt2);
+                                    //20220220 정연호 버튼에 날짜 표시
+                                    $('#oriDate').html(
+                                        "지정된 배송일 <font size='4'>(" + res[0].dlvyAsgnDt2.substring(0, 4) + "-" + res[0].dlvyAsgnDt2.substring(4, 6) + "-" + res[0].dlvyAsgnDt2.substring(6, 8) + ")</font> 에 받기"
+                                    );
+                                    $("#oCapaId").text(res[0].dlvyAsgnCapaId);
+                                    myCalendar2.setHolidays(dateTypeChange(res[0].dlvyAsgnDt2, 10));
+                                }
+                            } else {
+
+                                myCalendar2.hide();
+                                //alert("조회 수행 결과 없음");
+                                action_popup.alert("조회 수행 결과 없음", function (res) {
+                                })	//20230330 정연호 수정. alert를 모달로 변경
+                            }
+                        },
+                    });
+
+                },	//END of searchDisableDate : function() {
+
+                //20220221 정연호 추가. 고객이 선택한 배송일을 피드백 해주는 알림톡 내용을 불러서 바로 보냄
+                searchTalk: function () {
+
+                    var srchTalk = new FormData();
+                    srchTalk.append("cmpyCd", resultRes[0].cmpyCd);
+                    srchTalk.append("tblSoMId", resultRes[0].tblSoMId);
+                    srchTalk.append("tmplId", "AL_DELIVERY_SCHEDULE_NOTICE_V1");
+
+                    var tblSoMIdAjax = resultRes[0].tblSoMId;
+                    var soNoAjax = paramSoNo;
+                    var cmpyCdAjax = resultRes[0].cmpyCd;
+
+                    $.ajax({
+                        url: "/mobile/mCustTalk",
+                        processData: false,
+                        contentType: false,
+                        data: srchTalk,
+                        type: "POST",
+                        dataType: "json",
+                        success: function (res) {
+                            if (res) {
+                                res.tblSoMId = tblSoMIdAjax;
+                                res.soNo = soNoAjax;
+                                res.cmpyCd = cmpyCdAjax;
+                                fnObj.searchOpen.sendAlrmTmp(res);
+                            }
+                        },
+                        error: function (request, status, error) {
+                        },
+                    });
+
+                },	//END of searchTalk : function() {
+
+                //20220221 정연호 추가. 선택 날짜 피드백 알림톡 보내기
+                sendAlrmTmp: function (sendRes) {	//알림톡 보내기
+
+                    var reserveDtValu = "00000000000000";
+
+                    var sendData = [];
+                    var resData = {};
+                    var sendMsgSms = sendRes.alrmTalkTmp;
+                    resData.message_type = "AT";
+                    resData.phn = sendRes.phn;
+
+                    resData.profile = sendRes.profile;
+                    resData.talkReserveDt = reserveDtValu;
+                    resData.tmplId = sendRes.tmplId;
+                    resData.msg = sendRes.alrmTalkTmp;
+                    resData.smsKind = sendRes.smsKind;
+                    resData.msgSms = sendMsgSms;
+                    resData.smsSender = sendRes.smsSender;
+                    resData.smsOnly = sendRes.smsOnly;
+                    resData.userid = sendRes.userid;
+                    resData.tblSoMId = sendRes.tblSoMId;
+
+                    var button1Data = {};
+                    button1Data.name = "상담원에게 메시지 보내기";
+                    button1Data.type = "WL";
+                    button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
+                    button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
+                    resData.button1 = button1Data;
+
+                    var sendD = {}
+                    sendD = resData;
+
+                    $.ajax({
+                        url: "/sendAlrmTalk",
+                        processData: false,
+                        contentType: "application/json",
+                        data: JSON.stringify(resData),
+                        type: "POST",
+                        dataType: "json",
+                        async: false,
+                        success: function (res) {
+                            if (res != null && res.length == 1) {
+                                fnObj.searchOpen.saveAlrmTmpResult(sendD, res[0]);	//(발송한건, 리턴받은것)
+                            }
+                        },
+                        error: function (request, status, error) {
+
+                        },
+                    });
+                },
+
+                //20220221 정연호 추가. 알림톡 발송 결과를 DB에 저장하기
+                saveAlrmTmpResult: function (sendData, resultRes0) {	//알림톡 결과값 저장하기 (발송한건, 리턴받은것)
+                    if (!resultRes0.code == "success") {
+                        return;
+                    }
+
+                    var resultData = new FormData();
+
+                    resultData.append("tblSoMId", sendData.tblSoMId);
+                    resultData.append("code", resultRes0.code);
+                    resultData.append("userid", sendData.userid);
+                    resultData.append("message_type", sendData.message_type);
+                    resultData.append("phn", sendData.phn);
+                    resultData.append("profile", sendData.profile);
+                    resultData.append("talkReserveDt", sendData.talkReserveDt);
+                    resultData.append("msg", sendData.msg);
+                    resultData.append("smsLmsTit", sendData.smsLmsTit);
+                    resultData.append("tmplId", sendData.tmplId);
+                    resultData.append("cmplMsgCd", resultRes0.message);
+                    resultData.append("saveUser",	/*[[${session.tblUserMId}]]*/);
+
+                    $.ajax({
+                        url: "/saveAlrmTmpResult",
+                        processData: false,
+                        contentType: false,
+                        data: resultData,
+                        type: "POST",
+                        dataType: "json",
+                        async: false,
+                        success: function (res) {
+
+                        },
+                        error: function (request, status, error) {
+
+                        },
+                    });
+                },
+
+                selectDate: function () {	//배송일 선택하기 버튼을 누르면
+
+                    if ($("#selDate").text().trim() == "" || $("#selCapaId").text().trim() == "") {
+                        action_popup.alert("선택한 배송일이 없습니다.<br>배송가능한 날짜 중에서 배송일을 선택하세요", function (res) {
+                        })	//20230330 정연호 수정. alert를 모달로 변경
+                        return;
+                    }
+
+                    //20230329 정연호 수정. confirm modal 을 이용하여 클릭시 페이지 이동
+                    action_popup.confirm("선택한 배송일 <font color=red><b>"
+                        + $("#selDate").text().substring(0, 4) + "년 " + $("#selDate").text().substring(4, 6) + "월 " + $("#selDate").text().substring(6, 8) + "일"
+                        + "</b></font><br><br>배송일을 확정하시겠습니까?"
+                        + "<br>※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_ExbPtK/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다."
+                        , function (res) {
+                            if (res) {
+                                fnObj.searchOpen.save("sel");
+                                //alert("sel");		//0505 test
+                            }
+                        }
+                    )
+                },
+
+                originalDate: function () {	//지정된 배송일에 받기
+                    if ($("#dlvyAsgnDtText").text().trim() == "없음" || !$("#dlvyAsgnDtText").text().trim()) {
+                        action_popup.alert("지정된 배송일이 없습니다.<br>배송가능한 날짜 중에서 배송일을 선택하세요", function (res) {
+                        })	//20230330 정연호 수정. alert를 모달로 변경
+                        return;
+                    }
+
+                    var ori_confirm_msg = ''
+
+                    if ($("#selDate").text()) {
+                        ori_confirm_msg = "지정된 배송일(<font color=red><b>" + $("#dlvyAsgnDtText").text() + "</b></font>)을 선택하였습니다.<br><br>"
+                            + "선택한 배송일(" + $("#selDate").text().substring(0, 4) + "년 " + $("#selDate").text().substring(4, 6) + "월 " + $("#selDate").text().substring(6, 8) + "일)이 있지만<br>"
+                            + "지정된 배송일(<font color=red><b>" + $("#dlvyAsgnDtText").text() + "</b></font>)을 선택하시겠습니까?<br>"
+                            + "※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_ExbPtK/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다."
+                    } else {
+                        ori_confirm_msg = "지정된 배송일 <font color=red><b>" +
+                            $("#dlvyAsgnDtText").text()
+                            + "</b></font><br><br>배송일을 확정하시겠습니까?<br><br>"
+                            + "※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_ExbPtK/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다."
+                    }
+
+                    //20230329 정연호 수정. confirm modal 을 이용하여 클릭시 페이지 이동
+                    action_popup.confirm(ori_confirm_msg, function (res) {
+                            if (res) {
+                                fnObj.searchOpen.save("ori");
+                                //alert("ori")		//0505	test
+                            }
+                        }
+                    )
+                },
+
+                save: function (type) {
+
+                    if (type == "sel") {
+                        if ($("#selCapaId").text() == "0" || !$("#selCapaId").text()) {
+                            action_popup.alert("선택한 배송일이 없습니다.", function (res) {
+                            })	//20230330 정연호 수정. alert를 모달로 변경
+                            return;
+                        }
+                    } else if (type == "ori") {
+                        if ($("#oCapaId").text() == "0" || !$("#oCapaId").text()) {
+                            action_popup.alert("지정 배송일이 없습니다.", function (res) {
+                            })	//20230330 정연호 수정. alert를 모달로 변경
+                            return;
+                        }
+                    } else {
+                        action_popup.alert("구분유형(선택한 배송일/지정된 배송일)이 없습니다.", function (res) {
+                        })	//20230330 정연호 수정. alert를 모달로 변경
+                        return;
+                    }
+
+                    var saveData = {};
+                    saveData.cmpyCd = paramCmpyCd;
+                    saveData.soNo = paramSoNo;
+                    if (type == "sel") {
+                        saveData.capaId = $("#selCapaId").text();
+                    } else if (type == "ori") {
+                        saveData.capaId = $("#oCapaId").text();
+                    } else {
+                        action_popup.alert("구분유형(선택한 배송일/지정된 배송일)이 없습니다..", function (res) {
+                        });	//20230330 정연호 수정. alert를 모달로 변경
+                        return;
+                    }
+
+                    $.ajax({
+                        url: "/mobile/mCustCalSaveDate",
+                        processData: false,
+                        contentType: "application/json",
+                        data: JSON.stringify(saveData),
+                        type: "POST",
+                        datatype: "json",
+                        success: function (res) {
+                            $(".modal_close").text("창 닫기");
+                            if (res && res.rtnYn == "Y") {
+                                //20220221 정연호 추가. 피드백 알림톡 발송 템플릿 불러와서 발송하기
+                                try {
+                                    fnObj.searchOpen.searchTalk();
+                                } catch (e) {
+                                    console.error("알림톡 발송 중 오류 발생:", e);
+
+                                    var errorData = {
+                                        cmpyCd: paramCmpyCd,
+                                        soNo: paramSoNo,
+                                        errorType: "ALARM_TALK_SEND_ERROR",
+                                        errorMessage: e.message || e.toString(),
+                                        errorStack: e.stack || "",
+                                        timestamp: new Date().toISOString()
+                                    };
+
+                                    $.ajax({
+                                        url: "/mobile/mCustCalErrorLog",
+                                        processData: false,
+                                        contentType: "application/json",
+                                        data: JSON.stringify(errorData),
+                                        type: "POST",
+                                        dataType: "json",
+                                        async: true,
+                                        timeout: 5000,
+                                        success: function (res) {
+                                            console.log("오류 로그 전송 완료");
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.warn("오류 로그 전송 실패:", error);
+                                        }
+                                    });
+
+                                    // 사용자에게는 알림톡 발송 실패를 알리지 않고 정상 처리된 것처럼 진행
+                                    // (배송일 확정은 성공했으므로 알림톡 실패로 인해 전체 프로세스를 실패 처리하지 않음)
+                                }
+                                //20220221 정연호 추가. 피드백 알림톡 발송 템플릿 불러와서 발송하기.끝
+
+                                action_popup.alert(res.rtnMsg.replace(/\./g, ".<br>"),
+                                    function (res) {
+                                        if (res) {
+                                            setTimeout("WinClose();", 500);
+                                        }
+                                    }
+                                );
+
+                            } else {
+                                action_popup.alert(res.rtnMsg.replace(/\./g, ".<br>") + "<br>※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_ExbPtK/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다.",
+                                    function (res) {
+                                        if (res) {
+                                            setTimeout("WinClose();", 500);
+                                        }
+                                    }
+                                );
+                                //20230330 정연호 수정. alert를 모달로 변경
+                            }
+                        },
+                    });
+                },	//END of save : function() {
+
+            },	//END of searchOpen
+        }
+
+        function WinClose() {
+            top.window.open('about:blank', '_self').close();
+            top.window.opener = self;
+            top.self.close();
+        }
+
+        $(document).ready(function () {
+            //20230329 정연호. alert, confirm을 모달로 했을때 해당 모달을 닫을때 사용함(이거 없으면 모달이 닫히지 않음)
+            $(".modal_close").on("click", function () {
+                action_popup.close(this);
+            });
 
 
+            var now = new Date()
+            var year = now.getFullYear() + "";
+            var month = (now.getMonth() + 1) + "";
+            var date = now.getDate() + "";
+            if (month.length == 1) {
+                month = "0" + month;
+            }
+            if (date.length == 1) {
+                date = "0" + date;
+            }
 
-<link rel="stylesheet" type="text/css"
-	href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
-<link rel="stylesheet" type="text/css"
-	href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css"
-	href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
-<link rel="stylesheet" type="text/css" href="/css/common.css">
-<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js"
-	crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"
-	integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-	crossorigin="anonymous"></script>
-<script type="text/javascript" src="/js/common.js"></script>
-<script type="text/javascript" src="/js/commCode.js"></script>
+            var today = year + "-" + month + "-" + date;
 
-<style>
-body {
-	height: 100%;
-	overflow-x: hidden;
-	overflow-y: auto;
-}
+            $("#dateFrom").val(today);
+            $("#dateTo").val(today);
 
-.dhtmlxcalendar_dhx_terrace div.dhtmlxcalendar_month_cont ul.dhtmlxcalendar_line li.dhtmlxcalendar_cell.dhtmlxcalendar_month_hdr
-	{
-	font-size: 18px;
-}
+            myCalendar2 = new dhtmlXCalendarObject('box');
+            //오늘날짜부터 31일 이후의 날짜 구하기
+            var oneMonthLater = new Date(now.setDate(now.getDate() + dlvyCnfmDtRange));
+            var oneMonthLaterYear = oneMonthLater.getFullYear() + "";
+            var oneMonthLaterMonth = (oneMonthLater.getMonth() + 1) + "";
+            var oneMonthLaterDate = oneMonthLater.getDate() + "";
+            if (oneMonthLaterMonth.length == 1) {
+                oneMonthLaterMonth = "0" + oneMonthLaterMonth;
+            }
 
-/* 20230329 정연호 추가. css.  modal 을 쓰기위한 부분 */
-* {
-	padding: 0;
-	margin: 0;
-}
+            if (oneMonthLaterDate.length == 1) {
+                oneMonthLaterDate = "0" + oneMonthLaterDate;
+            }
 
-body, html {
-	height: 100%;
-}
+            var oneMonthLaterToday = oneMonthLaterYear + "-" + oneMonthLaterMonth + "-" + oneMonthLaterDate;
 
-.modal .btn {
-	cursor: pointer;
-	border: 1px solid #999999;
-	text-align: center;
-	border-radius: 5px;
-	outline: none;
-	font-weight: 500;
-}
+            //달력정의
+            myCalendar2.loadUserLanguage("ko");
+            myCalendar2.setSensitiveRange(today, oneMonthLaterToday);			//이만큼 범위만 날짜 선택가능
+            myCalendar2.hideTime();
 
-.dimLayer {
-	display: block;
-	width: 100%;
-	background-color: rgba(0, 0, 0, 0.3);
-	position: fixed;
-	left: 0;
-	top: 0px;
-	margin: 0;
-	padding: 0;
-	z-index: 9998;
-}
+            myCalendar2.attachEvent("onClick", function (date) {
 
-.modal {
-	width: 90%;
-	height: auto;
-	border-radius: 5px;
-	padding: 15px 15px 15px 15px;
-	box-sizing: border-box;
-	text-align: left;
-} /* 20230330 정연호 수정. text-align 을 center 에서 left로 변경함*/
-.modal-section {
-	background: #ffffff;
-	box-sizing: border-box;
-	display: none;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	-webkit-transform: translate(-50%, -50%);
-	-ms-transform: translate(-50%, -50%);
-	-moz-transform: translate(-50%, -50%);
-	-o-transform: translate(-50%, -50%);
-	transform: translate(-50%, -50%);
-	display: none;
-	z-index: 9999;
-}
+                for (var i = 0; i < resultRes.length; i++) {
+                    if (myCalendar2.getDate(true) == resultRes[i].instDt.substring(0, 4) + "-" + resultRes[i].instDt.substring(4, 6) + "-" + resultRes[i].instDt.substring(6, 8)) {
+                        if (resultRes[i].capaId == "0" || !resultRes[i].capaId) {
+                            action_popup.alert(myCalendar2.getDate(true) + "<br>선택 가능한 날짜가 아닙니다.", function (res) {
+                            })	//20230330 정연호 수정. alert를 모달로 변경
+                        } else {	//20230330 정연호 추가. if 에 걸리면 배송일 선택이 안되고 튕겨야하는데 if에 걸려도 아래 배송일 선택이 수행되어서 else를 추가함
+                            $("#selDate").text(resultRes[i].instDt);
+                            $('#selectDate').html(
+                                "선택한 배송일 <font size='4'>(" + resultRes[i].instDt.substring(0, 4) + "-" + resultRes[i].instDt.substring(4, 6) + "-" + resultRes[i].instDt.substring(6, 8) + ")</font> 에 받기"
+                            );
+                            $("#selCapaId").text(resultRes[i].capaId);
+                        }
+                        i = resultRes.length;	//20230330 정연호. 반복문을 중지시키기위해 추가
+                    }
+                }
+            });
+            myCalendar2.setPosition((innerWidth - 251) / 2, 60);
+            myCalendar2.show();
 
-.menu_msg {
-	font-size: 16px;
-	font-weight: 500;
-}
+            window.onresize = function (event) {		//윈도우의 사이즈가 변경했을떄
+                fnObj.gridOpen.setWidth();
+                fnObj.gridOpen.setWidth();
+            };
 
-.enroll_box p {
-	padding-bottom: 26px;
-}
+            fnObj.searchOpen.searchDisableDate();
+        });
 
-.gray_btn {
-	width: 60px;
-	background: #ffffff;
-	color: #999999;
-	height: 27px;
-	line-height: 2px;
-	transition: 0.5s;
-	font-size: 16px;
-}
-
-.blue_btn {
-	width: 60px;
-	background: #3079fb;
-	color: #ffffff;
-	height: 27px;
-	line-height: 2px;
-	transition: 0.5s;
-	font-size: 16px;
-	border: none;
-}
-/* 20230329 정연호 추가. css.  modal 을 쓰기위한 부분. 끝 */
-</style>
-
-<script th:inline="javascript">
-
-	var paramCmpyCd = /*[[${param.cmpyCd[0]}]]*/
-	var paramSoNo = /*[[${param.soNo[0]}]]*/
-	
-	var pagePerRow	=	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/
-	var myWins;
-	var myGrid;
-
-	var myCalendar;
-	var myCalendar2;
-	var dlvyCnfmDtRange = 89;	//배송확정일 가능/불가능 날짜 구하는 범위 31 일이면 오늘부터 31일 후 까지 중에 가능 / 불가능 표시
-	var rtnSoType="";
-	var resultRes;
-	
-	var defaultCapaId;		//원래 지정된 배송일 의 카파 아이디
-	
-	fnObj={
-			winOpen:{
-
-			},	//END of winOpen
-			comboOpen : {
-
-			},	//END of comboOpen
-			gridOpen : {
-				
-				setWidth : function(){
-
-				},	//END of setWidth
-			},	//END of gridOpen
-			searchOpen : {
-				
-				searchDisableDate : function() {	//배송확정일 가능 한 날 조회 - 오늘날짜부터 31일뒤 까지 중에서 불가능일 조사하기
-
-					var srchData = {};
-					srchData.cmpyCd			=	paramCmpyCd	;
-					srchData.soNo			=	paramSoNo		;
-
-					$.ajax({
-				        url: "/mobile/mCustCalDisableDay",	//선택 불가능한 날짜를 불러오는 SP
-				        processData : false,
-				        contentType : "application/json",
-				        data: JSON.stringify(srchData),
-				        type:"POST",
-				        dataType:"json",
-				        success : function(res){
-				        	if(res && res.length > 0){
-				        		resultRes = res;
-				        		$("#dlvyAsgnDtText").text(res[0].dlvyAsgnDt);
-				        		myCalendar2.hideToday();
-				        		var disableDays = [];
-				        		defaultCapaId = res[0].dlvyAsgnCapaId;
-				        		for(var i=0;i<res.length;i++)
-				        		{
-				        			if(res[i].ableYn != "Y" || res[i].capaId == 0) //사용할수 없는 날짜
-				        			{
-				        				disableDays.push(res[i].instDt.substring(0,4)+"-"+res[i].instDt.substring(4,6)+"-"+res[i].instDt.substring(6,8))
-				        			}
-				        			else
-				        			{
-										myCalendar2.disableDays("year", res[i].instDt.substring(0, 4) + "-" + res[i].instDt.substring(4, 6) + "-" + res[i].instDt.substring(6, 8));
-				        			}
-				        			if(res[i].instDt == res[i].dlvyAsgnDt2)
-				        			{
-				        				$("#selDate").text(res[i].instDt);
-
-				        				//20220220 정연호 버튼에 날짜 표시
-					        			$('#selectDate').html(
-												"선택한 배송일 <font size='4'>(" + resultRes[i].instDt.substring(0, 4) + "-" + resultRes[i].instDt.substring(4, 6) + "-" + resultRes[i].instDt.substring(6, 8) + ")</font> 에 받기"
-        			        			);
-				        	    		$("#selCapaId").text(res[i].capaId);
-
-										$("#oDate").text(res[i].instDt);
-
-				        				//20220220 정연호 버튼에 날짜 표시
-					        			$('#oriDate').html(
-												"지정된 배송일 <font size='4'>(" + resultRes[i].instDt.substring(0, 4) + "-" + resultRes[i].instDt.substring(4, 6) + "-" + resultRes[i].instDt.substring(6, 8) + ")</font> 에 받기"
-        			        			);
-				        	    		$("#oCapaId").text(res[i].capaId);
-
-				        			}
-				        		}
-				        		if(disableDays.length > 0)
-				        		{
-				        			myCalendar2.disableDays("year",JSON.stringify(disableDays));
-				        		}
-				        		//테스트용도
-				        		//myCalendar2.disableDays("year", ["2021-09-14","2021-09-16","2021-09-18","2021-09-19","2021-09-21","2021-09-22","2021-09-26","2021-09-27","2021-09-28"]);
-
-				        		//20211231 정연호 특정날짜 표시 - 지정된 배송일자 표시
-				        		myCalendar2.setHolidays(null);
-
-				        		//20220220 정연호 지정된 배송일자가 없으면 표시안함
-				        		if(res[0].dlvyAsgnDt2)
-				        		{
-				        			$("#oDate").text(res[0].dlvyAsgnDt2);
-				        			//20220220 정연호 버튼에 날짜 표시
-				        			$('#oriDate').html(
-											"지정된 배송일 <font size='4'>(" + res[0].dlvyAsgnDt2.substring(0, 4) + "-" + res[0].dlvyAsgnDt2.substring(4, 6) + "-" + res[0].dlvyAsgnDt2.substring(6, 8) + ")</font> 에 받기"
-   				        			);
-				        			$("#oCapaId").text(res[0].dlvyAsgnCapaId);
-				        			myCalendar2.setHolidays(dateTypeChange(res[0].dlvyAsgnDt2,10));
-				        		}
-				        	}
-				        	else{
-
-				        		myCalendar2.hide();
-				       			//alert("조회 수행 결과 없음");
-				       			action_popup.alert("조회 수행 결과 없음", function (res) {})	//20230330 정연호 수정. alert를 모달로 변경
-				        	}
-				        },
-					});
-
-				},	//END of searchDisableDate : function() {
-
-				//20220221 정연호 추가. 고객이 선택한 배송일을 피드백 해주는 알림톡 내용을 불러서 바로 보냄
-				searchTalk : function() {
-
-					var srchTalk = new FormData();
-					srchTalk.append("cmpyCd", resultRes[0].cmpyCd);
-					srchTalk.append("tblSoMId", resultRes[0].tblSoMId);
-					srchTalk.append("tmplId", "AL_DELIVERY_SCHEDULE_NOTICE_V1");
-
-					var tblSoMIdAjax = resultRes[0].tblSoMId;
-					var soNoAjax = paramSoNo;
-					var cmpyCdAjax = resultRes[0].cmpyCd;
-
-					$.ajax({
-				        url: "/mobile/mCustTalk",
-				        processData : false,
-				        contentType : false,
-				        data: srchTalk,
-				        type:"POST",
-				        dataType:"json",
-				        success : function(res){
-							if (res) {
-								res.tblSoMId = tblSoMIdAjax;
-								res.soNo = soNoAjax;
-								res.cmpyCd = cmpyCdAjax;
-								fnObj.searchOpen.sendAlrmTmp(res);
-							}
-				        },
-						error: function (request, status, error)
-					   	{
-						},
-					});
-
-				},	//END of searchTalk : function() {
-
-				//20220221 정연호 추가. 선택 날짜 피드백 알림톡 보내기
-				sendAlrmTmp : function(sendRes) {	//알림톡 보내기
-
-					var reserveDtValu="00000000000000";
-
-					var sendData=[];
-					var resData={};
-					var sendMsgSms = sendRes.alrmTalkTmp;
-					resData.message_type = "AT";
-					resData.phn = sendRes.phn;
-
-					resData.profile = sendRes.profile;
-					resData.talkReserveDt = reserveDtValu;
-					resData.tmplId = sendRes.tmplId;
-					resData.msg = sendRes.alrmTalkTmp;
-					resData.smsKind = sendRes.smsKind;
-					resData.msgSms = sendMsgSms;
-					resData.smsSender = sendRes.smsSender;
-					resData.smsOnly = sendRes.smsOnly;
-					resData.userid = sendRes.userid;
-					resData.tblSoMId = sendRes.tblSoMId;
-
-					var button1Data = {};
-					button1Data.name = "상담원에게 메시지 보내기";
-					button1Data.type = "WL";
-					button1Data.url_mobile = "http://pf.kakao.com/_ExbPtK/chat";
-					button1Data.url_pc = "http://pf.kakao.com/_ExbPtK/chat";
-					resData.button1 = button1Data;
-
-					var sendD = {}
-					sendD = resData;
-
-					$.ajax({
-				        url: "/sendAlrmTalk",
-				        processData : false,
-				        contentType : "application/json",
-				        data: JSON.stringify(resData),
-				        type:"POST",
-				        dataType:"json",
-				        async:false,
-				        success : function(res){
-							if (res != null && res.length == 1) {
-								fnObj.searchOpen.saveAlrmTmpResult(sendD, res[0]);	//(발송한건, 리턴받은것)
-							}
-				        },
-				        error : function(request, status, error)
-					   	{
-
-					   	},
-					});
-				},
-
-				//20220221 정연호 추가. 알림톡 발송 결과를 DB에 저장하기
-				saveAlrmTmpResult : function(sendData,resultRes0) {	//알림톡 결과값 저장하기 (발송한건, 리턴받은것)
-					if(!resultRes0.code == "success")
-					{
-						return;
-					}
-
-					var resultData = new FormData();
-
-					resultData.append("tblSoMId"		,	sendData.tblSoMId			);
-					resultData.append("code"			,	resultRes0.code				);
-					resultData.append("userid"			,	sendData.userid				);
-					resultData.append("message_type"	,	sendData.message_type		);
-					resultData.append("phn"				,	sendData.phn				);
-					resultData.append("profile"			,	sendData.profile			);
-					resultData.append("talkReserveDt"	,	sendData.talkReserveDt		);
-					resultData.append("msg"				,	sendData.msg				);
-					resultData.append("smsLmsTit"		,	sendData.smsLmsTit			);
-					resultData.append("tmplId"			,	sendData.tmplId				);
-					resultData.append("cmplMsgCd"		,	resultRes0.message			);
-					resultData.append("saveUser"		,	/*[[${session.tblUserMId}]]*/	);
-
-					 $.ajax({
-				        url: "/saveAlrmTmpResult",
-				        processData : false,
-						contentType : false,
-				        data: resultData,
-				        type:"POST",
-				        dataType:"json",
-				        async:false,
-				        success : function(res){
-
-				        },
-				        error : function(request, status, error)
-					   	{
-
-					   	},
-					});
-				},
-				
-				selectDate : function(){	//배송일 선택하기 버튼을 누르면
-			
-					if($("#selDate").text().trim() == "" || $("#selCapaId").text().trim() == "")
-					{
-						action_popup.alert("선택한 배송일이 없습니다.<br>배송가능한 날짜 중에서 배송일을 선택하세요", function (res) {})	//20230330 정연호 수정. alert를 모달로 변경
-						return;
-					}
-					
-					//20230329 정연호 수정. confirm modal 을 이용하여 클릭시 페이지 이동
-					action_popup.confirm(	"선택한 배송일 <font color=red><b>"
-											+$("#selDate").text().substring(0,4)+"년 "+$("#selDate").text().substring(4,6)+"월 "+$("#selDate").text().substring(6,8)+"일"
-		    								+"</b></font><br><br>배송일을 확정하시겠습니까?"
-		    								+"<br>※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_ExbPtK/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다."
-		    								, function (res) 
-						{
-				            if (res) {
-				            	fnObj.searchOpen.save("sel");
-				            	//alert("sel");		//0505 test
-				            }
-			        	}
-		    		)
-				},
-				
-				originalDate : function(){	//지정된 배송일에 받기
-					
-					if($("#dlvyAsgnDtText").text().trim() == "없음" || !$("#dlvyAsgnDtText").text().trim())
-					{
-						//alert("배송가능한 날짜 중에서 배송일을 선택하세요");
-						action_popup.alert("지정된 배송일이 없습니다.<br>배송가능한 날짜 중에서 배송일을 선택하세요", function (res) {})	//20230330 정연호 수정. alert를 모달로 변경
-						return;
-					}
-				
-					var ori_confirm_msg = ''
-				
-					if($("#selDate").text())
-					{
-						ori_confirm_msg =	"지정된 배송일(<font color=red><b>"+$("#dlvyAsgnDtText").text()+"</b></font>)을 선택하였습니다.<br><br>"				
-										+	"선택한 배송일("+	$("#selDate").text().substring(0,4)+"년 "+$("#selDate").text().substring(4,6)+"월 "+$("#selDate").text().substring(6,8)+"일)이 있지만<br>"
-										+	"지정된 배송일(<font color=red><b>"+$("#dlvyAsgnDtText").text()+"</b></font>)을 선택하시겠습니까?<br>"
-										+	"※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_ExbPtK/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다."
-					}
-					else
-					{
-						ori_confirm_msg = "지정된 배송일 <font color=red><b>"+		
-											$("#dlvyAsgnDtText").text()
-											+"</b></font><br><br>배송일을 확정하시겠습니까?<br><br>"
-											+"※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_ExbPtK/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다."
-					}				
-
-					//20230329 정연호 수정. confirm modal 을 이용하여 클릭시 페이지 이동
-					action_popup.confirm(	ori_confirm_msg, function (res) 
-						{
-				            if (res) {
-				            	fnObj.searchOpen.save("ori");
-				            	//alert("ori")		//0505	test
-				            }
-			        	}
-		    		)
-				},
-
-				save : function(type) {	//체크한 것 일괄변경(table에 저장)
-
-					if(type == "sel")
-					{
-						if($("#selCapaId").text() == "0" || !$("#selCapaId").text())
-						{
-							action_popup.alert("선택한 배송일이 없습니다.", function (res) {})	//20230330 정연호 수정. alert를 모달로 변경
-							return;
-						}
-					}
-					else if(type == "ori")
-					{
-						if($("#oCapaId").text() == "0" || !$("#oCapaId").text())
-						{
-							action_popup.alert("지정 배송일이 없습니다.", function (res) {})	//20230330 정연호 수정. alert를 모달로 변경
-							return;
-						}
-					}
-					else
-					{
-						action_popup.alert("구분유형(선택한 배송일/지정된 배송일)이 없습니다.", function (res) {})	//20230330 정연호 수정. alert를 모달로 변경
-						return;
-					}
-
-					var saveData = {};
-					saveData.cmpyCd			=	paramCmpyCd	;
-					saveData.soNo			=	paramSoNo		;
-					if(type == "sel")
-					{
-						saveData.capaId			=	$("#selCapaId").text();
-					}
-					else if(type == "ori")
-					{
-						saveData.capaId			=	$("#oCapaId").text();
-					}
-					else
-					{
-						action_popup.alert("구분유형(선택한 배송일/지정된 배송일)이 없습니다..", function (res) {});	//20230330 정연호 수정. alert를 모달로 변경
-						return;
-					}
-
-					$.ajax({
-				        url: "/mobile/mCustCalSaveDate",		//배송일 선택하는것
-				        processData : false,
-				        contentType : "application/json",
-				        data: JSON.stringify(saveData),
-				        type:"POST",
-				        datatype:"json",
-				        success : function(res){
-				        	$(".modal_close").text("창 닫기");
-				        	if(res && res.rtnYn == "Y"){
-				        		//20220221 정연호 추가. 피드백 알림톡 발송 템플릿 불러와서 발송하기
-				        		try{
-				        			fnObj.searchOpen.searchTalk();
-				        		}
-				        		catch(e){
-				        		
-				        		}
-				        		//20220221 정연호 추가. 피드백 알림톡 발송 템플릿 불러와서 발송하기.끝
-				        		
-					        	action_popup.alert(res.rtnMsg.replace(/\./g,".<br>"), 
-			        				function (res) { 
-					        			if (res)
-				        				{
-					        				setTimeout("WinClose();", 500);
-				        				}
-					        		}
-					        	);
-					        	
-	
-					        	//setTimeout("WinClose();", 500);
-				        	}
-				        	else{
-				        		
-				   				
-				        		action_popup.alert(res.rtnMsg.replace(/\./g,".<br>")+"<br>※확정 후 변경요청시에는<br><a href = 'http://pf.kakao.com/_ExbPtK/chat' target='_blank' class='btn blue_btn btn_ok'>고객센터</a> 클릭 후 문의 바랍니다.",
-				        			function (res) {
-					        			if (res)
-				        				{
-					        				setTimeout("WinClose();", 500);
-				        				}
-					        		}
-					        	);
-				        				
-				        				//20230330 정연호 수정. alert를 모달로 변경
-				        	
-				        		//setTimeout("WinClose();", 500)
-				        	}
-				        	//$(".modal_close").text("확인");
-				        },
-					});
-				},	//END of save : function() {	
-				
-		},	//END of searchOpen
-	}
-	function WinClose(){
-		top.window.open('about:blank','_self').close();
-		top.window.opener=self;
-		top.self.close();
-	}
-
-$(document).ready(function() {
-	//20230329 정연호. alert, confirm을 모달로 했을때 해당 모달을 닫을때 사용함(이거 없으면 모달이 닫히지 않음)
-	$(".modal_close").on("click", function () {
-	    action_popup.close(this);
-	});
-	
-
-	var now = new Date()
-	var year = now.getFullYear()+"";
-	var month = (now.getMonth()+1)+"";
-	var date = now.getDate()+"";
-	if(month.length == 1 )
-	{
-		month = "0"+month;
-	}
-	if(date.length == 1 )
-	{
-		date = "0"+date;
-	}
-	
-	var today =  year+"-" + month + "-" + date;
-	
-	$("#dateFrom").val(today);
-	$("#dateTo").val(today);
-
-	myCalendar2= new dhtmlXCalendarObject('box');
-	//오늘날짜부터 31일 이후의 날짜 구하기
-	var	oneMonthLater = new Date(now.setDate(now.getDate() + dlvyCnfmDtRange));
-	var oneMonthLaterYear = oneMonthLater.getFullYear()+"";
-	var oneMonthLaterMonth = (oneMonthLater.getMonth()+1)+"";
-	var oneMonthLaterDate = oneMonthLater.getDate()+"";
-	if (oneMonthLaterMonth.length == 1) {
-		oneMonthLaterMonth = "0"+oneMonthLaterMonth;
-	}
-
-	if (oneMonthLaterDate.length == 1) {
-		oneMonthLaterDate = "0"+oneMonthLaterDate;
-	}
-	
-	var oneMonthLaterToday =  oneMonthLaterYear+"-" + oneMonthLaterMonth + "-" + oneMonthLaterDate;
-	
-	//달력정의
-	myCalendar2.loadUserLanguage("ko");
-	myCalendar2.setSensitiveRange(today,oneMonthLaterToday);			//이만큼 범위만 날짜 선택가능
-	myCalendar2.hideTime();
-	
-	myCalendar2.attachEvent("onClick", function(date){
-
-	    for(var i=0;i<resultRes.length;i++)
-	    {  
-	    	if(myCalendar2.getDate(true) == resultRes[i].instDt.substring(0,4)+"-"+resultRes[i].instDt.substring(4,6)+"-"+resultRes[i].instDt.substring(6,8) )
-	    	{
-	    		if(resultRes[i].capaId == "0" || !resultRes[i].capaId)
-				{
-					action_popup.alert(	myCalendar2.getDate(true) + "<br>선택 가능한 날짜가 아닙니다.", function (res) {
-					})	//20230330 정연호 수정. alert를 모달로 변경
-				}
-	    		else{	//20230330 정연호 추가. if 에 걸리면 배송일 선택이 안되고 튕겨야하는데 if에 걸려도 아래 배송일 선택이 수행되어서 else를 추가함
-		    		$("#selDate").text(resultRes[i].instDt);
-		    		$('#selectDate').html(
-	        			"선택한 배송일 <font size='4'>("+resultRes[i].instDt.substring(0,4)+"-"+resultRes[i].instDt.substring(4,6)+"-"+resultRes[i].instDt.substring(6,8)+")</font> 에 받기"					
-	        			);
-		    		$("#selCapaId").text(resultRes[i].capaId);
-	    		}
-	    		i=resultRes.length;	//20230330 정연호. 반복문을 중지시키기위해 추가
-	    	}
-	    }
-	});
-	myCalendar2.setPosition((innerWidth-251)/2,60);
-	myCalendar2.show();
-	
-	window.onresize = function(event) {		//윈도우의 사이즈가 변경했을떄
-		fnObj.gridOpen.setWidth();
-		fnObj.gridOpen.setWidth();
-	};
-	
-	fnObj.searchOpen.searchDisableDate();
-});
-
-</script>
+    </script>
 </head>
 <!-- top , left, bottom , right,  -->
 <body>
-	<div id="mainDiv" style="width: 100%; margin: auto;">
-		<div style="height: 12px; margin-top: 5px;">
-			<center>
+<div id="mainDiv" style="width: 100%; margin: auto;">
+    <div style="height: 12px; margin-top: 5px;">
+        <center>
 				<span style="font-size: 18px"> <b>배송일자 선택</b>(희망 배송일자 선택)
 				</span>
-			</center>
-			<center>
+        </center>
+        <center>
 				<span style="font-size: 14px"> (지정된 배송일자&nbsp;<b><font
-						color="red" id="dlvyAsgnDtText"></font></b>)
+                        color="red" id="dlvyAsgnDtText"></font></b>)
 				</span>
-			</center>
-		</div>
-		<div id="box" style="height: 350px; transform: scale(1.2)"></div>
-		<div style="height: 24px; font-size: 12px;">
-			<!-- 20211231 정연호 폰트 사이즈 추가 -->
-			<center>
-				<!-- 20211231 정연호 지정된배송일자 추가 및 배송예약불가능 일자 수정 -->
-				<br> <span class="cell"> <input type="button"
-					style="width: 22px; height: 22px; background-color: red; border-radius: 6px; border: 1px solid lightgray; vertical-align: middle;">
+        </center>
+    </div>
+    <div id="box" style="height: 350px; transform: scale(1.2)"></div>
+    <div style="height: 24px; font-size: 12px;">
+        <!-- 20211231 정연호 폰트 사이즈 추가 -->
+        <center>
+            <!-- 20211231 정연호 지정된배송일자 추가 및 배송예약불가능 일자 수정 -->
+            <br> <span class="cell"> <input type="button"
+                                            style="width: 22px; height: 22px; background-color: red; border-radius: 6px; border: 1px solid lightgray; vertical-align: middle;">
 					지정된 배송일 </input>&nbsp;
 				</span> <span class="cell"> <input type="button"
-					style="width: 22px; height: 22px; background-color: #ededed; border-radius: 6px; border: 1px solid lightgray; vertical-align: middle;">
+                                                   style="width: 22px; height: 22px; background-color: #ededed; border-radius: 6px; border: 1px solid lightgray; vertical-align: middle;">
 					배송예약 불가능 </input>
 				</span>
-			</center>
-		</div>
+        </center>
+    </div>
 
-		<div style="z-index: 9999;">
-			<br>
-			<center>
-				<font id="selDate" style="display: none;"></font> <font
-					id="selCapaId" style="display: none;"></font> <font id="oDate"
-					style="display: none;"></font> <font id="oCapaId"
-					style="display: none;"></font>
+    <div style="z-index: 9999;">
+        <br>
+        <center>
+            <font id="selDate" style="display: none;"></font> <font
+                id="selCapaId" style="display: none;"></font> <font id="oDate"
+                                                                    style="display: none;"></font> <font id="oCapaId"
+                                                                                                         style="display: none;"></font>
 
-				<!-- 20211231 정연호 배송일 변경 선택 버튼 -->
-				<!-- 20230330 정연호 width를 300px 에서 280px로 변경  -->
-				<button id="selectDate" onclick="fnObj.searchOpen.selectDate();"
-					style="width: 280px; height: 40px; color: white; font-size: 14px; font-weight: bold; background-color: #3079fb; border-radius: 10px; border: 1px solid blue;">
-					선택한 배송일 <font size='4'>(선택하세요)</font> 에 받기
-				</button>
+            <!-- 20211231 정연호 배송일 변경 선택 버튼 -->
+            <!-- 20230330 정연호 width를 300px 에서 280px로 변경  -->
+            <button id="selectDate" onclick="fnObj.searchOpen.selectDate();"
+                    style="width: 280px; height: 40px; color: white; font-size: 14px; font-weight: bold; background-color: #3079fb; border-radius: 10px; border: 1px solid blue;">
+                선택한 배송일 <font size='4'>(선택하세요)</font> 에 받기
+            </button>
 
-				<br> <br>
-				<!-- 20211231 정연호 지정된 배송일에 받기 버튼 -->
-				<!-- 20230330 정연호 width를 300px 에서 280로 변경  -->
-				<button id="oriDate" onclick="fnObj.searchOpen.originalDate();"
-					style="width: 280px; height: 40px; color: white; font-size: 14px; font-weight: bold; background-color: #3079fb; border-radius: 10px; border: 1px solid blue;">
-					지정된 배송일 <font size='4'>(날짜미지정)</font> 에 받기
-				</button>
-			</center>
-		</div>
+            <br> <br>
+            <!-- 20211231 정연호 지정된 배송일에 받기 버튼 -->
+            <!-- 20230330 정연호 width를 300px 에서 280로 변경  -->
+            <button id="oriDate" onclick="fnObj.searchOpen.originalDate();"
+                    style="width: 280px; height: 40px; color: white; font-size: 14px; font-weight: bold; background-color: #3079fb; border-radius: 10px; border: 1px solid blue;">
+                지정된 배송일 <font size='4'>(날짜미지정)</font> 에 받기
+            </button>
+        </center>
+    </div>
 
-		<!-- 20230329 정연호 추가. modal 을 쓰기위한 부분 -->
-		<!-- confirm 모달을 쓸 페이지에 추가 start-->
-		<section class="modal modal-section type-confirm">
-			<div class="enroll_box">
-				<p class="menu_msg"></p>
-			</div>
-			<div class="enroll_btn" style="text-align: center;">
-				<button class="btn blue_btn btn_ok">확인</button>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<button class="btn gray_btn modal_close">취소</button>
-			</div>
-		</section>
-		<!-- confirm 모달을 쓸 페이지에 추가 end-->
+    <!-- 20230329 정연호 추가. modal 을 쓰기위한 부분 -->
+    <!-- confirm 모달을 쓸 페이지에 추가 start-->
+    <section class="modal modal-section type-confirm">
+        <div class="enroll_box">
+            <p class="menu_msg"></p>
+        </div>
+        <div class="enroll_btn" style="text-align: center;">
+            <button class="btn blue_btn btn_ok">확인</button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="btn gray_btn modal_close">취소</button>
+        </div>
+    </section>
+    <!-- confirm 모달을 쓸 페이지에 추가 end-->
 
-		<!-- alert 모달을 쓸 페이지에 추가 start-->
-		<section class="modal modal-section type-alert">
-			<div class="enroll_box">
-				<p class="menu_msg"></p>
-			</div>
-			<div class="enroll_btn" style="text-align: center;">
-				<button class="btn blue_btn modal_close">확인</button>
-			</div>
-		</section>
-		<!-- alert 모달을 쓸 페이지에 추가 end-->
-		<!-- 20230329 정연호 추가. modal 을 쓰기위한 부분. 끝 -->
+    <!-- alert 모달을 쓸 페이지에 추가 start-->
+    <section class="modal modal-section type-alert">
+        <div class="enroll_box">
+            <p class="menu_msg"></p>
+        </div>
+        <div class="enroll_btn" style="text-align: center;">
+            <button class="btn blue_btn modal_close">확인</button>
+        </div>
+    </section>
 
-		<div style="position: absolute; right: 15px; bottom: 20px;">
-			<font size=2px>배송일 확정 후 변경요청 : </font><a
-				href='http://pf.kakao.com/_ExbPtK/chat' target='_blank'
-				class='btn blue_btn btn_ok' style="border-radius: 5px;">&nbsp;&nbsp;고객센터&nbsp;&nbsp;</a>
-		</div>
-	</div>
+    <div style="position: absolute; right: 15px; bottom: 20px;">
+        <font size=2px>배송일 확정 후 변경요청 : </font><a
+            href='http://pf.kakao.com/_ExbPtK/chat' target='_blank'
+            class='btn blue_btn btn_ok' style="border-radius: 5px;">&nbsp;&nbsp;고객센터&nbsp;&nbsp;</a>
+    </div>
+</div>
 </body>
 </html>

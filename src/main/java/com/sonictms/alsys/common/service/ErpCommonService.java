@@ -28,8 +28,8 @@ import java.security.cert.X509Certificate;
 public class ErpCommonService {
 
     private final ErpCommonMapper erpCommonMapper;
+    private final Gson gson = new Gson();
 
-    // 20220517 정연호 추가 application에서 값 가져오기
     @Value("${common.java.kppApiStatus}")
     private String kppApiStatus;
 
@@ -39,23 +39,43 @@ public class ErpCommonService {
     @Value("${common.java.kppApiUserpass}")
     private String kppApiUserpass;
 
-    // 20220517 정연호 kpp 배송상태 변경을 위해 얼라이언스에서 보낼값을 조회하기. 1건 조회하기
+    private static final int CONNECT_TIMEOUT = 10000;
+    private static final int READ_TIMEOUT = 10000;
+    private static final String CONTENT_TYPE = "application/json;charset=UTF-8";
+    private static final String ACCEPT = "application/json;charset=UTF-8";
+
+    /**
+     * KPP 배송상태 변경을 위해 얼라이언스에서 보낼값을 조회 (1건)
+     */
     public ErpCommonVO erpCommoSendValueSearch(ErpCommonVO erpCommonVO) {
         erpCommonMapper.erpCommoSendValueSearch(erpCommonVO);
         return erpCommonVO;
     }
 
-    // 20220517 정연호 모바일에서 kpp 배송상태 변경을 위해 얼라이언스에서 보낼값을 조회하기. 1건 조회하기
+    /**
+     * 모바일에서 KPP 배송상태 변경을 위해 얼라이언스에서 보낼값을 조회 (1건)
+     */
     public ErpCommonVO erpCommoSendValueSearchForMobile(ErpCommonVO erpCommonVO) {
         erpCommonMapper.erpCommoSendValueSearchForMobile(erpCommonVO);
         return erpCommonVO;
     }
 
+    /**
+     * KPP 배송상태 변경 API 호출
+     */
     public ErpCommonVO kppDlvStateChange(ErpCommonVO erpCommonVO) {
         disableSslVerification();
-        JSONArray jsonarr = new JSONArray();
+
+        JSONObject requestBody = createKppRequest(erpCommonVO);
+        return sendKppApiRequest(requestBody);
+    }
+
+    /**
+     * KPP API 요청 데이터 생성
+     */
+    private JSONObject createKppRequest(ErpCommonVO erpCommonVO) {
+        JSONArray jsonArray = new JSONArray();
         JSONObject data = new JSONObject();
-        JSONObject req = new JSONObject();
 
         data.put("DLV_ORD_ID", erpCommonVO.getDlvOrdId());
         data.put("DLV_ORD_SEQ", erpCommonVO.getDlvOrdIdSeq());
@@ -78,122 +98,186 @@ public class ErpCommonService {
         data.put("PRINT_RECEIPT_YN", erpCommonVO.getPrintReceiptYn());
         data.put("MOBILE_COM_ID", erpCommonVO.getMobileComId());
 
-        jsonarr.add(data);
+        jsonArray.add(data);
 
-        req.put("request", jsonarr);
+        JSONObject request = new JSONObject();
+        request.put("request", jsonArray);
+        return request;
+    }
 
-        ErpCommonVO vo = null;
+    /**
+     * KPP API 요청 전송
+     */
+    private ErpCommonVO sendKppApiRequest(JSONObject requestBody) {
+        HttpURLConnection connection = null;
 
-        // JSON 데이터 HTTP POST 전송하기
         try {
-            // String host_url =
-            // "https://52.79.206.98:5521/restv2/WINUS.PAH:PAH_DLV_RR/PAH/DLV_RTN_INSERT";
-            String host_url = kppApiStatus;
+            connection = createHttpConnection();
+            sendRequest(connection, requestBody);
 
-            log.info("kppApiStatus host_url : " + host_url);
-            log.info("kppApiUsername        : " + kppApiUsername);
-            log.info("kppApiUserpass        : " + kppApiUserpass);
+            int responseCode = connection.getResponseCode();
+            logResponseCode(responseCode);
 
-            HttpURLConnection conn = null;
+            String responseMessage = readResponse(connection);
+            return parseResponse(responseMessage);
 
-            URL url = new URL(host_url);
-            conn = (HttpURLConnection) url.openConnection();
-
-            conn.setRequestMethod("POST");// POST GET
-            conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8"); // 타입설정(application/json) 형식으로 전송
-            // (Request Body 전달시
-            // application/json로 서버에 전달.)
-
-            conn.setRequestProperty("Accept", "application/json;charset=UTF-8");
-            // String encodedAuth = "Basic " + Base64Util.encode("eaitest" + ":" +
-            // "eaitest");
-            String encodedAuth = "Basic " + Base64Util.encode(kppApiUsername + ":" + kppApiUserpass);
-            conn.setRequestProperty("Authorization", encodedAuth);
-
-            conn.setConnectTimeout(10000);
-            conn.setReadTimeout(10000);
-
-            // POST방식으로 스트링을 통한 JSON 전송
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
-
-            bw.write(req.toString());
-            // log.info("\n\n"+req.toString()+"\n");
-
-            bw.flush();
-            bw.close();
-            // HTTP 응답 코드 수신
-            int responseCode = conn.getResponseCode();
-            if (responseCode == 400) {
-                log.info("     L> ErpCommonVO KPP 응답코드 400 : 명령을 실행 오류");
-            } else if (responseCode == 500) {
-                log.info("     L> ErpCommonVO KPP 응답코드 500 : 서버 에러.");
-            } else { // 정상 . 200 응답코드 . 기타 응답코드
-                log.info("     L> ErpCommonVO KPP 응답코드 " + responseCode);
-            }
-
-            // 서버에서 보낸 응답 데이터 수신 받기
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String returnMsg = in.readLine();
-            // log.info("returnMsg : " + returnMsg.toString());
-            Gson gson = new Gson();
-
-            // vo = gson.fromJson(returnMsg, new TypeToken<ErpCommonVO>() {}.getType());
-            vo = gson.fromJson(returnMsg, ErpCommonVO.class);
-            if (vo != null && vo.getResponse() != null) {
-                log.info("vo.getResponse().getIfYn() : " + vo.getResponse().getIfYn());
-                log.info("vo.getResponse().getIfCnt() : " + vo.getResponse().getIfCnt());
-                log.info("vo.getResponse().getIfMessage() : " + vo.getResponse().getIfMessage());
-            }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("KPP API 요청 중 오류 발생", e);
+            return null;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
+
+    /**
+     * HTTP 연결 생성
+     */
+    private HttpURLConnection createHttpConnection() throws Exception {
+        URL url = new URL(kppApiStatus);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", CONTENT_TYPE);
+        connection.setRequestProperty("Accept", ACCEPT);
+
+        String encodedAuth = "Basic " + Base64Util.encode(kppApiUsername + ":" + kppApiUserpass);
+        connection.setRequestProperty("Authorization", encodedAuth);
+
+        connection.setConnectTimeout(CONNECT_TIMEOUT);
+        connection.setReadTimeout(READ_TIMEOUT);
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+
+        logApiInfo();
+
+        return connection;
+    }
+
+    /**
+     * API 정보 로깅
+     */
+    private void logApiInfo() {
+        log.info("kppApiStatus host_url : {}", kppApiStatus);
+        log.info("kppApiUsername        : {}", kppApiUsername);
+        log.info("kppApiUserpass        : {}", kppApiUserpass);
+    }
+
+    /**
+     * 요청 데이터 전송
+     */
+    private void sendRequest(HttpURLConnection connection, JSONObject requestBody) throws Exception {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()))) {
+            writer.write(requestBody.toString());
+            writer.flush();
+        }
+    }
+
+    /**
+     * 응답 코드 로깅
+     */
+    private void logResponseCode(int responseCode) {
+        switch (responseCode) {
+            case 400:
+                log.info("L> ErpCommonVO KPP 응답코드 400 : 명령을 실행 오류");
+                break;
+            case 500:
+                log.info("L> ErpCommonVO KPP 응답코드 500 : 서버 에러");
+                break;
+            default:
+                log.info("L> ErpCommonVO KPP 응답코드 {}", responseCode);
+                break;
+        }
+    }
+
+    /**
+     * 응답 데이터 읽기
+     */
+    private String readResponse(HttpURLConnection connection) throws Exception {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            return reader.readLine();
+        }
+    }
+
+    /**
+     * 응답 데이터 파싱
+     */
+    private ErpCommonVO parseResponse(String responseMessage) {
+        if (responseMessage == null) {
+            return null;
         }
 
-        // log.info("kpp api 오더상태변경 : "+vo.toString());
+        ErpCommonVO vo = gson.fromJson(responseMessage, ErpCommonVO.class);
+
+        if (vo != null && vo.getResponse() != null) {
+            log.info("vo.getResponse().getIfYn() : {}", vo.getResponse().getIfYn());
+            log.info("vo.getResponse().getIfCnt() : {}", vo.getResponse().getIfCnt());
+            log.info("vo.getResponse().getIfMessage() : {}", vo.getResponse().getIfMessage());
+        }
 
         return vo;
-
     }
 
-    // ssl security Exception 방지
-    public void disableSslVerification() {
-        // TODO Auto-generated method stub
+    /**
+     * SSL 보안 검증 비활성화
+     */
+    private void disableSslVerification() {
         log.info("disableSslVerification() 수행 : ssl security Exception 방지");
+
         try {
-            // Create a trust manager that does not validate certificate chains
-            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
+            TrustManager[] trustAllCerts = createTrustAllManager();
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            HostnameVerifier allHostsValid = (hostname, session) -> {
+                if (hostname == null || hostname.trim().isEmpty()) {
+                    return false;
                 }
-
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                
+                try {
+                    URL kppUrl = new URL(kppApiStatus);
+                    String expectedHost = kppUrl.getHost();
+                    
+                    if (expectedHost != null && hostname.equalsIgnoreCase(expectedHost)) {
+                        log.info("호스트명 검증 성공: {}", hostname);
+                        return true;
+                    } else {
+                        log.warn("호스트명 불일치 - 예상: {}, 실제: {}", expectedHost, hostname);
+                        return false;
+                    }
+                } catch (Exception e) {
+                    log.error("호스트명 검증 중 오류 발생: {}", e.getMessage());
+                    return false;
                 }
-            }
             };
-
-            // Install the all-trusting trust manager
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-            // Create all-trusting host name verifier
-            HostnameVerifier allHostsValid = new HostnameVerifier() {
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            };
-
-            // Install the all-trusting host verifier
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
+
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            log.error("SSL 설정 중 오류 발생", e);
         }
     }
 
-};
+    /**
+     * 모든 인증서를 신뢰하는 TrustManager 생성
+     */
+    private TrustManager[] createTrustAllManager() {
+        return new TrustManager[]{new X509TrustManager() {
+            @Override
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+
+            @Override
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                // 모든 클라이언트 인증서 신뢰
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                // 모든 서버 인증서 신뢰
+            }
+        }};
+    }
+}

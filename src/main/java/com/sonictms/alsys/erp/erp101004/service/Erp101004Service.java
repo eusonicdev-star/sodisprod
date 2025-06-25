@@ -15,13 +15,11 @@ public class Erp101004Service {
 
     // 그리드 헤더 조회하기
     public List<Erp101004VO> gridHeaderSrch101004(Erp101004VO erp101004VO) {
-        List<Erp101004VO> list = erp101004Mapper.gridHeaderSrch101004(erp101004VO);
-        return list;
+        return erp101004Mapper.gridHeaderSrch101004(erp101004VO);
     }
 
     // 엑셀데이터를 json으로 바꾼것을 체크하기
     public Erp101004VO erp101004ExcelUploadCheck(Erp101004VO erp101004VO) {
-
         erp101004VO = erp101004Mapper.erp101004ExcelUploadCheck(erp101004VO);
 
         return erp101004VO;
@@ -30,10 +28,8 @@ public class Erp101004Service {
 
     // 엑셀데이터를 json으로 바꾼것을 저장하기
     public Erp101004VO erp101004ExcelUploadJson(Erp101004VO erp101004VO) {
-
         erp101004VO = erp101004Mapper.erp101004ExcelUploadJson(erp101004VO);
 
         return erp101004VO;
     }
-
 }

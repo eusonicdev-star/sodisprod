@@ -37,9 +37,7 @@ public class Erp101002Controller {
     @ResponseBody
 
     public List<Erp101002VO> erp101002ExcelUploadCheck(@RequestBody List<Erp101002VO> erp101002VO) {
-        for (int i = 0; i < erp101002VO.size(); i++) {
-            erp101002VO.set(i, erp101002Service.erp101002ExcelUploadCheck(erp101002VO.get(i)));
-        }
+        erp101002VO.replaceAll(erp101002Service::erp101002ExcelUploadCheck);
         return erp101002VO;
     }
 
@@ -56,10 +54,10 @@ public class Erp101002Controller {
         }
 
         if (errCnt > 0) {    //에러가 1개라도 발생했다면
-            // 강제롤백
             log.info("강제롤백발생 : TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()");
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
+
         return erp101002VO;
     }
-} 
+}

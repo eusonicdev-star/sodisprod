@@ -10,12 +10,10 @@ import lombok.ToString;
 
 @Getter
 @Setter
-//@ToString
 @ToString(callSuper=true)
 public class Erp104002VO extends commonVO{
 		
 	private static final long serialVersionUID = 1L;
-
 
 	private	String	agntCd			;		//화주사
 	private	String	agntNm			;
@@ -47,6 +45,7 @@ public class Erp104002VO extends commonVO{
 	private	String	passCost		;		//통행료
 	private	String	instDt			;		//시공일
 	private	String	instEr			;		//시공기사
+	private	String	instErId			;		//시공기사
 	private	String	instCost		;		//시공비
 	private	String	dlvyCost		;		//물류비
 	private	String	fromEr			;		//발송인

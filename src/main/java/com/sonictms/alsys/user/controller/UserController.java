@@ -1,9 +1,8 @@
 package com.sonictms.alsys.user.controller;
 
-import com.sonictms.alsys.user.entity.Repw;
-import com.sonictms.alsys.user.entity.User;
-import com.sonictms.alsys.user.service.UserService;
 import com.sonictms.alsys.config.ProfileConfig;
+import com.sonictms.alsys.user.entity.Repw;
+import com.sonictms.alsys.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -81,19 +79,13 @@ public class UserController {
 
     // JSON 데이터 HTTP POST 전송하기
     try {
-      //String host_url = "https://alimtalk-api.bizmsg.kr/v2/sender/send";
       String host_url = bizMsgUrl;
-      HttpURLConnection conn = null;
+      HttpURLConnection conn;
 
       URL url = new URL(host_url);
       conn = (HttpURLConnection) url.openConnection();
-
       conn.setRequestMethod("POST");// POST GET
       conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8"); // 타입설정(application/json) 형식으로 전송
-      // (Request Body 전달시
-      // application/json로 서버에 전달.)
-
-      //conn.setRequestProperty("userid", "alliance");
       conn.setRequestProperty("userid", bizMsgUserid);
 
       log.info("bizMsgUrl : " + bizMsgUrl);
@@ -122,16 +114,14 @@ public class UserController {
         log.info("모바일 인증번호 알림톡 발송하기 응답코드 400 : 명령을 실행 오류");
       } else if (responseCode == 500) {
         log.info("모바일 인증번호 알림톡 발송하기 응답코드 500 : 서버 에러.");
-      } else { // 정상 . 200 응답코드 . 기타 응답코드
+      } else {
         log.info("모바일 인증번호 알림톡 발송하기 응답코드 " + responseCode);
       }
 
     } catch (IOException ie) {
-      log.info("IOException " + ie.getCause());
-      ie.printStackTrace();
+      log.error("IOException 발생", ie);
     } catch (Exception ee) {
-      log.info("Exception " + ee.getCause());
-      ee.printStackTrace();
+      log.error("Exception 발생", ee);
     }
 
     param.setReqNo("");
@@ -167,7 +157,7 @@ public class UserController {
     return param;
   }
 
-  // 비밀번호변경하는 페이지 접속
+  // 비밀번호 변경하는 페이지 접속
   @PostMapping(value = {"changePw"})
   public ModelAndView getChangePw(@Valid Repw repw) {
     ModelAndView modelAndView = new ModelAndView();
@@ -176,7 +166,7 @@ public class UserController {
     return modelAndView;
   }
 
-  // 비밀번호변경하는 작업 수행
+  // 비밀번호 변경하는 작업 수행
   @RequestMapping(value = {"changePwSend"}, method = RequestMethod.POST)
   @ResponseBody
   public Repw changePwSend(Repw param) {
@@ -203,44 +193,6 @@ public class UserController {
   @RequestMapping(value = "sessionTimePlus")
   @ResponseBody
   public void sessionTimePlus() throws Exception {
-    return;
-  }
-
-  @GetMapping("registration")
-  public ModelAndView getRegistrationPage() {
-    ModelAndView modelAndView = new ModelAndView();
-    User user = new User();
-    modelAndView.addObject("user", user);
-    modelAndView.setViewName("user/registration");
-    return modelAndView;
-  }
-
-  @PostMapping("registration")
-  public ModelAndView createNewUser(@Valid User user, BindingResult bindingResult) {
-    ModelAndView modelAndView = new ModelAndView();
-
-    // 아이디로 정보를 찾아서 중복여부체크
-    User userExists = userService.findUserInfoByLoginId(user);
-    if (userExists != null) {
-      bindingResult.rejectValue("loginId", "error.loginId",
-              "There is already a user registered with the loginId provided");
-    }
-    if (bindingResult.hasErrors()) {
-      modelAndView.setViewName("user/registration");
-    } else {
-      userService.saveUser(user);
-      modelAndView.addObject("successMessage", "User has been registered successfully");
-      modelAndView.addObject("user", new User());
-      modelAndView.setViewName("user/registration");
-    }
-    return modelAndView;
-  }
-
-  @GetMapping("exception")
-  public ModelAndView getUserPermissionExceptionPage() {
-    ModelAndView mv = new ModelAndView();
-    mv.setViewName("user/access-denied");
-    return mv;
   }
 
   @GetMapping("/myInfo")

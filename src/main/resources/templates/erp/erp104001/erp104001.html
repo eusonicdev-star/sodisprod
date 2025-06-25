@@ -36,10 +36,9 @@
         var myCalendar;
 
         //20220216 정연호 몇일씩 나눠 조회할것인가? 예 1 -> 20220101~20220102 (날짜차이가 1일)
-        var daySetting = 7;
+        var daySetting = 1;
         fnObj = {
             winOpen: {
-
                 commSrch: function (title, cmpyCd, srchCtgr, srchInput) {		//공통코드 찾기 팝업
                     windowId = "commSrch";
                     windowText = title + "commSrch";
@@ -50,7 +49,6 @@
                     windowHeight = 600;
                     windowsModal = true;
                     windowOnClose = function (windowId) {
-                        alert("windowId : " + windowId);
                         return true;
                     };
                     windowSendObject = {
@@ -62,15 +60,11 @@
                         srchNm: $("#srchName").val()
                     };
 
-
                     myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
-
                     myWins.window(windowId).attachEvent("onClose", function (win) {
-
                         return true;
                     });
                 },	//END of commSrch : function(){
-
 
                 erp104001p1Open: function () {		//공통코드 찾기 팝업
                     windowId = "erp104001p1";
@@ -82,7 +76,6 @@
                     windowHeight = window.innerHeight;
                     windowsModal = true;
                     windowOnClose = function (windowId) {
-
                         return true;
                     };
                     windowSendObject = {
@@ -91,9 +84,7 @@
                         tblSoMId: myGrid.cellById(myGrid.getSelectedRowId(), myGrid.getColIndexById("tblSoMId")).getValue()
                     };
                     myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
-
                     myWins.window(windowId).attachEvent("onClose", function (win) {
-
                         return true;
                     });
                 },	//END of commSrch : function(){
@@ -171,7 +162,6 @@
                                     c++;
                                 }
                                 myComboDcCd.updateOption("", "", c + "개 선택", "");
-                                //myComboDcCd.selectOption(0);
                                 myComboDcCd.openSelect();
                             }
                             if (!myComboDcCd.isChecked(0))		//전체에 체크를 안했을때
@@ -202,11 +192,8 @@
                             } else {
                                 myComboDcCd.setChecked(0, false);
                             }
-
                             myComboDcCd.updateOption("", "", cnt + "개 선택", "");
-                            //myComboDcCd.selectOption(0);
                             myComboDcCd.openSelect();
-
 
                             return;
                         }
@@ -222,7 +209,6 @@
                     myComboSoType.readonly(true);
                     myComboSoType.setFontSize("12px", "12px");
                     myComboSoType.attachEvent("onChange", function (value, text) {
-                        //myGrid.clearAll(false);
                         if (this.getIndexByValue(value) != 0) {
                             this.setChecked(this.getIndexByValue(value), true);
                             var c = 0;
@@ -242,7 +228,6 @@
                         if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
                         {
                             if (myComboSoType.isChecked(0)) {
-                                //console.log("전체 에 체크를 했을때");
                                 var c = 0;
                                 for (var i = 1; i < myComboSoType.getOptionsCount(); i++) {
                                     myComboSoType.setChecked(i, true);
@@ -466,42 +451,50 @@
             gridOpen: {
                 grid: function () {
 
-                    myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
+                    myGrid.setImagePath("http://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
                     myGrid.setHeader("#master_checkbox,CUD,회사코드,화주코드,화주," +
                         "주문유형코드,주문유형,주문상태코드,주문상태,물류센터코드," +
                         "물류센터,시공카테<br>고리코드,시공카테<br>고리,시스템<br>등록일,고객접수일,고객배송<br>요청일,배송<br>확정일,공장<br>출고일," +
                         "쇼핑몰,브랜드,AL 오더,고객사<br>주문번호,수취인," +
-                        "수취인<br>(일반전화),수취인<br>휴대전화,우편번호,주소,상세주소," +
+                        "수취인<br>(일반전화),수취인<br>휴대전화," +
+                        "배송확정일<br>입력자,배송확정일<br>입력시간," +	//20250324 신규추가
+                        "우편번호,주소,상세주소," +
                         "배송요청사항,고객사<br>특이사항,운임상태코드,운임구분,착불비," +
                         "통행료,시공일," +
 
-                        "팔렛트<br>번호," +			//20220110 정연호 팔렛트번호
+                        "팔렛트<br>번호," +
 
                         "시공기사,팀,기사메모,시공비,물류비," +
                         "발송인,발송인<br>일반전화,발송인<br>휴대전화,발송인<br>우편번호,발송인<br>주소," +
                         "발송인<br>상세주소,distChanCd,원AL 오더,사용여부,delResn," +
                         "비고,저장자,저장일,수정자,수정일," +
-                        "tblSoMId");
+                        "tblSoMId," +
+                        "수취인<br>일반전화");
                     myGrid.setColumnIds("chk,cud,cmpyCd,agntCd,agntNm," +
                         "soType,soTypeNm,soStatCd,soStatNm,dcCd," +
                         "dcNm,instCtgr,instCtgrNm,ordrInptDt,rcptDt,rqstDt,dlvyCnfmDt,giLiftDt," +
                         "mallCd,brand,soNo,refSoNo,acptEr," +
-                        "acptTel1,acptTel2,postCd,addr1,addr2," +
+                        "acptTel1,acptTel2," +
+                        "dlvyCnfmInptEr,dlvyCnfmInptTime," +//20250324 신규추가
+                        "postCd,addr1,addr2," +
                         "dlvyRqstMsg,custSpclTxt,dlvyCostType,dlvyCostTypeNm,rcptCost," +
                         "passCost,instDt," +
 
-                        "paltNoxx," +			//20220110 정연호 팔렛트번호
+                        "paltNoxx," +
 
                         "instEr,team,instMemo,instCost,dlvyCost," +
                         "fromEr,fromTel1,fromTel2,fromPostCd,fromAddr1," +
                         "fromAddr2,distChanCd,orgnSoNo,useYn,delResn," +
                         "memo,saveUser,saveTime,updtUser,updtTime," +
-                        "tblSoMId");
+                        "tblSoMId," +
+                        "acptTel1");
                     myGrid.setInitWidths("40,40,80,80,80," +
                         "80,80,80,80,80," +
                         "80,100,100,80,100,100,80,80," +
                         "120,80,100,100,120," +
-                        "80,100,80,160,160," +
+                        "120,120," +
+                        "120,160," +//20250324 신규추가
+                        "80,160,160," +
                         "160,160,80,80,80," +
                         "80,80," +
 
@@ -511,12 +504,15 @@
                         "80,80,80,80,160," +
                         "160,80,80,80,80," +
                         "80,80,160,80,160," +
-                        "80");
+                        "80," +
+                        "120");
                     myGrid.setColAlign("center,center,center,center,center," +
                         "center,center,center,center,center," +
                         "center,center,center,center,center,center,center,center," +
                         "center,left,center,left,center," +
-                        "center,center,center,left,left," +
+                        "center,center," +
+                        "center,left," +//20250324 신규추가
+                        "center,left,left," +
                         "left,left,center,center,center," +
                         "center,center," +
 
@@ -526,12 +522,15 @@
                         "center,center,center,center,left," +
                         "left,center,center,center,center," +
                         "left,left,left,left,left," +
-                        "center,");
+                        "center," +
+                        "center");
                     myGrid.setColTypes("ch,ro,ro,ro,ro," +
                         "ro,ro,ro,ro,ro," +
                         "ro,ro,ro,ro,ro,ro,ro,ro," +
                         "ro,ro,ro,ro,ro," +
-                        "ro,ro,ro,ro,ro," +
+                        "ro,ro," +
+                        "ro,ro," +//20250324 신규추가
+                        "ro,ro,ro," +
                         "ro,ro,ro,ro,ro," +
                         "ro,ro," +
 
@@ -541,12 +540,15 @@
                         "ro,ro,ro,ro,ro," +
                         "ro,ro,ro,ro,ro," +
                         "ro,ro,ro,ro,ro," +
+                        "ro," +
                         "ro");
                     myGrid.setColSorting(",,str,str,str," +
                         "str,str,str,str,str," +
                         "str,str,str,str,str,str,str,str," +
                         "str,str,str,str,str," +
-                        "str,str,str,str,str," +
+                        "str,str," +
+                        "str,str," +//20250325 신규추가
+                        "str,str,str," +
                         "str,str,str,str,str," +
                         "str,str," +
 
@@ -556,12 +558,15 @@
                         "str,str,str,str,str," +
                         "str,str,str,str,str," +
                         "str,str,str,str,str," +
+                        "str," +
                         "str");
                     myGrid.attachHeader(",,#text_filter,#text_filter,#text_filter," +
                         "#text_filter,#text_filter,#text_filter,#numeric_filter,#text_filter," +
                         "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
                         "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
-                        "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
+                        "#text_filter,#text_filter," +
+                        "#text_filter,," +//20250325 신규추가
+                        "#text_filter,#text_filter,#text_filter," +
                         "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
                         "#text_filter,#text_filter," +
 
@@ -570,8 +575,8 @@
                         "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
                         "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
                         "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
-                        "#text_filter,#text_filter,,#text_filter,," +
-                        "");
+                        "#text_filter,#text_filter,,#text_filter,,," +
+                        "#text_filter");
 
                     myGrid.setColumnHidden(myGrid.getColIndexById("chk"), true);	//컬럼 아이디로 해당 컬럼 가리기
                     myGrid.setColumnHidden(myGrid.getColIndexById("cud"), true);	//컬럼 아이디로 해당 컬럼 가리기
@@ -583,7 +588,6 @@
                     myGrid.setColumnHidden(myGrid.getColIndexById("soStatCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
                     myGrid.setColumnHidden(myGrid.getColIndexById("brand"), true);	//컬럼 아이디로 해당 컬럼 가리기
                     myGrid.setColumnHidden(myGrid.getColIndexById("soType"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("acptTel1"), true);	//컬럼 아이디로 해당 컬럼 가리기
                     myGrid.setColumnHidden(myGrid.getColIndexById("dlvyCostType"), true);	//컬럼 아이디로 해당 컬럼 가리기
                     myGrid.setColumnHidden(myGrid.getColIndexById("fromEr"), true);	//컬럼 아이디로 해당 컬럼 가리기
                     myGrid.setColumnHidden(myGrid.getColIndexById("fromTel1"), true);	//컬럼 아이디로 해당 컬럼 가리기
@@ -606,15 +610,11 @@
 
                     //20220106 정연호 시공카테고리코드 가림
                     myGrid.setColumnHidden(myGrid.getColIndexById("instCtgr"), true);
-                    //myGrid.enablePaging(true,15,5,"paging-area",true,"infoArea");	//0505
-                    //myGrid.enablePaging(true,15,5,"pagingbox",true);
-                    //myGrid.setPagingSkin("toolbar", "dhx_terrace");
                     myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
 
-                    myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+                    myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능
                     myGrid.enablePreRendering(10);
-                    fnObj.gridOpen.setWidth();
-                    //그래야 진짜 화면에 보이는 높이가 만들어진다
+                    fnObj.gridOpen.setWidth();			//그래야 진짜 화면에 보이는 높이가 만들어진다
                     myGrid.addRow(1, "");	//로우 추가
                     myGrid.deleteRow(1);
 
@@ -623,10 +623,8 @@
 
                     myGrid.attachEvent("onKeyPress", fnObj.keyOpen.onKeyPressed);
 
-
                     myGrid.attachEvent("onRowDblClicked", function (rId, cInd) {
                         fnObj.winOpen.erp104001p1Open();
-
                     });
 
                 },//grid
@@ -640,12 +638,12 @@
                     myGrid.enableAutoWidth(true, c_width - 25, 100);
                     myGrid.enableAutoHeight(true, window.innerHeight - searchDiv_height - searchDiv2nd_height - page_height - xhdr_height - 30);	//그리드 자동높이
 
-
                     $("#searchDiv").width(c_width - 25);
                     $("#searchDiv2nd").width(c_width - 25);
 
                 },	//END of setWidth
             },	//END of gridOpen
+
             searchOpen: {
                 sTime: function () {
 
@@ -654,8 +652,6 @@
                         //오른쪽 옆에서 메세지 나왔다 사라지기
                         fnObj.searchOpen.search()
                     }, 300);
-
-
                 },
 
                 search: function () {	//그리드 목록 조회하기
@@ -770,13 +766,14 @@
 
                             //20220106 정연호 시공카테고리
                             srchData.append("instCtgrList", myComboInstCapaCtgr.getChecked());
+                            srchData.append("dlvyCnfmInptChk", $("#dlvyCnfmInptChk").is(":checked") ? "1" : "");	//20250324 배송일 확정자 고객 여부
                             $.ajax({
                                 url: "/erp104001List",
                                 processData: false,
                                 contentType: false,
                                 data: srchData,
                                 type: "POST",
-                                datatype: "json",
+                                dataType: "json",
                                 async: false,
                                 success: function (res) {
                                     if (res && res.length > 0) {
@@ -851,13 +848,14 @@
 
                             //20220106 정연호 시공카테고리
                             srchData.append("instCtgrList", myComboInstCapaCtgr.getChecked());
+                            srchData.append("dlvyCnfmInptChk", $("#dlvyCnfmInptChk").is(":checked") ? "1" : "");	//20250324 배송일 확정자 고객 여부
                             $.ajax({
                                 url: "/erp104001List",
                                 processData: false,
                                 contentType: false,
                                 data: srchData,
                                 type: "POST",
-                                datatype: "json",
+                                dataType: "json",
                                 async: false,
                                 success: function (res) {
                                     if (res && res.length > 0) {
@@ -868,16 +866,6 @@
                                 },
                             });
                         }	//end of FOR
-
-                        //31일이 넘거나 (92이은 안넘고 6개중에 하나라도 뭐가 있을떄)
-                        /* if(excelDown31 == "Y" && excelDown92 == "N" && sixCheck == "N")
-                        {
-                            exportExcel();
-                        }
-                        else
-                        {
-                            searchPaging(1);
-                        } */
                     }
                     toastr.remove()
                     //31일이 넘거나 (92이은 안넘고 6개중에 하나라도 뭐가 있을떄)
@@ -886,7 +874,7 @@
                     } else {
                         searchPaging(1);
                     }
-                    console.log("search : " + ((new Date()).valueOf() - zz) / 1000 + " 초");
+
                 },	//END of search : function() {
 
 
@@ -928,51 +916,13 @@
                                     rtnVal = false;
                                 }
                             }
-
-                            /* if($("#dateFrom").val() && $("#dateTo").val())
-                            {
-                                var date1 = new Date($("#dateFrom").val());
-                                var date2 = new Date($("#dateTo").val());
-                                var gapDate = (date2.getTime() - date1.getTime()) / (1000*60*60*24);
-                                if(gapDate > 31)
-                                {
-                                    chkValMsg = chkValMsg + "검색일은 최대 31일 입니다.\n";
-                                    rtnVal = false;
-                                }
-                            } */
-
-                            /* 	if(!$("#srchCode").val()){
-                                    chkValMsg = chkValMsg + "화주사코드가 없습니다. 화주를 검색하세요.\n";
-                                    rtnVal = false;
-                                }
-                                if(!$("#srchName").val()){
-                                    chkValMsg = chkValMsg + "화주사명칭이 없습니다. 화주를 검색하세요.\n";
-                                    rtnVal = false;
-                                }
-
-                                //물류센터 콤보 체크한 것 확인
-                                var a=0;
-                                for(var i=1;i<myComboDcCd.getOptionsCount();i++)
-                                {
-                                    if(myComboDcCd.isChecked(i))
-                                    {
-                                        a++;
-                                    }
-                                }
-
-                                if(a == 0){
-                                    chkValMsg = chkValMsg + "물류센터에 체크하세요\n";
-                                    rtnVal = false;
-                                }
-                                 */
-
-
                         }
                         return rtnVal;
                     },	//END of chkVal : function(){
                 },	//END of searchChkVal
 
             },	//END of searchOpen
+
             keyOpen: {
                 enterKey: function (enterType) {
                     if (window.event.keyCode == 13) {
@@ -999,17 +949,6 @@
         }
 
         function getDatesStartToLast(startDate, lastDate) {
-
-            /*  if(!(startDate instanceof Date && lastDate instanceof Date)) return "Not Date Object";
-             var result = [];
-             var curDate = startDate;
-             while(curDate <= lastDate) {
-                 result.push(curDate);
-                 console.log(curDate)
-                 curDate.setDate(curDate.getDate() + 1);
-             }
-             return result; */
-
 
             var regex = RegExp(/^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/);
             if (!(regex.test(startDate) && regex.test(lastDate))) return "Not Date Format";
@@ -1038,7 +977,6 @@
                 return XLSX.utils.json_to_sheet(this.getExcelData());
             }
         }
-
 
         function searchPaging(page) {
             if ($("#rowPerPage").val()) {
@@ -1111,12 +1049,11 @@
                 for (var c = 0; c < columns; c++) {
                     jsonData[myGrid.getColumnId(c)] = searchRes[i][myGrid.getColumnId(c)];
                 }
-                //var y=(new Date()).valueOf();	//20220216 정연호
-                //var y2=(new Date()).valueOf();	//20220216 정연호
+
                 myGrid.addRow(i + 1, "");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
-                //console.log("          "+(i+1) + " addrow: "+((new Date()).valueOf()-y)/1000+"s");
+
                 myGrid.setRowData(i + 1, jsonData);
-                //console.log("               "+(i+1) + " addrow: "+((new Date()).valueOf()-y2)/1000+"s");
+
                 var soStatCdVal = myGrid.cellById(i + 1, myGrid.getColIndexById("soStatCd")).getValue()
                 if (soStatCdVal == "8000") {
                     myGrid.setRowColor(i + 1, "#F5A9A9");
@@ -1126,7 +1063,7 @@
                     myGrid.setRowColor(i + 1, "#FF8000");
                 }
             }
-            console.log("     " + page + " page addrow: " + ((new Date()).valueOf() - z) / 1000 + "s");
+
         }
 
         function excelDn() {
@@ -1137,6 +1074,25 @@
             exportExcel();
         }
 
+        // 라벨 이름으로 컬럼 숨기기 함수
+        function hideColumnByLabel(grid, labelName) {
+            var colIndex = -1;
+            // 컬럼 개수 가져오기
+            var columnCount = grid.getColumnsNum();
+            // 모든 컬럼 순회하며 라벨 확인
+            for (var i = 0; i < columnCount; i++) {
+                var currentLabel = grid.getColumnLabel(i); // 특정 컬럼의 라벨 가져오기
+                if (currentLabel === labelName) {
+                    colIndex = i;
+                    break;
+                }
+            }
+
+            // 해당 인덱스의 컬럼 숨기기
+            if (colIndex !== -1) {
+                grid.setColumnHidden(colIndex, true);
+            }
+        }
 
         $(document).ready(function () {
             myWins = new dhtmlXWindows();
@@ -1207,25 +1163,24 @@
                 sessionDcCd = /*[[${session.dcCd}]]*/
                     sessionDcNm = /*[[${session.dcNm}]]*/
 
-
             if (sessionUserGrdCd == "2000" || sessionUserGrntCd == "6000") {
-                //console.log("sessionDcCd : " + sessionDcCd)
                 myComboDcCd.setChecked(myComboDcCd.getIndexByValue(sessionDcCd), true);
                 myComboDcCd.updateOption("", "", sessionDcNm, "");
                 myComboDcCd.disable();
             }
-            // $("#btnExcelDown").mouseover(function () {
-            //     $("#btnExcelDown").val("화면에 조회된 내용을 엑셀 다운로드");
+
+            // $("#btnExcelDown" ).mouseover(function() {
+            // 	$("#btnExcelDown").val("화면에 조회된 내용을 엑셀 다운로드");
             // });
-            // $("#btnExcelDown").mouseout(function () {
-            //     $("#btnExcelDown").val("엑셀다운로드");
+            // $("#btnExcelDown" ).mouseout(function() {
+            // 	$("#btnExcelDown").val("엑셀다운로드");
             // });
             //
-            // $("#btnSearch").mouseover(function () {
-            //     $("#btnSearch").val("검색조건에 따라 화면출력 또는 엑셀다운(F2)");
+            // $("#btnSearch" ).mouseover(function() {
+            // 	$("#btnSearch").val("검색조건에 따라 화면출력 또는 엑셀다운(F2)");
             // });
-            // $("#btnSearch").mouseout(function () {
-            //     $("#btnSearch").val("조회(F2)");
+            // $("#btnSearch" ).mouseout(function() {
+            // 	$("#btnSearch").val("조회(F2)");
             // });
 
             toastr.options = {
@@ -1237,6 +1192,7 @@
                 timeOut: 0
             };
 
+            hideColumnByLabel(myGrid, "수취인(일반전화)");
         });
 
         //20211226 정연호 추가. 키보드에서 F2 누르면 조회하기
@@ -1265,6 +1221,11 @@
 				</span>
                 <span class="item-data">
 					<input id="btnExcelDown" class="action-button" type="button" onclick="excelDn()" value="엑셀 다운로드"/>
+				</span>
+
+                <span class="item-data">
+					<input id="btnReload" class="action-button" type="button" onclick="location.reload(true);"
+                           value="초기화">
 				</span>
             </div>
         </div>
@@ -1342,7 +1303,7 @@
 				</span>
 
 
-			<span class="cell al-order" style="width:220px;">
+            <span class="cell al-order" style="width:220px;">
 					<span class="item-head" style="width:80px;">AL 오더</span>
 					<span class="item-data" style="width:140px;"><textArea id="soNoList" style="width:122px;"
                                                                            oninput="this.value = this.value.replace(/[^0-9\n]/g, '').replace(/(\..*)\./g, '$1');"/></textArea></span>
@@ -1363,21 +1324,26 @@
             <span class="cell" style="width:260px;">
 					<span class="item-head" style="width:80px;">주문상태</span>
 					<span class="item-data" style="width:160px;"><div opt_type="checkbox" id="soStat"></div></span>
-				</span>
+			</span>
 
-
-            <!-- 20220106 정연호 추가 시공카테고리 추가 -->
             <span class="cell" style="width:220px;">
-					<span class="item-head" style="width:80px;">시공카테고리</span>
-					<span class="item-data" style="width:140px;"><div opt_type="checkbox"
-                                                                      id="instCapaCtgr"></div></span>
+					<span class="item-head" style="width:80px;">
+						시공카테고리
+					</span>
+					<span class="item-data" style="width:140px;">
+						<div opt_type="checkbox" id="instCapaCtgr"></div>
+					</span>
+			</span>
+
+            <span class="cell" style="width:220px;">
+					<span class="item-head" style="width:160px;">배송확정일 입력자</span>
+					<span class="item-data" style="width: 40px;">
+						<label for="dlvyCnfmInptChk"></label>
+						<input type="checkbox" id="dlvyCnfmInptChk" name="dlvyCnfmInptChk"
+                               style="width:20px;height:20px;">
+					</span>
 				</span>
-            <!-- 20220106 정연호 추가 시공카테고리 추가.끝 -->
-
-
         </div>
-
-
     </div>
 
     <div id="searchDiv2nd"

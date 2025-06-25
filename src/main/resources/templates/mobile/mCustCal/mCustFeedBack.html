@@ -1,442 +1,540 @@
-<!DOCTYPE HTML>
-<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head>
-<title></title>
-<link rel="icon" href="data:;base64,iVBORw0KGgo=">
-<meta charset="UTF-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<!DOCTYPE html>
+<html
+  xmlns:sec="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <title></title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+    />
 
-<!-- <meta http-equiv="Cache-Control" content="no-cache">
-	<meta http-equiv="Pragma" content="no-cache">
-	<meta http-equiv="Expires" content="0"> -->
-<!-- 안드로이드 홈화면추가시 상단 주소창 제거 -->
-<!-- <meta name="mobile-web-app-capable" content="yes"> -->
+    <!-- 20220224 정연호. 기사평가 신규 -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css"
+    />
+    <link rel="stylesheet" type="text/css" href="/css/common.css" />
+    <script
+      src="https://cdn.dhtmlx.com/edge/dhtmlx.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
 
-<!-- 아이폰 홈화면추가시 상단 주소창 제거 -->
-<!-- <meta name="apple-mobile-web-app-capable" content="yes"> -->
+    <style>
+      body {
+        height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
 
-<!-- 20220224 정연호. 기사평가 신규 -->
+      textarea::placeholder {
+        color: #c0c0c0;
+        font-weight: bold;
+      }
+    </style>
+    <script th:inline="javascript">
+      var paramCmpyCd;
+      var paramTblSoMId;
+      var soNo;
+      var star = [0, 0, 0, 0, 0];
+      var evalSpcl1 = 0;
+      var evalItem1Value = "N";
+      var evalItem2Value = "N";
+      var evalItem3Value = "N";
 
-<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
-<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
-<link rel="stylesheet" type="text/css" href="/css/common.css">
-<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="/js/common.js"></script>
-<script type="text/javascript" src="/js/commCode.js"></script>
+      fnObj = {
+        winOpen: {}, //END of winOpen
+        comboOpen: {}, //END of comboOpen
+        gridOpen: {
+          setWidth: function () {}, //END of setWidth
+        }, //END of gridOpen
+        searchOpen: {
+          searchStar: function (starType) {
+            if (starType == 0) {
+              //1번 별을 눌랐을떄
+              var k = 0;
+              for (var i = 0; i < star.length; i++) {
+                //2,3,4,5 를 눌렀다가 1을 누른것인지 아니면 1 만 계속 누르고 있는것인지 구별
+                if (star[i] == 1) {
+                  k++;
+                }
+              }
+              if (k > 1) {
+                star[starType] = 0; //1번별이 1점으로 나오게 시작 점수를 0점으로 바꾼다
+              }
+              //2번별 부터 5번별 까지 0점으로 돌림
+              for (var i = 1; i < star.length; i++) {
+                star[i] = 0;
+                $("#star" + i + "img").attr(
+                  "src",
+                  "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png"
+                );
+              }
 
-<style>
-body {
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-}
-textarea::placeholder {
-  color: #c0c0c0;
-  font-weight: bold;
-}
-</style>
-<script th:inline="javascript">
+              if (star[starType] == 0) {
+                star[starType] = 1;
+                $("#star" + starType + "img").attr(
+                  "src",
+                  "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_full.png"
+                );
+              } else if (star[starType] == 1) {
+                star[starType] = 0.5;
+                $("#star" + starType + "img").attr(
+                  "src",
+                  "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_half.png"
+                );
+              } else if (star[starType] == 0.5) {
+                star[starType] = 0;
+                $("#star" + starType + "img").attr(
+                  "src",
+                  "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png"
+                );
+              }
+            } else {
+              var k = 0;
+              for (var i = starType; i < star.length; i++) {
+                if (star[i] == 1 || star[i] == 0.5) {
+                  k++;
+                }
+              }
+              if (k > 1) {
+                star[starType] = 0; //1번별이 1점으로 나오게 시작 점수를 0점으로 바꾼다
+              }
 
-	var paramCmpyCd;
-	var paramTblSoMId;
-	var soNo;
-	var star = [0,0,0,0,0];	
-	var evalSpcl1=0;
-	var evalItem1Value="N";
-	var evalItem2Value="N";
-	var evalItem3Value="N";
-	
+              //내가 누른것 다음꺼 부터 끝까지 0점으로 돌림
+              for (var i = starType + 1; i < star.length; i++) {
+                star[i] = 0;
+                $("#star" + i + "img").attr(
+                  "src",
+                  "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png"
+                );
+              }
+              //처음 부터 내가 누른것 전 까지 1점으로 바꿈
+              for (var j = 0; j < starType; j++) {
+                star[j] = 1;
+                $("#star" + j + "img").attr(
+                  "src",
+                  "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_full.png"
+                );
+              }
 
-	fnObj={
-		winOpen:{
+              if (star[starType] == 0) {
+                star[starType] = 1;
+                $("#star" + starType + "img").attr(
+                  "src",
+                  "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_full.png"
+                );
+              } else if (star[starType] == 1) {
+                star[starType] = 0.5;
+                $("#star" + starType + "img").attr(
+                  "src",
+                  "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_half.png"
+                );
+              } else if (star[starType] == 0.5) {
+                star[starType] = 1;
+                $("#star" + starType + "img").attr(
+                  "src",
+                  "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_full.png"
+                );
+              }
+            }
+            evalSpcl1 = 0;
+            for (var i = 0; i < star.length; i++) {
+              evalSpcl1 = evalSpcl1 + star[i];
+            }
+          },
 
-		},	//END of winOpen
-		comboOpen : {
+          //화면 아래 의견보내기 버튼을 눌렀을때
+          saveFeedBack: function () {
+            if (!evalSpcl1) {
+              alert("별점을 입력해주세요.");
+              return;
+            }
 
-		},	//END of comboOpen
-		gridOpen : {
-			
-			setWidth : function(){
+            //별점, 만족스러운 점, 전달하고 싶은 의견 3중 하나는 넣어야함
 
-			},	//END of setWidth
-		},	//END of gridOpen
-		searchOpen : {
-			searchStar : function(starType) {
-				
-				if(starType == 0) {		//1번 별을 눌랐을떄
-					var k=0;
-					for(var i=0;i<star.length;i++) {	//2,3,4,5 를 눌렀다가 1을 누른것인지 아니면 1 만 계속 누르고 있는것인지 구별
-						if(star[i] == 1) {
-							k++;	
-						}
-					}
-					if(k > 1) {
-						star[starType] = 0;	//1번별이 1점으로 나오게 시작 점수를 0점으로 바꾼다
-					}
-					//2번별 부터 5번별 까지 0점으로 돌림
-					for(var i=1;i<star.length;i++) {
-						star[i] = 0 ;
-						$("#star"+i+"img").attr("src","https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png");
-						
-					}
-					if(star[starType] == 0) {
-						star[starType] = 1;
-						$("#star"+starType+"img").attr("src","https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_full.png");
-					}
-					else if(star[starType] == 1) {
-						star[starType] = 0.5;
-						$("#star"+starType+"img").attr("src","https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_half.png");
-					}
-					else if(star[starType] == 0.5) {
-						star[starType] = 0;
-						$("#star"+starType+"img").attr("src","https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png");
-					}
-					
-				}
-				else{
-					var k=0;
-					for(var i=starType;i<star.length;i++) {	
-						if(star[i] == 1 || star[i] == 0.5) {
-							k++;	
-						}
-					}
-					if(k > 1) {
-						star[starType] = 0;	//1번별이 1점으로 나오게 시작 점수를 0점으로 바꾼다
-					}
+            if (
+              !evalSpcl1 &&
+              evalItem1Value == "N" &&
+              evalItem2Value == "N" &&
+              evalItem3Value == "N" &&
+              !$("#evalMsg").val().trim()
+            ) {
+              alert(
+                "별점, 만족스러운 점, 의견입력 중 최소 1가지는 입력하셔야 합니다."
+              );
+              return;
+            }
 
-					//내가 누른것 다음꺼 부터 끝까지 0점으로 돌림
-					for(var i=(starType+1);i<star.length;i++) {
-						star[i] = 0 ;
-						$("#star"+i+"img").attr("src","https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png");
-					}
-					//처음 부터 내가 누른것 전 까지 1점으로 바꿈
-					for(var j=0;j<starType;j++) {
-						star[j] = 1 ;
-						$("#star"+j+"img").attr("src","https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_full.png");
-					}
-					
-					if(star[starType] == 0) {
-						star[starType] = 1;
-						$("#star"+starType+"img").attr("src","https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_full.png");
-					}
-					else if(star[starType] == 1) {
-						star[starType] = 0.5;
-						$("#star"+starType+"img").attr("src","https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_half.png");
-					}
-					else if(star[starType] == 0.5) {
-						star[starType] = 1;
-						$("#star"+starType+"img").attr("src","https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_full.png");
-					}
-				}
-				evalSpcl1 = 0;
-				for(var i=0;i<star.length;i++) {
-					evalSpcl1 = evalSpcl1 + star[i];
-				}
-			},
-			
-			//화면 아래 의견보내기 버튼을 눌렀을때
-			saveFeedBack : function() {
-				
-				if(!evalSpcl1)
-				{
-					alert("별점을 입력해주세요.");
-					return;
-				}
-				
-				//별점, 만족스러운 점, 전달하고 싶은 의견 3중 하나는 넣어야함
-				
-				if(!evalSpcl1 && evalItem1Value == "N" && evalItem2Value == "N" && evalItem3Value == "N" && !$("#evalMsg").val().trim()) {
-					alert("별점, 만족스러운 점, 의견입력 중 최소 1가지는 입력하셔야 합니다.");
-					return;
-				}
-				
-				var feedData={};
-				feedData.cmpyCd = paramCmpyCd;
-				feedData.tblSoMId = paramTblSoMId;
-				feedData.soNo     = soNo;
-				feedData.evalItem1 = evalItem1Value;	//시간약속을 잘지켜요 Y / N
-				feedData.evalItem2 = evalItem2Value;	//친절하고 매너가 좋아요 Y /N
-				feedData.evalItem3 = evalItem3Value;	//주변정리를 잘해주셨어요 Y /N
-				feedData.evalSpcl1 = evalSpcl1;			//별 점수
-				feedData.evalMsg   = $("#evalMsg").val();			//전달하고 싶은 의견
-				
-				$.ajax({
-			        url: "/mobile/mSaveFeedBack",
-			        processData : false,
-			        contentType : "application/json",
-			        data: JSON.stringify(feedData),
-			        type:"POST",
-			        datatype:"json",
-			        async:false,
-			        success : function(res){
+            var feedData = {};
+            feedData.cmpyCd = paramCmpyCd;
+            feedData.tblSoMId = paramTblSoMId;
+            feedData.soNo = soNo;
+            feedData.evalItem1 = evalItem1Value; //시간약속을 잘지켜요 Y / N
+            feedData.evalItem2 = evalItem2Value; //친절하고 매너가 좋아요 Y /N
+            feedData.evalItem3 = evalItem3Value; //주변정리를 잘해주셨어요 Y /N
+            feedData.evalSpcl1 = evalSpcl1; //별 점수
+            feedData.evalMsg = $("#evalMsg").val(); //전달하고 싶은 의견
 
-			        	if(res && res.rtnYn == "Y"){
-				        	alert("평가결과를 등록하였습니다.\n감사합니다.");
-				        	$("#mainDiv").empty();	//20220308 정연호 추가
-				        	setTimeout("WinClose();", 500)
-				        	return;
-			        	}
-			        	else{
-			        		alert("평과결과를 등록하지 못하였습니다.")
-			        		//setTimeout("WinClose();", 500)
-			        		return;
-			        	}
-			        },
-			        error : function(request, status, error) 
-				   	{
-			        	alert("평과결과등록을 수행하지 못하였습니다.");
-			        	return;
-				   	},
-				});
-			},
-			//화면 아래 다음에 할게요 버튼을 눌렀을때
-			cancelFeedBack : function() {
-				$("#mainDiv").empty();	//20220308 정연호 추가
-        		setTimeout("WinClose();", 500)
-        		return;
-			},
+            $.ajax({
+              url: "/mobile/mSaveFeedBack",
+              processData: false,
+              contentType: "application/json",
+              data: JSON.stringify(feedData),
+              type: "POST",
+              datatype: "json",
+              async: false,
+              success: function (res) {
+                if (res && res.rtnYn == "Y") {
+                  alert("평가결과를 등록하였습니다.\n감사합니다.");
+                  $("#mainDiv").empty(); //20220308 정연호 추가
+                  setTimeout("WinClose();", 500);
+                  return;
+                } else {
+                  alert("평과결과를 등록하지 못하였습니다.");
+                  //setTimeout("WinClose();", 500)
+                  return;
+                }
+              },
+              error: function (request, status, error) {
+                alert("평과결과등록을 수행하지 못하였습니다.");
+                return;
+              },
+            });
+          },
+          //화면 아래 다음에 할게요 버튼을 눌렀을때
+          cancelFeedBack: function () {
+            $("#mainDiv").empty(); //20220308 정연호 추가
+            setTimeout("WinClose();", 500);
+            return;
+          },
 
-			evalItem1 : function() {
-				if(!evalItem1Value || evalItem1Value.toUpperCase() == "N") {
-					evalItem1Value = "Y";
-					$("#evalItem1").css("background-color","#3485ff");
-					$("#evalItem1").css("color","#ffffff");
-				}
-				else if(evalItem1Value.toUpperCase() == "Y") {
-					evalItem1Value = "N";
-					$("#evalItem1").css("background-color","#ffffff");
-					$("#evalItem1").css("color","#111111");
-				}
-			},
-			evalItem2 : function() {
-				if(!evalItem2Value || evalItem2Value.toUpperCase() == "N") {
-					evalItem2Value = "Y";
-					$("#evalItem2").css("background-color","#3485ff");
-					$("#evalItem2").css("color","#ffffff");
-				}
-				else if(evalItem2Value.toUpperCase() == "Y") {
-					evalItem2Value = "N";
-					$("#evalItem2").css("background-color","#ffffff");
-					$("#evalItem2").css("color","#111111");
-				}
-			},
-			evalItem3 : function() {
-				if(!evalItem3Value || evalItem3Value.toUpperCase() == "N") {
-					evalItem3Value = "Y";
-					$("#evalItem3").css("background-color","#3485ff");
-					$("#evalItem3").css("color","#ffffff");
-				}
-				else if(evalItem3Value.toUpperCase() == "Y") {
-					evalItem3Value = "N";
-					$("#evalItem3").css("background-color","#ffffff");
-					$("#evalItem3").css("color","#111111");
-				}
-			},
-			
-			//평가를 했나 안했나 먼저 검사해보기
-			searchFeed : function() {
-				
-				var feedSrch={};
-				feedSrch.cmpyCd = paramCmpyCd;
-				feedSrch.tblSoMId = paramTblSoMId;
+          evalItem1: function () {
+            if (!evalItem1Value || evalItem1Value.toUpperCase() == "N") {
+              evalItem1Value = "Y";
+              $("#evalItem1").css("background-color", "#3485ff");
+              $("#evalItem1").css("color", "#ffffff");
+            } else if (evalItem1Value.toUpperCase() == "Y") {
+              evalItem1Value = "N";
+              $("#evalItem1").css("background-color", "#ffffff");
+              $("#evalItem1").css("color", "#111111");
+            }
+          },
+          evalItem2: function () {
+            if (!evalItem2Value || evalItem2Value.toUpperCase() == "N") {
+              evalItem2Value = "Y";
+              $("#evalItem2").css("background-color", "#3485ff");
+              $("#evalItem2").css("color", "#ffffff");
+            } else if (evalItem2Value.toUpperCase() == "Y") {
+              evalItem2Value = "N";
+              $("#evalItem2").css("background-color", "#ffffff");
+              $("#evalItem2").css("color", "#111111");
+            }
+          },
+          evalItem3: function () {
+            if (!evalItem3Value || evalItem3Value.toUpperCase() == "N") {
+              evalItem3Value = "Y";
+              $("#evalItem3").css("background-color", "#3485ff");
+              $("#evalItem3").css("color", "#ffffff");
+            } else if (evalItem3Value.toUpperCase() == "Y") {
+              evalItem3Value = "N";
+              $("#evalItem3").css("background-color", "#ffffff");
+              $("#evalItem3").css("color", "#111111");
+            }
+          },
 
-				$.ajax({
-			        url: "/mobile/mFeedSrch",
-			        processData : false,
-			        contentType : "application/json",
-			        data: JSON.stringify(feedSrch),
-			        type:"POST",
-			        datatype:"json",
-			        async:false,
-			        success : function(res){
+          //평가를 했나 안했나 먼저 검사해보기
+          searchFeed: function () {
+            var feedSrch = {};
+            feedSrch.cmpyCd = paramCmpyCd;
+            feedSrch.tblSoMId = paramTblSoMId;
 
-			        	if(res && res.rtnYn == "N"){
-			        		$("#mainDiv").empty();	//20220308 정연호 추가
-			        		alert(res.rtnMsg);
-				        	
-				        	setTimeout("WinClose();", 500)
-			        	}
-			        	else{
-			        		soNo = res.soNo;	
-			        	}
-			        },
-			        error : function(request, status, error) 
-				   	{
-			        	
-				   	},
-				});
-			},	//END of searchFeed : function() {
-		},	//END of searchOpen
-	}
-	function WinClose(){
-		top.window.open('about:blank','_self').close();
-		top.window.opener=self;
-		top.self.close();
-	}
+            $.ajax({
+              url: "/mobile/mFeedSrch",
+              processData: false,
+              contentType: "application/json",
+              data: JSON.stringify(feedSrch),
+              type: "POST",
+              datatype: "json",
+              async: false,
+              success: function (res) {
+                if (res && res.rtnYn == "N") {
+                  $("#mainDiv").empty(); //20220308 정연호 추가
+                  alert(res.rtnMsg);
+                  setTimeout("WinClose();", 500);
+                } else {
+                  soNo = res.soNo;
+                }
+              },
+              error: function (request, status, error) {},
+            });
+          }, //END of searchFeed : function() {
+        }, //END of searchOpen
+      };
 
-$(document).ready(function() {
+      function WinClose() {
+        top.window.open("about:blank", "_self").close();
+        top.window.opener = self;
+        top.self.close();
+      }
 
-	try{
-		paramCmpyCd = /*[[${param.cmpyCd[0]}]]*/;
-		paramTblSoMId = /*[[${param.tblSoMId[0]}]]*/;
-	}
-	catch(e){
-		
-	};
-	if (!paramCmpyCd || paramCmpyCd == "null")
-	{
-		paramCmpyCd = "A";
-	}
-	console.log("param.cmpyCd[0] : " + paramCmpyCd);
-	console.log("param.tblSoMId[0] : " + paramTblSoMId);
+      $(document).ready(function () {
+        try {
+          paramCmpyCd = /*[[${param.cmpyCd[0]}]]*/ "A";
+          paramTblSoMId = /*[[${param.tblSoMId[0]}]]*/ "";
+        } catch (e) {
+          console.error("Thymeleaf 파라미터 파싱 오류:", e);
+          // 기본값 설정
+          paramCmpyCd = "A";
+          paramTblSoMId = "";
+          console.log(
+            "기본값으로 설정됨 - paramCmpyCd: " +
+              paramCmpyCd +
+              ", paramTblSoMId: " +
+              paramTblSoMId
+          );
+        }
 
-	fnObj.searchOpen.searchFeed();
-	
-});
+        if (!paramCmpyCd || paramCmpyCd == "null") {
+          paramCmpyCd = "A";
+        }
+        console.log("param.cmpyCd[0] : " + paramCmpyCd);
+        console.log("param.tblSoMId[0] : " + paramTblSoMId);
 
-</script>
-</head>
-<!-- top , left, bottom , right,  -->
-<body>
-	<div id="mainDiv" style="width: 100%; margin: auto;">
-		<div style="height: 100%; margin-top: 5px;">
-			<center>
-				<br>
-				
-				<span style="font-size: 20px;">
-					<b>기사님은 어떠셨나요?</b>
-				</span>
-				<br>
-				<br>
-				<span class="cell">
-					<span id="star0" onclick="fnObj.searchOpen.searchStar(0)">
-						<img id="star0img" width="52dp" height="52dp" src = "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png">
-					</span>
-				</span>
-				<span class="cell">
-					<span id="star1" onclick="fnObj.searchOpen.searchStar(1)">
-						<img id="star1img" width="52dp" height="52dp" src = "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png">
-					</span>
-				</span>
-				<span class="cell">
-					<span id="star2" onclick="fnObj.searchOpen.searchStar(2)">
-						<img id="star2img" width="52dp" height="52dp" src = "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png">
-					</span>
-				</span>
-				<span class="cell">
-					<span id="star3" onclick="fnObj.searchOpen.searchStar(3)">
-						<img id="star3img" width="52dp" height="52dp" src = "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png">
-					</span>
-				</span>
-				<span class="cell">
-					<span id="star4" onclick="fnObj.searchOpen.searchStar(4)">
-						<img id="star4img" width="52dp" height="52dp" src = "https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png">
-					</span>
-				</span>
-				
-				
-				<br>
-				<br>
-				
-				<span style="font-size: 20px;">
-					<b>어떤 점이 만족스러웠나요?</b>
-				</span>
-				<br>
-				<span style="font-size: 14px;color:#c0c0c0;">
-					<b>해당하는 항목을 골라주세요.</b>
-				</span>
-				<br>
-				<br>
-				
-				
-				<button id="evalItem1" onclick="fnObj.searchOpen.evalItem1()" style="	width				:	80%	;
-											height				:	42px	;
-											color				:	#111111	;
-											font-size			:	16px	;
-											font-weight			:	bold	;
-											background-color	:	#FFFFFF	;	
-											border-radius		:	5px	;
-											border				:	1px solid lightgray;
-										">
-										<img style="vertical-align:middle;" width="40dp" height="40dp" src = "https://sodisprod.cdn1.cafe24.com/feedback/good/ic_time.png">
-					시간 약속을 잘 지켜요
-				</button>
-				
-				<p style="margin-top: 10px;margin-bottom: 0px;"></p>
-				
-				<button id="evalItem2" onclick="fnObj.searchOpen.evalItem2()" style="	width				:	80%	;
-											height				:	42px	;
-											color				:	#111111	;
-											font-size			:	16px	;
-											font-weight			:	bold	;
-											background-color	:	#FFFFFF	;	
-											border-radius		:	5px	;
-											border				:	1px solid lightgray;
-										">
-										<img style="vertical-align:middle;" width="40dp" height="40dp" src = "https://sodisprod.cdn1.cafe24.com/feedback/good/ic_kind.png">
-					친절하고 매너가 좋아요
-				</button>
-				<p style="margin-top: 10px;margin-bottom: 0px;"></p>
-				<button id="evalItem3" onclick="fnObj.searchOpen.evalItem3()" style="	width				:	80%	;
-											height				:	42px	;
-											color				:	#111111	;
-											font-size			:	16px	;
-											font-weight			:	bold	;
-											background-color	:	#FFFFFF	;	
-											border-radius		:	5px	;
-											border				:	1px solid lightgray;
-										">
-										<img style="vertical-align:middle;" width="40dp" height="40dp" src = "https://sodisprod.cdn1.cafe24.com/feedback/good/ic_clean.png">
-					주변 정리를 잘 해주셨어요
-				</button>
-				<br>
-				<br>
-				<br>
-				<span style="font-size: 16px;font-weight:bold">
-					전달하고 싶은 의견이 있으신가요? (선택)
-				</span>
-				<p style="margin-top: 10px;margin-bottom: 0px;"></p>
+        fnObj.searchOpen.searchFeed();
+      });
+    </script>
+  </head>
+  <!-- top , left, bottom , right,  -->
+  <body>
+    <div id="mainDiv" style="width: 100%; margin: auto">
+      <div style="height: 100%; margin-top: 5px">
+        <center>
+          <br />
 
-				<textarea id="evalMsg" name="evalMsg" style="width: 80%; height: 140px; 
-				border-radius:5px	; border:	1px solid lightgray;padding:16px;font-size:16px;line-height:130%;" 
-				placeholder="남겨진 소중한 의견은&#13;&#10;서비스 개선에 큰 도움이 됩니다." onKeyUp="javascript:fnChkByte(this,'100')"
-				></textarea>
-				<p style="margin-top: 30px;margin-bottom: 0px;"></p>
-				<button	id			=	"saveFeedBack"
-						onclick		=	"fnObj.searchOpen.saveFeedBack()" 
-						style		=	"	width				:	90%	;
-											height				:	60px	;
-											color				:	white	;
-											font-size			:	16px	;
-											font-weight			:	bold	;
-											background-color	:	#1e6ce3	;	
-											border-radius		:	5px	;
-											border				:	0px solid blue;
-										">
-										의견 보내기
-				</button>
-				<br><br>
-				<button	id			=	"cancelFeedBack"
-						onclick		=	"fnObj.searchOpen.cancelFeedBack()" 
-						style		=	"	width				:	90%	;
-											height				:	60px	;
-											color				:	#1e6ce3	;
-											font-size			:	16px	;
-											font-weight			:	bold	;
-											background-color	:	white	;	
-											border-radius		:	5px	;
-											border				:	1px solid #c0c0c0;
-										">
-										다음에 할게요
-				</button>
-				<br><br>
-			</center>
-		</div>
-	</div>
-</body>
+          <span style="font-size: 20px">
+            <b>기사님은 어떠셨나요?</b>
+          </span>
+          <br />
+          <br />
+          <span class="cell">
+            <span id="star0" onclick="fnObj.searchOpen.searchStar(0)">
+              <img
+                id="star0img"
+                width="52dp"
+                height="52dp"
+                src="https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png"
+              />
+            </span>
+          </span>
+          <span class="cell">
+            <span id="star1" onclick="fnObj.searchOpen.searchStar(1)">
+              <img
+                id="star1img"
+                width="52dp"
+                height="52dp"
+                src="https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png"
+              />
+            </span>
+          </span>
+          <span class="cell">
+            <span id="star2" onclick="fnObj.searchOpen.searchStar(2)">
+              <img
+                id="star2img"
+                width="52dp"
+                height="52dp"
+                src="https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png"
+              />
+            </span>
+          </span>
+          <span class="cell">
+            <span id="star3" onclick="fnObj.searchOpen.searchStar(3)">
+              <img
+                id="star3img"
+                width="52dp"
+                height="52dp"
+                src="https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png"
+              />
+            </span>
+          </span>
+          <span class="cell">
+            <span id="star4" onclick="fnObj.searchOpen.searchStar(4)">
+              <img
+                id="star4img"
+                width="52dp"
+                height="52dp"
+                src="https://sodisprod.cdn1.cafe24.com/feedback/star/ic_star_default.png"
+              />
+            </span>
+          </span>
+
+          <br />
+          <br />
+
+          <span style="font-size: 20px">
+            <b>어떤 점이 만족스러웠나요?</b>
+          </span>
+          <br />
+          <span style="font-size: 14px; color: #c0c0c0">
+            <b>해당하는 항목을 골라주세요.</b>
+          </span>
+          <br />
+          <br />
+
+          <button
+            id="evalItem1"
+            onclick="fnObj.searchOpen.evalItem1()"
+            style="
+              width: 80%;
+              height: 42px;
+              color: #111111;
+              font-size: 16px;
+              font-weight: bold;
+              background-color: #ffffff;
+              border-radius: 5px;
+              border: 1px solid lightgray;
+            "
+          >
+            <img
+              style="vertical-align: middle"
+              width="40dp"
+              height="40dp"
+              src="https://sodisprod.cdn1.cafe24.com/feedback/good/ic_time.png"
+            />
+            시간 약속을 잘 지켜요
+          </button>
+
+          <p style="margin-top: 10px; margin-bottom: 0px"></p>
+
+          <button
+            id="evalItem2"
+            onclick="fnObj.searchOpen.evalItem2()"
+            style="
+              width: 80%;
+              height: 42px;
+              color: #111111;
+              font-size: 16px;
+              font-weight: bold;
+              background-color: #ffffff;
+              border-radius: 5px;
+              border: 1px solid lightgray;
+            "
+          >
+            <img
+              style="vertical-align: middle"
+              width="40dp"
+              height="40dp"
+              src="https://sodisprod.cdn1.cafe24.com/feedback/good/ic_kind.png"
+            />
+            친절하고 매너가 좋아요
+          </button>
+          <p style="margin-top: 10px; margin-bottom: 0px"></p>
+          <button
+            id="evalItem3"
+            onclick="fnObj.searchOpen.evalItem3()"
+            style="
+              width: 80%;
+              height: 42px;
+              color: #111111;
+              font-size: 16px;
+              font-weight: bold;
+              background-color: #ffffff;
+              border-radius: 5px;
+              border: 1px solid lightgray;
+            "
+          >
+            <img
+              style="vertical-align: middle"
+              width="40dp"
+              height="40dp"
+              src="https://sodisprod.cdn1.cafe24.com/feedback/good/ic_clean.png"
+            />
+            주변 정리를 잘 해주셨어요
+          </button>
+          <br />
+          <br />
+          <br />
+          <span style="font-size: 16px; font-weight: bold">
+            전달하고 싶은 의견이 있으신가요? (선택)
+          </span>
+          <p style="margin-top: 10px; margin-bottom: 0px"></p>
+
+          <textarea
+            id="evalMsg"
+            name="evalMsg"
+            style="
+              width: 80%;
+              height: 140px;
+              border-radius: 5px;
+              border: 1px solid lightgray;
+              padding: 16px;
+              font-size: 16px;
+              line-height: 130%;
+            "
+            placeholder="남겨진 소중한 의견은&#13;&#10;서비스 개선에 큰 도움이 됩니다."
+            onKeyUp="javascript:fnChkByte(this,'100')"
+          ></textarea>
+          <p style="margin-top: 30px; margin-bottom: 0px"></p>
+          <button
+            id="saveFeedBack"
+            onclick="fnObj.searchOpen.saveFeedBack()"
+            style="
+              width: 90%;
+              height: 60px;
+              color: white;
+              font-size: 16px;
+              font-weight: bold;
+              background-color: #1e6ce3;
+              border-radius: 5px;
+              border: 0px solid blue;
+            "
+          >
+            의견 보내기
+          </button>
+          <br /><br />
+          <button
+            id="cancelFeedBack"
+            onclick="fnObj.searchOpen.cancelFeedBack()"
+            style="
+              width: 90%;
+              height: 60px;
+              color: #1e6ce3;
+              font-size: 16px;
+              font-weight: bold;
+              background-color: white;
+              border-radius: 5px;
+              border: 1px solid #c0c0c0;
+            "
+          >
+            다음에 할게요
+          </button>
+          <br /><br />
+        </center>
+      </div>
+    </div>
+  </body>
 </html>

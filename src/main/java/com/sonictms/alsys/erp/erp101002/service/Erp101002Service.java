@@ -20,7 +20,6 @@ public class Erp101002Service {
 
     // 엑셀데이터를 json으로 바꾼것을 체크하기
     public Erp101002VO erp101002ExcelUploadCheck(Erp101002VO erp101002VO) {
-
         erp101002VO = erp101002Mapper.erp101002ExcelUploadCheck(erp101002VO);
 
         return erp101002VO;
@@ -29,10 +28,8 @@ public class Erp101002Service {
 
     // 엑셀데이터를 json으로 바꾼것을 저장하기
     public Erp101002VO erp101002ExcelUploadJson(Erp101002VO erp101002VO) {
-
         erp101002VO = erp101002Mapper.erp101002ExcelUploadJson(erp101002VO);
 
         return erp101002VO;
     }
-
 }

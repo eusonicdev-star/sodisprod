@@ -14,10 +14,7 @@
 	      )
       }
     </select>
-    
-    
-    
-    
+
     <select id="mDeliveryDelaySave"  statementType="CALLABLE"	parameterType	="com.sonictms.alsys.mobile.mDeliveryDelay.entity.MobileDeliveryDelayVO"
     															resultType		="com.sonictms.alsys.mobile.mDeliveryDelay.entity.MobileDeliveryDelayVO">
         {

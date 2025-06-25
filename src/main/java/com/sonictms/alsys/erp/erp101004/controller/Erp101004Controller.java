@@ -27,17 +27,16 @@ public class Erp101004Controller {
         return modelAndView;
     }
 
-    //그리드 헤더 조회하기
+    // 그리드 헤더 조회하기
     @RequestMapping(value = {"gridHeaderSrch101004"}, method = RequestMethod.POST)
     @ResponseBody
     public List<Erp101004VO> gridHeaderSrch101004(Erp101004VO erp101004VO) {
         return erp101004Service.gridHeaderSrch101004(erp101004VO);
     }
 
-    //엑셀데이터를 json으로 바꾼것을 체크하기
+    // 엑셀 데이터를 json으로 바꾼 것을 체크하기
     @RequestMapping(value = {"erp101004ExcelUploadCheck"}, method = RequestMethod.POST)
     @ResponseBody
-
     public List<Erp101004VO> erp101004ExcelUploadCheck(@RequestBody List<Erp101004VO> erp101004VO) {
         for (int i = 0; i < erp101004VO.size(); i++) {
             erp101004VO.set(i, erp101004Service.erp101004ExcelUploadCheck(erp101004VO.get(i)));
@@ -45,7 +44,7 @@ public class Erp101004Controller {
         return erp101004VO;
     }
 
-    //엑셀데이터를 json으로 바꾼것을 저장하기
+    // 엑셀데이터를 json으로 바꾼 것을 저장하기
     @RequestMapping(value = {"erp101004ExcelUploadJson"}, method = RequestMethod.POST)
     @ResponseBody
     public List<Erp101004VO> erp101004ExcelUploadJson(@RequestBody List<Erp101004VO> erp101004VO) {
@@ -57,11 +56,11 @@ public class Erp101004Controller {
             }
         }
 
-        if (errCnt > 0) {    //에러가 1개라도 발생했다면
-            // 강제롤백
+        if (errCnt > 0) {
             log.info("강제롤백발생 : TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()");
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
+
         return erp101004VO;
     }
 } 

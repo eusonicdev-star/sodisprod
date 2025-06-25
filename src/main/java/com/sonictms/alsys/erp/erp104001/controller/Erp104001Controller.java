@@ -38,7 +38,6 @@ public class Erp104001Controller {
     @RequestMapping(value = {"erp104001List"}, method = RequestMethod.POST)
     @ResponseBody
     public List<Erp104001VO> erp104001List(Erp104001VO erp104001VO) {
-        List<Erp104001VO> list = erp104001Service.erp104001List(erp104001VO);
-        return list;
+        return erp104001Service.erp104001List(erp104001VO);
     }
 }

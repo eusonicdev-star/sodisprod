@@ -177,19 +177,15 @@
                       tblSoMId: rtnTblSoMId,
                       rtnSoType: rtnSoType,
                       rtnName: rtnName
-
                   };
 
-
                   myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
-
                   myWins.window(windowId).attachEvent("onClose", function (win) {
 
                       return true;
                   });
 
               },	//END of soOrdrEditPopup : function(){
-
 
               //원오더 찾기 팝업
               soOriOrdrSrchPopup: function (soType) {
@@ -804,7 +800,7 @@
 
               },//grid
               setWidth: function () {
-                  c_width = top.myLayout.cells("c").getWidth();
+                  c_width = getLayoutCWidth();
                   searchDiv_height = $("#searchDiv").height();
                   // searchDiv2nd_height = $("#searchDiv2nd").height();
                   page_height = $("#page").height();

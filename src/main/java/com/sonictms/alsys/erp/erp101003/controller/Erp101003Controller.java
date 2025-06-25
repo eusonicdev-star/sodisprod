@@ -47,6 +47,7 @@ public class Erp101003Controller {
             erp101003VO.set(i, erp101003Service.erp101003ChkDel(erp101003VO.get(i)));
             erp101003VO.get(i).setSoNo(soNo);
         });
+
         return erp101003VO;
     }
 

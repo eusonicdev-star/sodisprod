@@ -51,20 +51,18 @@ war.enabled = true
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
 
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
 
-    //javx.validation
     implementation 'javax.validation:validation-api'
 
-    //디비로그
+    // 디비로그
     implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
 
-    //jasperreports
-//	implementation 'com.itextpdf:itext-pdfa:5.5.13.2'
     implementation 'com.itextpdf:itext-pdfa:5.5.13.3'
 
 //	6.17.0 은 login 페이지 잘됨 dhtmlx5 combo 잘 됨. 6.19.1은 값은 db에서 불렀는데 화면에 combo에 값들이 없음		
@@ -97,7 +95,6 @@ dependencies {
     // https://mvnrepository.com/artifact/net.sourceforge.barbecue/barbecue
     implementation 'net.sourceforge.barbecue:barbecue:1.5-beta1'
 
-
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     implementation files('libs/NanumGoThic.jar')
@@ -107,7 +104,6 @@ dependencies {
     runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
 
     annotationProcessor 'org.projectlombok:lombok'
-
 
     //애플리케이션의 내장 서블릿 컨테이너(내장톰캣)가 외부 서블릿컨테이너 작동에 영향을 주지 않도록 providedRuntime으로 명시해야 한다
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'

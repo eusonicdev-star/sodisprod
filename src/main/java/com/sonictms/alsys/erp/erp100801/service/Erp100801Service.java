@@ -18,14 +18,12 @@ public class Erp100801Service {
     public Erp100801VO outCmpySave(Erp100801VO erp100801VO) {
 
         int nCnt = 0;
-        log.info("erp100801VO.getResults().size() : " + erp100801VO.getResults().size());
         for (int i = 0; i < erp100801VO.getResults().size(); i++) {
-            //log.info(i + " 배송예정일 : " + erp100801VO.getResults().get(i).getDlvReqDt() + " 인수증 메모 : " + erp100801VO.getResults().get(i).getMemo());
             erp100801VO.getResults().get(i).setDlvDtFrom(erp100801VO.getDlvDtFrom());
             erp100801VO.getResults().get(i).setDlvDtTo(erp100801VO.getDlvDtTo());
             erp100801VO.getResults().get(i).setSaveUser(erp100801VO.getSaveUser());
-
             Erp100801VO returnVo = erp100801Mapper.outCmpySave(erp100801VO.getResults().get(i));
+
             if (!returnVo.getRtnYn().equals("Y")) {
                 nCnt++;
             }
@@ -34,19 +32,14 @@ public class Erp100801Service {
         if (nCnt != 0) {
             erp100801VO.setRtnYn("N");
             erp100801VO.setRtnMsg(erp100801VO.getResults().size() + "건 중 " + nCnt + "건 오류. 전체 저장실패.");
-            // 강제롤백
-            log.info(erp100801VO.getResults().size() + "건 중 " + nCnt + "건 오류. 전체 저장실패.\n" + "진짜 오류 발생 강제롤백발생 : TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()");
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
-            return erp100801VO;
-        }
-        //정상적으로 모두 저장했을때 저장한것을 불러오기
-        else {
+        } else {
             erp100801OutCmpyList(erp100801VO);
             erp100801VO.setRtnYn("Y");
             erp100801VO.setRtnMsg(erp100801VO.getResults().size() + "건 저장.");
-            return erp100801VO;
         }
+
+        return erp100801VO;
     }
 
     //kpp에서 불러온 데이터를 얼라이언스 테이블에 저장한것을 불러오는
@@ -95,7 +88,6 @@ public class Erp100801Service {
             erp100801VO.getResults().get(i).setQty(erp100801VO.getResults().get(i).getDlvQty());
             erp100801VO.getResults().get(i).setDcCd("");
             erp100801VO.getResults().get(i).setUseYn("Y");
-            //erp100801VO.getResults().get(i).setMemo("");
             erp100801VO.getResults().get(i).setMemo(erp100801VO.getResults().get(i).getMemo());    //20220625 정연호 수정. 메모 역할 변경으로 기존 공백입력에서 인수증메모입력으로변경
             erp100801VO.getResults().get(i).setInptSys("KPP_IF");
             erp100801VO.getResults().get(i).setDlvReqDt(erp100801VO.getResults().get(i).getDlvReqDt());    //20220625 정연호 추가. 배송예정일 추가

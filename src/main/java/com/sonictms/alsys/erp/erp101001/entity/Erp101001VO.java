@@ -14,6 +14,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class Erp101001VO extends commonVO {
     private static final long serialVersionUID = 1L;
+
     private String agntCd;        //화주사
     private String agntNm;
     private String soType;        //주문유형
@@ -108,5 +109,4 @@ public class Erp101001VO extends commonVO {
     private String instCtgrList;
     private String instCtgr;
     private String instCtgrNm;
-
 }

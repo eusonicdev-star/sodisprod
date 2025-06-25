@@ -28,8 +28,17 @@ import java.util.List;
 @Transactional // 트랜잭션 오류시 롤백
 public class CommCodeController {
 
+	public static final String AlimTalkUserId = "alliance";
 	private final CommCodeService commCodeService;
 
+	// 알림톡 API 설정값
+	@Value("${common.java.bizMsgUrl}")
+	private String bizMsgUrl;
+
+	@Value("${common.java.bizMsgUserid}")
+	private String bizMsgUserid;
+
+	// ==================== 공통 코드 관련 메서드 ====================
 	@GetMapping(value = {"robots.txt"})
 	public ModelAndView getLoginPage() {
 		ModelAndView modelAndView = new ModelAndView();
@@ -37,21 +46,18 @@ public class CommCodeController {
 		return modelAndView;
 	}
 
-	// 시스템
 	@RequestMapping(value = {"comComboList"}, method = RequestMethod.POST)
 	@ResponseBody
 	public List<CommCodeVO> comComboList(CommCodeVO CommCodeVO) {
-        return commCodeService.comComboList(CommCodeVO);
+		return commCodeService.comComboList(CommCodeVO);
 	}
 
-	// 모바일
 	@RequestMapping(value = {"mobile/comComboList"}, method = RequestMethod.POST)
 	@ResponseBody
 	public List<CommCodeVO> comComboListForMobile(@RequestBody CommCodeVO CommCodeVO) {
-        return commCodeService.comComboList(CommCodeVO);
+		return commCodeService.comComboList(CommCodeVO);
 	}
 
-	// 공통코드 찾기 팝업
 	@PostMapping(value = {"commSrch"})
 	public ModelAndView commSrch(ModelAndView modelAndView, @Valid CommCodeVO CommCodeVO) {
 		modelAndView.setViewName("commCode/commSrch");
@@ -59,7 +65,6 @@ public class CommCodeController {
 		return modelAndView;
 	}
 
-	// 품목코드 찾기 팝업
 	@PostMapping(value = {"prodSrch"})
 	public ModelAndView prodSrch(ModelAndView modelAndView, @Valid CommCodeVO CommCodeVO) {
 		modelAndView.setViewName("commCode/prodSrch");
@@ -67,244 +72,207 @@ public class CommCodeController {
 		return modelAndView;
 	}
 
-	// 공통코드 찾기 팝업의 그리그 리스트 조회하기
 	@RequestMapping(value = {"commSrchList"}, method = RequestMethod.POST)
 	@ResponseBody
 	public List<CommCodeVO> commSrchList(CommCodeVO CommCodeVO) {
-        return commCodeService.commSrchList(CommCodeVO);
+		return commCodeService.commSrchList(CommCodeVO);
 	}
 
-	//20220517 정연호 추가 application에서 값 가져오기
-	@Value("${common.java.bizMsgUrl}")
-	private String bizMsgUrl;
-
-	@Value("${common.java.bizMsgUserid}")
-	private String bizMsgUserid;
-
-	// 알림톡 보내기
-	@SuppressWarnings("unchecked")
+	// ==================== 알림톡 발송 관련 메서드 ====================
 	@RequestMapping(value = {"sendAlrmTalk"}, method = RequestMethod.POST)
 	@ResponseBody
 	public List<SendAlrmTalkVO> sendAlrmTalk(@RequestBody SendAlrmTalkVO sendAlrmTalkVO) {
-		JSONArray jsonarr = new JSONArray();
-
-		JSONObject data = new JSONObject();
-
-		data.put("message_type", sendAlrmTalkVO.getMessage_type());
-		data.put("phn", sendAlrmTalkVO.getPhn());
-		data.put("profile", sendAlrmTalkVO.getProfile());
-		data.put("reserveDt", sendAlrmTalkVO.getTalkReserveDt());
-		data.put("tmplId", sendAlrmTalkVO.getTmplId());
-		data.put("msg", sendAlrmTalkVO.getMsg());
-		data.put("smsKind", sendAlrmTalkVO.getSmsKind());
-		data.put("msgSms", sendAlrmTalkVO.getMsgSms());
-		data.put("smsSender", sendAlrmTalkVO.getSmsSender());
-		data.put("smsLmsTit", sendAlrmTalkVO.getSmsLmsTit());
-		data.put("smsOnly", sendAlrmTalkVO.getSmsOnly());
-		if (sendAlrmTalkVO.getButton1() != null) {
-			data.put("button1", sendAlrmTalkVO.getButton1());
-		}
-
-		if (sendAlrmTalkVO.getButton2() != null) {
-			data.put("button2", sendAlrmTalkVO.getButton2());
-		}
-
-		jsonarr.add(data);
-
-		List<SendAlrmTalkVO> vo = null;
-
-		log.info("sendAlrmTalk 알림톡 보내기 :" + jsonarr.toString());
-		// JSON 데이터 HTTP POST 전송하기
-
-		try {
-			//String host_url = "https://alimtalk-api.bizmsg.kr/v2/sender/send";
-			String host_url = bizMsgUrl;
-			HttpURLConnection conn = null;
-
-			URL url = new URL(host_url);
-			conn = (HttpURLConnection) url.openConnection();
-
-			conn.setRequestMethod("POST");// POST GET
-			conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8"); // 타입설정(application/json) 형식으로 전송
-			// (Request Body 전달시
-			// application/json로 서버에 전달.)
-			//conn.setRequestProperty("userid", "alliance");
-			conn.setRequestProperty("userid", bizMsgUserid);
-
-			log.info("bizMsgUrl : {}", bizMsgUrl);
-			log.info("bizMsgUserid : {}", bizMsgUserid);
-
-			conn.setConnectTimeout(10000);
-			conn.setReadTimeout(10000);
-
-			// POST방식으로 스트링을 통한 JSON 전송
-			conn.setDoOutput(true);
-			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
-
-			bw.write(jsonarr.toString());
-
-			bw.flush();
-			bw.close();
-
-			// 서버에서 보낸 응답 데이터 수신 받기
-			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-			String returnMsg = in.readLine();
-
-			log.info("sendAlrmTalk 알림톡 보내기 응답메시지 : {}", returnMsg);
-
-			Gson gson = new Gson();
-
-			vo = gson.fromJson(returnMsg, new TypeToken<ArrayList<SendAlrmTalkVO>>() {
-			}.getType());
-
-			// HTTP 응답 코드 수신
-			int responseCode = conn.getResponseCode();
-			if (responseCode == 400) {
-				log.info("     L> sendAlrmTalk 알림톡 보내기 응답코드 400 : 명령을 실행 오류");
-			} else if (responseCode == 500) {
-				log.info("     L> sendAlrmTalk 알림톡 보내기 응답코드 500 : 서버 에러.");
-			} else { // 정상 . 200 응답코드 . 기타 응답코드
-				log.info("     L> sendAlrmTalk 알림톡 보내기 응답코드 " + responseCode);
-			}
-		} catch (IOException ie) {
-			log.info("IOException " + ie.getCause());
-			ie.printStackTrace();
-		} catch (Exception ee) {
-			log.info("Exception " + ee.getCause());
-			ee.printStackTrace();
-		}
-		return vo;
+		JSONArray jsonArray = createAlrmTalkJsonArray(sendAlrmTalkVO);
+		log.info("sendAlrmTalk 알림톡 보내기 : {}", jsonArray.toString());
+		
+		return sendAlrmTalkToApi(jsonArray);
 	}
 
-	// 알람톡 발송 결과를 성공일때만 저장
 	@RequestMapping(value = {"saveAlrmTmpResult"}, method = RequestMethod.POST)
 	@ResponseBody
 	public SendAlrmTalkVO saveAlrmTmpResult(SendAlrmTalkVO sendAlrmTalkVO) {
-		sendAlrmTalkVO = commCodeService.saveAlrmTmpResult(sendAlrmTalkVO);
-		return sendAlrmTalkVO;
+		return commCodeService.saveAlrmTmpResult(sendAlrmTalkVO);
 	}
 
-	// 알림톡 스케줄 발송 보내기
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value = {"sendScdlAlrm"}, method = RequestMethod.POST)
 	@ResponseBody
-	public List<SendAlrmTalkVO> sendScdlAlrm(@RequestBody List<SendAlrmTalkVO> sendAlrmTalkVO) {
-		List<SendAlrmTalkVO> vo = null;
-		List<SendAlrmTalkVO> rerutnValue = new ArrayList<SendAlrmTalkVO>();
+	public List<SendAlrmTalkVO> sendScdlAlrm(@RequestBody List<SendAlrmTalkVO> sendAlrmTalkVOList) {
+		List<SendAlrmTalkVO> resultList = new ArrayList<>();
+		
+		for (SendAlrmTalkVO alrmTalkVO : sendAlrmTalkVOList) {
+			JSONArray jsonArray = createAlrmTalkJsonArray(alrmTalkVO);
+			log.info("sendScdlAlrm 알림톡 스케줄 : {}", jsonArray.toString());
+			
+			List<SendAlrmTalkVO> apiResponse = sendAlrmTalkToApi(jsonArray);
+			if (!apiResponse.isEmpty()) {
+				SendAlrmTalkVO resultVO = processScheduledAlrmTalkResult(apiResponse.get(0), alrmTalkVO);
+				resultList.add(resultVO);
+			}
+		}
+		
+		return resultList;
+	}
+
+	// ==================== 공통 유틸리티 메서드 ====================
+
+	/**
+	 * 알림톡 발송을 위한 JSON 배열 생성
+	 */
+	private JSONArray createAlrmTalkJsonArray(SendAlrmTalkVO alrmTalkVO) {
+		JSONArray jsonArray = new JSONArray();
 		JSONObject data = new JSONObject();
 
-        for (SendAlrmTalkVO alrmTalkVO : sendAlrmTalkVO) {
-            JSONArray jsonarr = new JSONArray();
+		data.put("message_type", alrmTalkVO.getMessage_type());
+		data.put("phn", alrmTalkVO.getPhn());
+		data.put("profile", alrmTalkVO.getProfile());
+		data.put("reserveDt", alrmTalkVO.getTalkReserveDt());
+		data.put("tmplId", alrmTalkVO.getTmplId());
+		data.put("msg", alrmTalkVO.getMsg());
+		data.put("smsKind", alrmTalkVO.getSmsKind());
+		data.put("msgSms", alrmTalkVO.getMsgSms());
+		data.put("smsSender", alrmTalkVO.getSmsSender());
+		data.put("smsLmsTit", alrmTalkVO.getSmsLmsTit());
+		data.put("smsOnly", alrmTalkVO.getSmsOnly());
 
-            data = new JSONObject();
+		if (alrmTalkVO.getButton1() != null) {
+			data.put("button1", alrmTalkVO.getButton1());
+		}
+		if (alrmTalkVO.getButton2() != null) {
+			data.put("button2", alrmTalkVO.getButton2());
+		}
 
-            data.put("message_type", alrmTalkVO.getMessage_type());
-            data.put("phn", alrmTalkVO.getPhn());
-            data.put("profile", alrmTalkVO.getProfile());
-            data.put("reserveDt", alrmTalkVO.getTalkReserveDt());
-            data.put("tmplId", alrmTalkVO.getTmplId());
-            data.put("msg", alrmTalkVO.getMsg());
-            data.put("smsKind", alrmTalkVO.getSmsKind());
-            data.put("msgSms", alrmTalkVO.getMsgSms());
-            data.put("smsSender", alrmTalkVO.getSmsSender());
-            data.put("smsLmsTit", alrmTalkVO.getSmsLmsTit());
-            data.put("smsOnly", alrmTalkVO.getSmsOnly());
+		jsonArray.add(data);
+		return jsonArray;
+	}
 
-            if (alrmTalkVO.getButton1() != null) {
-                data.put("button1", alrmTalkVO.getButton1());
-            }
+	/**
+	 * 알림톡 API 호출 공통 메서드
+	 */
+	private List<SendAlrmTalkVO> sendAlrmTalkToApi(JSONArray jsonArray) {
+		HttpURLConnection conn = null;
+		BufferedWriter bw = null;
+		BufferedReader in = null;
+		
+		try {
+			conn = createHttpConnection();
+			
+			// JSON 데이터 전송
+			bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
+			bw.write(jsonArray.toString());
+			bw.flush();
 
-            if (alrmTalkVO.getButton2() != null) {
-                data.put("button2", alrmTalkVO.getButton2());
-            }
+			// 응답 데이터 수신
+			in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String returnMsg = in.readLine();
+			
+			log.info("알림톡 API 응답메시지 : {}", returnMsg);
+			
+			// 응답 코드 로깅
+			logResponseCode(conn.getResponseCode());
+			
+			// JSON 응답을 객체로 변환
+			return parseApiResponse(returnMsg);
+			
+		} catch (IOException ie) {
+			log.error("알림톡 API 호출 중 IOException 발생: {}", ie.getMessage(), ie);
+		} catch (Exception ee) {
+			log.error("알림톡 API 호출 중 Exception 발생: {}", ee.getMessage(), ee);
+		} finally {
+			closeResources(bw, in, conn);
+		}
+		
+		return new ArrayList<>();
+	}
 
-            jsonarr.add(data);
-            log.info("sendScdlAlrm 알림톡 스케줄 : " + jsonarr.toString());
-            // JSON 데이터 HTTP POST 전송하기
+	/**
+	 * HTTP 연결 생성
+	 */
+	private HttpURLConnection createHttpConnection() throws IOException {
+		URL url = new URL(bizMsgUrl);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-            try {
-                //String host_url = "https://alimtalk-api.bizmsg.kr/v2/sender/send";
-                String host_url = bizMsgUrl;
-                HttpURLConnection conn = null;
+		conn.setRequestMethod("POST");
+		conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+		conn.setRequestProperty("userid", bizMsgUserid);
+		conn.setConnectTimeout(10000);
+		conn.setReadTimeout(10000);
+		conn.setDoOutput(true);
 
-                URL url = new URL(host_url);
-                conn = (HttpURLConnection) url.openConnection();
+		log.info("bizMsgUrl : {}", bizMsgUrl);
+		log.info("bizMsgUserid : {}", bizMsgUserid);
 
-                conn.setRequestMethod("POST");// POST GET
-                conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8"); // 타입설정(application/json)
-                // 형식으로 전송 (Request Body 전달시
-                // application/json로 서버에
-                // 전달.)
-                //conn.setRequestProperty("userid", "alliance"); // 0505
-                conn.setRequestProperty("userid", bizMsgUserid);
+		return conn;
+	}
 
-                log.info("bizMsgUrl : " + bizMsgUrl);
-                log.info("bizMsgUserid : " + bizMsgUserid);
+	/**
+	 * 응답 코드 로깅
+	 */
+	private void logResponseCode(int responseCode) {
+		switch (responseCode) {
+			case 200:
+				log.info("알림톡 API 응답코드 {} : 정상 처리", responseCode);
+				break;
+			case 400:
+				log.info("알림톡 API 응답코드 {} : 명령 실행 오류", responseCode);
+				break;
+			case 500:
+				log.info("알림톡 API 응답코드 {} : 서버 에러", responseCode);
+				break;
+			default:
+				log.info("알림톡 API 응답코드 {} : 기타 응답", responseCode);
+		}
+	}
 
-                conn.setConnectTimeout(10000);
-                conn.setReadTimeout(10000);
+	/**
+	 * API 응답을 객체로 파싱
+	 */
+	private List<SendAlrmTalkVO> parseApiResponse(String returnMsg) {
+		Gson gson = new Gson();
+		return gson.fromJson(returnMsg, new TypeToken<ArrayList<SendAlrmTalkVO>>() {}.getType());
+	}
 
-                // POST방식으로 스트링을 통한 JSON 전송
-                conn.setDoOutput(true);
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
+	/**
+	 * 스케줄 알림톡 결과 처리
+	 */
+	private SendAlrmTalkVO processScheduledAlrmTalkResult(SendAlrmTalkVO apiResponse, SendAlrmTalkVO originalVO) {
+		// API 응답 데이터를 원본 VO에 매핑
+		apiResponse.setTblSoMId(originalVO.getTblSoMId());
+		apiResponse.setUserid(AlimTalkUserId);
+		apiResponse.setCode(apiResponse.getCode());
+		apiResponse.setMessage_type(apiResponse.getData().getType());
+		apiResponse.setPhn(apiResponse.getData().getPhn());
+		apiResponse.setProfile(originalVO.getProfile());
+		apiResponse.setTalkReserveDt(originalVO.getTalkReserveDt());
+		apiResponse.setMsgSms(originalVO.getMsgSms());
+		apiResponse.setSmsLmsTit(originalVO.getSmsLmsTit());
+		apiResponse.setTmplId(originalVO.getTmplId());
+		apiResponse.setCmplMsgCd(apiResponse.getMessage());
+		apiResponse.setSaveUser(originalVO.getSaveUser());
 
-                bw.write(jsonarr.toString());
+		// 발송 결과 저장
+		try {
+			SendAlrmTalkVO savedResult = commCodeService.sendScdlAlrmResult(apiResponse);
+			apiResponse.setRtnYn(savedResult.getRtnYn());
+			apiResponse.setRtnMsg(savedResult.getRtnMsg());
+		} catch (Exception e) {
+			log.error("알림톡 발송 결과 저장 실패: {}", e.getMessage(), e);
+			apiResponse.setRtnYn("N");
+			apiResponse.setRtnMsg("알림톡 발송 결과 저장 실패");
+		}
 
-                bw.flush();
-                bw.close();
+		return apiResponse;
+	}
 
-                // 서버에서 보낸 응답 데이터 수신 받기
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String returnMsg = in.readLine();
-
-                log.info("sendScdlAlrm 알림톡 스케줄 응답메시지 : " + returnMsg);
-                Gson gson = new Gson();
-
-                vo = gson.fromJson(returnMsg, new TypeToken<ArrayList<SendAlrmTalkVO>>() {
-                }.getType());
-
-                // HTTP 응답 코드 수신
-                int responseCode = conn.getResponseCode();
-                if (responseCode == 400) {
-                    log.info("     L> sendScdlAlrm 알림톡 스케줄 응답코드 400 : 명령을 실행 오류");
-                } else if (responseCode == 500) {
-                    log.info("     L> sendScdlAlrm 알림톡 스케줄 응답코드 500 : 서버 에러.");
-                } else { // 정상 . 200 응답코드 . 기타 응답코드
-                    log.info("     L> sendScdlAlrm 알림톡 스케줄 응답코드 " + responseCode);
-                }
-            } catch (IOException ie) {
-                log.info("IOException " + ie.getCause());
-                ie.printStackTrace();
-            } catch (Exception ee) {
-                log.info("Exception " + ee.getCause());
-                ee.printStackTrace();
-            }
-
-            vo.get(0).setTblSoMId(alrmTalkVO.getTblSoMId());
-            vo.get(0).setUserid("alliance");
-            vo.get(0).setCode(vo.get(0).getCode());
-            vo.get(0).setMessage_type(vo.get(0).getData().getType());
-            vo.get(0).setPhn(vo.get(0).getData().getPhn());
-            vo.get(0).setProfile(alrmTalkVO.getProfile());
-            vo.get(0).setTalkReserveDt(alrmTalkVO.getTalkReserveDt());
-            vo.get(0).setMsgSms(alrmTalkVO.getMsgSms());
-            vo.get(0).setSmsLmsTit(alrmTalkVO.getSmsLmsTit());
-            vo.get(0).setTmplId(alrmTalkVO.getTmplId());
-            vo.get(0).setCmplMsgCd(vo.get(0).getMessage());
-            vo.get(0).setSaveUser(alrmTalkVO.getSaveUser());
-
-            SendAlrmTalkVO rtnVO = null;
-            try {
-                rtnVO = commCodeService.sendScdlAlrmResult(vo.get(0));
-            } catch (Exception e) {
-                rtnVO.setRtnYn("N");
-                rtnVO.setRtnMsg("알림톡 발송 결과 저장 실패");
-            }
-
-            vo.get(0).setRtnYn(rtnVO.getRtnYn());
-            vo.get(0).setRtnMsg(rtnVO.getRtnMsg());
-            rerutnValue.add(vo.get(0));
-        }
-		return rerutnValue;
+	/**
+	 * 리소스 정리
+	 */
+	private void closeResources(BufferedWriter bw, BufferedReader in, HttpURLConnection conn) {
+		try {
+			if (bw != null) bw.close();
+			if (in != null) in.close();
+			if (conn != null) conn.disconnect();
+		} catch (IOException e) {
+			log.warn("리소스 정리 중 IOException 발생: {}", e.getMessage());
+		}
 	}
 }

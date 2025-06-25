@@ -23,7 +23,7 @@ public class Erp102001Controller {
     // 공통코드관리 화면 열기
     @GetMapping(value = {"erp102001"})
     public ModelAndView getErp102001(ModelAndView modelAndView) {
-        modelAndView.setViewName("erp/erp102001/erp102001-n");
+        modelAndView.setViewName("erp/erp102001/erp102001");
         return modelAndView;
     }
 

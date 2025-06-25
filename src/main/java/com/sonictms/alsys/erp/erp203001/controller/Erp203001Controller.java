@@ -20,18 +20,9 @@ public class Erp203001Controller {
     @Autowired
     private final Erp203001Service erp203001Service;
 
-    // 화면오픈
     @GetMapping(value = {"erp203001"})
-    public ModelAndView getErp203001(ModelAndView modelAndView) {
+    public ModelAndView erp203001(ModelAndView modelAndView) {
         modelAndView.setViewName("erp/erp203001/erp203001");
-
-        return modelAndView;
-    }
-
-    // 뉴 화면오픈
-    @GetMapping(value = {"erp2030010"})
-    public ModelAndView erp2030010(ModelAndView modelAndView) {
-        modelAndView.setViewName("erp/erp203001/erp2030010");
 
         return modelAndView;
     }

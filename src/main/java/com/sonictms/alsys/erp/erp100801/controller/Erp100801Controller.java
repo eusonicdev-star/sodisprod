@@ -29,14 +29,21 @@ import java.security.cert.X509Certificate;
 @Transactional
 @Controller
 public class Erp100801Controller {
+
     @Autowired
     Erp100801Service erp100801Service;
+
     @Value("${common.java.kppApiSearch}")
     private String kppApiSearch;
+
     @Value("${common.java.kppApiUsername}")
     private String kppApiUsername;
+
     @Value("${common.java.kppApiUserpass}")
     private String kppApiUserpass;
+
+    @Value("${common.java.kppApiStatus}")
+    private String kppApiStatus;
 
     @GetMapping({"erp100801"})
     public ModelAndView getErp100801(ModelAndView modelAndView) {
@@ -62,12 +69,16 @@ public class Erp100801Controller {
         data.put("DLV_DT_TO", erp100801VO.getDlvDtTo());
         Erp100801VO vo = null;
 
+        HttpURLConnection conn = null;
+        BufferedWriter bw = null;
+        BufferedReader in = null;
+
         try {
             String host_url = this.kppApiSearch;
             log.info("kppApiSearch host_url : " + host_url);
             log.info("kppApiUsername        : " + this.kppApiUsername);
             log.info("kppApiUserpass        : " + this.kppApiUserpass);
-            HttpURLConnection conn = null;
+
             URL url = new URL(host_url);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
@@ -79,11 +90,13 @@ public class Erp100801Controller {
             conn.setReadTimeout(10000);
             conn.setDoInput(true);
             conn.setDoOutput(true);
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
+
+            bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
             bw.write(data.toString());
             bw.flush();
             bw.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+            in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String returnMsg = in.readLine();
             Gson gson = new Gson();
             vo = (Erp100801VO) gson.fromJson(returnMsg, (new TypeToken<Erp100801VO>() {
@@ -97,11 +110,27 @@ public class Erp100801Controller {
                 log.info("     L> Erp100801VO KPP 응답코드 " + responseCode);
             }
         } catch (IOException ie) {
-            log.info("IOException " + ie.getCause());
-            ie.printStackTrace();
+            log.error("IOException 발생", ie);
         } catch (Exception ee) {
-            log.info("Exception " + ee.getCause());
-            ee.printStackTrace();
+            log.error("Exception 발생", ee);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    log.warn("BufferedReader close 중 오류", e);
+                }
+            }
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    log.warn("BufferedWriter close 중 오류", e);
+                }
+            }
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
 
         log.info("kpp에서 불러온 데이터 목록 수 : " + vo.getResults().size());
@@ -165,13 +194,35 @@ public class Erp100801Controller {
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HostnameVerifier allHostsValid = (hostname, session) -> true;
-            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
-        }
 
+            HostnameVerifier allHostsValid = (hostname, session) -> {
+                // 호스트명 검증 로직
+                if (hostname == null || hostname.trim().isEmpty()) {
+                    log.warn("호스트명이 null이거나 비어있음");
+                    return false;
+                }
+
+                // KPP API URL에서 호스트명 추출하여 검증
+                try {
+                    URL kppUrl = new URL(kppApiStatus);
+                    String expectedHost = kppUrl.getHost();
+
+                    if (expectedHost != null && hostname.equalsIgnoreCase(expectedHost)) {
+                        log.info("호스트명 검증 성공: {}", hostname);
+                        return true;
+                    } else {
+                        log.warn("호스트명 불일치 - 예상: {}, 실제: {}", expectedHost, hostname);
+                        return false;
+                    }
+                } catch (Exception e) {
+                    log.error("호스트명 검증 중 오류 발생: {}", e.getMessage());
+                    return false;
+                }
+            };
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+            
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            log.error("SSL 설정 중 오류 발생", e);
+        }
     }
 }

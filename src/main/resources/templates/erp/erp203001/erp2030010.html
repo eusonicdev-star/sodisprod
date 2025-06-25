@@ -3275,19 +3275,19 @@ if ( event.keyCode == 113 || event.which == 113 ) {
 									  	{
 										  	if(addr[index].instPlanYn == "N")	//시공 미계획 마커는 회색
 										  	{
-										  		imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker/gray/marker_completed_others.png'; // 회색
+										  		imageUrl = 'http://sodisprod.cdn1.cafe24.com/marker/gray/marker_completed_others.png'; // 회색
 										  	}
 										  	else if(addr[index].instPlanYn == "Y")	//시공 계획
 										  	{
-										  		imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker/green/marker_ing_others.png'; // 녹색
+										  		imageUrl = 'http://sodisprod.cdn1.cafe24.com/marker/green/marker_ing_others.png'; // 녹색
 										  	}
 
 										  	//20220423 정연호추가. 판매오더배송상태 코드가 9999 배송완료라면 위에 꺼 무시하고 imageUrl을 재정의(라벤더)
 									  		if(addr[index].soStatCd == "9999") {
-									  			imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker/lavender/marker_9999_others.png'; // 라벤
+									  			imageUrl = 'http://sodisprod.cdn1.cafe24.com/marker/lavender/marker_9999_others.png'; // 라벤
 									  		}
 									  		else if(addr[index].soStatCd == "8000") { //미마감
-									  			imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker/orange/marker_8000_others.png'; // 미마감은 오렌지색
+									  			imageUrl = 'http://sodisprod.cdn1.cafe24.com/marker/orange/marker_8000_others.png'; // 미마감은 오렌지색
 									  		}
 
 											imageSrc = imageUrl,
@@ -3307,7 +3307,7 @@ if ( event.keyCode == 113 || event.which == 113 ) {
 
 											//마커를 클릭했을때 바뀌는 마커이미지
 
-											clickImageSrc ="http://gloakoreahost.cdn3.cafe24.com/marker/red/marker_return_others.png",		//red
+											clickImageSrc ="http://sodisprod.cdn1.cafe24.com/marker/red/marker_return_others.png",		//red
 								            //clickImageSize = new kakao.maps.Size(30, 36),	//클릭시 커지는 이미지 크기를 마커의 이미지 크기와 같게한다
 								            clickImageSize = new kakao.maps.Size(20, 24),	//클릭시 커지는 이미지 크기를 마커의 이미지 크기와 같게한다
 											//clickImageOption = {offset: new kakao.maps.Point(13, 36)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
@@ -3318,20 +3318,20 @@ if ( event.keyCode == 113 || event.which == 113 ) {
 									  	{
 										  	if(addr[index].instPlanYn == "N")	//시공 미계획 마커는 회색
 										  	{
-										  		imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker2/marker_2_551401.png'; // 선지색
+										  		imageUrl = 'http://sodisprod.cdn1.cafe24.com/marker2/marker_2_551401.png'; // 선지색
 										  	}
 										  	else if(addr[index].instPlanYn == "Y")	//시공 계획
 										  	{
-										  		imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker2/marker_2_blue.png'; // 파랑
+										  		imageUrl = 'http://sodisprod.cdn1.cafe24.com/marker2/marker_2_blue.png'; // 파랑
 										  	}
 
 											//20220423 정연호추가. 판매오더배송상태 코드가 9999 배송완료라면 위에 꺼 무시하고 imageUrl을 재정의(라벤더)
 									  		if(addr[index].soStatCd == "9999") {
-									  			imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker2/marker_2_lavender.png'; // 라벤더
+									  			imageUrl = 'http://sodisprod.cdn1.cafe24.com/marker2/marker_2_lavender.png'; // 라벤더
 									  		}
 
 									  		else if(addr[index].soStatCd == "8000") {
-									  			imageUrl = 'http://gloakoreahost.cdn3.cafe24.com/marker2/marker_2_orange2.png'; //미마감은 오렌지색
+									  			imageUrl = 'http://sodisprod.cdn1.cafe24.com/marker2/marker_2_orange2.png'; //미마감은 오렌지색
 									  		}
 
 											imageSrc = imageUrl,
@@ -3346,7 +3346,7 @@ if ( event.keyCode == 113 || event.which == 113 ) {
 
 
 											//마커를 클릭했을때 바뀌는 마커이미지
-											clickImageSrc ="http://gloakoreahost.cdn3.cafe24.com/marker2/marker_2_red.png",		//red
+											clickImageSrc ="http://sodisprod.cdn1.cafe24.com/marker2/marker_2_red.png",		//red
 								            clickImageSize = new kakao.maps.Size(24, 24),	//클릭시 커지는 이미지 크기를 마커의 이미지 크기와 같게한다
 											clickImageOption = {offset: new kakao.maps.Point(12, 24)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
 

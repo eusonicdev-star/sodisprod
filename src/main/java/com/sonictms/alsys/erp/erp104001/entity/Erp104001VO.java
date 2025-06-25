@@ -94,4 +94,7 @@ public class Erp104001VO extends commonVO{
 	
 	//20220110 정연호 팔렛트번호
 	private	String	paltNoxx;
+	private String dlvyCnfmInptEr;
+	private String dlvyCnfmInptTime;
+	private String dlvyCnfmInptChk;
 }

@@ -1,5 +1,6 @@
 package com.sonictms.alsys.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -9,27 +10,48 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-//20220115 정연호. 로그 인터셉터
-//@Slf4j
+@Slf4j
 @Component
 public class LogInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        HttpSession session = request.getSession();
         try {
-            MDC.put("cmpyCd", session.getAttribute("cmpyCd").toString());
-            MDC.put("tblUserMId", session.getAttribute("tblUserMId").toString());
-            MDC.put("system", session.getAttribute("system").toString());
-            MDC.put("cnntSysCd", session.getAttribute("cnntSysCd").toString());
-            //MDC.put("userId", session.getAttribute("userId").toString());
-            //MDC.put("userNm", session.getAttribute("userNm").toString());
-            //MDC.put("agntCd", session.getAttribute("agntCd").toString());
-            //MDC.put("agntNm", session.getAttribute("agntNm").toString());
-        } catch (Exception e) {
+            HttpSession session = request.getSession(false);
 
+            if (session != null) {
+                putMdc("cmpyCd", session.getAttribute("cmpyCd"));
+                putMdc("tblUserMId", session.getAttribute("tblUserMId"));
+                putMdc("system", session.getAttribute("system"));
+                putMdc("cnntSysCd", session.getAttribute("cnntSysCd"));
+            }
+        } catch (IllegalStateException e) {
+            log.warn("세션이 이미 무효화됨 - URI: {}", request.getRequestURI(), e);
+        } catch (SecurityException e) {
+            log.warn("세션 접근 권한 없음 - URI: {}", request.getRequestURI(), e);
+        } catch (ClassCastException e) {
+            log.warn("세션 속성 타입 캐스팅 오류 - URI: {}", request.getRequestURI(), e);
+        } catch (Exception e) {
+            log.error("LogInterceptor preHandle 중 예상치 못한 예외 발생 - URI: {}", request.getRequestURI(), e);
+            // GlobalExceptionHandler가 처리할 수 있도록 예외를 다시 던짐
+            throw e;
         }
+
         return true;
+    }
+
+    private void putMdc(String key, Object value) {
+        try {
+            if (value != null) {
+                MDC.put(key, value.toString());
+            }
+        } catch (IllegalArgumentException e) {
+            log.warn("MDC key가 null이거나 유효하지 않음 - key: {}", key, e);
+        } catch (SecurityException e) {
+            log.warn("MDC 접근 권한 없음 - key: {}", key, e);
+        } catch (Exception e) {
+            log.warn("MDC 설정 중 예상치 못한 예외 발생 - key: {}", key, e);
+        }
     }
 
     /*
@@ -39,8 +61,14 @@ public class LogInterceptor implements HandlerInterceptor {
      */
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        MDC.clear();
-        //log.info("post");
+        try {
+            MDC.clear();
+        } catch (SecurityException e) {
+            log.warn("MDC clear 중 접근 권한 없음", e);
+        } catch (Exception e) {
+            log.error("LogInterceptor postHandle 중 예상치 못한 예외 발생", e);
+            throw e;
+        }
     }
 
     /*
@@ -49,6 +77,14 @@ public class LogInterceptor implements HandlerInterceptor {
      */
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        //log.info("after");
+        try {
+            MDC.clear();
+        } catch (SecurityException e) {
+            log.warn("MDC clear 중 접근 권한 없음", e);
+        } catch (Exception e) {
+            log.error("LogInterceptor afterCompletion 중 예상치 못한 예외 발생", e);
+            // GlobalExceptionHandler가 처리할 수 있도록 예외를 다시 던짐
+            throw e;
+        }
     }
 }
