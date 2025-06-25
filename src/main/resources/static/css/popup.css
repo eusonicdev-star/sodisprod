@@ -1,364 +1,363 @@
 .popup-header-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.5rem;
 }
 
 .popup-header-text {
-    align-items: center;
-    font-weight: 600;
-    font-size: 1.2rem;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.2rem;
 }
 
 .popup-header-button {
-    display: flex;
+  display: flex;
 }
 
 .sub {
-    font-size: 1rem;
+  font-size: 1rem;
 }
 
 .search-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2px;
-    padding: 10px;
-    background: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 10px;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
 }
 
 .search-item {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 5px;
-    padding: 5px;
-    min-width: 200px;
-    margin: 3px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 5px;
+  min-width: 200px;
+  margin: 3px;
 }
 
 .memo {
-    height: 100px;
-    width: 200px;
+  height: 100px;
+  width: 200px;
 }
 
 .search-label {
-    font-weight: 500;
-    font-size: 14px;
-    text-align: right;
-    color: #333;
+  font-weight: 500;
+  font-size: 14px;
+  text-align: right;
+  color: #333;
 }
 
 .stress {
-    color: #ff5e5e;
+  color: #ff5e5e;
 }
 
 .search-input {
-    flex: 1 1 auto;
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    height: 30px;
-    min-width: 0;
-    max-width: 100%;
-    box-sizing: border-box;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 30px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .search-input .width {
-    width: 200px;
+  width: 200px;
 }
 
 .search-input[readonly] {
-    background: #f8f9fa; /* 일반 필드와 차별화된 배경색 */
-    color: #666; /* 글자 색상을 연하게 */
-    border: 1px solid #ddd; /* 테두리 색상 변경 */
-    cursor: default; /* 클릭할 수 없다는 느낌 부여 */
+  background: #f8f9fa; /* 일반 필드와 차별화된 배경색 */
+  color: #666; /* 글자 색상을 연하게 */
+  border: 1px solid #ddd; /* 테두리 색상 변경 */
+  cursor: default; /* 클릭할 수 없다는 느낌 부여 */
 }
 
 .search-input:disabled {
-    background: #e9ecef;
+  background: #e9ecef;
 }
 
 .search-input.combo-box {
-    width: 150px
+  width: 150px;
 }
 
 .search-icon {
-    cursor: pointer;
-    font-size: 18px;
-    color: #333;
+  cursor: pointer;
+  font-size: 18px;
+  color: #333;
 }
 
 .product-icon {
-    font-size: 20px;
-    color: #333;
-    cursor: pointer;
-    transition: color 0.3s ease-in-out;
+  font-size: 20px;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.3s ease-in-out;
 }
 
 .product-icon:hover {
-    color: #3da0e3; /* 호버 시 색상 변경 */
+  color: #3da0e3; /* 호버 시 색상 변경 */
 }
 
 .search-icon:hover {
-    color: #555;
+  color: #555;
 }
 
 /* 버튼 스타일 */
 .action-button {
-    padding: 6px 12px;
-    margin: 0 5px;
-    border: 1px solid #ddd;
-    background-color: #fff;
-    color: #333;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: all 0.3s ease;
-    font-size: 12px;
+  padding: 6px 12px;
+  margin: 0 5px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+  font-size: 12px;
 }
 
 .button-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 1rem;
-    gap: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem;
+  gap: 1rem;
 }
 
 /* textarea 스타일 개선 */
 .textarea {
-    width: 20rem;
-    height: 120px;
-    padding: 10px;
-    border: 1px solid #bbb;
-    border-radius: 6px;
-    background: #f2f8ff;
-    font-size: 14px;
-    font-family: 'Arial', sans-serif;
-    transition: all 0.3s ease-in-out;
-    resize: none;
+  width: 90rem;
+  height: 120px;
+  padding: 10px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background: #f2f8ff;
+  font-size: 14px;
+  font-family: "Arial", sans-serif;
+  transition: all 0.3s ease-in-out;
+  resize: none;
 }
 
 /* textarea 클릭 시 강조 */
 .textarea:focus {
-    border-color: #3da0e3;
-    background: #fff;
-    outline: none;
-    box-shadow: 0 0 5px rgba(61, 160, 227, 0.5);
+  border-color: #3da0e3;
+  background: #fff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(61, 160, 227, 0.5);
 }
 
 /* 일반 input과 구분되도록 textarea 내부 글자 색상 차이 */
 .textarea::placeholder {
-    color: #888;
-    font-style: italic;
+  color: #888;
+  font-style: italic;
 }
 
-
 .action-button:hover {
-    background-color: #f5f5f5;
-    border-color: #999;
+  background-color: #f5f5f5;
+  border-color: #999;
 }
 
 .action-button.primary {
-    background-color: #4a90e2;
-    color: white;
-    border-color: #4a90e2;
+  background-color: #4a90e2;
+  color: white;
+  border-color: #4a90e2;
 }
 
 .action-button.primary:hover {
-    background-color: #357abd;
-    border-color: #357abd;
+  background-color: #357abd;
+  border-color: #357abd;
 }
 
 .action-button.danger {
-    background-color: #e74c3c;
-    color: white;
-    border-color: #e74c3c;
+  background-color: #e74c3c;
+  color: white;
+  border-color: #e74c3c;
 }
 
 .action-button.danger:hover {
-    background-color: #c0392b;
-    border-color: #c0392b;
+  background-color: #c0392b;
+  border-color: #c0392b;
 }
 
 .action-button.success {
-    background-color: #2ecc71;
-    color: white;
-    border-color: #2ecc71;
+  background-color: #2ecc71;
+  color: white;
+  border-color: #2ecc71;
 }
 
 .action-button.success:hover {
-    background-color: #27ae60;
-    border-color: #27ae60;
+  background-color: #27ae60;
+  border-color: #27ae60;
 }
 
 .action-button.warning {
-    background-color: #f1c40f;
-    color: white;
-    border-color: #f1c40f;
+  background-color: #f1c40f;
+  color: white;
+  border-color: #f1c40f;
 }
 
 .action-button.warning:hover {
-    background-color: #d39e00;
-    border-color: #d39e00;
+  background-color: #d39e00;
+  border-color: #d39e00;
 }
 
 div.dhxcombo_dhx_terrace.dhxcombo_disabled {
-    background-color: transparent !important;
-    border: none !important;
+  background-color: transparent !important;
+  border: none !important;
 }
 
 div.dhxcombo_dhx_terrace.dhxcombo {
-    background-color: transparent !important;
-    border: none !important;
+  background-color: transparent !important;
+  border: none !important;
 }
 
 .tooltip-container {
-    position: relative;
-    display: inline-block;
+  position: relative;
+  display: inline-block;
 }
 
 .tooltip {
-    visibility: hidden;
-    position: absolute;
-    left: 50%;
-    top: 100%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: pre-line;
-    z-index: 1000;
-    margin-top: 10px;
-    min-width: 200px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  visibility: hidden;
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: pre-line;
+  z-index: 1000;
+  margin-top: 10px;
+  min-width: 200px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .tooltip-container:hover .tooltip {
-    visibility: visible;
+  visibility: visible;
 }
 
 .tooltip::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: -6px;
-    transform: translateX(-50%);
-    border-width: 0 6px 6px 6px;
-    border-style: solid;
-    border-color: transparent transparent #333 transparent;
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  transform: translateX(-50%);
+  border-width: 0 6px 6px 6px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
 }
 
 .info-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 시공 사진 컨테이너 스타일 */
 .title-container {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .title-text.sub {
-    font-weight: bold;
-    font-size: 1.1em;
+  font-weight: bold;
+  font-size: 1.1em;
 }
 
 /* 공통 셀 스타일 */
 .cell {
-    display: block;
-    width: 100%;
+  display: block;
+  width: 100%;
 }
 
 .item-head {
-    float: left;
-    width: 80px;
-    padding: 5px;
+  float: left;
+  width: 80px;
+  padding: 5px;
 }
 
 .item-data {
-    display: block;
-    width: 93%;
+  display: block;
+  width: 93%;
 }
 
 /* 이미지 타이틀 스타일 */
 .image-title {
-    width: calc(14% - 20px); /* 카드와 동일한 너비 */
-    margin: 10px;
-    float: left;
-    text-align: center;
-    font-size: 0.9em;
-    color: #666;
-    min-width: 120px;
+  width: calc(14% - 20px); /* 카드와 동일한 너비 */
+  margin: 10px;
+  float: left;
+  text-align: center;
+  font-size: 0.9em;
+  color: #666;
+  min-width: 120px;
 }
 
 /* 이미지 카드 스타일 */
 .card {
-    margin: 10px;
-    float: left;
-    width: calc(14% - 20px); /* 7개의 이미지를 한 줄에 표시 */
-    min-width: 120px;
+  margin: 10px;
+  float: left;
+  width: calc(14% - 20px); /* 7개의 이미지를 한 줄에 표시 */
+  min-width: 120px;
 }
 
 .ratio-box {
-    position: relative;
-    width: 100%;
-    padding-top: 100%; /* 1:1 비율 유지 */
+  position: relative;
+  width: 100%;
+  padding-top: 100%; /* 1:1 비율 유지 */
 }
 
 .the-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* 이미지 비율 유지하면서 영역 채우기 */
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    transition: transform 0.2s;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 이미지 비율 유지하면서 영역 채우기 */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: transform 0.2s;
 }
 
 .the-image:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 /* 미마감 섹션 스타일 */
 .unfinished-section {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .unfinished-reason {
-    width: 132px;
+  width: 132px;
 }
 
 .unfinished-memo {
-    width: 722px;
+  width: 722px;
 }
 
 /* 레이아웃 유틸리티 */
 .clearfix::after {
-    content: "";
-    clear: both;
-    display: table;
+  content: "";
+  clear: both;
+  display: table;
 }
 
 /* 이미지 컨테이너 스타일 */
 #dlvStatImgContainer {
-    margin: 20px 0;
-    overflow: hidden;
+  margin: 20px 0;
+  overflow: hidden;
 }
 
 #dlvStatImgContainer .item-data {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  width: 100%;
 }

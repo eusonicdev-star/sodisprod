@@ -50,8 +50,6 @@
 }
 
 #menuInfo img {
-    height: 45px;
-    margin: 20px;
     border: none;
     object-fit: contain;
 }

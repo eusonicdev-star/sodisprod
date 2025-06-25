@@ -60,7 +60,6 @@
 .item-data i {
   margin-left: 5px;
   cursor: pointer;
-  color: #666;
 }
 
 .item-data i:hover {
@@ -173,14 +172,12 @@
 }
 
 .action-button.warning {
-  background-color: #f1c40f;
+  background-color: #ff7f00;
   color: white;
-  border-color: #f1c40f;
 }
 
 .action-button.warning:hover {
-  background-color: #d39e00;
-  border-color: #d39e00;
+  background-color: #e67300;
 }
 
 /* disabled 버튼 스타일 */
@@ -219,10 +216,6 @@ input[type="file"][disabled] {
 }
 
 /* 레이아웃 스타일 */
-#mainDiv {
-  padding: 10px 10px 0 10px;
-}
-
 #searchDiv {
   width: 100%;
   font-size: 12px;
