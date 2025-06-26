@@ -96,7 +96,7 @@ class LayoutManager {
 
     const menuBarHTML = `
             <div id="menuInfo">
-                <img src="/img/logo.png" alt="로고">
+                <img src="/img/new-logo.png" alt="로고">
                 <a href="#" class="menu-action" onclick="layoutManager.menuOpen();">
                     <i class="fa fa-plus" aria-hidden="true"></i><span>메뉴 열기</span>
                 </a>
