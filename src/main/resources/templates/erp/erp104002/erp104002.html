@@ -394,7 +394,6 @@
                                     myComboInstCapaCtgr.setChecked(i, false);
                                 }
                                 myComboInstCapaCtgr.updateOption("", "", c + "개 선택", "");
-                                //myComboInstCapaCtgr.selectOption(0);
                                 myComboInstCapaCtgr.openSelect();
                                 return;
                             }
@@ -417,7 +416,6 @@
                             }
 
                             myComboInstCapaCtgr.updateOption("", "", cnt + "개 선택", "");
-                            //myComboInstCapaCtgr.selectOption(0);
                             myComboInstCapaCtgr.openSelect();
 
 
@@ -435,549 +433,399 @@
                     myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
 
 
-                    myGrid.setHeader("#master_checkbox,CUD,회사코드,화주코드,화주," +
-                        "주문유형코드,주문유형,주문상태코드,주문상태,물류센터코드," +
-                        "물류센터,시공카테<br>고리코드,시공카테<br>고리,시스템등록일,고객접수일,고객배송<br>요청일,배송확정일,공장출고일," +
-                        "쇼핑몰,브랜드,AL 오더,고객사<br>주문번호,수취인," +
-                        "수취인<br>(일반전화),수취인<br>휴대전화,우편번호,주소,상세주소," +
-                        "배송요청사항,고객사<br>특이사항,운임상태코드,운임구분,착불비," +
-                        "통행료,시공일," +
-
-                        "팔렛트<br>번호," +			//20220110 정연호 팔렛트번호
-
-                        "시공기사,팀,기사메모,시공비,물류비," +
-
-                        "배송상태,상차완료,순번,상품코드(FERT),상품명(FERT),수량(FERT),상품코드(HAWA),상품명(HAWA),수량(HAWA),시공기사ID," +
-
-                        "발송인,발송인<br>일반전화,발송인<br>휴대전화,발송인<br>우편번호,발송인<br>주소," +
-                        "발송인<br>상세주소,distChanCd,원AL 오더,사용여부,delResn," +
-                        "비고,저장자,저장일,수정자,수정일" +
-                        "");
-                    myGrid.setColumnIds("chk,cud,cmpyCd,agntCd,agntNm," +
-                        "soType,soTypeNm,soStatCd,soStatNm,dcCd," +
-                        "dcNm,instCtgr,instCtgrNm,ordrInptDt,rcptDt,rqstDt,dlvyCnfmDt,giLiftDt," +
-                        "mallCd,brand,soNo,refSoNo,acptEr," +
-                        "acptTel1,acptTel2,postCd,addr1,addr2," +
-                        "dlvyRqstMsg,custSpclTxt,dlvyCostType,dlvyCostTypeNm,rcptCost," +
-                        "passCost,instDt," +
-
-                        "paltNoxx," +			//20220110 정연호 팔렛트번호
-
-                        "instEr,team,instMemo,instCost,dlvyCost," +
-
-                        "dlvyStatNm,liftYn,prodSeq,prodCd,prodNm,qty,cprodCd,cprodNm,cqty,instErId," +
-
-                        "fromEr,fromTel1,fromTel2,fromPostCd,fromAddr1," +
-                        "fromAddr2,distChanCd,orgnSoNo,useYn,delResn," +
-                        "memo,saveUser,saveTime,updtUser,updtTime" +
-                        "");
-                    myGrid.setInitWidths("40,40,80,80,80," +
-                        "80,80,80,80,80," +
-                        "80,100,100,100,100,100,100,100," +
-                        "120,80,100,100,120," +
-                        "80,100,80,160,160," +
-                        "160,160,80,80,80," +
-                        "80,80," +
-
-                        "80," +
-
-                        "80,80,240,80,80," +
-
-                        "120,80,60,80,200,60,80,200,60,80," +
-
-                        "80,80,80,80,160," +
-                        "160,80,80,80,80," +
-                        "80,80,160,80,160" +
-                        "");
-                    myGrid.setColAlign("center,center,center,center,center," +
-                        "center,center,center,center,center," +
-                        "center,center,center,center,center,center,center,center," +
-                        "center,left,center,center,center," +
-                        "center,center,center,left,left," +
-                        "left,left,center,center,center," +
-                        "center,center," +
-
-                        "center," +
-
-                        "center,center,left,right,right," +
-
-                        "left,center,right,left,center,right,left,center,right,center," +
-
-                        "center,center,center,center,left," +
-                        "left,center,center,center,center," +
-                        "left,left,left,left,left" +
-                        "");
-
-                    myGrid.setColTypes("ch,ro,ro,ro,ro," +
-                        "ro,ro,ro,ro,ro," +
-                        "ro,ro,ro,ro,ro,ro,ro,ro," +
-                        "ro,ro,ro,ro,ro," +
-                        "ro,ro,ro,ro,ro," +
-                        "ro,ro,ro,ro,ro," +
-                        "ro,ro," +
-
-                        "ro," +
-
-                        "ro,ro,ro,ro,ro," +
-
-                        "ro,ro,ro,ro,ro,ro,ro,ro,ro,ro," +
-
-                        "ro,ro,ro,ro,ro," +
-                        "ro,ro,ro,ro,ro," +
-                        "ro,ro,ro,ro,ro" +
-                        "");
-
-                    myGrid.setColSorting(",,str,str,str," +
-                        "str,str,str,str,str," +
-                        "str,str,str,str,str,str,str,str," +
-                        "str,str,str,str,str," +
-                        "str,str,str,str,str," +
-                        "str,str,str,str,str," +
-                        "str,str," +
-
-                        "str," +
-
-                        "str,str,str,str,str," +
-
-                        "str,str,str,str,str,str,str,str,str,str," +
-
-                        "str,str,str,str,str," +
-                        "str,str,str,str,str," +
-                        "str,str,str,str,str" +
-                        "");
-
-                    myGrid.attachHeader(",,#text_filter,#text_filter,#text_filter," +
-                        "#text_filter,#text_filter,#text_filter,#numeric_filter,#text_filter," +
-                        "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
-                        "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
-                        "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
-                        "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
-                        "#text_filter,#text_filter," +
-
-                        "#text_filter," +
-
-                        "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
-
-                        "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
-
-                        "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
-                        "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter," +
-                        "#text_filter,#text_filter,,#text_filter," +
-                        "");
-
-
-                    myGrid.setColumnHidden(myGrid.getColIndexById("chk"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("cud"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("cmpyCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("agntCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("soType"), true);	//컬럼 아이디로 해당 컬럼 가리기
-
-                    myGrid.setColumnHidden(myGrid.getColIndexById("soStatCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("brand"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("soType"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("acptTel1"), true);	//컬럼 아이디로 해당 컬럼 가리기
-
-                    myGrid.setColumnHidden(myGrid.getColIndexById("fromEr"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("fromTel1"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("fromTel2"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("fromPostCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("fromAddr1"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("fromAddr2"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("distChanCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
-
-                    myGrid.setColumnHidden(myGrid.getColIndexById("orgnSoNo"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("useYn"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("delResn"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("memo"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("saveUser"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("saveTime"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("updtUser"), true);	//컬럼 아이디로 해당 컬럼 가리기
-                    myGrid.setColumnHidden(myGrid.getColIndexById("updtTime"), true);	//컬럼 아이디로 해당 컬럼 가리기
-
-
-                    //20220106 정연호 시공카테고리코드 가림
-                    myGrid.setColumnHidden(myGrid.getColIndexById("instCtgr"), true);
-
-
-                    myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
-
-
-                    myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
-                    myGrid.enablePreRendering(10);	//20220423 정연호 추가
-
-                    fnObj.gridOpen.setWidth();
-                    //그래야 진짜 화면에 보이는 높이가 만들어진다
-                    myGrid.addRow(1, "");	//로우 추가
-                    myGrid.deleteRow(1);
-
-
-                    myGrid.enableEditEvents(true, false, false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
-                    myGrid.enableBlockSelection(true);
-
-
-                    myGrid.attachEvent("onKeyPress", fnObj.keyOpen.onKeyPressed);
-
-                },//grid
-                setWidth: function () {
-                    c_width = top.myLayout.cells("c").getWidth();
-                    searchDiv_height = $("#searchDiv").height();
-                    searchDiv2nd_height = $("#searchDiv2nd").height();
-                    page_height = $("#page").height();
-                    xhdr_height = $(".xhdr").height();
-
-                    myGrid.enableAutoWidth(true, c_width - 25, 100);
-                    myGrid.enableAutoHeight(true, window.innerHeight - searchDiv_height - searchDiv2nd_height - page_height - xhdr_height - 30);	//그리드 자동높이
-
-
-                    $("#searchDiv").width(c_width - 25);
-                    $("#searchDiv2nd").width(c_width - 25);
-
-                },	//END of setWidth
-            },	//END of gridOpen
-            searchOpen: {
-                sTime: function () {
-
-                    toastr.success('잠시 기다려주세요', '조회중');
-                    setTimeout(function () {
-                        //오른쪽 옆에서 메세지 나왔다 사라지기
-                        fnObj.searchOpen.search()
-                    }, 300);
-
-
-                },
-
-                search: function () {	//그리드 목록 조회하기
-                    var z = (new Date()).valueOf();	//20220216 정연호
-                    myGrid.clearAll(false);
-                    searchRes = null;
-                    searchRes = [];
-                    var gapDate = 0;
-                    var excelDown92 = "N";	//최대 92일은 무조건 넘으면 안됨
-                    var excelDown31 = "N";
-                    var sixCheck = "N";		//6개의 검색조건중 아무것도없다
-                    if ($("#srchCode").val().trim() != ""	//화주사코드
-                        || myComboDcCd.getChecked() != ""		//울류센터콤보
-                        || $("#mall").val().trim() != ""		//쇼핑몰
-                        || $("#rcptNm").val().trim() != ""		//수령인
-                        || $("#rcptTel").val().trim() != ""		//전화번호
-                        || $("#soList").val().trim() != ""		//AL 오더
-                    ) {
-                        sixCheck = "Y";		//뭐라도 한개있다
-                    }
-
-
-                    if (!fnObj.searchOpen.searchChkVal.chkVal("search")) {
-                        alert(chkValMsg);
-                        return false;
-                    }
-
-
-                    if ($("#dateFrom").val() && $("#dateTo").val()) {
-                        var date1 = new Date($("#dateFrom").val());
-                        var date2 = new Date($("#dateTo").val());
-                        gapDate = (date2.getTime() - date1.getTime()) / (1000 * 60 * 60 * 24);
-                        if (date1 == "Invalid Date") {
-                            alert("시작날짜의 형식이 잘못되었습니다.");
-                            return;
-                        }
-                        if (date2 == "Invalid Date") {
-                            alert("종료날짜의 형식이 잘못되었습니다.");
-                            return;
-                        }
-                        if (gapDate > 92) {
-                            excelDown92 = "Y";
-                        }
-
-                        if (gapDate > 31)	//시작날짜가 크고 종료날짜가 작을떄
-                        {
-
-                            excelDown31 = "Y";
-                        }
-                    }
-
-
-                    if (excelDown92 == "Y") {
-                        alert("달력 날짜의 범위가 92일을 초과할 수 없습니다.(" + gapDate + "일)");
-                        return;
-                    }
-
-                    //31일이 안넘을떄
-                    if (excelDown31 == "N") {
-
-
-                        /*
-                        var srchData = new FormData();
-                        srchData.append("cmpyCd",				myComboCmpyCd.getSelectedValue()			);
-                        srchData.append("dtType",				myComboDtType.getSelectedValue()			);
-                        srchData.append("fromDt",				$("#dateFrom").val().replace(/-/g,"")		);
-                        srchData.append("toDt",					$("#dateTo").val().replace(/-/g,"")			);
-                        srchData.append("agntList",				$("#srchCode").val()						);	//화주사
-                        srchData.append("dcList",				myComboDcCd.getChecked()					);		//물류센터
-                        srchData.append("soList",				$("#soList").val().replace(/\n/g,",")											);		//AL 오더
-                        srchData.append("soTypeList",			myComboSoType.getChecked()					);	//주문유형
-                        srchData.append("soStatList",			myComboSoStat.getChecked()					);	//주문상태
-                        srchData.append("mallNm",				$("#mall").val()							);		//쇼핑몰
-                        srchData.append("acptNm",				$("#rcptNm").val()							);		//수령인
-                        srchData.append("acptTel",				$("#rcptTel").val()							);		//전화번호
-                        srchData.append("useYn",				""											);		//사용유무
-                        srchData.append("refSoList",			$("#refSoList").val().replace(/\n/g,",")		);
-
-                        srchData.append("prodList",			$("#prodList").val().replace(/\n/g,",")		);		//20211119 추가 상품코드
-                        srchData.append("prodNm",			$("#prodNm").val()		);		//20211119 추가 상품명칭
-
-                        $.ajax({
-                            url: "/erp104002List",
-                            processData : false,
-                            contentType : false,
-                            data: srchData,
-                            type:"POST",
-                            datatype:"json",
-                            //async:false,
-                            success : function(res){
-                                if(res && res.length > 0){
-                                    searchRes = res;
-                                    searchPaging(1);
-                                }
-                                else{
-                                       alert("조회 수행 결과 없음");
-                                }
-                            },
-                        });
-                        */
-
-
-                        var rDate = [];
-                        var rDate10 = [];
-                        var sDate = new Date(dateTypeChange($("#dateFrom").val().replace(/-/g, ""), 10));
-                        var eDate = new Date(dateTypeChange($("#dateTo").val().replace(/-/g, ""), 10));
-
-                        var sDate10 = dateTypeChange($("#dateFrom").val().replace(/-/g, ""), 10);
-                        var eDate10 = dateTypeChange($("#dateTo").val().replace(/-/g, ""), 10);
-
-
-                        var rDate10 = getDatesStartToLast(sDate10, eDate10)
-
-                        var nDate = [];
-                        var n = {}
-                        for (var i = 0; i < rDate10.length; i = i + daySetting + 1)//20220216 정연호 daySetting 몇일씩 자를것인가
-                        {
-                            if (!rDate10[i + daySetting])//20220216 정연호 daySetting 몇일씩 자를것인가
-                            {
-
-                                n.sDate = rDate10[i];
-                                n.eDate = rDate10[rDate10.length - 1];
-                            } else {
-
-                                n.sDate = rDate10[i];
-                                n.eDate = rDate10[i + daySetting];//20220216 정연호 daySetting 몇일씩 자를것인가
-                            }
-                            nDate.push(n);
-                            n = {}
-                        }
-                        if ($("#soList").val() || $("#refSoList").val()) {
-                            nDate = [];
-
-
-                            n = {}
-                            n.sDate = $("#dateFrom").val().replace(/-/g, "");
-                            n.eDate = $("#dateTo").val().replace(/-/g, "")
-                            nDate.push(n);
-                            n = {}
-                        }
-
-                        for (var j = 0; j < nDate.length; j++) {
-
-
-                            var srchData = new FormData();
-                            srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
-                            srchData.append("dtType", myComboDtType.getSelectedValue());
-                            srchData.append("fromDt", nDate[j].sDate.replace(/-/g, ""));
-                            srchData.append("toDt", nDate[j].eDate.replace(/-/g, ""));
-                            srchData.append("agntList", $("#srchCode").val());	//화주사
-                            srchData.append("dcList", myComboDcCd.getChecked());		//물류센터
-                            srchData.append("soList", $("#soList").val().replace(/\n/g, ","));		//AL 오더
-                            srchData.append("soTypeList", myComboSoType.getChecked());	//주문유형
-                            srchData.append("soStatList", myComboSoStat.getChecked());	//주문상태
-                            srchData.append("mallNm", $("#mall").val());		//쇼핑몰
-                            srchData.append("acptNm", $("#rcptNm").val());		//수령인
-                            srchData.append("acptTel", $("#rcptTel").val());		//전화번호
-                            srchData.append("useYn", "");		//사용유무
-                            srchData.append("refSoList", $("#refSoList").val().replace(/\n/g, ","));
-
-                            srchData.append("prodList", $("#prodList").val().replace(/\n/g, ","));		//20211119 추가 상품코드
-                            srchData.append("prodNm", $("#prodNm").val());		//20211119 추가 상품명칭
-
-
-                            srchData.append("srchAddr", $("#srchAddr").val());
-
-                            //20220106 정연호 시공카테고리
-                            srchData.append("instCtgrList", myComboInstCapaCtgr.getChecked());
-
-                            $.ajax({
-                                url: "/erp104002List",
-                                processData: false,
-                                contentType: false,
-                                data: srchData,
-                                type: "POST",
-                                datatype: "json",
-                                async: false,
-
-                                success: function (res) {
-
-                                    if (res && res.length > 0) {
-
-                                        for (var k = 0; k < res.length; k++) {
-                                            searchRes.push(res[k])
-
-                                        }
-                                    }
-                                },
-                                /*
-                                error : function(request, status, error)
-                                    {
-                                        $(top.document).find('#loader').hide();
-                                       if (request.status == '403')
-                                       {
-                                           alert(request.status + " : 세션 종료\n로그인을 다시하세요." );
-                                           location.href = "/exception";
-                                       }
-
-                                       else
-                                       {
-                                           alert("데이터량이 너무 많아 조회에 실패하였습니다.\n날짜 범위를 줄이시거나 검색옵션을 변경,추가하십시오");
-                                           return;
-                                       }
-                                   }
-                                */
-
-                            });
-
-                        }	//end of FOR
-                        searchPaging(1);
-
-
-                    } else {
-
-
-                        if (!(excelDown92 == "N" && sixCheck == "Y")) {
-                            if (!confirm("달력 날짜의 범위가 31일을 초과하여(" + gapDate + "일) 엑셀다운로드 합니다.\n진행 하시겠습니까?\n(화면이 멈춘것 처럼 보일수있으나 진행중입니다.)")) {
-                                return;
-                            }
-                        }
-
-                        var rDate = [];
-                        var rDate10 = [];
-                        var sDate = new Date(dateTypeChange($("#dateFrom").val().replace(/-/g, ""), 10));
-                        var eDate = new Date(dateTypeChange($("#dateTo").val().replace(/-/g, ""), 10));
-
-                        var sDate10 = dateTypeChange($("#dateFrom").val().replace(/-/g, ""), 10);
-                        var eDate10 = dateTypeChange($("#dateTo").val().replace(/-/g, ""), 10);
-
-
-                        var rDate10 = getDatesStartToLast(sDate10, eDate10)
-
-                        var nDate = [];
-                        var n = {}
-                        for (var i = 0; i < rDate10.length; i = i + daySetting + 1)//20220216 정연호 daySetting 몇일씩 자를것인가
-                        {
-                            if (!rDate10[i + daySetting]) {
-
-                                n.sDate = rDate10[i];
-                                n.eDate = rDate10[rDate10.length - 1];
-                            } else {
-
-                                n.sDate = rDate10[i];
-                                n.eDate = rDate10[i + daySetting];//20220216 정연호 daySetting 몇일씩 자를것인가
-                            }
-                            nDate.push(n);
-                            n = {}
-                        }
-                        if ($("#soList").val() || $("#refSoList").val()) {
-                            nDate = [];
-
-
-                            n = {}
-                            n.sDate = $("#dateFrom").val().replace(/-/g, "");
-                            n.eDate = $("#dateTo").val().replace(/-/g, "")
-                            nDate.push(n);
-                            n = {}
-                        }
-                        for (var j = 0; j < nDate.length; j++) {
-
-
-                            var srchData = new FormData();
-                            srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
-                            srchData.append("dtType", myComboDtType.getSelectedValue());
-                            srchData.append("fromDt", nDate[j].sDate.replace(/-/g, ""));
-                            srchData.append("toDt", nDate[j].eDate.replace(/-/g, ""));
-                            srchData.append("agntList", $("#srchCode").val());	//화주사
-                            srchData.append("dcList", myComboDcCd.getChecked());		//물류센터
-                            srchData.append("soList", $("#soList").val().replace(/\n/g, ","));		//AL 오더
-                            srchData.append("soTypeList", myComboSoType.getChecked());	//주문유형
-                            srchData.append("soStatList", myComboSoStat.getChecked());	//주문상태
-                            srchData.append("mallNm", $("#mall").val());		//쇼핑몰
-                            srchData.append("acptNm", $("#rcptNm").val());		//수령인
-                            srchData.append("acptTel", $("#rcptTel").val());		//전화번호
-                            srchData.append("useYn", "");		//사용유무
-                            srchData.append("refSoList", $("#refSoList").val().replace(/\n/g, ","));
-
-                            srchData.append("prodList", $("#prodList").val().replace(/\n/g, ","));		//20211119 추가 상품코드
-                            srchData.append("prodNm", $("#prodNm").val());		//20211119 추가 상품명칭
-                            srchData.append("srchAddr", $("#srchAddr").val());
-
-                            //20220106 정연호 시공카테고리
-                            srchData.append("instCtgrList", myComboInstCapaCtgr.getChecked());
-
-                            $.ajax({
-                                url: "/erp104002List",
-                                processData: false,
-                                contentType: false,
-                                data: srchData,
-                                type: "POST",
-                                datatype: "json",
-                                async: false,
-                                success: function (res) {
-
-                                    if (res && res.length > 0) {
-
-                                        for (var k = 0; k < res.length; k++) {
-                                            searchRes.push(res[k])
-                                        }
-                                    }
-
-                                },
-                                /*
-                                error : function(request, status, error)
-                                    {
-                                        $(top.document).find('#loader').hide();
-                                       if (request.status == '403')
-                                       {
-                                           alert(request.status + " : 세션 종료\n로그인을 다시하세요." );
-                                           location.href = "/exception";
-                                       }
-
-                                       else
-                                       {
-                                           alert("데이터량이 너무 많아 조회에 실패하였습니다.\n날짜 범위를 줄이시거나 검색옵션을 변경,추가하십시오");
-                                           return;
-                                       }
-                                   }
-                                */
-                            });
-
-                        }	//end of FOR
-
-                        //31일이 넘거나 (92이은 안넘고 6개중에 하나라도 뭐가 있을떄)
-                        if (excelDown31 == "Y" && excelDown92 == "N" && sixCheck == "N") {
-                            exportExcel();
-                        } else {
-                            searchPaging(1);
-                        }
-
-                    }
-                    toastr.remove()
-                    console.log("search : " + ((new Date()).valueOf() - z) / 1000 + " 초");
-                },	//END of search : function() {
+					myGrid.setHeader(		"#master_checkbox,CUD,회사코드,화주코드,화주,"+
+											"주문유형코드,주문유형,주문상태코드,주문상태,물류센터코드,"+
+											"물류센터,시공카테<br>고리코드,시공카테<br>고리,시스템등록일,고객접수일,고객배송<br>요청일,배송확정일,공장출고일,"+
+											"쇼핑몰,브랜드,AL 오더,고객사<br>주문번호,수취인,"+
+											"수취인<br>(일반전화),수취인<br>휴대전화,우편번호,주소,상세주소,"+
+											"배송요청사항,고객사<br>특이사항,운임상태코드,운임구분,착불비,"+
+											"통행료,시공일,"+
+											"팔렛트<br>번호,"+
+											"시공기사,시공기사ID,기사메모,시공비,물류비,"+
+											"배송상태,상차완료,순번,상품코드(FERT),상품명(FERT),수량(FERT),상품코드(HAWA),상품명(HAWA),수량(HAWA),"+
+											"발송인,발송인<br>일반전화,발송인<br>휴대전화,발송인<br>우편번호,발송인<br>주소,"+
+											"발송인<br>상세주소,distChanCd,원AL 오더,사용여부,delResn,"+
+											"비고,저장자,저장일,수정자,수정일,"+
+											"수취인<br>일반전화");
+
+					myGrid.setColumnIds(	"chk,cud,cmpyCd,agntCd,agntNm,"+
+											"soType,soTypeNm,soStatCd,soStatNm,dcCd,"+
+											"dcNm,instCtgr,instCtgrNm,ordrInptDt,rcptDt,rqstDt,dlvyCnfmDt,giLiftDt,"+
+											"mallCd,brand,soNo,refSoNo,acptEr,"+
+											"acptTel1,acptTel2,postCd,addr1,addr2,"+
+											"dlvyRqstMsg,custSpclTxt,dlvyCostType,dlvyCostTypeNm,rcptCost,"+
+											"passCost,instDt,"+
+											"paltNoxx,"+
+											"instEr,instErId,instMemo,instCost,dlvyCost,"+
+											"dlvyStatNm,liftYn,prodSeq,prodCd,prodNm,qty,cprodCd,cprodNm,cqty,"+
+											"fromEr,fromTel1,fromTel2,fromPostCd,fromAddr1,"+
+											"fromAddr2,distChanCd,orgnSoNo,useYn,delResn,"+
+											"memo,saveUser,saveTime,updtUser,updtTime,"+
+											"acptTel1");
+
+					myGrid.setInitWidths(	"40,40,80,80,80,"+
+											"80,80,80,80,80,"+
+											"80,100,100,100,100,100,100,100,"+
+											"120,80,100,100,120,"+
+											"120,120,80,160,160,"+
+											"160,160,80,80,80,"+
+											"80,80,"+
+											"80,"+
+											"80,80,240,80,80,"+
+											"120,80,60,80,200,60,80,200,60,"+
+											"80,80,80,80,160,"+
+											"160,80,80,80,80,"+
+											"80,80,160,80,160,"+
+											"120");
+
+					myGrid.setColAlign(		"center,center,center,center,center,"+
+											"center,center,center,center,center,"+
+											"center,center,center,center,center,center,center,center,"+
+											"center,left,center,center,center,"+
+											"center,center,center,left,left,"+
+											"left,left,center,center,center,"+
+											"center,center,"+
+											"center,"+
+											"center,center,left,right,right,"+
+											"left,center,right,left,center,right,left,center,right,"+
+											"center,center,center,center,left,"+
+											"left,center,center,center,center,"+
+											"left,left,left,left,left,"+
+											"center");
+
+					myGrid.setColTypes(		"ch,ro,ro,ro,ro,"+
+											"ro,ro,ro,ro,ro,"+
+											"ro,ro,ro,ro,ro,ro,ro,ro,"+
+											"ro,ro,ro,ro,ro,"+
+											"ro,ro,ro,ro,ro,"+
+											"ro,ro,ro,ro,ro,"+
+											"ro,ro,"+
+											"ro,"+
+											"ro,ro,ro,ro,ro,"+
+											"ro,ro,ro,ro,ro,ro,ro,ro,ro,"+
+											"ro,ro,ro,ro,ro,"+
+											"ro,ro,ro,ro,ro,"+
+											"ro,ro,ro,ro,ro,"+
+											"ro");
+
+					myGrid.setColSorting(	",,str,str,str,"+
+											"str,str,str,str,str,"+
+											"str,str,str,str,str,str,str,str,"+
+											"str,str,str,str,str,"+
+											"str,str,str,str,str,"+
+											"str,str,str,str,str,"+
+											"str,str,"+
+											"str,"+
+											"str,str,str,str,str,"+
+											"str,str,str,str,str,str,str,str,str,"+
+											"str,str,str,str,str,"+
+											"str,str,str,str,str,"+
+											"str,str,str,str,str,"+
+											"str");
+
+					myGrid.attachHeader(	",,#text_filter,#text_filter,#text_filter,"+
+											"#text_filter,#text_filter,#text_filter,#numeric_filter,#text_filter,"+
+											"#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,"+
+											"#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,"+
+											"#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,"+
+											"#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,"+
+											"#text_filter,#text_filter,"+
+											"#text_filter,"+
+											"#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,"+
+											"#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,"+
+											"#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,"+
+											"#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,"+
+											"#text_filter,#text_filter,,#text_filter,,"+
+											"#text_filter");
+
+
+					myGrid.setColumnHidden(myGrid.getColIndexById("chk"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("cud"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("cmpyCd"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("agntCd"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("soType"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("soStatCd"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("brand"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("soType"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("fromEr"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("fromTel1"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("fromTel2"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("fromPostCd"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("fromAddr1"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("fromAddr2"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("distChanCd"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("orgnSoNo"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("useYn"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("delResn"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("memo"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("saveUser"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("saveTime"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("updtUser"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("updtTime"),true);	//컬럼 아이디로 해당 컬럼 가리기
+					myGrid.setColumnHidden(myGrid.getColIndexById("instCtgr"),true);
+					myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
+					myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능
+					myGrid.enablePreRendering(10);
+					fnObj.gridOpen.setWidth();	//그래야 진짜 화면에 보이는 높이가 만들어진다
+					myGrid.addRow(1,"");	//로우 추가
+					myGrid.deleteRow(1);
+
+					myGrid.enableEditEvents(true,false,false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+					myGrid.enableBlockSelection(true);
+
+					myGrid.attachEvent("onKeyPress",fnObj.keyOpen.onKeyPressed);
+
+				},//grid
+
+				setWidth : function(){
+					c_width =  top.myLayout.cells("c").getWidth();
+					searchDiv_height =  $("#searchDiv").height();
+					searchDiv2nd_height =  $("#searchDiv2nd").height();
+					page_height =  $("#page").height();
+					xhdr_height =  $(".xhdr").height();
+
+					myGrid.enableAutoWidth(true,c_width-25,100);
+					myGrid.enableAutoHeight(true,window.innerHeight-searchDiv_height-searchDiv2nd_height-page_height-xhdr_height-30);	//그리드 자동높이
+
+					$("#searchDiv").width(c_width-25);
+					$("#searchDiv2nd").width(c_width-25);
+
+				},	//END of setWidth
+			},	//END of gridOpen
+
+			searchOpen : {
+				sTime : function(){
+					toastr.success('잠시 기다려주세요', '조회중');
+					setTimeout(function() {
+						//오른쪽 옆에서 메세지 나왔다 사라지기
+						fnObj.searchOpen.search()
+						}, 300);
+				},
+
+				search : function() {	//그리드 목록 조회하기
+					var z=(new Date()).valueOf();	//20220216 정연호
+					myGrid.clearAll(false);
+					searchRes = null;
+					searchRes = [];
+					var gapDate=0;
+					var excelDown92	=	"N";	//최대 92일은 무조건 넘으면 안됨
+					var excelDown31		=	"N";
+					var sixCheck		=	"N";		//6개의 검색조건중 아무것도없다
+					if(		$("#srchCode").val().trim() != ""	//화주사코드
+						||	myComboDcCd.getChecked() != ""		//울류센터콤보
+						||	$("#mall").val().trim() != ""		//쇼핑몰
+						||	$("#rcptNm").val().trim() != ""		//수령인
+						||	$("#rcptTel").val().trim() != ""		//전화번호
+						||	$("#soList").val().trim() != ""		//AL 오더
+					) {
+						sixCheck = "Y";		//뭐라도 한개있다
+					}
+
+					if(!fnObj.searchOpen.searchChkVal.chkVal("search")) {
+						alert(chkValMsg);
+						return false;
+					}
+
+					if($("#dateFrom").val() && $("#dateTo").val()) {
+						var date1 = new Date($("#dateFrom").val());
+						var date2 = new Date($("#dateTo").val());
+						gapDate = (date2.getTime() - date1.getTime()) / (1000*60*60*24);
+						if(date1 == "Invalid Date") {
+							alert("시작날짜의 형식이 잘못되었습니다.");
+							return;
+						}
+						if(date2  == "Invalid Date") {
+							alert("종료날짜의 형식이 잘못되었습니다.");
+							return;
+						}
+						if(gapDate > 92)	 {
+							excelDown92 = "Y";
+						}
+
+						if(gapDate > 31) {
+
+							excelDown31 = "Y";
+						}
+					}
+
+					if(excelDown92 == "Y") {
+						alert("달력 날짜의 범위가 92일을 초과할 수 없습니다.("+gapDate+"일)");
+						return;
+					}
+
+					//31일이 안넘을떄
+					if(excelDown31 == "N") {
+						var rDate=[];
+						var rDate10=[];
+						var sDate = new Date(dateTypeChange($("#dateFrom").val().replace(/-/g,""),10));
+						var eDate = new Date(dateTypeChange($("#dateTo").val().replace(/-/g,""),10));
+
+						var sDate10 = dateTypeChange($("#dateFrom").val().replace(/-/g,""),10);
+						var eDate10 = dateTypeChange($("#dateTo").val().replace(/-/g,""),10);
+
+						var rDate10 = getDatesStartToLast(sDate10,eDate10)
+
+						var nDate=[];
+						var n={}
+
+						//20220216 정연호 daySetting 몇일씩 자를것인가
+						for(var i=0; i < rDate10.length; i = i + daySetting + 1) {
+							if(!rDate10[i+daySetting]) {
+								n.sDate = rDate10[i];
+								n.eDate = rDate10[rDate10.length-1];
+							} else {
+								n.sDate = rDate10[i];
+								n.eDate = rDate10[i + daySetting];
+							}
+							nDate.push(n);
+							n={}
+						}
+
+						if($("#soList").val() || $("#refSoList").val()) {
+							nDate = [];
+
+							n={}
+							n.sDate = $("#dateFrom").val().replace(/-/g,"");
+							n.eDate = $("#dateTo").val().replace(/-/g,"")
+							nDate.push(n);
+							n={}
+						}
+
+						for(var j=0;j<nDate.length;j++) {
+							var srchData = new FormData();
+							srchData.append("cmpyCd"		,				myComboCmpyCd.getSelectedValue()			);
+							srchData.append("dtType"		,				myComboDtType.getSelectedValue()			);
+							srchData.append("fromDt"		,				nDate[j].sDate.replace(/-/g,"")		);
+							srchData.append("toDt"			,					nDate[j].eDate.replace(/-/g,"")		);
+							srchData.append("agntList"		,				$("#srchCode").val()						);	//화주사
+							srchData.append("dcList",				myComboDcCd.getChecked()					);		//물류센터
+							srchData.append("soList",				$("#soList").val().replace(/\n/g,",")											);		//AL 오더
+							srchData.append("soTypeList",			myComboSoType.getChecked()					);	//주문유형
+							srchData.append("soStatList",			myComboSoStat.getChecked()					);	//주문상태
+							srchData.append("mallNm",				$("#mall").val()							);		//쇼핑몰
+							srchData.append("acptNm",				$("#rcptNm").val()							);		//수령인
+							srchData.append("acptTel",				$("#rcptTel").val()							);		//전화번호
+							srchData.append("useYn",				""											);		//사용유무
+							srchData.append("refSoList",			$("#refSoList").val().replace(/\n/g,",")		);
+
+							srchData.append("prodList",				$("#prodList").val().replace(/\n/g,",")		);		//20211119 추가 상품코드
+							srchData.append("prodNm",				$("#prodNm").val()		);		//20211119 추가 상품명칭
+
+							srchData.append("srchAddr",				$("#srchAddr").val()							);
+
+							srchData.append("instCtgrList"		,myComboInstCapaCtgr.getChecked()		);
+
+									$.ajax({
+								        url: "/erp104002List",
+								        processData : false,
+										contentType : false,
+								        data: srchData,
+								        type:"POST",
+								        dataType:"json",
+								        async:false,
+								        success : function(res){
+								        	if(res && res.length > 0){
+
+								        		for(var k=0;k<res.length;k++){
+								        			searchRes.push(res[k])
+								        		}
+								        	}
+								        },
+									});
+
+						}	//end of FOR
+						searchPaging(1);
+					} else {
+						if(!(excelDown92 == "N" && sixCheck == "Y")) {
+							if(!confirm("달력 날짜의 범위가 31일을 초과하여("+gapDate+"일) 엑셀다운로드 합니다.\n진행 하시겠습니까?\n(화면이 멈춘것 처럼 보일수있으나 진행중입니다.)")) {
+								return;
+							}
+						}
+
+						var rDate=[];
+						var rDate10=[];
+						var sDate = new Date(dateTypeChange($("#dateFrom").val().replace(/-/g,""),10));
+						var eDate = new Date(dateTypeChange($("#dateTo").val().replace(/-/g,""),10));
+
+						var sDate10 = dateTypeChange($("#dateFrom").val().replace(/-/g,""),10);
+						var eDate10 = dateTypeChange($("#dateTo").val().replace(/-/g,""),10);
+
+
+						var rDate10 = getDatesStartToLast(sDate10,eDate10)
+
+						var nDate=[];
+						var n={}
+						//20220216 정연호 daySetting 몇일씩 자를것인가
+						for(var i=0;i<rDate10.length;i=i+daySetting+1) {
+							if(!rDate10[i+daySetting]) {
+								n.sDate = rDate10[i];
+								n.eDate = rDate10[rDate10.length-1];
+							} else {
+								n.sDate = rDate10[i];
+								n.eDate = rDate10[i+daySetting];//20220216 정연호 daySetting 몇일씩 자를것인가
+							}
+							nDate.push(n);
+							n={}
+						}
+
+						if($("#soList").val() || $("#refSoList").val()) {
+							nDate = [];
+							n={}
+							n.sDate = $("#dateFrom").val().replace(/-/g,"");
+							n.eDate = $("#dateTo").val().replace(/-/g,"")
+							nDate.push(n);
+							n={}
+						}
+
+						for(var j=0;j<nDate.length;j++) {
+							var srchData = new FormData();
+							srchData.append("cmpyCd",				myComboCmpyCd.getSelectedValue()		);
+							srchData.append("dtType",				myComboDtType.getSelectedValue()		);
+							srchData.append("fromDt",				nDate[j].sDate.replace(/-/g,"")			);
+							srchData.append("toDt",					nDate[j].eDate.replace(/-/g,"")			);
+							srchData.append("agntList",				$("#srchCode").val()					);	//화주사
+							srchData.append("dcList",				myComboDcCd.getChecked()				);		//물류센터
+							srchData.append("soList",				$("#soList").val().replace(/\n/g,",")	);		//AL 오더
+							srchData.append("soTypeList",			myComboSoType.getChecked()				);	//주문유형
+							srchData.append("soStatList",			myComboSoStat.getChecked()				);	//주문상태
+							srchData.append("mallNm",				$("#mall").val()						);		//쇼핑몰
+							srchData.append("acptNm",				$("#rcptNm").val()						);		//수령인
+							srchData.append("acptTel",				$("#rcptTel").val()						);		//전화번호
+							srchData.append("useYn",				""										);		//사용유무
+							srchData.append("refSoList",			$("#refSoList").val().replace(/\n/g,","));
+
+							srchData.append("prodList",				$("#prodList").val().replace(/\n/g,",")	);		//20211119 추가 상품코드
+							srchData.append("prodNm",				$("#prodNm").val()						);		//20211119 추가 상품명칭
+							srchData.append("srchAddr",				$("#srchAddr").val()					);
+							srchData.append("instCtgrList",			myComboInstCapaCtgr.getChecked()		);
+
+							$.ajax({
+						        url: "/erp104002List",
+						        processData : false,
+								contentType : false,
+						        data: srchData,
+						        type:"POST",
+						        dataType:"json",
+						        async:false,
+						        success : function(res){
+						        	if(res && res.length > 0){
+						        		for(var k=0;k<res.length;k++){
+						        			searchRes.push(res[k])
+						        		}
+						        	}
+						        },
+							});
+						}	//end of FOR
+
+						//31일이 넘거나 (92이은 안넘고 6개중에 하나라도 뭐가 있을떄)
+						if(excelDown31 == "Y" && excelDown92 == "N" && sixCheck == "N") {
+		        			exportExcel();
+		        		} else {
+			        		searchPaging(1);
+		        		}
+					}
+					toastr.remove()
+				},	//END of search : function() {
 
 
                 delSrchCode: function () {

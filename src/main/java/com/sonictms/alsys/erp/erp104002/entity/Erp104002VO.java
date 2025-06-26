@@ -45,7 +45,7 @@ public class Erp104002VO extends commonVO{
 	private	String	passCost		;		//통행료
 	private	String	instDt			;		//시공일
 	private	String	instEr			;		//시공기사
-	private	String	instErId			;		//시공기사
+	private	String	instErId		;		//시공기사
 	private	String	instCost		;		//시공비
 	private	String	dlvyCost		;		//물류비
 	private	String	fromEr			;		//발송인
@@ -60,8 +60,6 @@ public class Erp104002VO extends commonVO{
 	private	String	delResn			;
 	private	String	memo			;		//비고
 
-
-
 	private	String	dtType			;		//날짜종류	
 	private	String	fromDt			;		//날짜시작
 	private	String	toDt			;		//날짜종류
@@ -73,8 +71,7 @@ public class Erp104002VO extends commonVO{
 	private	String	mallNm			;		//쇼핑몰
 	private	String	acptNm			;		//고객명
 	private	String	acptTel			;		//고객전화번호
-	
-	
+
 	
 	private	String	prodSeq			;		//순번
 	private	String	prodCd			;		//상품코드
