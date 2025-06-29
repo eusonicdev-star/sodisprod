@@ -110,15 +110,17 @@
 
 /* 버튼 스타일 */
 .action-button {
-  padding: 6px 12px;
+  padding: 6px 6px;
   margin: 0 5px;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  color: #333;
+  border: 1px solid #e1e5e9;
+  background-color: #ffffff;
+  color: #495057;
   cursor: pointer;
-  border-radius: 3px;
-  transition: all 0.3s ease;
-  font-size: 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .button-container {
@@ -158,52 +160,54 @@
 }
 
 .action-button:hover {
-  background-color: #f5f5f5;
-  border-color: #999;
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .action-button.primary {
-  background-color: #4a90e2;
+  background-color: #007bff;
   color: white;
-  border-color: #4a90e2;
+  border-color: #007bff;
 }
 
 .action-button.primary:hover {
-  background-color: #357abd;
-  border-color: #357abd;
+  background-color: #0056b3;
+  border-color: #0056b3;
 }
 
 .action-button.danger {
-  background-color: #e74c3c;
+  background-color: #6c757d;
   color: white;
-  border-color: #e74c3c;
+  border-color: #6c757d;
 }
 
 .action-button.danger:hover {
-  background-color: #c0392b;
-  border-color: #c0392b;
+  background-color: #545b62;
+  border-color: #545b62;
 }
 
 .action-button.success {
-  background-color: #2ecc71;
+  background-color: #28a745;
   color: white;
-  border-color: #2ecc71;
+  border-color: #28a745;
 }
 
 .action-button.success:hover {
-  background-color: #27ae60;
-  border-color: #27ae60;
+  background-color: #1e7e34;
+  border-color: #1e7e34;
 }
 
 .action-button.warning {
-  background-color: #f1c40f;
-  color: white;
-  border-color: #f1c40f;
+  background-color: #ffc107;
+  color: #212529;
+  border-color: #ffc107;
 }
 
 .action-button.warning:hover {
-  background-color: #d39e00;
-  border-color: #d39e00;
+  background-color: #e0a800;
+  border-color: #e0a800;
 }
 
 div.dhxcombo_dhx_terrace.dhxcombo_disabled {

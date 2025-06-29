@@ -103,9 +103,8 @@
 						srchCtgr: srchCtgr,
 						srchInput: srchInput,
 						windowId: windowId,
-						/* 							srchCd : $("#srchCode").val(),
-                                                    srchNm : $("#srchName").val(),*/
-						srchArea: $("#srchTextArea").val()
+						srchCd: $("#srchCode").val(),
+						srchNm: $("#srchName").val()
 					};
 
 
@@ -473,18 +472,13 @@
 					srchData.append("dtType", myComboDtType.getSelectedValue());
 					srchData.append("fromDt", $("#dateFrom").val().replace(/-/g, ""));
 					srchData.append("toDt", $("#dateTo").val().replace(/-/g, ""));
-					srchData.append("agntList", $("#srchTextArea").val().replace(/\n/g, ","));
+					srchData.append("agntList", $("#srchCode").val());
 					srchData.append("soList", $("#soTextArea").val().replace(/\n/g, ","));
 					srchData.append("soTypeList", myComboSoType.getChecked());
 					srchData.append("soStatList", myComboSoStat.getChecked());
 					srchData.append("rcptNm", $("#rcptNm").val());
 					srchData.append("rcptTel", $("#rcptTel").val());
 					srchData.append("alrmSendYn", $("#alrmSendYn").is(":checked") ? "N" : "Y");
-
-					/* for(var pair of srchData.entries()) {
-                       console.log(pair[0]+ ' : '+ pair[1]);
-                    } */
-
 
 					$.ajax({
 						url: "/erp102003List",
@@ -510,6 +504,10 @@
 					toastr.remove()
 				},	//END of search : function() {
 
+				delSrchCode: function () {
+					$("#srchCode").val("");
+					$("#srchName").val("");
+				},
 
 				//알림톡보내기 팝업
 				talkSendPopup: function () {		//알림톡보내기 팝업
@@ -921,14 +919,30 @@
 				</span>
 
 			<span class="cell">
-					<span class="item-head">화주사</span>
-					<span class="item-data">
-						<textArea id="srchTextArea"></textArea>
-						<i id="srchIcon" class="fa fa-search" aria-hidden="true"
-						   onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','textArea')"></i>
-					</span>
-
-				</span>
+            <span class="item-head">화주사</span>
+            <span class="item-data margin-right-5">
+              <input
+					  type="text"
+					  id="srchName"
+					  onkeyup="fnObj.keyOpen.enterKey('srchName');"
+			  />
+              <i
+					  id="srchIcon"
+					  class="fa fa-search"
+					  aria-hidden="true"
+					  onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"
+			  ></i>
+            </span>
+            <span class="item-data">
+              <input type="text" id="srchCode" readonly/>
+              <i
+					  id="delIcon"
+					  class="fa fa-minus-circle"
+					  aria-hidden="true"
+					  onclick="fnObj.searchOpen.delSrchCode('srchName')"
+			  ></i>
+            </span>
+          </span>
 
 			<span class="cell">
 					<span class="item-head">수령인</span>
