@@ -88,7 +88,7 @@
                 nowSend: function () {	//즉시보내기
 
                     if (!myComboSendTalkTmp.getSelectedValue()) {
-                        alert("알림톡 템플릿을 선택하세요.");
+                        alert("알림톡 템플릿을 선택해주세요.");
                         return;
                     }
                     fnObj.searchOpen.loadAlrmTmp("nowSend");
@@ -97,16 +97,16 @@
 
                 bookSend: function () {	//예약보내기
                     if (!myComboSendTalkTmp.getSelectedValue()) {
-                        alert("알림톡 템플릿을 선택하세요.");
+                        alert("알림톡 템플릿을 선택해주세요.");
                         return;
                     }
 
                     if ($("#sendDate").val().length != 8) {
-                        alert("예약날짜를 선택하세요.");
+                        alert("예약날짜를 선택해주세요.");
                         return;
                     }
                     if ($("#sendTime").val().length != 4) {
-                        alert("예약시간-4자리 숫자-을 입력하세요.");
+                        alert("예약시간-4자리 숫자-을 입력해주세요.");
                         return;
                     }
 
@@ -226,20 +226,20 @@
                 sendAlrmTmp: function (sendRes) {	//알림톡 보내기
 
                     if (!sendRes.tmplId) {
-                        alert("알림톡을 보낼 수 없습니다. 템플릿을 선택하세요");
+                        alert("알림톡을 보낼 수 없습니다. 템플릿을 선택해주세요");
                         return;
                     }
                     if (sendRes.tmplId == "ALSYS05_1") {	//배송시간안내 1 일경우에는 배송예정일과 배송시간 필수
                         if ($("#sendRqstDt").val().trim().replace(/-/g, "").length != 8) {
-                            alert("배송예정일 날짜를 확인하세요.");
+                            alert("배송예정일 날짜를 확인해주세요.");
                             return;
                         }
                         if ($("#sendRqstFromDt").val().trim().length != 2) {
-                            alert("배송 시작시간을 확인하세요.");
+                            alert("배송 시작시간을 확인해주세요.");
                             return;
                         }
                         if ($("#sendRqstToDt").val().trim().length != 2) {
-                            alert("배송 종료시간을 확인하세요.");
+                            alert("배송 종료시간을 확인해주세요.");
                             return;
                         }
 
@@ -260,7 +260,7 @@
                     if (sendRes.gubn == "bookSend") {
                         reserveDtValu = $("#sendDate").val() + $("#sendTime").val() + "00";
                         if (reserveDtValu.length != 14) {
-                            alert("예약 날짜와 시간을 확인하세요");
+                            alert("예약 날짜와 시간을 확인해주세요");
                             return;
                         }
                     }

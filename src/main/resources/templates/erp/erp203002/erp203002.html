@@ -159,7 +159,7 @@
 					});
 					myComboDcCd.attachEvent("onCheck", function (value, text) {
 
-						if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+						if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
 						{
 							if (myComboDcCd.isChecked(0)) {
 
@@ -501,7 +501,7 @@
 
 
 							if (!$("#instDt").val()) {
-								chkValMsg = chkValMsg + "시공일자를 입력하세요\n";
+								chkValMsg = chkValMsg + "시공일자를 입력해주세요\n";
 								rtnVal = false;
 							}
 						}
@@ -512,7 +512,7 @@
 							
 							if(!myGrid.getSelectedRowId())
 							{
-								chkValMsg = chkValMsg + "로우를 1줄 선택하세요.\n";
+								chkValMsg = chkValMsg + "로우를 1줄 선택해주세요.\n";
 								rtnVal = false;
 							
 							}
@@ -536,7 +536,7 @@
 
 
 							if (myGrid.getRowsNum() == 0) {
-								chkValMsg = chkValMsg + "조회를 하세요.\n";
+								chkValMsg = chkValMsg + "조회를해주세요.\n";
 								rtnVal = false;
 							}
 
@@ -558,7 +558,7 @@
 							});
 
 							if (myGrid.getRowsNum() > 0 && chkCnt == 0) {
-								chkValMsg = chkValMsg + "원하는 로우에 체크하세요.\n";
+								chkValMsg = chkValMsg + "원하는 로우에 체크해주세요.\n";
 								rtnVal = false;
 							}
 							if (chkCnt != 0 && MoYCnt > 0) {
@@ -578,7 +578,7 @@
 
 
 							if (myGrid.getRowsNum() == 0) {
-								chkValMsg = chkValMsg + "조회를 하세요.\n";
+								chkValMsg = chkValMsg + "조회를해주세요.\n";
 								rtnVal = false;
 							}
 
@@ -603,7 +603,7 @@
 							});
 
 							if (myGrid.getRowsNum() > 0 && chkCnt == 0) {
-								chkValMsg = chkValMsg + "원하는 로우에 체크하세요.\n";
+								chkValMsg = chkValMsg + "원하는 로우에 체크해주세요.\n";
 								rtnVal = false;
 							}
 							if (chkCnt != 0 && MoNCnt > 0) {

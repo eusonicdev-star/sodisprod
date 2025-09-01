@@ -108,12 +108,12 @@
                     var errMsg = "";
                     var rtnVal = true;
                     if (!$("#srchCode").val()) {
-                        errMsg = errMsg + "화주코드가 없습니다. 화주를 검색하세요.\n";
+                        errMsg = errMsg + "화주코드가 없습니다. 화주를 검색해주세요.\n";
                         rtnVal = false;
 
                     }
                     if (!$("#srchName").val()) {
-                        errMsg = errMsg + "화주명칭이 없습니다. 화주를 검색하세요.\n";
+                        errMsg = errMsg + "화주명칭이 없습니다. 화주를 검색해주세요.\n";
                         rtnVal = false;
                     }
                     if (errMsg != "" && rtnVal == false) {
@@ -153,12 +153,12 @@
                     var errMsg = "";
                     var rtnVal = true;
                     if (!$("#srchCode").val()) {
-                        errMsg = errMsg + "화주코드가 없습니다. 화주를 검색하세요.\n";
+                        errMsg = errMsg + "화주코드가 없습니다. 화주를 검색해주세요.\n";
                         rtnVal = false;
 
                     }
                     if (!$("#srchName").val()) {
-                        errMsg = errMsg + "화주명칭이 없습니다. 화주를 검색하세요.\n";
+                        errMsg = errMsg + "화주명칭이 없습니다. 화주를 검색해주세요.\n";
                         rtnVal = false;
                     }
                     if (errMsg != "" && rtnVal == false) {
@@ -211,7 +211,7 @@
                 cnslListPopup: function () {		//해피콜상세리스트 팝업
 
                     if (!$("#talkTblSoMId").val()) {
-                        alert("조회를 먼저 하세요")
+                        alert("조회를 먼저해주세요")
                         return
                     }
 
@@ -240,7 +240,7 @@
                 //주문이력보기 팝업
                 soLogPopup: function () {
                     if (!$("#cnslTblSoMId").val()) {
-                        alert("조회를 먼저 하세요")
+                        alert("조회를 먼저해주세요")
                         return
                     }
                     windowId = "erp102001p5";
@@ -268,7 +268,7 @@
                 talkListPopup: function () {		//알림톡이력보기 팝업
 
                     if (!$("#talkTblSoMId").val()) {
-                        alert("조회를 먼저 하세요")
+                        alert("조회를 먼저해주세요")
                         return
                     }
 
@@ -304,7 +304,7 @@
                     //20220308 정연호 추가. 주문상태코드가 0000 삭제된 오더 일경우 알림톡 못보내게 함.끝
 
                     if (!$("#talkTblSoMId").val()) {
-                        alert("조회를 먼저 하세요")
+                        alert("조회를 먼저해주세요")
                         return
                     }
                     windowId = "erp102001p4";
@@ -511,7 +511,7 @@
                     });
                     srchMyComboInstCapaCtgr.attachEvent("onCheck", function (value, text) {
 
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
                         {
                             if (srchMyComboInstCapaCtgr.isChecked(0)) {
                                 //console.log("전체 에 체크를 했을때");
@@ -827,7 +827,7 @@
                             }
 
                             if (stage == 2 && nValue.trim() == "") {
-                                alert("고객사 주문번호를 입력하세요");
+                                alert("고객사 주문번호를 입력해주세요");
                                 return false;	//입력한걸 취소시킨다
                             } else if (stage == 2 && nValue.trim() != "") {
                                 //20211129 정연호 추가
@@ -923,11 +923,11 @@
                         }
                     });
                     if (chkCnt == 0) {
-                        alert("삭제할 대상을 체크 하세요.");
+                        alert("삭제할 대상을 체크해주세요.");
                         return;
                     }
                     if (chkDelResn > 0) {
-                        alert("삭제할 대상에 삭제이유를 입력하세요.");
+                        alert("삭제할 대상에 삭제이유를 입력해주세요.");
                         myGrid.selectCell(myGrid.getRowIndex(delResnRowId), myGrid.getColIndexById("delResn"), true, true);
                         return;
                     }
@@ -1013,12 +1013,12 @@
                 },
                 dlvyCnfmDtBtn: function () {	//배송일확정 버튼을 누르면 그 배송확정일을 저장한다
                     if (!$("#tblSoMId").val()) {
-                        alert("조회를 하세요");
+                        alert("조회를해주세요");
                         return;
                     }
 
                     if (!$("#dlvyCnfmDt").val()) {
-                        alert("배송확정일을 입력하세요");
+                        alert("배송확정일을 입력해주세요");
                         return;
                     }
 
@@ -1103,7 +1103,7 @@
 
                     });
                     if (!prodCdList || !qtyList) {
-                        alert("제품정보 그리드를 확인하세요.(품목, 수량)")
+                        alert("제품정보 그리드를 확인해주세요.(품목, 수량)")
                         myCalendar2.hide();
                         return false;
                     }
@@ -1840,7 +1840,7 @@
                         success: function (res) {
                             if (res) {
                                 if (res.rtnYn == "Y") {
-                                    alert("주문정보 변경 성공 - 변경내용을 꼭 확인하세요.")
+                                    alert("주문정보 변경 성공 - 변경내용을 꼭 확인해주세요.")
                                     $(top.document).find('#loader').hide();
 
                                     //주문헤더 다시 조회함
@@ -1864,7 +1864,7 @@
                     myGrid.selectRow(0);
 
                     if (myGrid.getRowsNum() == 0) {
-                        alert("조회를 하세요.");
+                        alert("조회를해주세요.");
                         return;
                     }
 
@@ -1932,20 +1932,20 @@
                     });
                     //
                     if (errRefSoNoCnt != 0) {
-                        alert("제품정보의 고객사주문번호를 확인하세요.(필수)");
+                        alert("제품정보의 고객사주문번호를 확인해주세요.(필수)");
                         return;
                     }
                     if (errRcptCost != 0) {
-                        alert("제품정보의 착불비를 확인하세요.\n빈칸 안됨. 숫자(0포함)만 가능");
+                        alert("제품정보의 착불비를 확인해주세요.\n빈칸 안됨. 숫자(0포함)만 가능");
                         return;
                     }
 
                     if (rIdProdCdErrCnt > 0) {
-                        alert("제품정보에 상품명을 입력하세요");
+                        alert("제품정보에 상품명을 입력해주세요");
                         return;
                     }
                     if (rIdrIdQty > 0) {
-                        alert("제품정보에 수량을 입력하세요");
+                        alert("제품정보에 수량을 입력해주세요");
                         return;
                     }
 
@@ -1990,7 +1990,7 @@
 
                                 if (res.rtnYn == "Y") {
 
-                                    //alert("품목수정 성공 [오더번호 : " +res.soNo+ "]\n    ㄴ> 반드시 다시 조회하여 확인하세요.")
+                                    //alert("품목수정 성공 [오더번호 : " +res.soNo+ "]\n    ㄴ> 반드시 다시 조회하여 확인해주세요.")
                                     alert("품목수정 성공 [오더번호 : " + res.soNo + "]")
                                     $(top.document).find('#loader').hide();
                                     //parent.myWins.window('erp101001p3').close();	//팝업창 닫기
@@ -2018,21 +2018,21 @@
                     }
 
                     if ($("#cnslTblSoMId").val().trim().length == 0) {
-                        alert("주문헤더 고유ID가 없습니다.\n조회를 하세요");
+                        alert("주문헤더 고유ID가 없습니다.\n조회를해주세요");
                         return;
                     }
                     if ($("#cnslSoNo").val().trim().length == 0) {
-                        alert("AL 오더가 없습니다.\n조회를 하세요");
+                        alert("AL 오더가 없습니다.\n조회를해주세요");
                         return;
                     }
 
                     if ($("#cnslEr").val().trim().length == 0) {
-                        alert("상담사 이름을 확인하세요");
+                        alert("상담사 이름을 확인해주세요");
                         return;
                     }
 
                     if ($("#cnslTxt").val().trim().length == 0) {
-                        alert("상담내역을 입력하세요");
+                        alert("상담내역을 입력해주세요");
                         return;
                     }
 
@@ -2080,7 +2080,7 @@
 
                             //배송확정일
                             if (!$("#dlvyCnfmDt").val()) {
-                                chkValMsg = chkValMsg + "배송확정일을 입력하세요\n";
+                                chkValMsg = chkValMsg + "배송확정일을 입력해주세요\n";
                                 rtnVal = false;
                             }
 

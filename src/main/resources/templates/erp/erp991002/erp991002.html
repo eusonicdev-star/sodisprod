@@ -33,7 +33,7 @@
 			winOpen: {
 				grntAdd: function () {	//권한그룹 추가 window open
 					if (!myComboCmpyCd.getSelectedValue()) {
-						alert("회사를 선택하세요");
+						alert("회사를 선택해주세요");
 						return false;
 					}
 
@@ -241,14 +241,14 @@
 					grntUpdt: function () {		//권한그룹 일괄적용버튼
 
 						if (!myGrid.getRowsNum()) {
-							alert("조회 수행하세요.");
+							alert("조회 수행해주세요.");
 							return false;
 						}
 
 
 						var myGridData = get_cud_json(myGrid);
 						if (myGridData.length == 0) {
-							alert("권한변경을 수행하세요.");
+							alert("권한변경을 수행해주세요.");
 							return false;
 						}
 
@@ -279,7 +279,7 @@
 						chkValMsg = "";	//메세지 초기화
 						var rtnVal = true;
 						if (!myComboSysCd.getSelectedValue()) {
-							chkValMsg = chkValMsg + "시스템을 선택하세요\n";
+							chkValMsg = chkValMsg + "시스템을 선택해주세요\n";
 							rtnVal = false;
 						}
 						return rtnVal;

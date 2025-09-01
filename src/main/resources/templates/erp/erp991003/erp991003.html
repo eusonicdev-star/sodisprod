@@ -250,7 +250,7 @@
                 history: function () {	//이력조회버튼
 
                     if (!myGrid.getSelectedRowId()) {
-                        alert("한 줄을 선택하세요");
+                        alert("한 줄을 선택해주세요");
                         return;
                     }
                     var selectRowData = myGrid.getRowData(myGrid.getSelectedRowId());
@@ -274,7 +274,7 @@
                         var rtnVal = true;
 
                         /* if(!myComboCmpyCd.getSelectedValue()){
-                            chkValMsg = chkValMsg + "회사를 선택하세요\n";
+                            chkValMsg = chkValMsg + "회사를 선택해주세요\n";
                             rtnVal = false;
                         } */
                         return rtnVal;
@@ -441,7 +441,7 @@
                                onclick="fnObj.winOpen.save('INS','')" value="등록">
                     <span class="item-data">
                         <input id="btnExcelDown" class="action-button" type="button"
-                               onclick="if(myGrid.getRowsNum() === 0){alert('조회를 하세요.');return;} exportExcel(); "
+                               onclick="if(myGrid.getRowsNum() === 0){alert('조회를해주세요.');return;} exportExcel(); "
                                value="엑셀 다운로드">
                     </span>
                     <span class="item-data">

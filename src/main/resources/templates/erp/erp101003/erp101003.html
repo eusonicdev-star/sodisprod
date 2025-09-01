@@ -221,7 +221,7 @@
                     });
                     myComboDcCd.attachEvent("onCheck", function (value, text) {
 
-                        if (!value)		//체크를 한 것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+                        if (!value)		//체크를 한 것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
                         {
                             if (myComboDcCd.isChecked(0)) {
 
@@ -299,7 +299,7 @@
                     });
                     myComboSoType.attachEvent("onCheck", function (value, text) {
 
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
                         {
                             if (myComboSoType.isChecked(0)) {
 
@@ -376,7 +376,7 @@
                     });
                     myComboSoStat.attachEvent("onCheck", function (value, text) {
 
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
                         {
                             if (myComboSoStat.isChecked(0)) {
 
@@ -515,7 +515,7 @@
                     });
                     myComboInstCapaCtgr.attachEvent("onCheck", function (value, text) {
 
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
                         {
                             if (myComboInstCapaCtgr.isChecked(0)) {
                                 //console.log("전체 에 체크를 했을때");
@@ -761,7 +761,7 @@
                     });
 
                     if (!prodCdList || !qtyList) {
-                        alert("제품정보 그리드를 확인하세요.(품목, 수량)")
+                        alert("제품정보 그리드를 확인해주세요.(품목, 수량)")
                         myCalendar2.hide();
                         return false;
                     }
@@ -897,7 +897,7 @@
                     }
 
                     if (!$("#delResn").val().trim()) {
-                        alert("삭제사유를 입력하세요");
+                        alert("삭제사유를 입력해주세요");
                         return;
                     }
                     var chkVal = 0;
@@ -1338,15 +1338,15 @@
                             }
 
                             if (!myComboDtType.getSelectedValue()) {
-                                chkValMsg = chkValMsg + "달력유형을 선택하세요\n";
+                                chkValMsg = chkValMsg + "달력유형을 선택해주세요\n";
                                 rtnVal = false;
                             }
                             if (!$("#dateFrom").val()) {
-                                chkValMsg = chkValMsg + "검색시작일을 입력하세요\n";
+                                chkValMsg = chkValMsg + "검색시작일을 입력해주세요\n";
                                 rtnVal = false;
                             }
                             if (!$("#dateTo").val()) {
-                                chkValMsg = chkValMsg + "검색종료일을 입력하세요\n";
+                                chkValMsg = chkValMsg + "검색종료일을 입력해주세요\n";
                                 rtnVal = false;
                             }
 
@@ -1420,57 +1420,57 @@
                                 !$("input[id=chkBoxDlvyStatCd]:radio").is(":checked") &&
                                 !$("input[id=chkBoxDlvyCmplDt]:radio").is(":checked") &&
                                 !$("input[id=chkBoxDlvyRqstMsg]:radio").is(":checked")) {
-                                chkValMsg = chkValMsg + "일괄변경 중 최소 하나는 선택하세요\n";
+                                chkValMsg = chkValMsg + "일괄변경 중 최소 하나는 선택해주세요\n";
                                 rtnVal = false;
                             }
 
 
                             //체크를 한 상태인데 콤보목록을 선택하지 않았을때
                             if ($("input[id=chkBoxSoStat]:radio").is(":checked") && !myComboChkSoStat.getSelectedValue()) {
-                                chkValMsg = chkValMsg + "주문상태를 선택하세요\n";
+                                chkValMsg = chkValMsg + "주문상태를 선택해주세요\n";
                                 rtnVal = false;
                             }
 
                             //20211226 정연호 추가. 체크를 한 상태인데 콤보목록을 선택하지 않았을때
                             if ($("input[id=chkBoxSoType]:radio").is(":checked") && !myComboChkSoType.getSelectedValue()) {
-                                chkValMsg = chkValMsg + "주문유형을 선택하세요\n";
+                                chkValMsg = chkValMsg + "주문유형을 선택해주세요\n";
                                 rtnVal = false;
                             }
 
 
                             //체크를 한 상태인데 콤보목록을 선택하지 않았을때
                             if ($("input[id=chkBoxDcCd]:radio").is(":checked") && !myComboChkDcCd.getSelectedValue()) {
-                                chkValMsg = chkValMsg + "물류센터를 선택하세요\n";
+                                chkValMsg = chkValMsg + "물류센터를 선택해주세요\n";
                                 rtnVal = false;
                             }
                             if ($("input[id=chkBoxDlvyCnfmDt]:radio").is(":checked") && !$("#chkDlvyCnfmDt").val()) {
-                                chkValMsg = chkValMsg + "배송확정일을 입력하세요\n";
+                                chkValMsg = chkValMsg + "배송확정일을 입력해주세요\n";
                                 rtnVal = false;
                             }
 
 
                             //일괄변경의 공장출고일
                             if ($("input[id=chkBoxGiLiftDt]:radio").is(":checked") && !$("#chkGiLiftDt").val()) {
-                                chkValMsg = chkValMsg + "공장출고일을 입력하세요\n";
+                                chkValMsg = chkValMsg + "공장출고일을 입력해주세요\n";
                                 rtnVal = false;
                             }
 
                             //일괄변경의 배송상태
                             if ($("input[id=chkBoxDlvyStatCd]:radio").is(":checked") && !myComboChkDlvyStatCd.getSelectedValue()) {
-                                chkValMsg = chkValMsg + "배송상태를 선택하세요\n";
+                                chkValMsg = chkValMsg + "배송상태를 선택해주세요\n";
                                 rtnVal = false;
                             }
 
                             //일괄변경의 배송완료일
                             if ($("input[id=chkBoxDlvyCmplDt]:radio").is(":checked") && !$("#chkDlvyCmplDt").val()) {
-                                chkValMsg = chkValMsg + "배송완료일을 입력하세요\n";
+                                chkValMsg = chkValMsg + "배송완료일을 입력해주세요\n";
                                 rtnVal = false;
                             }
 
 
                             //일괄변경의 배송완료일
                             if ($("input[id=chkBoxDlvyRqstMsg]:radio").is(":checked") && !$("#chkDlvyRqstMsg").val()) {
-                                chkValMsg = chkValMsg + "배송요청메세지를 입력하세요\n";
+                                chkValMsg = chkValMsg + "배송요청메세지를 입력해주세요\n";
                                 rtnVal = false;
                             }
 
@@ -1634,7 +1634,7 @@
 
         function excelDn() {
             if (!myGrid.getRowsNum()) {
-                alert("엑셀다운로드 대상이 없습니다.\n조회를 하세요");
+                alert("엑셀다운로드 대상이 없습니다.\n조회를해주세요");
                 return;
             }
             exportExcel();

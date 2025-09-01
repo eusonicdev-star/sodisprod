@@ -139,7 +139,7 @@
 							<span>저장</span>
 						</div>
 					</label>
-					<input type="text" id="loginId" name="loginId" class="form-control" placeholder="아이디를 입력하세요" />
+					<input type="text" id="loginId" name="loginId" class="form-control" placeholder="아이디를 입력해주세요" />
 				</div>
 
 				<div class="form-group">
@@ -151,13 +151,13 @@
 						</div>
 					</label>
 					<input type="password" id="password" name="password" class="form-control"
-						placeholder="비밀번호를 입력하세요" />
+						placeholder="비밀번호를 입력해주세요" />
 				</div>
 
 				<div th:if="${param.error}" class="error-message">
 					<p>
-						<span th:if="${param.error.toString() == 'cmpyCd'}" th:text="'선택한 회사를 확인하세요.'"></span>
-						<span th:if="${param.error.toString() == 'true'}" th:text="'아이디 또는 암호를 확인하세요.'"></span>
+						<span th:if="${param.error.toString() == 'cmpyCd'}" th:text="'선택한 회사를 확인해주세요.'"></span>
+						<span th:if="${param.error.toString() == 'true'}" th:text="'아이디 또는 암호를 확인해주세요.'"></span>
 						<span th:if="${param.error.toString() == 'loginH'}" th:text="'로그인과정중 문제가 발생하였습니다.'"></span>
 						<span th:if="${param.error.toString() == 'userInfo'}" th:text="'사용자정보를 찾을수 없습니다.'"></span>
 					</p>

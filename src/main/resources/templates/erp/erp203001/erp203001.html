@@ -253,7 +253,7 @@
                     });
                     myComboInstCapaCtgr.attachEvent("onCheck", function (value, text) {
 
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한것이다
                         {
                             if (myComboInstCapaCtgr.isChecked(0)) {
 
@@ -338,7 +338,7 @@
                     });
                     myComboInstCapaType.attachEvent("onCheck", function (value, text) {
 
-                        if (!value) {		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+                        if (!value) {		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한것이다
                             if (myComboInstCapaType.isChecked(0)) {
                                 var c = 0;
                                 for (var i = 1; i < myComboInstCapaType.getOptionsCount(); i++) {
@@ -424,7 +424,7 @@
                     });
                     myComboZone.attachEvent("onCheck", function (value, text) {
 
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한것이다
                         {
                             if (myComboZone.isChecked(0)) {
                                 var c = 0;
@@ -544,7 +544,7 @@
 
                     });
                     myComboSeatType.attachEvent("onCheck", function (value, text) {
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한것이다
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한것이다
                         {
                             if (myComboSeatType.isChecked(0)) {
                                 var c = 0;
@@ -1951,7 +1951,7 @@
 
                     var checked = myGrid2.getCheckedRows(myGrid2.getColIndexById("chk"));
                     if (!checked) {
-                        alert("삭제대상을 체크하세요");
+                        alert("삭제대상을 체크해주세요");
                         return;
                     }
                     myGrid2.forEachRow(function (rId) {
@@ -2109,7 +2109,7 @@
 
 
                     if (cnt == 0) {
-                        alert("팔렛트초기화 대상을 체크 하세요");
+                        alert("팔렛트초기화 대상을 체크해주세요");
                         return;
                     }
                     if (!confirm(cnt + "건을 팔렛트초기화 하시겠습니까?")) {
@@ -2340,7 +2340,7 @@
                 update: function () {	//저장 버튼
 
                     if (myGrid2.getRowsNum() == 0) {
-                        alert("팔렛트를 지정할 데이터를 추가하세요.")
+                        alert("팔렛트를 지정할 데이터를 추가해주세요.")
                         return;
                     }
                     //아래그리드의 팔렛트 넘버 필수
@@ -2349,7 +2349,7 @@
                         return;
                     }
                     if (!$("#tblUserMId").val().trim()) {
-                        alert("시공기사를 검색하세요.");
+                        alert("시공기사를 검색해주세요.");
                         return;
                     }
                     var updateData = [];
@@ -2408,20 +2408,20 @@
                         if (chkGubn == "search")	//조회 검색 조건
                         {
                             if (!myComboCmpyCd.getSelectedValue()) {
-                                chkValMsg = chkValMsg + "회사코드를 선택하세요\n";
+                                chkValMsg = chkValMsg + "회사코드를 선택해주세요\n";
                                 rtnVal = false;
                             }
 
 
                             if (!$("#dateFrom").val()) {
-                                chkValMsg = chkValMsg + "날짜를 입력하세요.\n";
+                                chkValMsg = chkValMsg + "날짜를 입력해주세요.\n";
                             }
 
 
-                            //물류센터를 선택하세요
+                            //물류센터를 선택해주세요
 
                             if (!myComboDcCd.getSelectedValue().trim()) {
-                                chkValMsg = chkValMsg + "물류센터를 선택하세요\n";
+                                chkValMsg = chkValMsg + "물류센터를 선택해주세요\n";
                                 rtnVal = false;
                             }
 

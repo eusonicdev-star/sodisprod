@@ -248,7 +248,7 @@
                 exclUpload: function () {	//일괄 업로드
 
                     if (!myGrid.getRowsNum()) {
-                        alert("일괄 등록할 엑셀파일을 선택하세요.");
+                        alert("일괄 등록할 엑셀파일을 선택해주세요.");
                         return;
                     }
 
@@ -709,11 +709,11 @@
                                 rtnVal = false;
                             }
                             if (!$("#srchCode").val()) {
-                                chkValMsg = chkValMsg + "화주사 코드가 없습니다. 화주사를 검색하세요\n";
+                                chkValMsg = chkValMsg + "화주사 코드가 없습니다. 화주사를 검색해주세요\n";
                                 rtnVal = false;
                             }
                             if (!$("#srchName").val()) {
-                                chkValMsg = chkValMsg + "화주사 명칭이 없습니다. 화주사를 검색하세요\n";
+                                chkValMsg = chkValMsg + "화주사 명칭이 없습니다. 화주사를 검색해주세요\n";
                                 rtnVal = false;
                             }
 
@@ -951,7 +951,7 @@
         //엑셀파일 읽어 json으로 변경하기
         function readExcel(event) {
             if (!$('#srchCode').val() || !$('#srchName').val()) {
-                alert('화주사를 검색하세요');
+                alert('화주사를 검색해주세요');
                 this.value = null;
                 $(top.document).find('#loader').hide();
                 return;
@@ -988,11 +988,11 @@
                 return;
             }
             if (!$("#srchCode").val()) {
-                alert("화주사코드가 없습니다. 화주사를 검색하세요");
+                alert("화주사코드가 없습니다. 화주사를 검색해주세요");
                 return;
             }
             if (!$("#srchName").val()) {
-                alert("화주사명칭이 없습니다. 화주사를 검색하세요");
+                alert("화주사명칭이 없습니다. 화주사를 검색해주세요");
                 return;
             }
 
@@ -1207,7 +1207,7 @@
 
 					<span class="item-data">
 						<input id="fileUpload" type="file" disabled
-                               onclick="this.value=null;myGrid.clearAll(false);if(!$('#srchCode').val() || !$('#srchName').val()){alert('화주사를 검색하세요');return;}"
+                               onclick="this.value=null;myGrid.clearAll(false);if(!$('#srchCode').val() || !$('#srchName').val()){alert('화주사를 검색해주세요');return;}"
                                onchange="toastr.info('엑셀파일 읽는중'); setTimeout(function() {readExcel(event);}, 300);"
                                accept=".xls,.xlsx" class="action-button"/>
 					</span>

@@ -155,7 +155,7 @@
 					});
 					mycomboClndWeekCd.attachEvent("onCheck", function (value, text) {
 
-						if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+						if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
 						{
 							if (mycomboClndWeekCd.isChecked(0)) {
 								//console.log("전체 에 체크를 했을때");	
@@ -474,27 +474,27 @@
 							}
 
 							if (!myComboClndType.getSelectedValue()) {
-								chkValMsg = chkValMsg + "달력유형을 선택하세요\n";
+								chkValMsg = chkValMsg + "달력유형을 선택해주세요\n";
 								rtnVal = false;
 							}
 
 
 							if (!$("#clndYear").val()) {
-								chkValMsg = chkValMsg + "년도를 입력하세요\n";
+								chkValMsg = chkValMsg + "년도를 입력해주세요\n";
 								rtnVal = false;
 							}
 							if ($("#clndYear").val().length != 4) {
-								chkValMsg = chkValMsg + "숫자 4자리를 입력하세요\n";
+								chkValMsg = chkValMsg + "숫자 4자리를 입력해주세요\n";
 								rtnVal = false;
 							}
 
 
 							if (!$("#dateFrom").val()) {
-								chkValMsg = chkValMsg + "검색시작일을 입력하세요\n";
+								chkValMsg = chkValMsg + "검색시작일을 입력해주세요\n";
 								rtnVal = false;
 							}
 							if (!$("#dateTo").val()) {
-								chkValMsg = chkValMsg + "검색종료일을 입력하세요\n";
+								chkValMsg = chkValMsg + "검색종료일을 입력해주세요\n";
 								rtnVal = false;
 							}
 							if ($("#dateFrom").val() && $("#dateTo").val()) {
@@ -510,7 +510,7 @@
 						}
 						if (chkGubn == "mappingBtn") {
 							if (myGrid.getRowsNum() == 0) {
-								chkValMsg = chkValMsg + "조회를 하세요\n";
+								chkValMsg = chkValMsg + "조회를해주세요\n";
 								rtnVal = false;
 							}
 
@@ -520,12 +520,12 @@
 							}
 
 							if (!myComboZoneType2.getSelectedValue()) {
-								chkValMsg = chkValMsg + "권역맵팽의 권역유형을 선택하세요\n";
+								chkValMsg = chkValMsg + "권역맵팽의 권역유형을 선택해주세요\n";
 								rtnVal = false;
 							}
 
 							if (!myComboZoneCd2.getSelectedValue()) {
-								chkValMsg = chkValMsg + "권역맵팽의 권역을 선택하세요\n";
+								chkValMsg = chkValMsg + "권역맵팽의 권역을 선택해주세요\n";
 								rtnVal = false;
 							}
 
@@ -655,7 +655,7 @@
 
 					<span class="item-data">
 						<input id="btnExcelDown" class="action-button success" type="button"
-							onclick="if(myGrid.getRowsNum() == 0){alert('조회를 하세요.');return;} exportExcel(); "
+							onclick="if(myGrid.getRowsNum() == 0){alert('조회를해주세요.');return;} exportExcel(); "
 							value="엑셀 다운로드">
 					</span>
 				</span>

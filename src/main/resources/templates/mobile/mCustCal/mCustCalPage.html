@@ -357,7 +357,7 @@
                 selectDate: function () {	//배송일 선택하기 버튼을 누르면
 
                     if ($("#selDate").text().trim() == "" || $("#selCapaId").text().trim() == "") {
-                        action_popup.alert("선택한 배송일이 없습니다.<br>배송가능한 날짜 중에서 배송일을 선택하세요", function (res) {
+                        action_popup.alert("선택한 배송일이 없습니다.<br>배송가능한 날짜 중에서 배송일을 선택해주세요", function (res) {
                         })	//20230330 정연호 수정. alert를 모달로 변경
                         return;
                     }
@@ -378,7 +378,7 @@
 
                 originalDate: function () {	//지정된 배송일에 받기
                     if ($("#dlvyAsgnDtText").text().trim() == "없음" || !$("#dlvyAsgnDtText").text().trim()) {
-                        action_popup.alert("지정된 배송일이 없습니다.<br>배송가능한 날짜 중에서 배송일을 선택하세요", function (res) {
+                        action_popup.alert("지정된 배송일이 없습니다.<br>배송가능한 날짜 중에서 배송일을 선택해주세요", function (res) {
                         })	//20230330 정연호 수정. alert를 모달로 변경
                         return;
                     }
@@ -634,7 +634,7 @@
             <!-- 20230330 정연호 width를 300px 에서 280px로 변경  -->
             <button id="selectDate" onclick="fnObj.searchOpen.selectDate();"
                     style="width: 280px; height: 40px; color: white; font-size: 14px; font-weight: bold; background-color: #3079fb; border-radius: 10px; border: 1px solid blue;">
-                선택한 배송일 <font size='4'>(선택하세요)</font> 에 받기
+                선택한 배송일 <font size='4'>(선택해주세요)</font> 에 받기
             </button>
 
             <br> <br>

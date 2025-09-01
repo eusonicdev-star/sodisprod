@@ -273,11 +273,11 @@
                         var rtnVal = true;
                         if (chkGubn == "commSave") {
                             if (!myComboCmpyCd.getSelectedValue()) {
-                                chkValMsg = chkValMsg + "회사코드를 선택하세요\n";
+                                chkValMsg = chkValMsg + "회사코드를 선택해주세요\n";
                                 rtnVal = false;
                             }
                             if (!myComboTmpType.getSelectedValue()) {
-                                chkValMsg = chkValMsg + "탬플릿 코드를 선택하세요\n";
+                                chkValMsg = chkValMsg + "탬플릿 코드를 선택해주세요\n";
                                 rtnVal = false;
                             }
 
@@ -295,7 +295,7 @@
                                 rtnVal = false;
                             } */
                             if (!myComboDtCalType.getSelectedValue()) {
-                                chkValMsg = chkValMsg + "날짜계산을 선택하세요\n";
+                                chkValMsg = chkValMsg + "날짜계산을 선택해주세요\n";
                                 rtnVal = false;
                             }
                             if (!$("#dtCalDay").val()) {
@@ -308,12 +308,12 @@
                             }
 
                             if ($("#sendTime").val().trim().length != 2) {
-                                chkValMsg = chkValMsg + "전송시간 2자리를 입력하세요\n";
+                                chkValMsg = chkValMsg + "전송시간 2자리를 입력해주세요\n";
                                 rtnVal = false;
                             }
 
                             if (parseInt($("#sendTime").val()) == 24) {
-                                chkValMsg = chkValMsg + "전송시간을 00시로 입력하세요\n";
+                                chkValMsg = chkValMsg + "전송시간을 00시로 입력해주세요\n";
                                 rtnVal = false;
                             }
                         }

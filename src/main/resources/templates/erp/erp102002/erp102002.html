@@ -32,11 +32,11 @@
 
                 scdlPop: function () {
                     if (myGrid.getRowsNum() == 0) {
-                        alert("조회를 하세요");
+                        alert("조회를해주세요");
                         return;
                     }
                     if (!myGrid.getSelectedRowId()) {
-                        alert("원하는 행을 선택하세요");
+                        alert("원하는 행을 선택해주세요");
                         return;
                     }
 
@@ -76,7 +76,7 @@
                 save: function (saveGubn, tblAlrmScdlId) {	//사용자 추가 팝업
                     /* 	if(!myGrid.getSelectedRowId())
                         {
-                            alert("마스터 공통코드를 선택 하세요");
+                            alert("마스터 공통코드를 선택해주세요");
                             return;
                         } */
                     var selData;
@@ -302,13 +302,13 @@
                     }
                     /* if(myGrid.getRowsNum() == 0 )
                     {
-                        alert("조회를 하세요");
+                        alert("조회를해주세요");
                         return;
                     }
 
                     if(!myGrid.getSelectedRowId())
                     {
-                        alert("로우 1줄을 선택하세요");
+                        alert("로우 1줄을 선택해주세요");
                         return;
                     } */
 
@@ -485,7 +485,7 @@
                         var rtnVal = true;
                         if (chkGubn == "search") {
                             if (!myComboCmpyCd.getSelectedValue()) {
-                                chkValMsg = chkValMsg + "회사를 선택하세요\n";
+                                chkValMsg = chkValMsg + "회사를 선택해주세요\n";
                                 rtnVal = false;
                             }
                         }

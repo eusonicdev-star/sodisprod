@@ -279,7 +279,7 @@
                             }
 
                             if (stage == 2 && isNaN(nValue)) {
-                                alert("숫자만 입력하세요");
+                                alert("숫자만 입력해주세요");
 
                                 return false;	//입력한걸 취소시킨다
                             } else if (stage == 2 && !isNaN(nValue) && nValue != oValue) {
@@ -303,7 +303,7 @@
                             }
 
                             if (stage == 2 && (nValue != "Y" && nValue != "N" && nValue != "y" && nValue != "n")) {
-                                alert("Y/N 중 하나만 입력하세요");
+                                alert("Y/N 중 하나만 입력해주세요");
 
                                 return false;	//입력한걸 취소시킨다
                             } else if (stage == 2 && (nValue == "Y" || nValue == "N" || nValue == "y" || nValue == "n") && nValue != oValue) {
@@ -439,7 +439,7 @@
 
                     //조건1. 알림톡발송여부가 Y 인데 사람수가 0 일때 저장못함
                     if (alrmTalkYnChk == "Y" && alrmTalkynCnt == 0) {
-                        alert("알림톡발송이 사용 이라면 알림톡 수신자를 입력하세요");
+                        alert("알림톡발송이 사용 이라면 알림톡 수신자를 입력해주세요");
                         return;
                     }
                     //조건2. 알림톡 발송여부가 N 인데 사람수가 있을때 그럼에도 불구하고 진짜 저장할꺼냐고 물어봄
@@ -573,7 +573,7 @@
                             } */
                             /*
                             if(!$("#bossTel").val() && !$("#officeTel").val()){
-                                chkValMsg = chkValMsg + "대표자 일반전화,휴대전화 모두 없습니다.\n둘 중 하나는 입력하세요.\n";
+                                chkValMsg = chkValMsg + "대표자 일반전화,휴대전화 모두 없습니다.\n둘 중 하나는 입력해주세요.\n";
                                 rtnVal = false;
                             } */
 
@@ -610,7 +610,7 @@
                             }
                             */
                             /* if(!$("#mngeTel").val() && !$("#mngeHp").val()){
-                                chkValMsg = chkValMsg + "담당자 일반전화,휴대전화 모두 없습니다.\n둘 중 하나는 입력하세요.\n";
+                                chkValMsg = chkValMsg + "담당자 일반전화,휴대전화 모두 없습니다.\n둘 중 하나는 입력해주세요.\n";
                                 rtnVal = false;
                             }  */
 

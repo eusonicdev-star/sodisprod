@@ -262,11 +262,11 @@
                     if(myComboClndType.getSelectedValue()	==	"1")	//1 범위
                     {
                         if(!$("#dateFrom").val()){
-                            chkValMsg = chkValMsg + "시공시작일을 입력하세요.\n";
+                            chkValMsg = chkValMsg + "시공시작일을 입력해주세요.\n";
                             rtnVal = false;
                         }
                         if(!$("#dateTo").val()){
-                            chkValMsg = chkValMsg + "시공종료일을 입력하세요.\n";
+                            chkValMsg = chkValMsg + "시공종료일을 입력해주세요.\n";
                             rtnVal = false;
                         }
 
@@ -296,7 +296,7 @@
                     else if(myComboClndType.getSelectedValue()	==	"2")	//2 단일
                     {
                         if(!$("#date").val()){
-                            chkValMsg = chkValMsg + "시공일을 입력하세요..\n";
+                            chkValMsg = chkValMsg + "시공일을 입력해주세요..\n";
                             rtnVal = false;
                         }
 
@@ -305,7 +305,7 @@
                     {
                         if(!$("#dateFromTo").val())
                         {
-                            chkValMsg = chkValMsg + "시공일을 입력하세요...\n";
+                            chkValMsg = chkValMsg + "시공일을 입력해주세요...\n";
                             rtnVal = false;
                         }
                     }
@@ -328,18 +328,18 @@
 
                     if(!myComboInstCapaCtgr.getSelectedValue())	//시공카테고리 선택된것 없을때
                     {
-                        chkValMsg = chkValMsg + "시공카테고리를 선택하세요.\n";
+                        chkValMsg = chkValMsg + "시공카테고리를 선택해주세요.\n";
                         rtnVal = false;
                     }
                     if(!myComboInstCapaType.getSelectedValue())	//시공유형 선택된것 없을때
                     {
-                        chkValMsg = chkValMsg + "시공유형 선택하세요.\n";
+                        chkValMsg = chkValMsg + "시공유형 선택해주세요.\n";
                         rtnVal = false;
                     }
 
                     if(!myComboZoneType.getSelectedValue())	//권역유형 선택된것 없을때
                     {
-                        chkValMsg = chkValMsg + "권역유형을 선택하세요.\n";
+                        chkValMsg = chkValMsg + "권역유형을 선택해주세요.\n";
                         rtnVal = false;
                     }
 
@@ -349,7 +349,7 @@
                     var leftChecked=myGrid.getCheckedRows(myGrid.getColIndexById("chk"));
                     if(!leftChecked)
                     {
-                        chkValMsg = chkValMsg + "시공권역명에 체크를 하세요.\n";
+                        chkValMsg = chkValMsg + "시공권역명에 체크를해주세요.\n";
                         rtnVal = false;
                     }
 
@@ -357,19 +357,19 @@
                     var rightChecked=myGrid2.getCheckedRows(myGrid2.getColIndexById("chk"));
                     if(!rightChecked)
                     {
-                        chkValMsg = chkValMsg + "시공좌석유형에 체크를 하세요.\n";
+                        chkValMsg = chkValMsg + "시공좌석유형에 체크를해주세요.\n";
                         rtnVal = false;
                     }
 
                     if(!$("#crtCapaCnt").val())
                     {
-                        chkValMsg = chkValMsg + "생성좌석수를 입력하세요.\n";
+                        chkValMsg = chkValMsg + "생성좌석수를 입력해주세요.\n";
                         rtnVal = false;
                     }
                     if(isNaN($("#crtCapaCnt").val()))	//숫자가아니면 true
                     {
 
-                        chkValMsg = chkValMsg + "생성좌석수에 숫자를 입력하세요.\n";
+                        chkValMsg = chkValMsg + "생성좌석수에 숫자를 입력해주세요.\n";
                         rtnVal = false;
                     }
 

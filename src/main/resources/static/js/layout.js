@@ -354,7 +354,7 @@ class LayoutManager {
     const ids = myTabbar.getAllTabs();
 
     if (ids.length >= 15) {
-      alert("창을 더 열 수 없습니다.(최대 15개)");
+      alert("더 이상 창을 열 수 없습니다. (최대 15개)");
       return;
     }
 

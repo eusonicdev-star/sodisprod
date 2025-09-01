@@ -152,7 +152,7 @@
                     });
                     myComboDcCd.attachEvent("onCheck", function (value, text) {
 
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
                         {
                             if (myComboDcCd.isChecked(0)) {
 
@@ -225,7 +225,7 @@
                     });
                     myComboSoType.attachEvent("onCheck", function (value, text) {
 
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
                         {
                             if (myComboSoType.isChecked(0)) {
                                 var c = 0;
@@ -302,7 +302,7 @@
                     });
                     myComboSoStat.attachEvent("onCheck", function (value, text) {
 
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
                         {
                             if (myComboSoStat.isChecked(0)) {
                                 //console.log("전체 에 체크를 했을때");
@@ -391,7 +391,7 @@
                     });
                     myComboInstCapaCtgr.attachEvent("onCheck", function (value, text) {
 
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
                         {
                             if (myComboInstCapaCtgr.isChecked(0)) {
                                 //console.log("전체 에 체크를 했을때");
@@ -895,15 +895,15 @@
                             }
 
                             if (!myComboDtType.getSelectedValue()) {
-                                chkValMsg = chkValMsg + "달력유형을 선택하세요\n";
+                                chkValMsg = chkValMsg + "달력유형을 선택해주세요\n";
                                 rtnVal = false;
                             }
                             if (!$("#dateFrom").val()) {
-                                chkValMsg = chkValMsg + "검색시작일을 입력하세요\n";
+                                chkValMsg = chkValMsg + "검색시작일을 입력해주세요\n";
                                 rtnVal = false;
                             }
                             if (!$("#dateTo").val()) {
-                                chkValMsg = chkValMsg + "검색종료일을 입력하세요\n";
+                                chkValMsg = chkValMsg + "검색종료일을 입력해주세요\n";
                                 rtnVal = false;
                             }
 
@@ -1068,7 +1068,7 @@
 
         function excelDn() {
             if (!myGrid.getRowsNum()) {
-                alert("엑셀다운로드 대상이 없습니다.\n조회를 하세요");
+                alert("엑셀다운로드 대상이 없습니다.\n조회를해주세요");
                 return;
             }
             exportExcel();

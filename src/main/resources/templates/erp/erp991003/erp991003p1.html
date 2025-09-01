@@ -296,7 +296,7 @@
 
                 dupSearch: function () {	//아이디 중복확인하기
                     if (!$("#userId").val()) {
-                        alert("사용자ID를 입력하세요");
+                        alert("사용자ID를 입력해주세요");
                         return false;
                     }
                     if (id && id == $("#userId").val().trim()) {
@@ -465,17 +465,17 @@
                         if (chkGubn == "commSave") {
 
                             if ($("#userIdChk").val() != "Y") {
-                                chkValMsg = chkValMsg + "사용자ID 중복확인을 하세요\n"
+                                chkValMsg = chkValMsg + "사용자ID 중복확인을해주세요\n"
                                 return false;
                             }
 
                             if (sendObject.saveGubn == "INS") {
                                 if (!$("#userPw").val()) {
-                                    chkValMsg = chkValMsg + "암호를 입력 하세요\n"
+                                    chkValMsg = chkValMsg + "암호를 입력해주세요\n"
                                     return false;
                                 }
                                 if (!$("#userPwCf").val()) {
-                                    chkValMsg = chkValMsg + "암호확인을 입력 하세요\n"
+                                    chkValMsg = chkValMsg + "암호확인을 입력해주세요\n"
                                     return false;
                                 }
                                 if ($("#userPw").val() != $("#userPwCf").val()) {
@@ -487,7 +487,7 @@
 
 
                             if (!$("#userNm").val()) {
-                                chkValMsg = chkValMsg + "사용자명(이름)을 입력하세요\n";
+                                chkValMsg = chkValMsg + "사용자명(이름)을 입력해주세요\n";
                                 rtnVal = false;
                             }
 
@@ -495,7 +495,7 @@
 
 
                             if (!myComboUserGrd.getSelectedValue()) {
-                                chkValMsg = chkValMsg + "사용자구분을 선택하세요\n";
+                                chkValMsg = chkValMsg + "사용자구분을 선택해주세요\n";
                                 rtnVal = false;
                             }
 
@@ -527,11 +527,11 @@
 
 
                             /* if(!$("#deptNm").val()){
-                                chkValMsg = chkValMsg + "사용자부서를 입력하세요\n";
+                                chkValMsg = chkValMsg + "사용자부서를 입력해주세요\n";
                                 rtnVal = false;
                             } */
                             if (!myComboUserGrntCd.getSelectedValue()) {
-                                chkValMsg = chkValMsg + "ERP권한을 선택하세요\n";
+                                chkValMsg = chkValMsg + "ERP권한을 선택해주세요\n";
                                 rtnVal = false;
                             }
 
@@ -552,7 +552,7 @@
 
 
                             if (!$("#hp").val()) {
-                                chkValMsg = chkValMsg + "휴대전화를 입력하세요\n";
+                                chkValMsg = chkValMsg + "휴대전화를 입력해주세요\n";
                                 rtnVal = false;
                             }
 

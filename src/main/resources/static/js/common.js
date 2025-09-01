@@ -11,7 +11,7 @@ $.ajaxSetup({
   error: function (request, status, error) {
     $(top.document).find("#loader").hide();
     if (request.status == "403") {
-      alert("세션 종료 : " + request.status + "\n로그인을 다시하세요.");
+      alert("세션 종료 : " + request.status + "\n 다시 로그인하세요");
       location.href = "/exception";
     } else {
       alert(
@@ -395,7 +395,7 @@ dhtmlXCalendarObject.prototype.langData["ko"] = {
 //res to json (myGrid의 눈에 보이는 컬럼값에 해당하는것)
 function get_json_res(myGrid, res) {
   if (res == undefined || res == null || res.length <= 0) {
-    alert("조회를 하세요");
+    alert("데이터를 먼저 조회해주세요");
     return;
   }
 
@@ -429,7 +429,7 @@ function get_json_res(myGrid, res) {
 //res to json2 (myGrid의 눈에 보이는 컬럼값에 해당하는것. 2nd 라인에 컬럼명이 있을때)
 function get_json_res2(myGrid, res) {
   if (res == undefined || res == null || res.length <= 0) {
-    alert("조회를 하세요");
+    alert("데이터를 먼저 조회해주세요");
     return;
   }
 

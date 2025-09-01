@@ -352,18 +352,18 @@
 							if (ugc2 != "9999") {
 
 								if (!$("#srchCode").val()) {
-									chkValMsg = chkValMsg + "화주사코드가 없습니다.화주사를 검색하세요\n";
+									chkValMsg = chkValMsg + "화주사코드가 없습니다.화주사를 검색해주세요\n";
 									rtnVal = false;
 								}
 								if (!$("#srchName").val()) {
-									chkValMsg = chkValMsg + "화주사명칭이 없습니다.화주사를 검색하세요\n";
+									chkValMsg = chkValMsg + "화주사명칭이 없습니다.화주사를 검색해주세요\n";
 									rtnVal = false;
 								}
 
 							}
 
 							if (!myComboExclTmplType.getSelectedValue()) {
-								chkValMsg = chkValMsg + "양식구분을 선택하세요.\n";
+								chkValMsg = chkValMsg + "양식구분을 선택해주세요.\n";
 								rtnVal = false;
 							}
 						}
@@ -412,7 +412,7 @@
 		}
 		function exportExcel2() {
 			if (!myGrid.getRowsNum()) {
-				alert("조회를 하세요");
+				alert("조회를해주세요");
 				return;
 			}
 
@@ -519,7 +519,7 @@
 		function get_json_res_erp901006(myGrid, res) {
 
 			if (res == undefined || res == null || res.length <= 0) {
-				alert("조회를 하세요");
+				alert("조회를해주세요");
 				return;
 			}
 

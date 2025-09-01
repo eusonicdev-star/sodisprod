@@ -245,7 +245,7 @@
                     myGrid.attachEvent("onRowDblClicked", function (rId, cInd) {
 
                         if ($("#prntMtrlSrchYn").val() != "Y") {
-                            alert("상위상품을 조회 하세요.")
+                            alert("상위상품을 조회해주세요.")
                             return;
                         }
                         var myGridCmpyCd = myGrid.cellById(rId, myGrid.getColIndexById("cmpyCd")).getValue();
@@ -716,7 +716,7 @@
                         var rtnVal = true;
                         if (chkGubn == "commSave") {
                             if (myGrid2.getRowsNum() == 0) {
-                                chkValMsg = "조회를 하세요"
+                                chkValMsg = "조회를해주세요"
                                 rtnVal = false;
                                 return rtnVal;
                             }

@@ -180,7 +180,7 @@
 			    	});
 			    	myComboInstCapaCtgr.attachEvent("onCheck", function(value, text){
 
-						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
 						{
 							if(myComboInstCapaCtgr.isChecked(0))
 							{
@@ -272,7 +272,7 @@
 			    	});
 			    	myComboInstCapaType.attachEvent("onCheck", function(value, text){
 
-						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
 						{
 							if(myComboInstCapaType.isChecked(0))
 							{
@@ -383,7 +383,7 @@
 			    	});
 			    	myComboZone.attachEvent("onCheck", function(value, text){
 
-						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
 						{
 							if(myComboZone.isChecked(0))
 							{
@@ -475,7 +475,7 @@
 			    	});
 			    	mycomboClndWeekCd.attachEvent("onCheck", function(value, text){
 
-						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
 						{
 							if(mycomboClndWeekCd.isChecked(0))
 							{
@@ -582,7 +582,7 @@
 			    	});
 			    	myComboSeatType.attachEvent("onCheck", function(value, text){
 
-						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
 						{
 							if(myComboSeatType.isChecked(0))
 							{
@@ -847,7 +847,7 @@
 						}
 						
 						if(!myComboLoadComboType.getSelectedValue()){
-							chkValMsg = chkValMsg + "시공일유형을 선택하세요\n";
+							chkValMsg = chkValMsg + "시공일유형을 선택해주세요\n";
 							rtnVal = false;
 						}
 
@@ -856,11 +856,11 @@
 							
 						
 							if(!$("#dateFrom").val()){
-								chkValMsg = chkValMsg + "검색시작일을 입력하세요\n";
+								chkValMsg = chkValMsg + "검색시작일을 입력해주세요\n";
 								rtnVal = false;
 							}
 							if(!$("#dateTo").val()){
-								chkValMsg = chkValMsg + "검색종료일을 입력하세요\n";
+								chkValMsg = chkValMsg + "검색종료일을 입력해주세요\n";
 								rtnVal = false;
 							}
 				
@@ -893,7 +893,7 @@
 						
 							if(!$("#dateFromTo").val())
 							{
-								chkValMsg = chkValMsg + "날짜를 입력하세요.\n";
+								chkValMsg = chkValMsg + "날짜를 입력해주세요.\n";
 							}
 						}
 						
@@ -909,7 +909,7 @@
 			    		}
 		    			
 		    			if(a == 0){
-							chkValMsg = chkValMsg + "시공카테고리를 체크하세요\n";
+							chkValMsg = chkValMsg + "시공카테고리를 체크해주세요\n";
 							rtnVal = false;
 						}
 		    			
@@ -927,13 +927,13 @@
 			    		}
 		    			
 		    			if(b == 0){
-							chkValMsg = chkValMsg + "시공유형을 체크하세요\n";
+							chkValMsg = chkValMsg + "시공유형을 체크해주세요\n";
 							rtnVal = false;
 						} */
 		    			
 		    			/* //권역유형 선택여부 체크
 		    			if(!myComboZoneType.getSelectedValue()){
-							chkValMsg = chkValMsg + "권역유형을 선택하세요\n";
+							chkValMsg = chkValMsg + "권역유형을 선택해주세요\n";
 							rtnVal = false;
 						} */
 		    			
@@ -948,7 +948,7 @@
 			    		}
 		    			
 		    			if(d == 0){
-							chkValMsg = chkValMsg + "권역을 체크하세요\n";
+							chkValMsg = chkValMsg + "권역을 체크해주세요\n";
 							rtnVal = false;
 						} */
 		    			
@@ -964,7 +964,7 @@
 			    		}
 		    			
 		    			if(c == 0){
-							chkValMsg = chkValMsg + "요일을 체크하세요\n";
+							chkValMsg = chkValMsg + "요일을 체크해주세요\n";
 							rtnVal = false;
 						} */
 		    			
@@ -979,7 +979,7 @@
 			    		}
 		    			
 		    			if(s == 0){
-							chkValMsg = chkValMsg + "시공좌석분류를 체크하세요\n";
+							chkValMsg = chkValMsg + "시공좌석분류를 체크해주세요\n";
 							rtnVal = false;
 						} */
 		    			
@@ -987,12 +987,12 @@
 		    			
 						
 						/* if(!myComboSido.getSelectedValue()){
-							chkValMsg = chkValMsg + "시/도를 선택하세요\n";
+							chkValMsg = chkValMsg + "시/도를 선택해주세요\n";
 							rtnVal = false;
 						} */
 						/*
 						if(!myComboSigu.getSelectedValue()){
-							chkValMsg = chkValMsg + "구/군을 선택하세요\n";
+							chkValMsg = chkValMsg + "구/군을 선택해주세요\n";
 							rtnVal = false;
 						}
 						*/
@@ -1001,7 +1001,7 @@
 					{
 						if(myGrid.getRowsNum() == 0)
 						{
-							chkValMsg = chkValMsg + "조회를 하세요\n";
+							chkValMsg = chkValMsg + "조회를해주세요\n";
 							rtnVal = false;
 						}
 						
@@ -1011,12 +1011,12 @@
 						}
 						
 						if(!myComboZoneType2.getSelectedValue()){
-							chkValMsg = chkValMsg + "권역맵팽의 권역유형을 선택하세요\n";
+							chkValMsg = chkValMsg + "권역맵팽의 권역유형을 선택해주세요\n";
 							rtnVal = false;
 						}
 						
 						if(!myComboZoneCd2.getSelectedValue()){
-							chkValMsg = chkValMsg + "권역맵팽의 권역을 선택하세요\n";
+							chkValMsg = chkValMsg + "권역맵팽의 권역을 선택해주세요\n";
 							rtnVal = false;
 						}
 

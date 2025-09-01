@@ -80,7 +80,7 @@ public class MobileLoginController {
 		if (bCryptPasswordEncoder.matches(inputPw, getPw) == false) {
 
 			mobileLoginVO.setRtnYn("N");
-			mobileLoginVO.setRtnMsg("아이디 또는 암호를 확인하세요.");
+			mobileLoginVO.setRtnMsg("아이디 또는 암호를 확인해주세요.");
 			return mobileLoginVO;
 		}
 
@@ -92,7 +92,7 @@ public class MobileLoginController {
 		if (mobileLoginVO3 == null) {
 
 			mobileLoginVO.setRtnYn("N");
-			mobileLoginVO.setRtnMsg("사용자 정보가 조회되지 않습니다.\n관리자에게 문의하세요");
+			mobileLoginVO.setRtnMsg("사용자 정보가 조회되지 않습니다.\n관리자에게 문의해주세요");
 			return mobileLoginVO;
 		}
 

@@ -36,7 +36,7 @@
 				comboSoType : function(){		//주문유형
 					myComboSoType = new dhtmlXCombo("soType");
 			    	comboList(myComboSoType,'A','COMM','SO_ORDR_TYPE','','Y','req');		     
-			    	myComboSoType.selectOption(1);	//테스트로 1 일반오더. 원래는 0 선택하세요 
+			    	myComboSoType.selectOption(1);	//테스트로 1 일반오더. 원래는 0 선택해주세요
 			    	myComboSoType.setFontSize("12px","12px");
 				},
 			},	//END of comboOpen : {
@@ -46,7 +46,7 @@
 			searchOpen : {
 				selectData : function (){		//선택 버튼 눌렀을때
 					if(!myComboSoType.getSelectedValue()){
-						alert("주문유형을 선택하세요.");
+						alert("주문유형을 선택해주세요.");
 						return;
 					}
 

@@ -119,7 +119,7 @@
 				comboSigu: function () {		//구군콤보목록
 					myComboSigu = new dhtmlXCombo("sigu");
 					//comboList(myComboSigu,'A','SIDO','','','Y','req');	
-					myComboSigu.addOption([{ value: "", text: "선택하세요" }]);
+					myComboSigu.addOption([{ value: "", text: "선택해주세요" }]);
 					myComboSigu.selectOption(0);
 					myComboSigu.setFontSize("12px", "12px");
 					myComboSigu.attachEvent("onChange", function (value, text) {
@@ -442,23 +442,23 @@
 							}
 
 							if (!myComboDcCd.getSelectedValue()) {
-								chkValMsg = chkValMsg + "물류센터를 선택하세요\n";
+								chkValMsg = chkValMsg + "물류센터를 선택해주세요\n";
 								rtnVal = false;
 							}
 							/* if(!myComboSido.getSelectedValue()){
-								chkValMsg = chkValMsg + "시/도를 선택하세요\n";
+								chkValMsg = chkValMsg + "시/도를 선택해주세요\n";
 								rtnVal = false;
 							} */
 							/*
 							if(!myComboSigu.getSelectedValue()){
-								chkValMsg = chkValMsg + "구/군을 선택하세요\n";
+								chkValMsg = chkValMsg + "구/군을 선택해주세요\n";
 								rtnVal = false;
 							}
 							*/
 						}
 						if (chkGubn == "mappingBtn") {
 							if (myGrid.getRowsNum() == 0) {
-								chkValMsg = chkValMsg + "조회를 하세요\n";
+								chkValMsg = chkValMsg + "조회를해주세요\n";
 								rtnVal = false;
 							}
 
@@ -468,7 +468,7 @@
 							}
 
 							if (!myComboDcCd2.getSelectedValue()) {
-								chkValMsg = chkValMsg + "물류센터맵팽의 물류센터를 선택하세요\n";
+								chkValMsg = chkValMsg + "물류센터맵팽의 물류센터를 선택해주세요\n";
 								rtnVal = false;
 							}
 
@@ -686,7 +686,7 @@
 					</span>
 					<span class="item-data">
 						<input id="btnExcelDown" class="action-button success" type="button"
-							onclick="if(myGrid.getRowsNum() == 0){alert('조회를 하세요.');return;} exportExcel(); "
+							onclick="if(myGrid.getRowsNum() == 0){alert('조회를해주세요.');return;} exportExcel(); "
 							value="엑셀 다운로드"></span>
 				</span>
 			</div>

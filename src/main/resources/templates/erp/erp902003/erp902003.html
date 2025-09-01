@@ -163,7 +163,7 @@
 
 					mycomboZoneCd.attachEvent("onCheck", function (value, text) {
 
-						if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택하세요 를 체크한 것이다
+						if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
 						{
 							if (mycomboZoneCd.isChecked(0)) {
 
@@ -236,7 +236,7 @@
 				comboSigu: function () {		//구군콤보목록
 					myComboSigu = new dhtmlXCombo("sigu");
 					//comboList(myComboSigu,'A','SIDO','','','Y','req');	
-					myComboSigu.addOption([{ value: "", text: "선택하세요" }]);
+					myComboSigu.addOption([{ value: "", text: "선택해주세요" }]);
 					myComboSigu.selectOption(0);
 					myComboSigu.setFontSize("12px", "12px");
 					myComboSigu.attachEvent("onChange", function (value, text) {
@@ -290,7 +290,7 @@
 				},
 				comboZoneCd2: function () {		//권역 콤보
 					myComboZoneCd2 = new dhtmlXCombo("zoneCd2");
-					myComboZoneCd2.addOption([{ value: "", text: "선택하세요" }]);
+					myComboZoneCd2.addOption([{ value: "", text: "선택해주세요" }]);
 					myComboZoneCd2.selectOption(0);
 					myComboZoneCd2.setFontSize("12px", "12px");
 					myComboZoneCd2.attachEvent("onChange", function (value, text) {
@@ -484,7 +484,7 @@
 						}
 					}
 					if (errCnt > 0) {
-						alert("권역 맵핑 영역의 권영유형, 권역 을 먼저 선택한 후 로우를 체크 하세요");
+						alert("권역 맵핑 영역의 권영유형, 권역 을 먼저 선택한 후 로우를 체크해주세요");
 						myGrid.uncheckAll();
 						return
 					}
@@ -542,7 +542,7 @@
 						}
 					}
 					if (errDelCnt > 0) {
-						alert("매핑여부가 N 인것은 제외하세요.");
+						alert("매핑여부가 N 인것은 제외해주세요.");
 
 						return
 					}
@@ -595,7 +595,7 @@
 							}
 
 							if (!myComboZoneType.getSelectedValue()) {
-								chkValMsg = chkValMsg + "권역유형을 선택하세요\n";
+								chkValMsg = chkValMsg + "권역유형을 선택해주세요\n";
 								rtnVal = false;
 							}
 
@@ -608,7 +608,7 @@
 							}
 
 							if (c == 0) {
-								chkValMsg = chkValMsg + "권역을 체크하세요\n";
+								chkValMsg = chkValMsg + "권역을 체크해주세요\n";
 								rtnVal = false;
 							}
 
@@ -616,7 +616,7 @@
 						}
 						if (chkGubn == "mappingBtn") {
 							if (myGrid.getRowsNum() == 0) {
-								chkValMsg = chkValMsg + "조회를 하세요\n";
+								chkValMsg = chkValMsg + "조회를해주세요\n";
 								rtnVal = false;
 							}
 
@@ -626,12 +626,12 @@
 							}
 
 							if (!myComboZoneType2.getSelectedValue()) {
-								chkValMsg = chkValMsg + "권역맵핑의 권역유형을 선택하세요\n";
+								chkValMsg = chkValMsg + "권역맵핑의 권역유형을 선택해주세요\n";
 								rtnVal = false;
 							}
 
 							if (!myComboZoneCd2.getSelectedValue()) {
-								chkValMsg = chkValMsg + "권역맵핑의 권역을 선택하세요\n";
+								chkValMsg = chkValMsg + "권역맵핑의 권역을 선택해주세요\n";
 								rtnVal = false;
 							}
 

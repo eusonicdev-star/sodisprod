@@ -112,12 +112,12 @@
                           var errMsg = "";
                           var rtnVal = true;
                           if (!$("#srchCode").val()) {
-                              errMsg = errMsg + "화주코드가 없습니다. 화주를 검색하세요.\n";
+                              errMsg = errMsg + "화주코드가 없습니다. 화주를 검색해주세요.\n";
                               rtnVal = false;
 
                           }
                           if (!$("#srchName").val()) {
-                              errMsg = errMsg + "화주명칭이 없습니다. 화주를 검색하세요.\n";
+                              errMsg = errMsg + "화주명칭이 없습니다. 화주를 검색해주세요.\n";
                               rtnVal = false;
                           }
                           if (errMsg != "" && rtnVal == false) {
@@ -166,12 +166,12 @@
                           var errMsg = "";
                           var rtnVal = true;
                           if (!$("#srchCode").val()) {
-                              errMsg = errMsg + "화주코드가 없습니다. 화주를 검색하세요.\n";
+                              errMsg = errMsg + "화주코드가 없습니다. 화주를 검색해주세요.\n";
                               rtnVal = false;
 
                           }
                           if (!$("#srchName").val()) {
-                              errMsg = errMsg + "화주명칭이 없습니다. 화주를 검색하세요.\n";
+                              errMsg = errMsg + "화주명칭이 없습니다. 화주를 검색해주세요.\n";
                               rtnVal = false;
                           }
                           if (errMsg != "" && rtnVal == false) {
@@ -528,12 +528,12 @@
                               }
                           });
                           if (chkCnt == 0) {
-                              alert("삭제할 대상을 체크 하세요.");
+                              alert("삭제할 항목을 선택해주세요");
                               return;
                           }
 
                           if (!confirm("체크한 것을 삭제하시겠습니까?")) {
-                              alert("취소하였습니다.")
+                              alert("삭제가 취소되었습니다")
                               return;
                           }
 
@@ -588,7 +588,7 @@
                                   } else {
 
 
-                                      alert("우편번호로 물류센터 찾기 실패");
+                                      alert("우편번호로 물류센터를 찾을 수 없습니다");
                                   }
                               },
                           });
@@ -620,7 +620,7 @@
                           });
 
                           if (!prodCdList || !qtyList) {
-                              alert("제품정보 그리드를 확인하세요.(품목, 수량)")
+                              alert("제품정보를 확인해주세요 (품목, 수량)")
                               myCalendar2.hide();
                               return false;
                           }
@@ -722,15 +722,15 @@
 
                           });
                           if (errRefSoNoCnt != 0) {
-                              alert("제품정보의 고객사주문번호를 확인하세요.(필수)");
+                              alert("제품정보의 고객사주문번호를 확인해주세요.(필수)");
                               return;
                           }
                           if (errRcptCost != 0) {
-                              alert("제품정보의 착불비를 확인하세요.\n빈칸 안됨. 숫자(0포함)만 가능");
+                              alert("제품정보의 착불비를 확인해주세요.\n빈칸 안됨. 숫자(0포함)만 가능");
                               return;
                           }
                           if (prodGrid.length == 0) {
-                              alert("제품정보를 확인하세요");
+                              alert("제품정보를 확인해주세요");
                               return;
 
                           }
@@ -801,7 +801,7 @@
                                   if (res) {
 
                                       if (res.rtnYn == "Y") {
-                                          alert("주문입력 성공 [오더번호 : " + res.soNo + "]\n    ㄴ> 반드시 다시 조회하여 확인하세요.")
+                                          alert("주문입력 성공 [오더번호 : " + res.soNo + "]\n    ㄴ> 반드시 다시 조회하여 확인해주세요.")
                                           $(top.document).find('#loader').hide();
                                           parent.myWins.window('erp101001p2').close();	//팝업창 닫기
 
@@ -834,7 +834,7 @@
                                   }
 
                                   if (!$("#srchCode").val()) {
-                                      chkValMsg = chkValMsg + "화주사 코드가 없습니다. 화주사를 선택하세요\n";
+                                      chkValMsg = chkValMsg + "화주사 코드가 없습니다. 화주사를 선택해주세요\n";
                                       rtnVal = false;
                                   }
                                   if (!today) {
@@ -864,43 +864,43 @@
                                   }
                                   //시스템등록일
                                   if (!$("#ordrInptDt").val()) {
-                                      chkValMsg = chkValMsg + "시스템등록일을 입력하세요\n";
+                                      chkValMsg = chkValMsg + "시스템등록일을 입력해주세요\n";
                                       rtnVal = false;
                                   }
 
 
                                   //화주사코드
                                   if (!$("#srchCode").val()) {
-                                      chkValMsg = chkValMsg + "화주사 코드가 없습니다. 화주사를 선택하세요\n";
+                                      chkValMsg = chkValMsg + "화주사 코드가 없습니다. 화주사를 선택해주세요\n";
                                       rtnVal = false;
                                   }
                                   //화주사명칭
                                   if (!$("#srchName").val()) {
-                                      chkValMsg = chkValMsg + "화주사 명칭이 없습니다. 화주사를 선택하세요\n";
+                                      chkValMsg = chkValMsg + "화주사 명칭이 없습니다. 화주사를 선택해주세요\n";
                                       rtnVal = false;
                                   }
 
                                   //고객명(수취인)
                                   if (!$("#acptEr").val()) {
-                                      chkValMsg = chkValMsg + "고객명(수취인)을 입력하세요\n";
+                                      chkValMsg = chkValMsg + "고객명(수취인)을 입력해주세요\n";
                                       rtnVal = false;
                                   }
 
 
                                   //휴대전화 acptTel2
                                   if (!$("#acptTel2").val()) {
-                                      chkValMsg = chkValMsg + "연락처를 입력하세요\n";
+                                      chkValMsg = chkValMsg + "연락처를 입력해주세요\n";
                                       rtnVal = false;
                                   }
 
                                   //20211226 정연호 추가. 착불비합계 체크
                                   if ($("#mainRcptCost").val().trim() == "") {
-                                      chkValMsg = chkValMsg + "착불비 합계가 없습니다.\n(제품정보의 착불비를 확인하세요)\n";
+                                      chkValMsg = chkValMsg + "착불비 합계가 없습니다.\n(제품정보의 착불비를 확인해주세요)\n";
                                       rtnVal = false;
                                   }
                                   //20211226 정연호 추가. 착불비합계 체크
                                   if (isNaN($("#mainRcptCost").val())) {	//착불비 합계가 숫자가 아닐때 isNaN 은 true 가 숫자가아님
-                                      chkValMsg = chkValMsg + "착불비 합계가 숫자가 아닙니다.\n(제품정보의 착불비를 확인하세요)\n";
+                                      chkValMsg = chkValMsg + "착불비 합계가 숫자가 아닙니다.\n(제품정보의 착불비를 확인해주세요)\n";
                                       rtnVal = false;
                                   }
 

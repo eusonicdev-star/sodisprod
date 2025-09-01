@@ -26,7 +26,7 @@
             winOpen: {
                 save: function (saveGubn, tblCommMId) {	//사용자 추가 팝업
                     if (!myGrid.getSelectedRowId()) {
-                        alert("마스터 공통코드를 선택 하세요");
+                        alert("마스터 공통코드를 선택해주세요");
                         return;
                     }
                     var selData = myGrid.getRowData(myGrid.getSelectedRowId());
@@ -271,7 +271,7 @@
                         var rtnVal = true;
 
                         /* if(!myComboCmpyCd.getSelectedValue()){
-                            chkValMsg = chkValMsg + "회사를 선택하세요\n";
+                            chkValMsg = chkValMsg + "회사를 선택해주세요\n";
                             rtnVal = false;
                         } */
                         return rtnVal;

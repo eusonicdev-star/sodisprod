@@ -24,11 +24,11 @@
 	        		}
 	        		if(top == 'req')
 	        		{
-	        			combo.addOption([{value:"", text:"선택하세요"}]);
+	        			combo.addOption([{value:"", text:"선택해주세요"}]);
 	        		}
 	        		if(top == 'chk')
 	        		{
-	        			combo.addOption([{value:"", text:"체크하세요"}]);
+	        			combo.addOption([{value:"", text:"체크해주세요"}]);
 	        		}
 	        		for(var i=0;i<res.length;i++)
 	        		{
