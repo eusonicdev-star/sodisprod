@@ -30,6 +30,7 @@
     <script src=" https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <script th:inline="javascript">
         var myWins;
@@ -1026,7 +1027,7 @@
                     dlvyCnfm.cmpyCd = myComboCmpyCd.getSelectedValue();
                     dlvyCnfm.tblSoMId = $("#tblSoMId").val();
                     dlvyCnfm.dlvyCnfmDt = $("#dlvyCnfmDt").val().replace(/-/g, "");
-                    dlvyCnfm.saveUser =		/*[[${session.tblUserMId}]]*/;
+                    dlvyCnfm.saveUser = /*[[${session.tblUserMId}]]*/ "";
 
                     //20220517 정연호 추가 타업체 여부, 오더번호 추가
                     dlvyCnfm.outCmpyCd = $("#outCmpyCd").val();
@@ -1827,7 +1828,7 @@
                     updt.addr2 = $("#findAdd_detailAddress").val();			//주소2
                     updt.dlvyRqstMsg = $("#dlvyRqstMsg").val();			//배송메세지
                     updt.custSpclTxt = $("#custSpclTxt").val();			//고객사메세지
-                    updt.saveUser =		/*[[${session.tblUserMId}]]*/;
+                    updt.saveUser = /*[[${session.tblUserMId}]]*/ "";
 
                     $.ajax({
                         url: "/erp102001p1Updt",
@@ -2042,7 +2043,7 @@
                     cnslSave.soNo = $("#cnslSoNo").val();
                     cnslSave.cnslEr = $("#cnslEr").val();
                     cnslSave.cnslTxt = $("#cnslTxt").val();
-                    cnslSave.saveUser =	/*[[${session.tblUserMId}]]*/;
+                    cnslSave.saveUser = /*[[${session.tblUserMId}]]*/ "";
 
 
                     $.ajax({
@@ -2148,6 +2149,90 @@
 
                 },
 
+            },
+            downloadOpen: {
+                downloadAllImages: function () {
+                    var imageUrls = [];
+                    var imageNames = [];
+
+                    // 주문번호와 고객명 가져오기
+                    var soNo = $("#soNo").val() || "주문";
+                    var acptEr = $("#acptEr").val() || "고객";
+
+                    // 배송완료 상태의 이미지들 수집
+                    if ($("#dlvyStat9999Img").is(":visible")) {
+                        for (var i = 1; i <= 6; i++) {
+                            var imgSrc = $("#imgSrc0" + i).attr("src");
+                            if (imgSrc && imgSrc !== "" && imgSrc.indexOf("noimage.png") === -1) {
+                                imageUrls.push(imgSrc);
+                                imageNames.push("배송완료_" + soNo + "_" + acptEr + "_" + i + ".jpg");
+                            }
+                        }
+                        var signImgSrc = $("#signImgSrc").attr("src");
+                        if (signImgSrc && signImgSrc !== "" && signImgSrc.indexOf("noimage.png") === -1) {
+                            imageUrls.push(signImgSrc);
+                            imageNames.push("배송완료_" + soNo + "_" + acptEr + "_서명.jpg");
+                        }
+                    }
+
+                    // 미마감 상태의 이미지들 수집
+                    if ($("#dlvyStat8000Img").is(":visible")) {
+                        for (var i = 1; i <= 6; i++) {
+                            var imgSrc = $("#ximgSrc0" + i).attr("src");
+                            if (imgSrc && imgSrc !== "" && imgSrc.indexOf("noimage.png") === -1) {
+                                imageUrls.push(imgSrc);
+                                imageNames.push("미마감_" + soNo + "_" + acptEr + "_" + i + ".jpg");
+                            }
+                        }
+                        var signImgSrc = $("#xsignImgSrc").attr("src");
+                        if (signImgSrc && signImgSrc !== "" && signImgSrc.indexOf("noimage.png") === -1) {
+                            imageUrls.push(signImgSrc);
+                            imageNames.push("미마감_" + soNo + "_" + acptEr + "_서명.jpg");
+                        }
+                    }
+
+                    if (imageUrls.length === 0) {
+                        alert("다운로드할 이미지가 없습니다.");
+                        return;
+                    }
+
+                    // 서버에 이미지 다운로드 요청
+                    var downloadData = new FormData();
+                    downloadData.append("tblSoMId", $("#tblSoMId").val());
+                    downloadData.append("imageUrls", JSON.stringify(imageUrls));
+                    downloadData.append("imageNames", JSON.stringify(imageNames));
+
+                    $.ajax({
+                        url: "/erp102001DownloadImages",
+                        processData: false,
+                        contentType: false,
+                        data: downloadData,
+                        type: "POST",
+                        xhrFields: {
+                            responseType: "blob",
+                        },
+                        success: function (data, status, xhr) {
+                            var soNo = $("#soNo").val() || "주문";
+                            var acptEr = $("#acptEr").val() || "고객";
+                            var fileName = soNo + "_" + acptEr + "_시공사진.zip";
+
+                            // Blob을 다운로드
+                            var blob = new Blob([data], { type: "application/zip" });
+                            var url = window.URL.createObjectURL(blob);
+                            var a = document.createElement("a");
+                            a.href = url;
+                            a.download = fileName;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            window.URL.revokeObjectURL(url);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("이미지 다운로드 실패:", error);
+                            alert("이미지 다운로드에 실패했습니다: " + error);
+                        },
+                    });
+                },
             },
         }
 
@@ -3121,6 +3206,16 @@
 						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>전체사진</center></span>
 						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>시리얼번호</center></span>
 						<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>고객서명</center></span>
+						<span style="float: right; margin-right: 10px;">
+							<button 
+								type="button" 
+								class="btn btn-primary" 
+								onclick="fnObj.downloadOpen.downloadAllImages()"
+								style="padding: 5px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;"
+							>
+								<i class="fa fa-download"></i> 일괄 다운로드
+							</button>
+						</span>
 					</span>
 				</span>
 			<span id="dlvyStat9999Img" class="cell" style="width: 100%; height: 100%; display:none;">
@@ -3233,8 +3328,18 @@
 							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>시리얼번호</center></span>
 							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>기타</center></span>
 							<span style="width:11%; margin-left: 10px; margin-right: 10px;float: left;"><center>고객서명</center></span>
+							<span style="float: right; margin-right: 10px;">
+								<button 
+									type="button" 
+									class="btn btn-primary" 
+									onclick="fnObj.downloadOpen.downloadAllImages()"
+									style="padding: 5px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;"
+								>
+									<i class="fa fa-download"></i> 일괄 다운로드
+								</button>
+							</span>
 						</span>
-				</span>
+					</span>
 				<div id="dlvyStat8000Img" class="cell" style="width: 100%; height: 100%; display:none;">
 					<span class="item-head" style="width: 80px;float:left;">시공사진</span>
 
