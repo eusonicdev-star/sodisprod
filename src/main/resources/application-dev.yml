@@ -12,8 +12,8 @@ logging:
 
 common:
   java:
-    kppApiSearch: https://52.79.206.98:5201/restv2/WINUS.PAH:PAH_DLV_RR/PAH/DLV_ORDER
-    kppApiStatus: https://52.79.206.98:5201/restv2/WINUS.PAH:PAH_DLV_RR/PAH/DLV_RTN_INSERT
+    kppApiSearch: https://winus-interface.logisall.com:5200/restv2/WINUS.PAH:PAH_DLV_RR/PAH/DLV_ORDER
+    kppApiStatus: https://winus-interface.logisall.com:5200/restv2/WINUS.PAH:PAH_DLV_RR/PAH/DLV_RTN_INSERT
     kppApiUsername: pahuser01
     kppApiUserpass: pahuser01
     bizMsgUrl: https://alimtalk-api.bizmsg.kr/v2/sender/send

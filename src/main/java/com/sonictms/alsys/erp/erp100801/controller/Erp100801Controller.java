@@ -23,6 +23,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -98,9 +99,24 @@ public class Erp100801Controller {
 
             in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String returnMsg = in.readLine();
-            Gson gson = new Gson();
-            vo = (Erp100801VO) gson.fromJson(returnMsg, (new TypeToken<Erp100801VO>() {
-            }).getType());
+            
+            // 응답 메시지 null 체크
+            if (returnMsg == null || returnMsg.trim().isEmpty()) {
+                log.error("KPP API 응답이 비어있습니다.");
+                vo = new Erp100801VO();
+                vo.setResults(new ArrayList<>());
+            } else {
+                log.info("KPP API 응답 메시지: " + returnMsg);
+                Gson gson = new Gson();
+                try {
+                    vo = (Erp100801VO) gson.fromJson(returnMsg, (new TypeToken<Erp100801VO>() {
+                    }).getType());
+                } catch (Exception jsonException) {
+                    log.error("JSON 파싱 중 오류 발생: " + jsonException.getMessage(), jsonException);
+                    vo = new Erp100801VO();
+                    vo.setResults(new ArrayList<>());
+                }
+            }
             int responseCode = conn.getResponseCode();
             if (responseCode == 400) {
                 log.info("     L> Erp100801VO KPP 응답코드 400 : 명령을 실행 오류");
@@ -109,10 +125,22 @@ public class Erp100801Controller {
             } else {
                 log.info("     L> Erp100801VO KPP 응답코드 " + responseCode);
             }
+        } catch (java.net.ConnectException ce) {
+            log.error("KPP API 서버 연결 실패: " + ce.getMessage(), ce);
+            vo = new Erp100801VO();
+            vo.setResults(new ArrayList<>());
+        } catch (java.net.SocketTimeoutException ste) {
+            log.error("KPP API 서버 연결 타임아웃: " + ste.getMessage(), ste);
+            vo = new Erp100801VO();
+            vo.setResults(new ArrayList<>());
         } catch (IOException ie) {
-            log.error("IOException 발생", ie);
+            log.error("KPP API 통신 중 IOException 발생: " + ie.getMessage(), ie);
+            vo = new Erp100801VO();
+            vo.setResults(new ArrayList<>());
         } catch (Exception ee) {
-            log.error("Exception 발생", ee);
+            log.error("KPP API 호출 중 예상치 못한 오류 발생: " + ee.getMessage(), ee);
+            vo = new Erp100801VO();
+            vo.setResults(new ArrayList<>());
         } finally {
             if (in != null) {
                 try {
@@ -133,6 +161,18 @@ public class Erp100801Controller {
             }
         }
 
+        // NPE 방지를 위한 null 체크 추가
+        if (vo == null) {
+            log.error("KPP API 응답 파싱 실패: vo가 null입니다.");
+            vo = new Erp100801VO();
+            vo.setResults(new ArrayList<>());
+        }
+        
+        if (vo.getResults() == null) {
+            log.warn("KPP API 응답에서 results가 null입니다. 빈 리스트로 초기화합니다.");
+            vo.setResults(new ArrayList<>());
+        }
+        
         log.info("kpp에서 불러온 데이터 목록 수 : " + vo.getResults().size());
         vo.setSaveUser(erp100801VO.getSaveUser());
         vo.setDlvDtFrom(erp100801VO.getDlvDtFrom());
