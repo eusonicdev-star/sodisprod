@@ -472,19 +472,6 @@
                         return;
                     }
 
-                    /*
-                    console.log("수량오류 qtyErrCnt			: " + qtyErrCnt				)
-                    console.log("유편번호 postCdErrCnt		: " + postCdErrCnt			)
-                    console.log("착불비 rcptCostErrCnt		: " + rcptCostErrCnt		)
-                    console.log("오더유형 soTypeErrCnt	   	: " + soTypeErrCnt			)
-                    console.log("고객접수일 rcptDtErrCnt		: " + rcptDtErrCnt			)
-                    console.log("고객배송요청일 rqstDtErrCnt		: " + rqstDtErrCnt			)
-                    console.log("시스템등록일 ordrInptDtErrCnt	: " + ordrInptDtErrCnt		)
-                    console.log("상품코드 procCdErrCnt		: " + procCdErrCnt			)
-                    console.log("상품명칭 prodNmErrCnt		: " + prodNmErrCnt			)
-                    */
-
-                    //fnObj.searchOpen.excelUploadCheck(excelUploadData);
                     toastr.success('체크중', excelUploadData.length + '건');
                     setTimeout(function () {
                         fnObj.searchOpen.excelUploadCheck(excelUploadData);
