@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class ErpCommonVO extends commonVO {
+public class ErpCommonVO extends CommonVO {
 
 	private static final long serialVersionUID = 1L;
 

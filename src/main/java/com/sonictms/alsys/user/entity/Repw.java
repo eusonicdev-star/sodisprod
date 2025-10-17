@@ -2,7 +2,7 @@ package com.sonictms.alsys.user.entity;
 
 import java.io.Serializable;
 
-import com.sonictms.alsys.common.entity.commonVO;
+import com.sonictms.alsys.common.entity.CommonVO;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,7 @@ import lombok.ToString;
 //@ToString
 @ToString(callSuper=true)
 
-public class Repw extends commonVO  implements Serializable {
+public class Repw extends CommonVO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	

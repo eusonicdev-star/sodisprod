@@ -1,6 +1,6 @@
 package com.sonictms.alsys.commCode.entity;
 
-import com.sonictms.alsys.common.entity.commonVO;
+import com.sonictms.alsys.common.entity.CommonVO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -8,11 +8,11 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper=true)
-public class CommCodeVO extends commonVO{
+public class CommCodeVO extends CommonVO {
 	
 	private static final long serialVersionUID = 1L;
 
-	private String	comboType;		//가져올 공통코드 유형
+    private String comboType;        //공통코드 유형
 	private	String	comboCd;		//콤보코드
 	private	String	comboNm;		//콤보명칭
 	private	String	srchCtgr;		//공통 검색종류

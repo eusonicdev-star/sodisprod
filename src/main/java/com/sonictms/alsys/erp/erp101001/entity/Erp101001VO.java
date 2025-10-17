@@ -1,7 +1,7 @@
 package com.sonictms.alsys.erp.erp101001.entity;
 
 
-import com.sonictms.alsys.common.entity.commonVO;
+import com.sonictms.alsys.common.entity.CommonVO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class Erp101001VO extends commonVO {
+public class Erp101001VO extends CommonVO {
     private static final long serialVersionUID = 1L;
 
     private String agntCd;        //화주사

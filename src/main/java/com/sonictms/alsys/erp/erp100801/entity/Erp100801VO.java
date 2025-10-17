@@ -1,7 +1,7 @@
 package com.sonictms.alsys.erp.erp100801.entity;
 
 import com.google.gson.annotations.SerializedName;
-import com.sonictms.alsys.common.entity.commonVO;
+import com.sonictms.alsys.common.entity.CommonVO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class Erp100801VO extends commonVO {
+public class Erp100801VO extends CommonVO {
 
 	private static final long serialVersionUID = 1L;
 

@@ -2,7 +2,7 @@ package com.sonictms.alsys.mobile.mCustCal.entity;
 
 
 
-import com.sonictms.alsys.common.entity.commonVO;
+import com.sonictms.alsys.common.entity.CommonVO;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper=true)
-public class MobileCustCalVO extends commonVO{
+public class MobileCustCalVO extends CommonVO {
 		
 	private static final long serialVersionUID = 1L;
 

@@ -2,7 +2,7 @@ package com.sonictms.alsys.mobile.mTalk.entity;
 
 
 
-import com.sonictms.alsys.common.entity.commonVO;
+import com.sonictms.alsys.common.entity.CommonVO;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper=true)
-public class MobileTalkVO extends commonVO{
+public class MobileTalkVO extends CommonVO {
 		
 	private static final long serialVersionUID = 1L;
 	private String messageType;    //알림톡 발송 메세지 타입

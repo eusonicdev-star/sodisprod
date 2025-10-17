@@ -1,6 +1,6 @@
 package com.sonictms.alsys.user.entity;
 
-import com.sonictms.alsys.common.entity.commonVO;
+import com.sonictms.alsys.common.entity.CommonVO;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +11,7 @@ import lombok.ToString;
 //@ToString
 @ToString(callSuper=true,exclude = {"password","passwordConfirm"})
 
-public class User extends commonVO{
+public class User extends CommonVO {
 
 	private static final long serialVersionUID = 1L;
 

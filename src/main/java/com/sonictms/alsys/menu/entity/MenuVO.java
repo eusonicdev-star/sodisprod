@@ -1,6 +1,6 @@
 package com.sonictms.alsys.menu.entity;
 
-import com.sonictms.alsys.common.entity.commonVO;
+import com.sonictms.alsys.common.entity.CommonVO;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +11,7 @@ import lombok.ToString;
 @Setter
 //@ToString
 @ToString(callSuper=true)
-public class MenuVO extends commonVO{
+public class MenuVO extends CommonVO {
 	
 	
 	private static final long serialVersionUID = 1L;

@@ -33,14 +33,14 @@ public class ControllerUtils {
     /**
      * API 응답 성공 여부 확인
      */
-    public static boolean isSuccessResponse(commonVO response) {
+    public static boolean isSuccessResponse(CommonVO response) {
         return response != null && "Y".equals(response.getRtnYn());
     }
 
     /**
      * API 응답 실패 여부 확인
      */
-    public static boolean isFailureResponse(commonVO response) {
+    public static boolean isFailureResponse(CommonVO response) {
         return response == null || "N".equals(response.getRtnYn());
     }
 

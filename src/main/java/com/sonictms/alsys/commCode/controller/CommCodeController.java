@@ -38,18 +38,11 @@ public class CommCodeController {
 	@Value("${common.java.bizMsgUserid}")
 	private String bizMsgUserid;
 
-	// ==================== 공통 코드 관련 메서드 ====================
-	@GetMapping(value = {"robots.txt"})
-	public ModelAndView getLoginPage() {
-		ModelAndView modelAndView = new ModelAndView();
-		modelAndView.setViewName("robots.txt");
-		return modelAndView;
-	}
 
-	@RequestMapping(value = {"comComboList"}, method = RequestMethod.POST)
+    @PostMapping("comComboList")
 	@ResponseBody
-	public List<CommCodeVO> comComboList(CommCodeVO CommCodeVO) {
-		return commCodeService.comComboList(CommCodeVO);
+    public List<CommCodeVO> comComboList(CommCodeVO commCodeVO) {
+        return commCodeService.comComboList(commCodeVO);
 	}
 
 	@RequestMapping(value = {"mobile/comComboList"}, method = RequestMethod.POST)

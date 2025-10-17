@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
-public class commonVO implements Serializable {
+public class CommonVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
