@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.sonictms.alsys.erp.erp105001.mapper.Erp105001Mapper">
+
+	<!-- 재고 현황 목록 조회하기 -->
+	<select id="erp105001List" 
+		parameterType="com.sonictms.alsys.erp.erp105001.entity.Erp105001VO"
+		resultType="com.sonictms.alsys.erp.erp105001.entity.Erp105001VO">
+        SELECT
+        TBL_INV_PRODUCT_ID as tblInvProductId,
+        CMPY_CD as cmpyCd,
+        AGNT_CD as agntCd,
+        AGNT_NM as agntNm,
+        TBL_MTRL_M_ID as tblProductMId,
+        MTRL_CD as productCd,
+        MTRL_NM as productNm,
+        CURRENT_QTY as currentQty,
+        SAVE_TIME as saveTime,
+        SAVE_USER as saveUser,
+        UPDT_TIME as updtTime,
+        UPDT_USER as updtUser
+        FROM TBL_INV_PRODUCT
+        WHERE 1=1
+        <if test="cmpyCd != null and cmpyCd != ''">
+            AND CMPY_CD = #{cmpyCd}
+        </if>
+        <if test="agntCd != null and agntCd != ''">
+            AND AGNT_CD = #{agntCd}
+        </if>
+        <if test="productCd != null and productCd != ''">
+            AND MTRL_CD LIKE '%' + #{productCd} + '%'
+        </if>
+        <if test="productNm != null and productNm != ''">
+            AND MTRL_NM LIKE '%' + #{productNm} + '%'
+        </if>
+        ORDER BY MTRL_CD
+    </select>
+
+    <!-- 재고 조정 -->
+    <update id="adjustInventory" 
+        parameterType="com.sonictms.alsys.erp.erp105001.entity.Erp105001VO">
+        UPDATE TBL_INV_PRODUCT 
+        SET CURRENT_QTY = #{afterQty},
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = ISNULL(#{saveUser}, 'SYSTEM')
+        WHERE CMPY_CD = #{cmpyCd}
+          AND AGNT_CD = #{agntCd}
+          AND MTRL_CD = #{productCd}
+    </update>
+</mapper>

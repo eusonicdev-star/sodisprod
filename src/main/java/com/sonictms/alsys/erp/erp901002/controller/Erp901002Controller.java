@@ -72,22 +72,13 @@ public class Erp901002Controller {
         return erp901002VO;
     }
 
-
-    //엡셀업로드 팝업에서 엑셀데이터를 json으로 바꾼것을 저장하기
+    //엑셀 업로드 팝업에서 엑셀데이터를 json으로 바꾼것을 저장하기
     @RequestMapping(value = {"erp901002p2ExcelUploadJson"}, method = RequestMethod.POST)
     @ResponseBody
-
     public List<Erp901002ExcelVO> erp901002p2ExcelUploadJson(@RequestBody List<Erp901002ExcelVO> erp901002ExcelVO) {
-
-
         for (int i = 0; i < erp901002ExcelVO.size(); i++) {
-
             erp901002ExcelVO.set(i, erp901002Service.erp901002p2ExcelUploadJson(erp901002ExcelVO.get(i)));
         }
-
-
         return erp901002ExcelVO;
-
     }
-
 }

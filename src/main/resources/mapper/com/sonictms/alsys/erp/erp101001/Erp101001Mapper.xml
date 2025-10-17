@@ -125,11 +125,6 @@
 		}
 	</select>
 
-
-
-
-
-
 	<!-- 주문수정 팝업에서 헤더 불러오기 헤더는 1줄만 불러옴 -->
 	<select id="erp101001p3HeaderList" statementType="CALLABLE"
 		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"

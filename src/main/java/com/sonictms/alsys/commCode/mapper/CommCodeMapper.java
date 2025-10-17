@@ -13,6 +13,8 @@ public interface CommCodeMapper {
 
     List<CommCodeVO> commSrchList(CommCodeVO commCodeVO);
 
+    List<CommCodeVO> commSrchListMto(CommCodeVO commCodeVO);
+
     //알람톡 발송 결과를 성공일때만 저장
     SendAlrmTalkVO saveAlrmTmpResult(SendAlrmTalkVO sendAlrmTalkVO);
 

@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html
+  xmlns:sec="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <title>입고 관리 (erp105002)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/skins/web/dhtmlx.css"
+    />
+    <link rel="stylesheet" type="text/css" href="/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="/css/erp-style.css" />
+    <link rel="stylesheet" type="text/css" href="/css/erp105002.css" />
+    <script
+      src="https://cdn.dhtmlx.com/edge/dhtmlx.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+    <script type="text/javascript" src="/js/erp105002.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+
+    <style>
+      /* 기본 스타일 - 다른 페이지와 일관성 유지 */
+      .search-section {
+        background: #f8f9fa;
+        padding: 15px;
+        border: 1px solid #dee2e6;
+        margin-bottom: 10px;
+      }
+
+      .search-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .search-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .search-group {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .search-group label {
+        min-width: 80px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .search-group input,
+      .search-group select {
+        padding: 4px 8px;
+        border: 1px solid #ced4da;
+        border-radius: 3px;
+        font-size: 12px;
+        width: 120px;
+      }
+
+      .btn {
+        padding: 6px 12px;
+        border: 1px solid #007bff;
+        background: #007bff;
+        color: white;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.2s ease;
+      }
+
+      .btn:hover {
+        background: #0056b3;
+        border-color: #0056b3;
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        border-color: #6c757d;
+      }
+
+      .btn-secondary:hover {
+        background: #545b62;
+        border-color: #545b62;
+      }
+
+      .btn-success {
+        background: #28a745;
+        border-color: #28a745;
+      }
+
+      .btn-success:hover {
+        background: #1e7e34;
+        border-color: #1e7e34;
+      }
+
+      .btn-danger {
+        background: #dc3545;
+        border-color: #dc3545;
+      }
+
+      .btn-danger:hover {
+        background: #c82333;
+        border-color: #c82333;
+      }
+
+      /* 테이블 스타일 */
+      .table-container {
+        background: white;
+        border: 1px solid #dee2e6;
+        margin-top: 10px;
+      }
+
+      .table-header {
+        background: #f8f9fa;
+        padding: 10px;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .data-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        font-size: 12px;
+      }
+
+      .data-table tr:hover {
+        background: #f8f9fa;
+      }
+
+      /* 상태 배지 */
+      .status-badge {
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 500;
+      }
+
+      .status-pending {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .status-completed {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      /* 액션 버튼 */
+      .action-btn {
+        padding: 2px 6px;
+        border: 1px solid;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 11px;
+        margin-right: 3px;
+      }
+
+      /* 폼 스타일 */
+      .form-section {
+        background: #f8f9fa;
+        padding: 15px;
+        border: 1px solid #dee2e6;
+        margin-bottom: 10px;
+      }
+
+      .form-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 10px;
+        align-items: center;
+      }
+
+      .form-group {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .form-group label {
+        min-width: 80px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .form-group input,
+      .form-group select {
+        padding: 4px 8px;
+        border: 1px solid #ced4da;
+        border-radius: 3px;
+        font-size: 12px;
+        width: 150px;
+      }
+
+      .search-icon {
+        padding: 4px 8px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .search-icon:hover {
+        background: #0056b3;
+      }
+
+      .delete-icon {
+        padding: 4px 8px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .delete-icon:hover {
+        background: #c82333;
+      }
+
+      /* 선택된 상품 목록 */
+      .selected-products {
+        background: #e3f2fd;
+        padding: 10px;
+        border: 1px solid #90caf9;
+        margin-top: 10px;
+        border-radius: 3px;
+      }
+
+      .selected-product-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px;
+        background: white;
+        border: 1px solid #e9ecef;
+        margin-bottom: 5px;
+        border-radius: 3px;
+      }
+
+      .selected-product-item:last-child {
+        margin-bottom: 0;
+      }
+
+      /* 탭 스타일 */
+      .tab-container {
+        display: flex;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .tab-button {
+        padding: 10px 20px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        color: #6c757d;
+        border-bottom: 2px solid transparent;
+      }
+
+      .tab-button:hover {
+        background: #e9ecef;
+        color: #495057;
+      }
+
+      .tab-button.active {
+        background: white;
+        color: #007bff;
+        border-bottom-color: #007bff;
+      }
+
+      .tab-content {
+        display: none;
+        padding: 15px;
+        background: white;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+    </style>
+
+    <script th:inline="javascript">
+      var pagePerRow = /*[[${@environment.getProperty('common.html.pagePerRow')}]]*/ 10;
+      var myWins;
+      var myGrid;
+      var myComboCmpyCd;
+      var currentTab = "register";
+
+      fnObj = {
+        // 탭 전환
+        tabOpen: {
+          showRegisterTab: function () {
+            currentTab = "register";
+            $(".tab-button").removeClass("active");
+            $("#registerTab").addClass("active");
+            $(".tab-content").removeClass("active");
+            $("#registerContent").addClass("active");
+          },
+          showHistoryTab: function () {
+            currentTab = "history";
+            $(".tab-button").removeClass("active");
+            $("#historyTab").addClass("active");
+            $(".tab-content").removeClass("active");
+            $("#historyContent").addClass("active");
+            fnObj.loadInboundHistory();
+          },
+        },
+
+        // 회사 콤보 초기화 (사용하지 않음)
+        comboOpen: {
+          comboCmpyCd: function () {
+            // 회사 콤보박스는 현재 사용하지 않음
+            console.log("회사 콤보박스 초기화 생략");
+          },
+        },
+
+        // 선택된 상품을 목록에 추가
+        addProductToList: function () {
+          var quantity = $("#productQuantity").val();
+          var expectedDate = $("#expectedDate").val();
+          var productCd = $("#selectedProductCd").val();
+          var productNm = $("#selectedProductNm").val();
+          var productId = $("#selectedProductId").val();
+
+          if (!productCd || !productNm) {
+            alert("상품을 선택해주세요.");
+            return;
+          }
+          if (!quantity || quantity <= 0) {
+            alert("수량을 입력해주세요.");
+            return;
+          }
+          if (!expectedDate) {
+            alert("예정일을 선택해주세요.");
+            return;
+          }
+
+          // 이미 추가된 상품인지 확인
+          var isDuplicate = false;
+          $("#selectedProductsList tr").each(function () {
+            var existingProductCd = $(this).find(".product-cd").text();
+            if (existingProductCd === productCd) {
+              isDuplicate = true;
+              return false;
+            }
+          });
+
+          if (isDuplicate) {
+            alert("이미 추가된 상품입니다.");
+            return;
+          }
+
+          // 선택된 상품 목록에 추가
+          var productHtml = "<tr>";
+          productHtml += '<td class="product-cd">' + productCd + "</td>";
+          productHtml += '<td class="product-nm">' + productNm + "</td>";
+          productHtml += '<td class="product-qty">' + quantity + "</td>";
+          productHtml += '<td class="product-date">' + expectedDate + "</td>";
+          productHtml +=
+            '<td><button class="btn btn-danger" onclick="fnObj.removeProductFromList(this)" style="padding: 4px 8px; font-size: 11px;">삭제</button></td>';
+          productHtml += "</tr>";
+
+          $("#selectedProductsList").append(productHtml);
+
+          // 테이블 컨테이너 표시
+          $("#selectedProductsContainer").show();
+
+          // 상품 정보만 초기화 (수량과 예정일은 유지)
+          $("#selectedProductCd").val("");
+          $("#selectedProductNm").val("");
+          $("#selectedProductId").val("");
+          $("#productQuantity").prop("disabled", true);
+          $("#expectedDate").prop("disabled", true);
+        },
+
+        // 상품을 목록에서 제거
+        removeProductFromList: function (button) {
+          $(button).closest("tr").remove();
+
+          // 테이블이 비어있으면 컨테이너 숨기기
+          if ($("#selectedProductsList tr").length === 0) {
+            $("#selectedProductsContainer").hide();
+          }
+        },
+
+        // 선택된 상품들을 일괄 등록
+        registerSelectedProducts: function () {
+          var selectedProducts = [];
+          var agntCd = $("#agntCd").val();
+          var agntNm = $("#agntNm").val();
+
+          if (!agntCd || !agntNm) {
+            alert("화주사를 선택해주세요.");
+            return;
+          }
+
+          $("#selectedProductsList tr").each(function () {
+            var productCd = $(this).find(".product-cd").text();
+            var productNm = $(this).find(".product-nm").text();
+            var quantity = $(this).find(".product-qty").text();
+            var expectedDate = $(this).find(".product-date").text();
+
+            var inboundVO = {
+              cmpyCd: /*[[${session.cmpyCd}]]*/ "A",
+              agntCd: agntCd,
+              mtrlCd: productCd,
+              mtrlNm: productNm,
+              tblMtrlMId: $("#selectedProductId").val(), // 마지막 선택된 상품의 ID 사용
+              inboundQuantity: parseInt(quantity),
+              inboundStatus: "PENDING",
+              expectedDate: expectedDate,
+              saveUser: /*[[${session.userId}]]*/ "admin",
+              updtUser: /*[[${session.userId}]]*/ "admin",
+              remarks: "",
+            };
+
+            selectedProducts.push(inboundVO);
+          });
+
+          if (selectedProducts.length === 0) {
+            alert("등록할 상품이 없습니다.");
+            return;
+          }
+
+          $.ajax({
+            url: "/erp105002InsertMultipleInbound",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(selectedProducts),
+            success: function (res) {
+              if (res.success) {
+                alert(res.message);
+                fnObj.clearRegisterForm();
+              } else {
+                alert(res.message);
+              }
+            },
+            error: function () {
+              alert("입고 등록 중 오류가 발생했습니다.");
+            },
+          });
+        },
+
+        // 상품 입력 폼 초기화
+        clearProductForm: function () {
+          $("#selectedProductCd").val("");
+          $("#selectedProductNm").val("");
+          $("#selectedProductId").val("");
+          $("#productQuantity").val("");
+          // 예정일은 초기화하지 않음 (화주사별로 동일한 예정일 사용 가능)
+          $("#productQuantity").prop("disabled", true);
+          $("#expectedDate").prop("disabled", true);
+        },
+
+        // 전체 등록 폼 초기화
+        clearRegisterForm: function () {
+          $("#agntCd").val("");
+          $("#agntNm").val("");
+          $("#selectedProductsList").empty();
+          $("#selectedProductsContainer").hide();
+          fnObj.clearProductForm();
+        },
+
+        // 입고 내역 조회
+        loadInboundHistory: function () {
+          var inboundVO = {
+            cmpyCd: /*[[${session.cmpyCd}]]*/ "A",
+            agntCd: $("#historyAgntCd").val(),
+            mtrlCd: $("#historyProductCd").val(),
+            mtrlNm: $("#historyProductNm").val(),
+            inboundStatus: $("#historyStatus").val(),
+            saveUser: /*[[${session.userId}]]*/ "admin", // 본인이 등록한 것만 조회
+            dateFrom: $("#historyDateFrom").val(),
+            dateTo: $("#historyDateTo").val(),
+          };
+
+          $.ajax({
+            url: "/erp105002InboundList",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(inboundVO),
+            success: function (res) {
+              fnObj.renderInboundHistory(res);
+            },
+            error: function () {
+              alert("입고 내역 조회 중 오류가 발생했습니다.");
+            },
+          });
+        },
+
+        // 입고 내역 렌더링
+        renderInboundHistory: function (data) {
+          var html = "";
+          if (data.length === 0) {
+            html =
+              '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #666;">조회된 입고 내역이 없습니다.</td></tr>';
+          } else {
+            data.forEach(function (item) {
+              var statusClass =
+                item.inboundStatus === "COMPLETED"
+                  ? "status-completed"
+                  : "status-pending";
+              var statusText =
+                item.inboundStatus === "COMPLETED" ? "입고 완료" : "입고 예정";
+              var actionHtml = "";
+
+              if (item.inboundStatus === "PENDING") {
+                actionHtml =
+                  '<button class="btn btn-danger" onclick="fnObj.deleteInbound(' +
+                  item.tblInboundProductId +
+                  ')" style="padding: 4px 8px; font-size: 11px;">삭제</button>';
+              }
+
+              html += "<tr>";
+              html +=
+                '<td><input type="checkbox" class="inbound-checkbox" value="' +
+                item.tblInboundProductId +
+                '" onchange="fnObj.updateDeleteButton()" /></td>';
+              html += "<td>" + (item.agntNm || "") + "</td>";
+              html += "<td>" + (item.mtrlCd || "") + "</td>";
+              html += "<td>" + (item.mtrlNm || "") + "</td>";
+              html += "<td>" + (item.inboundQuantity || 0) + "</td>";
+              html += "<td>" + fnObj.formatDate(item.expectedDate) + "</td>";
+              html += "<td>" + fnObj.formatDate(item.saveTime) + "</td>";
+              html +=
+                '<td><span class="status-badge ' +
+                statusClass +
+                '">' +
+                statusText +
+                "</span></td>";
+              html += "<td>" + actionHtml + "</td>";
+              html += "</tr>";
+            });
+          }
+          $("#inboundHistoryList").html(html);
+          fnObj.updateDeleteButton(); // 삭제 버튼 상태 업데이트
+        },
+
+        // 입고 내역 삭제
+        deleteInbound: function (tblInboundProductId) {
+          if (!confirm("정말로 이 입고 내역을 삭제하시겠습니까?")) {
+            return;
+          }
+
+          $.ajax({
+            url: "/erp105002DeleteInbound",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ tblInboundProductId: tblInboundProductId }),
+            success: function (res) {
+              if (res.success) {
+                alert(res.message);
+                fnObj.loadInboundHistory();
+              } else {
+                alert(res.message);
+              }
+            },
+            error: function () {
+              alert("입고 내역 삭제 중 오류가 발생했습니다.");
+            },
+          });
+        },
+
+        // 화주사 검색 팝업
+        winOpen: {
+          commSrch: function (title, cmpyCd, srchCtgr, srchInput) {
+            windowId = "commSrch";
+            windowText = title + " commSrch";
+            windowUrl = "/commSrch";
+            windowLeft = -14400;
+            windowTop = -14400;
+            windowWidth = 800;
+            windowHeight = 600;
+            windowsModal = true;
+            windowOnClose = function (windowId) {
+              return true;
+            };
+            windowSendObject = {
+              cmpyCd: cmpyCd,
+              srchCtgr: srchCtgr,
+              srchInput: srchInput,
+              windowId: windowId,
+              srchCd: $("#agntCd").val(),
+              srchNm: $("#agntNm").val(),
+              srchText: $("#agntNm").val(), // 입력된 화주사명을 검색어로 전달
+            };
+
+            myWindowsOpen(
+              windowId,
+              windowText,
+              windowUrl,
+              windowLeft,
+              windowTop,
+              windowWidth,
+              windowHeight,
+              windowsModal,
+              windowOnClose,
+              windowSendObject
+            );
+            myWins.window(windowId).attachEvent("onClose", function (win) {
+              return true;
+            });
+          },
+
+          prodCommSrch: function (title, cmpyCd, srchCtgr, srchInput) {
+            //상품 찾기 팝업
+            windowId = "prodCommSrch";
+            windowText = title + " prodSrch";
+            windowUrl = "/prodSrch";
+            windowLeft = 0;
+            windowTop = 0;
+            windowWidth = 800;
+            windowHeight = 600;
+            windowsModal = true;
+            windowOnClose = function (windowId) {
+              return true;
+            };
+            windowSendObject = {
+              windowId: windowId,
+              cmpyCd: cmpyCd,
+              srchCtgr: srchCtgr,
+              srchInput: srchInput,
+              srchCd: "",
+              srchNm: "",
+              srchText: $("#selectedProductNm").val(), // 입력된 상품명을 검색어로 전달
+              srchArea: $("#agntCd").val(), //화주코드
+              agntCd: $("#agntCd").val(),
+              agntNm: $("#agntNm").val(),
+            };
+
+            var errMsg = "";
+            var rtnVal = true;
+            if (!$("#agntCd").val()) {
+              errMsg = errMsg + "화주코드가 없습니다. 화주를 검색해주세요.\n";
+              rtnVal = false;
+            }
+            if (!$("#agntNm").val()) {
+              errMsg = errMsg + "화주명칭이 없습니다. 화주를 검색해주세요.\n";
+              rtnVal = false;
+            }
+            if (errMsg != "" && rtnVal == false) {
+              alert(errMsg);
+              return;
+            }
+            myWindowsOpen(
+              windowId,
+              windowText,
+              windowUrl,
+              windowLeft,
+              windowTop,
+              windowWidth,
+              windowHeight,
+              windowsModal,
+              windowOnClose,
+              windowSendObject
+            );
+            myWins.window(windowId).attachEvent("onClose", function (win) {
+              return true;
+            });
+          },
+
+          historyCommSrch: function (title, cmpyCd, srchCtgr, srchInput) {
+            windowId = "historyCommSrch";
+            windowText = title + " commSrch";
+            windowUrl = "/commSrch";
+            windowLeft = -14400;
+            windowTop = -14400;
+            windowWidth = 800;
+            windowHeight = 600;
+            windowsModal = true;
+            windowOnClose = function (windowId) {
+              return true;
+            };
+            windowSendObject = {
+              cmpyCd: cmpyCd,
+              srchCtgr: srchCtgr,
+              srchInput: srchInput,
+              windowId: windowId,
+              srchCd: $("#historyAgntCd").val(),
+              srchNm: $("#historyAgntNm").val(),
+              srchText: $("#historyAgntNm").val(),
+            };
+
+            myWindowsOpen(
+              windowId,
+              windowText,
+              windowUrl,
+              windowLeft,
+              windowTop,
+              windowWidth,
+              windowHeight,
+              windowsModal,
+              windowOnClose,
+              windowSendObject
+            );
+            myWins.window(windowId).attachEvent("onClose", function (win) {
+              return true;
+            });
+          },
+
+          historyProdCommSrch: function (title, cmpyCd, srchCtgr, srchInput) {
+            windowId = "historyProdCommSrch";
+            windowText = title + " prodSrch";
+            windowUrl = "/prodSrch";
+            windowLeft = 0;
+            windowTop = 0;
+            windowWidth = 800;
+            windowHeight = 600;
+            windowsModal = true;
+            windowOnClose = function (windowId) {
+              return true;
+            };
+            windowSendObject = {
+              windowId: windowId,
+              cmpyCd: cmpyCd,
+              srchCtgr: srchCtgr,
+              srchInput: srchInput,
+              srchCd: "",
+              srchNm: "",
+              srchText: $("#historyProductNm").val(),
+              srchArea: $("#historyAgntCd").val(),
+              agntCd: $("#historyAgntCd").val(),
+              agntNm: $("#historyAgntNm").val(),
+            };
+
+            myWindowsOpen(
+              windowId,
+              windowText,
+              windowUrl,
+              windowLeft,
+              windowTop,
+              windowWidth,
+              windowHeight,
+              windowsModal,
+              windowOnClose,
+              windowSendObject
+            );
+            myWins.window(windowId).attachEvent("onClose", function (win) {
+              return true;
+            });
+          },
+
+          rtnObject: function (windowId, rtnObj, srchInput) {
+            if (windowId == "commSrch") {
+              if (rtnObj == null) {
+                myWins.window(windowId).setPosition(0, 0);
+                return;
+              }
+
+              if (srchInput == "text") {
+                $("#agntCd").val(rtnObj[0].commCd);
+                $("#agntNm").val(rtnObj[0].commNm);
+              }
+            }
+            if (windowId == "prodCommSrch") {
+              if (rtnObj == null) {
+                myWins.window(windowId).setPosition(0, 0);
+                return;
+              }
+
+              if (srchInput == "text") {
+                $("#selectedProductCd").val(rtnObj[0].commCd);
+                $("#selectedProductNm").val(rtnObj[0].commNm);
+                $("#selectedProductId").val(rtnObj[0].tblMtrlMId);
+                // 상품이 선택되면 수량과 날짜 입력 필드를 활성화
+                $("#productQuantity").prop("disabled", false);
+                $("#expectedDate").prop("disabled", false);
+              }
+            }
+            if (windowId == "historyCommSrch") {
+              if (rtnObj == null) {
+                myWins.window(windowId).setPosition(0, 0);
+                return;
+              }
+
+              if (srchInput == "text") {
+                $("#historyAgntCd").val(rtnObj[0].commCd);
+                $("#historyAgntNm").val(rtnObj[0].commNm);
+              }
+            }
+            if (windowId == "historyProdCommSrch") {
+              if (rtnObj == null) {
+                myWins.window(windowId).setPosition(0, 0);
+                return;
+              }
+
+              if (srchInput == "text") {
+                $("#historyProductCd").val(rtnObj[0].commCd);
+                $("#historyProductNm").val(rtnObj[0].commNm);
+              }
+            }
+          },
+        },
+
+        // 화주사 코드 삭제
+        delAgntCode: function () {
+          $("#agntCd").val("");
+          $("#agntNm").val("");
+        },
+
+        // 상품 코드 삭제
+        delProductCode: function () {
+          $("#selectedProductCd").val("");
+          $("#selectedProductNm").val("");
+          $("#selectedProductId").val("");
+          $("#productQuantity").val("");
+          $("#expectedDate").val("");
+          $("#productQuantity").prop("disabled", true);
+          $("#expectedDate").prop("disabled", true);
+        },
+
+        // 화주사명 엔터키 처리
+        handleAgntNmKeypress: function (event) {
+          if (event.key === "Enter") {
+            var agntNm = $("#agntNm").val().trim();
+            if (agntNm.length > 0) {
+              fnObj.winOpen.commSrch("화주", "A", "AGENCY", "text");
+            }
+          }
+        },
+
+        // 상품명 엔터키 처리
+        handleProductNmKeypress: function (event) {
+          if (event.key === "Enter") {
+            var productNm = $("#selectedProductNm").val().trim();
+            if (productNm.length > 0) {
+              fnObj.winOpen.prodCommSrch("상품", "A", "MTRL_SO", "text");
+            }
+          }
+        },
+
+        // 입고 내역 화주사명 엔터키 처리
+        handleHistoryAgntNmKeypress: function (event) {
+          if (event.key === "Enter") {
+            var agntNm = $("#historyAgntNm").val().trim();
+            if (agntNm.length > 0) {
+              fnObj.winOpen.historyCommSrch("화주", "A", "AGENCY", "text");
+            }
+          }
+        },
+
+        // 입고 내역 상품명 엔터키 처리
+        handleHistoryProductNmKeypress: function (event) {
+          if (event.key === "Enter") {
+            var productNm = $("#historyProductNm").val().trim();
+            if (productNm.length > 0) {
+              fnObj.winOpen.historyProdCommSrch("상품", "A", "MTRL_SO", "text");
+            }
+          }
+        },
+
+        // 입고 내역 화주사 코드 삭제
+        delHistoryAgntCode: function () {
+          $("#historyAgntCd").val("");
+          $("#historyAgntNm").val("");
+        },
+
+        // 입고 내역 상품 코드 삭제
+        delHistoryProductCode: function () {
+          $("#historyProductCd").val("");
+          $("#historyProductNm").val("");
+        },
+
+        // 전체 선택/해제
+        toggleSelectAll: function () {
+          var isChecked = $("#selectAllCheckbox").prop("checked");
+          $(".inbound-checkbox").prop("checked", isChecked);
+          fnObj.updateDeleteButton();
+        },
+
+        // 삭제 버튼 표시/숨김 업데이트
+        updateDeleteButton: function () {
+          var checkedCount = $(".inbound-checkbox:checked").length;
+          if (checkedCount > 0) {
+            $("#deleteSelectedBtn").show();
+          } else {
+            $("#deleteSelectedBtn").hide();
+          }
+        },
+
+        // 안전한 날짜 포맷팅 함수
+        formatDate: function (dateValue) {
+          if (!dateValue) return "";
+
+          // 문자열로 변환
+          var dateStr = String(dateValue);
+
+          // 이미 YYYY-MM-DD 형식인 경우
+          if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            return dateStr;
+          }
+
+          // ISO 형식 (2025-01-10T15:30:00)인 경우
+          if (dateStr.includes("T")) {
+            return dateStr.split("T")[0];
+          }
+
+          // 8자리 숫자 형식 (20250110)인 경우
+          if (dateStr.match(/^\d{8}$/)) {
+            return (
+              dateStr.substring(0, 4) +
+              "-" +
+              dateStr.substring(4, 6) +
+              "-" +
+              dateStr.substring(6, 8)
+            );
+          }
+
+          // 배열 형식 [2025, 1, 10]인 경우
+          if (Array.isArray(dateValue) && dateValue.length >= 3) {
+            var year = dateValue[0];
+            var month = String(dateValue[1]).padStart(2, "0");
+            var day = String(dateValue[2]).padStart(2, "0");
+            return year + "-" + month + "-" + day;
+          }
+
+          // Date 객체인 경우
+          if (dateValue instanceof Date) {
+            return dateValue.toISOString().split("T")[0];
+          }
+
+          // 기타 경우 그대로 반환
+          return dateStr;
+        },
+
+        // 선택된 입고 내역 일괄 삭제
+        deleteSelectedInbound: function () {
+          var selectedIds = [];
+          $(".inbound-checkbox:checked").each(function () {
+            selectedIds.push($(this).val());
+          });
+
+          if (selectedIds.length === 0) {
+            alert("삭제할 항목을 선택해주세요.");
+            return;
+          }
+
+          if (
+            !confirm(
+              "선택된 " +
+                selectedIds.length +
+                "개의 입고 내역을 삭제하시겠습니까?"
+            )
+          ) {
+            return;
+          }
+
+          // 각 항목을 개별적으로 삭제
+          var deletePromises = selectedIds.map(function (id) {
+            return $.ajax({
+              url: "/erp105002DeleteInbound",
+              type: "POST",
+              contentType: "application/json",
+              data: JSON.stringify({ tblInboundProductId: parseInt(id) }),
+            });
+          });
+
+          Promise.all(deletePromises)
+            .then(function (responses) {
+              alert("선택된 입고 내역이 삭제되었습니다.");
+              fnObj.loadInboundHistory();
+            })
+            .catch(function (error) {
+              alert("삭제 중 오류가 발생했습니다.");
+              console.error(error);
+            });
+        },
+      };
+
+      $(document).ready(function () {
+        myWins = new dhtmlXWindows();
+        fnObj.tabOpen.showRegisterTab();
+
+        // 오늘 날짜를 기본값으로 설정
+        var today = new Date().toISOString().split("T")[0];
+        $('input[type="date"]').val(today);
+
+        // 입고 내역 조회 시 기본값으로 오늘 날짜 설정
+        $("#historyDateFrom").val(today);
+        $("#historyDateTo").val(today);
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="mainDiv">
+      <div id="searchDiv">
+        <div id="btnDiv1">
+          <span class="title-container">
+            <span class="item-heade title-text">입고 관리</span>
+            <span class="sub-title">erp105002</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- 탭 컨테이너 -->
+      <div class="tab-container">
+        <button
+          id="registerTab"
+          class="tab-button active"
+          onclick="fnObj.tabOpen.showRegisterTab()"
+        >
+          입고 등록
+        </button>
+        <button
+          id="historyTab"
+          class="tab-button"
+          onclick="fnObj.tabOpen.showHistoryTab()"
+        >
+          입고 내역
+        </button>
+      </div>
+
+      <!-- 입고 등록 탭 -->
+      <div id="registerContent" class="tab-content active">
+        <div class="form-section">
+          <div class="form-row">
+            <div class="form-group">
+              <label>화주사</label>
+              <input
+                type="text"
+                id="agntNm"
+                placeholder="화주사명을 입력하세요"
+                onkeypress="fnObj.handleAgntNmKeypress(event)"
+              />
+              <button
+                class="search-icon"
+                onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"
+              >
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+            <div class="form-group">
+              <label>화주사코드</label>
+              <input
+                type="text"
+                id="agntCd"
+                placeholder="화주사코드"
+                readonly
+              />
+              <button class="delete-icon" onclick="fnObj.delAgntCode()">
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+            <div class="form-group">
+              <label>상품</label>
+              <input
+                type="text"
+                id="selectedProductNm"
+                placeholder="상품명을 입력하세요"
+                onkeypress="fnObj.handleProductNmKeypress(event)"
+              />
+              <button
+                class="search-icon"
+                onclick="fnObj.winOpen.prodCommSrch('상품','A','MTRL_SO','text')"
+              >
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+            <div class="form-group">
+              <label>상품코드</label>
+              <input
+                type="text"
+                id="selectedProductCd"
+                placeholder="상품코드"
+                readonly
+              />
+              <button class="delete-icon" onclick="fnObj.delProductCode()">
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>수량</label>
+              <input
+                type="number"
+                id="productQuantity"
+                placeholder="수량"
+                min="1"
+                disabled
+              />
+            </div>
+            <div class="form-group">
+              <label>예정일</label>
+              <input type="date" id="expectedDate" disabled />
+            </div>
+            <div class="form-group">
+              <button
+                class="btn btn-success"
+                onclick="fnObj.addProductToList()"
+              >
+                목록에 추가
+              </button>
+            </div>
+            <div class="form-group">
+              <button
+                class="btn btn-primary"
+                onclick="fnObj.registerSelectedProducts()"
+              >
+                선택된 상품들 입고 등록
+              </button>
+            </div>
+            <div class="form-group">
+              <button
+                class="btn btn-secondary"
+                onclick="fnObj.clearRegisterForm()"
+              >
+                초기화
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="table-container"
+            id="selectedProductsContainer"
+            style="display: none"
+          >
+            <div class="table-header">선택된 상품 목록</div>
+            <table class="data-table" id="selectedProductsTable">
+              <thead>
+                <tr>
+                  <th>상품코드</th>
+                  <th>상품명</th>
+                  <th>수량</th>
+                  <th>예정일</th>
+                  <th>액션</th>
+                </tr>
+              </thead>
+              <tbody id="selectedProductsList">
+                <!-- 선택된 상품 목록이 여기에 표시됩니다 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 입고 내역 탭 -->
+      <div id="historyContent" class="tab-content">
+        <div class="search-section">
+          <div class="search-row">
+            <div class="search-group">
+              <label>등록일자</label>
+              <input type="date" id="historyDateFrom" />
+            </div>
+            <div class="search-group">
+              <label>~</label>
+              <input type="date" id="historyDateTo" />
+            </div>
+            <div class="search-group">
+              <label>화주사</label>
+              <input
+                type="text"
+                id="historyAgntNm"
+                placeholder="화주사명을 입력하세요"
+                onkeypress="fnObj.handleHistoryAgntNmKeypress(event)"
+              />
+              <button
+                class="search-icon"
+                onclick="fnObj.winOpen.historyCommSrch('화주','A','AGENCY','text')"
+              >
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+            <div class="search-group">
+              <label>화주사코드</label>
+              <input
+                type="text"
+                id="historyAgntCd"
+                placeholder="화주사코드"
+                readonly
+              />
+              <button class="delete-icon" onclick="fnObj.delHistoryAgntCode()">
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+            <div class="search-group">
+              <label>상품</label>
+              <input
+                type="text"
+                id="historyProductNm"
+                placeholder="상품명을 입력하세요"
+                onkeypress="fnObj.handleHistoryProductNmKeypress(event)"
+              />
+              <button
+                class="search-icon"
+                onclick="fnObj.winOpen.historyProdCommSrch('상품','A','MTRL_SO','text')"
+              >
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+            <div class="search-group">
+              <label>상품코드</label>
+              <input
+                type="text"
+                id="historyProductCd"
+                placeholder="상품코드"
+                readonly
+              />
+              <button
+                class="delete-icon"
+                onclick="fnObj.delHistoryProductCode()"
+              >
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <div class="search-row">
+            <div class="search-group">
+              <label>상태</label>
+              <select id="historyStatus">
+                <option value="">전체</option>
+                <option value="PENDING">입고 예정</option>
+                <option value="COMPLETED">입고 완료</option>
+              </select>
+            </div>
+            <div class="search-group">
+              <button class="btn" onclick="fnObj.loadInboundHistory()">
+                조회
+              </button>
+              <button
+                class="btn btn-danger"
+                onclick="fnObj.deleteSelectedInbound()"
+                id="deleteSelectedBtn"
+                style="display: none; margin-left: 10px"
+              >
+                선택 삭제
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <div class="table-header">입고 내역</div>
+          <table class="data-table" id="inboundHistoryTable">
+            <thead>
+              <tr>
+                <th>
+                  <input
+                    type="checkbox"
+                    id="selectAllCheckbox"
+                    onchange="fnObj.toggleSelectAll()"
+                  />
+                </th>
+                <th>화주사명</th>
+                <th>상품코드</th>
+                <th>상품명</th>
+                <th>수량</th>
+                <th>예정일</th>
+                <th>등록일</th>
+                <th>상태</th>
+                <th>삭제</th>
+              </tr>
+            </thead>
+            <tbody id="inboundHistoryList">
+              <!-- 입고 내역이 여기에 동적으로 로드됩니다 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

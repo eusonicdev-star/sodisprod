@@ -8,7 +8,7 @@ spring:
     cache: false
     check-template-location: true
   profiles:
-    active: local
+    active: prod
 
 common:
   html:

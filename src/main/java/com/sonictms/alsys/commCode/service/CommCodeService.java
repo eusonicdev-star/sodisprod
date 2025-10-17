@@ -22,6 +22,10 @@ public class CommCodeService {
         return commCodeMapper.commSrchList(commCodeVO);
     }
 
+    public List<CommCodeVO> commSrchListMto(CommCodeVO commCodeVO) {
+        return commCodeMapper.commSrchListMto(commCodeVO);
+    }
+
     //알람톡 발송 결과를 성공일때만 저장
     public SendAlrmTalkVO saveAlrmTmpResult(SendAlrmTalkVO sendAlrmTalkVO) {
         return commCodeMapper.saveAlrmTmpResult(sendAlrmTalkVO);
