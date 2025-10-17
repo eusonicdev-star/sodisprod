@@ -84,13 +84,16 @@ public class CommCodeController {
 		return commCodeService.commSrchListMto(CommCodeVO);
 	}
 
-	// ==================== 알림톡 발송 관련 메서드 ====================
+    /**
+     * 알림톡 발송 관련 메서드
+     *
+     * @param sendAlrmTalkVO
+     * @return
+     */
 	@RequestMapping(value = {"sendAlrmTalk"}, method = RequestMethod.POST)
 	@ResponseBody
 	public List<SendAlrmTalkVO> sendAlrmTalk(@RequestBody SendAlrmTalkVO sendAlrmTalkVO) {
 		JSONArray jsonArray = createAlrmTalkJsonArray(sendAlrmTalkVO);
-		log.info("sendAlrmTalk 알림톡 보내기 : {}", jsonArray.toString());
-		
 		return sendAlrmTalkToApi(jsonArray);
 	}
 
@@ -107,8 +110,7 @@ public class CommCodeController {
 		
 		for (SendAlrmTalkVO alrmTalkVO : sendAlrmTalkVOList) {
 			JSONArray jsonArray = createAlrmTalkJsonArray(alrmTalkVO);
-			log.info("sendScdlAlrm 알림톡 스케줄 : {}", jsonArray.toString());
-			
+
 			List<SendAlrmTalkVO> apiResponse = sendAlrmTalkToApi(jsonArray);
 			if (!apiResponse.isEmpty()) {
 				SendAlrmTalkVO resultVO = processScheduledAlrmTalkResult(apiResponse.get(0), alrmTalkVO);

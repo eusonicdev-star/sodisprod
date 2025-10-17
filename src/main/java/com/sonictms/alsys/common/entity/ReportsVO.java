@@ -1,10 +1,10 @@
 package com.sonictms.alsys.common.entity;
 
-import java.io.Serializable;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.io.Serializable;
 
 @Getter
 @Setter
@@ -17,7 +17,6 @@ public class ReportsVO implements Serializable {
     private String cmpyCd;    //회사코드
     private String sysCd;    //시스템코드
     private String userGrntCd;    //권한코드
-    //erp104003_01
     private String soIdList;    //주문헤더고유ID
     private String saveUser;    //출력하는 사람 아이디
     private String p1;

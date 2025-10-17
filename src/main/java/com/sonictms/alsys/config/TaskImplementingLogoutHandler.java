@@ -1,20 +1,16 @@
 package com.sonictms.alsys.config;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
-public class TaskImplementingLogoutHandler implements LogoutHandler {        //LogoutHandler 를 빌려다가 TaskImplementingLogoutHandler 를 만듦
-
+public class TaskImplementingLogoutHandler implements LogoutHandler {
     @Override
-    public void logout(HttpServletRequest req, HttpServletResponse res,
-                       Authentication authentication) {        //logout 함수는 LogoutHandler 안에 들어있다
+    public void logout(HttpServletRequest req, HttpServletResponse res, Authentication authentication) {
 
-        log.info("로그아웃 되었습니다.");
     }
 }

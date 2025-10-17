@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.function.Function;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.sonictms.alsys.common.entity.ReportUtils.*;
 

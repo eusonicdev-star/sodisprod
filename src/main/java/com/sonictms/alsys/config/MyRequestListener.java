@@ -1,4 +1,3 @@
-//세션타임아웃 설정
 package com.sonictms.alsys.config;
 
 import lombok.extern.slf4j.Slf4j;

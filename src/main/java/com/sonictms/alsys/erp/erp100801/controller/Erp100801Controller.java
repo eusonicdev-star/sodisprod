@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Base64Util;
 import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +30,7 @@ import java.util.ArrayList;
 @Controller
 public class Erp100801Controller {
 
-    @Autowired
-    Erp100801Service erp100801Service;
+    private final Erp100801Service erp100801Service;
 
     @Value("${common.java.kppApiSearch}")
     private String kppApiSearch;
@@ -58,10 +56,7 @@ public class Erp100801Controller {
         return modelAndView;
     }
 
-    @RequestMapping(
-            value = {"kppSearch"},
-            method = {RequestMethod.POST}
-    )
+    @RequestMapping(value = {"kppSearch"}, method = {RequestMethod.POST})
     @ResponseBody
     public Erp100801VO kppSearch(@RequestBody Erp100801VO erp100801VO) {
         this.disableSslVerification();
@@ -109,7 +104,7 @@ public class Erp100801Controller {
                 log.info("KPP API 응답 메시지: " + returnMsg);
                 Gson gson = new Gson();
                 try {
-                    vo = (Erp100801VO) gson.fromJson(returnMsg, (new TypeToken<Erp100801VO>() {
+                    vo = gson.fromJson(returnMsg, (new TypeToken<Erp100801VO>() {
                     }).getType());
                 } catch (Exception jsonException) {
                     log.error("JSON 파싱 중 오류 발생: " + jsonException.getMessage(), jsonException);
@@ -161,7 +156,6 @@ public class Erp100801Controller {
             }
         }
 
-        // NPE 방지를 위한 null 체크 추가
         if (vo == null) {
             log.error("KPP API 응답 파싱 실패: vo가 null입니다.");
             vo = new Erp100801VO();
@@ -182,34 +176,24 @@ public class Erp100801Controller {
         vo.setOutSoNoList(erp100801VO.getOutSoNoList());
         vo.setOutCmpyCd(erp100801VO.getOutCmpyCd());
         vo.setCmpyCd(erp100801VO.getCmpyCd());
-        Erp100801VO outCmpySave = this.erp100801Service.outCmpySave(vo);
-        return outCmpySave;
+        return this.erp100801Service.outCmpySave(vo);
     }
 
-    @RequestMapping(
-            value = {"erp100801OutCmpyList"},
-            method = {RequestMethod.POST}
-    )
+    @RequestMapping(value = {"erp100801OutCmpyList"}, method = {RequestMethod.POST})
     @ResponseBody
     public Erp100801VO erp100801OutCmpyList(@RequestBody Erp100801VO erp100801VO) {
         erp100801VO = this.erp100801Service.erp100801OutCmpyList(erp100801VO);
         return erp100801VO;
     }
 
-    @RequestMapping(
-            value = {"erp100801DataChk"},
-            method = {RequestMethod.POST}
-    )
+    @RequestMapping(value = {"erp100801DataChk"}, method = {RequestMethod.POST})
     @ResponseBody
     public Erp100801VO erp100801DataChk(@RequestBody Erp100801VO erp100801VO) {
         erp100801VO = this.erp100801Service.erp100801DataChk(erp100801VO);
         return erp100801VO;
     }
 
-    @RequestMapping(
-            value = {"erp100801AlOrdrSave"},
-            method = {RequestMethod.POST}
-    )
+    @RequestMapping(value = {"erp100801AlOrdrSave"}, method = {RequestMethod.POST})
     @ResponseBody
     public Erp100801VO erp100801AlOrdrSave(@RequestBody Erp100801VO erp100801VO) {
         this.erp100801Service.erp100801AlOrdrSave(erp100801VO);
@@ -247,7 +231,7 @@ public class Erp100801Controller {
                     URL kppUrl = new URL(kppApiStatus);
                     String expectedHost = kppUrl.getHost();
 
-                    if (expectedHost != null && hostname.equalsIgnoreCase(expectedHost)) {
+                    if (hostname.equalsIgnoreCase(expectedHost)) {
                         log.info("호스트명 검증 성공: {}", hostname);
                         return true;
                     } else {
@@ -259,8 +243,8 @@ public class Erp100801Controller {
                     return false;
                 }
             };
+
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-            
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             log.error("SSL 설정 중 오류 발생", e);
         }

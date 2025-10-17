@@ -1,4 +1,3 @@
-//세션타임아웃 설정
 package com.sonictms.alsys.config;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,7 @@ public class SessionListener implements HttpSessionListener {
 	//sessions라는 Map을 만들어서 키값으로 세션의 고유 생성 아이디값, 값으로는 HttpSession을 갖도록 하였다
 	public static final Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
 
-    //중복로그인 지우기
+    //중복 로그인 지우기
     public synchronized static String getSessionidCheck(String type, String compareId) {
        String result = "";
         for (String key : sessions.keySet()) {
@@ -28,7 +27,7 @@ public class SessionListener implements HttpSessionListener {
 
             try {
                 if (value != null && value.getAttribute(type).toString().equals(compareId)) {
-	                result =  key.toString();
+                    result = key;
 	            }
             } catch (Exception e) {
             	log.error("Session error: " + e.getMessage());
@@ -65,7 +64,6 @@ public class SessionListener implements HttpSessionListener {
             sessionList.add(session);
         }
     }
-
 
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {

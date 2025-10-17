@@ -1,8 +1,8 @@
 package com.sonictms.alsys.common.service;
 
+import com.google.gson.Gson;
 import com.sonictms.alsys.common.entity.ErpCommonVO;
 import com.sonictms.alsys.common.mapper.ErpCommonMapper;
-import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Base64Util;
@@ -43,22 +43,6 @@ public class ErpCommonService {
     private static final int READ_TIMEOUT = 10000;
     private static final String CONTENT_TYPE = "application/json;charset=UTF-8";
     private static final String ACCEPT = "application/json;charset=UTF-8";
-
-    /**
-     * KPP 배송상태 변경을 위해 얼라이언스에서 보낼값을 조회 (1건)
-     */
-    public ErpCommonVO erpCommoSendValueSearch(ErpCommonVO erpCommonVO) {
-        erpCommonMapper.erpCommoSendValueSearch(erpCommonVO);
-        return erpCommonVO;
-    }
-
-    /**
-     * 모바일에서 KPP 배송상태 변경을 위해 얼라이언스에서 보낼값을 조회 (1건)
-     */
-    public ErpCommonVO erpCommoSendValueSearchForMobile(ErpCommonVO erpCommonVO) {
-        erpCommonMapper.erpCommoSendValueSearchForMobile(erpCommonVO);
-        return erpCommonVO;
-    }
 
     /**
      * KPP 배송상태 변경 API 호출

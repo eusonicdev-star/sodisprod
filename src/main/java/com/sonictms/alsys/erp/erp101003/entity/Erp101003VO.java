@@ -1,7 +1,6 @@
 package com.sonictms.alsys.erp.erp101003.entity;
 
 import com.sonictms.alsys.common.entity.CommonVO;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

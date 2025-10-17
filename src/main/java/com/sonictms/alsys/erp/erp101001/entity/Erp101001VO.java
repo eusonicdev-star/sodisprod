@@ -58,9 +58,7 @@ public class Erp101001VO extends CommonVO {
     private String useYn;        //사용여부
     private String delResn;
     private String memo;        //비고
-
     private String refSoList;
-
     private String dtType;        //날짜종류
     private String fromDt;        //날짜시작
     private String toDt;        //날짜종류

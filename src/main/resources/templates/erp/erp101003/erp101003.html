@@ -62,7 +62,6 @@
                     myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
 
                     myWins.window(windowId).attachEvent("onClose", function (win) {
-                        //alert("windowId : " + windowId);
                         return true;
                     });
                 },	//END of commSrch : function(){
@@ -86,11 +85,9 @@
                         windowId: windowId
                     };
 
-
                     myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
 
-                    myWins.window(windowId).attachEvent("onClose", function (win) {
-
+                    myWins.window(windowId).attachEvent("onClose", function () {
                         return true;
                     });
                 },	//END of commSrch : function(){
@@ -115,9 +112,7 @@
                         soType: soType
                     };
 
-
                     myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
-
                     myWins.window(windowId).attachEvent("onClose", function (win) {
 
                         return true;
@@ -144,11 +139,8 @@
                         tblSoMId: tblSoMId
                     };
 
-
                     myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
-
                     myWins.window(windowId).attachEvent("onClose", function (win) {
-
                         return true;
                     });
                 },	//END of soUpdatePopup : function(){
@@ -165,10 +157,8 @@
                         }
                     }
                     if (windowId == "erp101003p1") {
-
                         rtnSoType = rtnObj[0].soType;
                         fnObj.winOpen.soInsertPopup(rtnSoType);
-
                     }
                 },	//END of rtnObject : function(windowId,rtnObj){
             },	//END of winOpen
@@ -182,7 +172,6 @@
                         myGrid.clearAll(false);
                     });
                     myComboCmpyCd.disable();
-
                 },
 
                 comboDtType: function () {	//달력유형구분 콤보
@@ -195,7 +184,6 @@
                         myGrid.clearAll(false);
                     });
                 },
-
 
                 comboDcCd: function () {		//물류센터 콤보
                     myComboDcCd = new dhtmlXComboFromSelect("dcCd");
@@ -217,8 +205,8 @@
                             this.selectOption(0);
                             this.openSelect();
                         }
-
                     });
+
                     myComboDcCd.attachEvent("onCheck", function (value, text) {
 
                         if (!value)		//체크를 한 것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
@@ -231,7 +219,6 @@
                                     c++;
                                 }
                                 myComboDcCd.updateOption("", "", c + "개 선택", "");
-                                //myComboDcCd.selectOption(0);
                                 myComboDcCd.openSelect();
                             }
                             if (!myComboDcCd.isChecked(0))		//전체에 체크를 안했을때
@@ -242,47 +229,37 @@
                                     myComboDcCd.setChecked(i, false);
                                 }
                                 myComboDcCd.updateOption("", "", c + "개 선택", "");
-                                //myComboDcCd.selectOption(0);
                                 myComboDcCd.openSelect();
                                 return;
                             }
 
                         } else {
                             var cnt = 0;
-
                             for (var i = 1; i < myComboDcCd.getOptionsCount(); i++) {
                                 if (myComboDcCd.isChecked(i)) {
                                     cnt++;
                                 }
                             }
 
-
                             if ((myComboDcCd.getOptionsCount() - 1) == cnt) {
                                 myComboDcCd.setChecked(0, true);
                             } else {
                                 myComboDcCd.setChecked(0, false);
                             }
-
                             myComboDcCd.updateOption("", "", cnt + "개 선택", "");
-                            //myComboDcCd.selectOption(0);
                             myComboDcCd.openSelect();
-
-
-                            return;
                         }
 
                     });
                 },
 
-
-                comboSoType: function () {		//주문유형
+                comboSoType: function () {
                     myComboSoType = new dhtmlXComboFromSelect("soType");
                     comboList(myComboSoType, 'A', 'COMM', 'SO_ORDR_TYPE', '', 'Y', 'req');
                     myComboSoType.selectOption(0);
                     myComboSoType.readonly(true);
                     myComboSoType.setFontSize("12px", "12px");
                     myComboSoType.attachEvent("onChange", function (value, text) {
-                        //myGrid.clearAll(false);
                         if (this.getIndexByValue(value) != 0) {
                             this.setChecked(this.getIndexByValue(value), true);
                             var c = 0;
@@ -297,9 +274,8 @@
                         }
 
                     });
-                    myComboSoType.attachEvent("onCheck", function (value, text) {
-
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
+                    myComboSoType.attachEvent("onCheck", function (value) {
+                        if (!value)
                         {
                             if (myComboSoType.isChecked(0)) {
 
@@ -309,7 +285,6 @@
                                     c++;
                                 }
                                 myComboSoType.updateOption("", "", c + "개 선택", "");
-                                //myComboSoType.selectOption(0);
                                 myComboSoType.openSelect();
                             }
                             if (!myComboSoType.isChecked(0))		//전체에 체크를 안했을때
@@ -320,11 +295,9 @@
                                     myComboSoType.setChecked(i, false);
                                 }
                                 myComboSoType.updateOption("", "", c + "개 선택", "");
-                                //myComboSoType.selectOption(0);
                                 myComboSoType.openSelect();
                                 return;
                             }
-
                         } else {
                             var cnt = 0;
 
@@ -334,7 +307,6 @@
                                 }
                             }
 
-
                             if ((myComboSoType.getOptionsCount() - 1) == cnt) {
                                 myComboSoType.setChecked(0, true);
                             } else {
@@ -342,24 +314,19 @@
                             }
 
                             myComboSoType.updateOption("", "", cnt + "개 선택", "");
-                            //myComboSoType.selectOption(0);
                             myComboSoType.openSelect();
-
-
-                            return;
                         }
 
                     });
                 },
 
-                comboSoStat: function () {		//주문상태
+                comboSoStat: function () {
                     myComboSoStat = new dhtmlXComboFromSelect("soStat");
                     comboList(myComboSoStat, 'A', 'COMM', 'SO_STAT_CD', '', 'Y', 'req');
                     myComboSoStat.selectOption(0);
                     myComboSoStat.readonly(true);
                     myComboSoStat.setFontSize("12px", "12px");
                     myComboSoStat.attachEvent("onChange", function (value, text) {
-                        //myGrid.clearAll(false);
                         if (this.getIndexByValue(value) != 0) {
                             this.setChecked(this.getIndexByValue(value), true);
                             var c = 0;
@@ -376,28 +343,23 @@
                     });
                     myComboSoStat.attachEvent("onCheck", function (value, text) {
 
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
-                        {
+                        if (!value) {
                             if (myComboSoStat.isChecked(0)) {
-
                                 var c = 0;
                                 for (var i = 1; i < myComboSoStat.getOptionsCount(); i++) {
                                     myComboSoStat.setChecked(i, true);
                                     c++;
                                 }
                                 myComboSoStat.updateOption("", "", c + "개 선택", "");
-                                //myComboSoStat.selectOption(0);
                                 myComboSoStat.openSelect();
                             }
-                            if (!myComboSoStat.isChecked(0))		//전체에 체크를 안했을때
-                            {
+                            if (!myComboSoStat.isChecked(0)) {
 
                                 var c = 0;
                                 for (var i = 1; i < myComboSoStat.getOptionsCount(); i++) {
                                     myComboSoStat.setChecked(i, false);
                                 }
                                 myComboSoStat.updateOption("", "", c + "개 선택", "");
-                                //myComboSoStat.selectOption(0);
                                 myComboSoStat.openSelect();
                                 return;
                             }
@@ -416,60 +378,49 @@
                             } else {
                                 myComboSoStat.setChecked(0, false);
                             }
-
                             myComboSoStat.updateOption("", "", cnt + "개 선택", "");
-                            //myComboSoStat.selectOption(0);
                             myComboSoStat.openSelect();
-
-
-                            return;
                         }
 
                     });
                 },
 
-                comboChkSoStat: function () {		//주문상태
+                comboChkSoStat: function () {
                     myComboChkSoStat = new dhtmlXCombo("chkSoStat");
                     comboList(myComboChkSoStat, 'A', 'COMM', 'SO_STAT_CD', '', 'Y', 'req');
                     myComboChkSoStat.selectOption(0);
-
                     myComboChkSoStat.setFontSize("12px", "12px");
                     myComboChkSoStat.attachEvent("onChange", function (value, text) {
-                        //myGrid.clearAll(false);
                     });
                     myComboChkSoStat.readonly(true);
                     myComboChkSoStat.disable();
                 },
 
                 //20211226 정연호 추가 일괄변경에 주문유형 추가
-                comboChkSoType: function () {		//주문상태
+                comboChkSoType: function () {
                     myComboChkSoType = new dhtmlXCombo("chkSoType");
                     comboList(myComboChkSoType, 'A', 'COMM', 'SO_ORDR_TYPE', '', 'Y', 'req');
                     myComboChkSoType.selectOption(0);
                     myComboChkSoType.setFontSize("12px", "12px");
                     myComboChkSoType.attachEvent("onChange", function (value, text) {
-                        //myGrid.clearAll(false);
                     });
                     myComboChkSoType.readonly(true);
                     myComboChkSoType.disable();
                 },
 
-
-                comboChkDcCd: function () {		//물류센터
+                comboChkDcCd: function () {
                     myComboChkDcCd = new dhtmlXCombo("chkDcCd");
                     comboList(myComboChkDcCd, 'A', 'DC_CD', '', '', 'Y', 'req');
                     myComboChkDcCd.selectOption(0);
-
                     myComboChkDcCd.setFontSize("12px", "12px");
                     myComboChkDcCd.attachEvent("onChange", function (value, text) {
-                        //myGrid.clearAll(false);
                     });
                     myComboChkDcCd.readonly(true);
                     myComboChkDcCd.disable();
                 },
 
                 //일괄변경의 배송상태
-                comboChkDlvyStatCd: function () {		//
+                comboChkDlvyStatCd: function () {
                     myComboChkDlvyStatCd = new dhtmlXCombo("chkDlvyStatCd");
                     comboList(myComboChkDlvyStatCd, 'A', 'COMM', 'DLVY_STAT_CD', '', 'Y', 'req');
                     myComboChkDlvyStatCd.selectOption(0);
@@ -488,8 +439,6 @@
                     comboList(myComboInstCapaCtgr, 'A', 'COMM', 'INST_CAPA_CTGR', '', 'Y', 'req');
                     myComboInstCapaCtgr.readonly(true);
                     myComboInstCapaCtgr.selectOption(0);
-                    //myComboInstCapaCtgr.setChecked(1,true);
-                    //myComboInstCapaCtgr.updateOption("","",1+"개 선택","");
                     var c = 0;
                     for (var i = 0; i < myComboInstCapaCtgr.getOptionsCount(); i++) {
                         myComboInstCapaCtgr.setChecked(i, true);
@@ -513,10 +462,8 @@
                         }
 
                     });
-                    myComboInstCapaCtgr.attachEvent("onCheck", function (value, text) {
-
-                        if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
-                        {
+                    myComboInstCapaCtgr.attachEvent("onCheck", function (value) {
+                        if (!value) {
                             if (myComboInstCapaCtgr.isChecked(0)) {
                                 //console.log("전체 에 체크를 했을때");
                                 var c = 0;
@@ -525,12 +472,10 @@
                                     c++;
                                 }
                                 myComboInstCapaCtgr.updateOption("", "", c + "개 선택", "");
-                                //myComboInstCapaCtgr.selectOption(0);
                                 myComboInstCapaCtgr.openSelect();
                             }
                             if (!myComboInstCapaCtgr.isChecked(0))		//전체에 체크를 안했을때
                             {
-                                //console.log("전체 에 체크를 안했을때");
                                 var c = 0;
                                 for (var i = 1; i < myComboInstCapaCtgr.getOptionsCount(); i++) {
                                     myComboInstCapaCtgr.setChecked(i, false);
@@ -549,9 +494,6 @@
                                     cnt++;
                                 }
                             }
-                            //console.log("체크한 것 cnt : " + cnt);
-
-
                             if ((myComboInstCapaCtgr.getOptionsCount() - 1) == cnt) {
                                 myComboInstCapaCtgr.setChecked(0, true);
                             } else {
@@ -559,11 +501,7 @@
                             }
 
                             myComboInstCapaCtgr.updateOption("", "", cnt + "개 선택", "");
-                            //myComboInstCapaCtgr.selectOption(0);
                             myComboInstCapaCtgr.openSelect();
-
-
-                            return;
                         }
 
                     });
@@ -1503,16 +1441,13 @@
                         if (enterType == 'srchName') {
                             $("#srchName").blur();
                             $("#srchCode").blur();
-
-
                             $("#srchCode").val("");
-
                             fnObj.winOpen.commSrch('화주', 'A', 'AGENCY', 'text');
                         }
                     }
 
                 },
-                onKeyPressed: function (code, ctrl, shift) {
+                onKeyPressed: function (code, ctrl) {
                     if (code == 67 && ctrl) {
                         myGrid.setCSVDelimiter("\t");
                         myGrid.copyBlockToClipboard()
@@ -1525,7 +1460,6 @@
             }
         }
 
-
         //엑셀 헨들러
         var excelHandler = {
             getExcelFileName: function () {
@@ -1535,7 +1469,7 @@
                 return '주문등록';		//시트명
             },
             getExcelData: function () {
-                return get_json_res(myGrid, searchRes);		//그리드를 엑셀다운로드dyd json 으로 변경
+                return get_json_res(myGrid, searchRes);
             },
             getWorksheet: function () {
                 return XLSX.utils.json_to_sheet(this.getExcelData());
@@ -1544,24 +1478,18 @@
 
 
         function searchPaging(page) {
-
             selectPageNo = page
-            //pagePerRow	=	15;	//페이지당 몇줄을 보여줄것인가
 
             if ($("#rowPerPage").val()) {
                 pagePerRow = parseInt($("#rowPerPage").val());
             }
 
-            var pageRange = 10;	//페이지범위를 몇개씩짜를것인가. 예) 23페이지 라면 1 2 3 4 5 6 7 8 9 10  이 한번 나오고 >> 누르면 11 12 13 14 15 16 17 18 19 20 나오고 >> 누르면 21 22 23 나옴
-
+            var pageRange = 10;
             var totalPageCnt = searchRes.length % pagePerRow == 0 ? parseInt(searchRes.length / pagePerRow) : parseInt(searchRes.length / pagePerRow) + 1
-
             var a = "<div class='pagination-container'>";
-
             //패이징 처리
             var start = (page - 1);
             var end = (page - 1) + pageRange;
-
             if (start % pageRange != 0) {
                 start = parseInt(start / pageRange) * pageRange;
             }
@@ -1600,8 +1528,8 @@
             a += "</div></div>";
             $("#page").html(a);
 
-            var is = (page - 1) * pagePerRow;	//시작점
-            var ie = (page - 1) * pagePerRow + pagePerRow;	//종료점
+            var is = (page - 1) * pagePerRow;
+            var ie = (page - 1) * pagePerRow + pagePerRow;
 
             if (searchRes.length < ie) {
                 ie = searchRes.length;
@@ -1618,7 +1546,6 @@
                 myGrid.addRow(i + 1, "");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
                 myGrid.setRowData(i + 1, jsonData);
 
-                //20220106 정연호 미마감은 빨강, 기사취소 8060 은 주황색
                 var soStatCdVal = myGrid.cellById(i + 1, myGrid.getColIndexById("soStatCd")).getValue()
                 if (soStatCdVal == "8000") {
                     myGrid.setRowColor(i + 1, "#F5A9A9");
@@ -1626,8 +1553,6 @@
                 if (soStatCdVal == "8060") {
                     myGrid.setRowColor(i + 1, "#FF8000");
                 }
-
-
             }
         }
 
@@ -1638,7 +1563,6 @@
             }
             exportExcel();
         }
-
 
         $(document).ready(function () {
             myWins = new dhtmlXWindows();
@@ -1682,19 +1606,8 @@
             }
 
             var oneMonthLaterToday = oneMonthLaterYear + "-" + oneMonthLaterMonth + "-" + oneMonthLaterDate;
-            //달력정의
 
-            //$("#chkDlvyCnfmDt").val(today);
             myCalendar2.loadUserLanguage("ko");
-
-            //20220111 정연호 주석처리 선택가능한 달력을 90일제한 하는것을 품
-            //myCalendar2.setSensitiveRange(today,oneMonthLaterToday);			//이만큼 범위만 날짜 선택가능 (오늘 부터 1달 후 로 지정)
-
-            myCalendar2.attachEvent("onShow", function () {
-                //fnObj.searchOpen.searchDisableDate();	//20211030 정연호. 일단 날짜비활성화 없이 일반달력으로 오픈
-
-            });
-
 
             myCalendar3 = new dhtmlXCalendarObject([
                 {input: "chkGiLiftDt", button: "chkGiLiftDtIcon"},		//일괄변경의 공장출고일 달력선택
@@ -1723,7 +1636,6 @@
             //20220106 정연호 추가 시공카테고리 체크박스 콤보 추가
             fnObj.comboOpen.comboInstCapaCtgr();	//시공카테고리콤보 바인드
             //20220106 정연호 추가 시공카테고리 체크박스 콤보 추가. 끝
-
 
             fnObj.gridOpen.grid()
 
@@ -1754,8 +1666,6 @@
                     myComboChkSoType.selectOption(0);
                     myComboChkSoType.disable();
                 }
-
-
                 //일괄변경의 물류센터 콤보목록
                 if ($("input[id=chkBoxDcCd]:radio").is(":checked")) {
                     myComboChkDcCd.enable();
@@ -1789,7 +1699,6 @@
                     myComboChkDlvyStatCd.disable();
                 }
 
-
                 //일괄변경의 배송완료일
                 if ($("input[id=chkBoxDlvyCmplDt]:radio").is(":checked")) {
                     $("#chkDlvyCmplDt").prop("disabled", false);
@@ -1806,25 +1715,17 @@
                 } else {
                     $("#chkDlvyRqstMsg").val("");
                     $("#chkDlvyRqstMsg").prop("disabled", true);
-
                 }
-
-
             });
         });
 
-        //20211226 정연호 추가. 키보드에서 F2 누르면 조회하기
         $(document).keydown(function (event) {
             if (event.keyCode == 113 || event.which == 113) {
                 fnObj.searchOpen.search()
             }
         });
-
-
     </script>
 </head>
-<!-- top , left, bottom , right,  -->
-
 <body>
 <div id="mainDiv">
     <div id="searchDiv">
@@ -1865,7 +1766,6 @@
 					</span>
 				</span>
 
-
             <span id="fromTo" class="cell">
 					<span class="item-head">달력</span>
 					<span class="item-data icon-cell">
@@ -1877,7 +1777,6 @@
 						<i id="dateToIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
 					</span>
 				</span>
-
 
             <span class="cell">
 					<span class="item-head">화주사</span>
@@ -1899,7 +1798,6 @@
 						<div opt_type="checkbox" id="dcCd"></div>
 					</span>
 				</span>
-
 
             <span class="cell">
 					<span class="item-head">쇼핑몰</span>
@@ -2105,5 +2003,4 @@
     <div id="page"></div>
 </div>
 </body>
-
 </html>

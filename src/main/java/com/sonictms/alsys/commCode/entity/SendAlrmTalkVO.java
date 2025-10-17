@@ -52,7 +52,7 @@ public class SendAlrmTalkVO extends CommonVO {
 	@Getter
 	@Setter
 	@ToString(callSuper = true)
-	public class Data {
+	public static class Data {
 		private String phn;     //리턴값
 		private String msgid;   //리턴값
 		private String type;    //리턴값

@@ -33,7 +33,6 @@ public class LogInterceptor implements HandlerInterceptor {
             log.warn("세션 속성 타입 캐스팅 오류 - URI: {}", request.getRequestURI(), e);
         } catch (Exception e) {
             log.error("LogInterceptor preHandle 중 예상치 못한 예외 발생 - URI: {}", request.getRequestURI(), e);
-            // GlobalExceptionHandler가 처리할 수 있도록 예외를 다시 던짐
             throw e;
         }
 

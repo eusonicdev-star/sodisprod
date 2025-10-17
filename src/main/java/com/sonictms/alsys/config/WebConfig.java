@@ -19,7 +19,6 @@ import javax.sql.DataSource;
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
 
-    //20220115 정연호 로그 인터셉트
     @Autowired
     LogInterceptor logInterceptor;
 
@@ -42,14 +41,12 @@ public class WebConfig implements WebMvcConfigurer {
         return new BCryptPasswordEncoder();
     }
 
-    //jasper
     @Bean(name = "db")
     @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource dataSource() {
         return DataSourceBuilder.create().build();
     }
 
-    //jasper
     @Bean(name = "jdbcTemplate")
     public JdbcTemplate jdbcTemplate(@Qualifier("db") DataSource ds) {
         return new JdbcTemplate(ds);
