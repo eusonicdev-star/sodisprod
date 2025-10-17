@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html
+  xmlns:sec="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <title>재고 조정 (erp105004)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/skins/web/dhtmlx.css"
+    />
+    <link rel="stylesheet" type="text/css" href="/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="/css/erp-style.css" />
+    <link rel="stylesheet" type="text/css" href="/css/erp105004.css" />
+    <script
+      src="https://cdn.dhtmlx.com/edge/dhtmlx.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+    <script type="text/javascript" src="/js/erp105004.js"></script>
+
+    <script th:inline="javascript">
+      // Thymeleaf 변수 초기화
+      pagePerRow = /*[[${@environment.getProperty('common.html.pagePerRow')}]]*/ 10;
+
+      // 세션 변수 초기화
+      $(document).ready(function () {
+        initializeSessionVariables(
+          /*[[${session.cmpyCd}]]*/ "A",
+          /*[[${session.userId}]]*/ "admin"
+        );
+
+        // 날짜 유효성 검증 및 기본값 설정
+        setupDateValidation();
+      });
+
+      // 날짜 유효성 검증 및 기본값 설정 함수
+      function setupDateValidation() {
+        // 오늘 날짜 설정
+        var today = new Date();
+        var year = today.getFullYear();
+        var month = String(today.getMonth() + 1).padStart(2, "0");
+        var day = String(today.getDate()).padStart(2, "0");
+        var todayStr = year + "-" + month + "-" + day;
+
+        // 기본 날짜 설정
+        $("#historyDateFrom").val(todayStr);
+        $("#historyDateTo").val(todayStr);
+        $("#adjustmentDate").val(todayStr);
+
+        // 날짜 유효성 검증 함수
+        function validateDateRange(startDateId, endDateId) {
+          var startDate = new Date($("#" + startDateId).val());
+          var endDate = new Date($("#" + endDateId).val());
+
+          if (startDate && endDate && startDate > endDate) {
+            alert("시작일은 종료일보다 늦을 수 없습니다.");
+            $("#" + endDateId).val($("#" + startDateId).val());
+          }
+        }
+
+        // 날짜 변경 시 유효성 검증
+        $("#historyDateFrom").on("change", function () {
+          validateDateRange("historyDateFrom", "historyDateTo");
+        });
+
+        $("#historyDateTo").on("change", function () {
+          validateDateRange("historyDateFrom", "historyDateTo");
+        });
+
+        // 조정 일자 포커스 시 오늘 날짜로 설정
+        $("#adjustmentDate").on("focus", function () {
+          if (!$(this).val()) {
+            $(this).val(todayStr);
+          }
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id="mainDiv">
+      <div id="searchDiv">
+        <div id="btnDiv1">
+          <span class="title-container">
+            <span class="item-heade title-text">재고 조정</span>
+            <span class="sub-title">erp105004</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- 탭 컨테이너 -->
+      <div class="tab-container">
+        <button
+          id="adjustmentTab"
+          class="tab-button active"
+          onclick="fnObj.tabOpen.showAdjustmentTab()"
+        >
+          재고 조정
+        </button>
+        <button
+          id="historyTab"
+          class="tab-button"
+          onclick="fnObj.tabOpen.showHistoryTab()"
+        >
+          조정 내역
+        </button>
+        <button
+          id="inventoryTab"
+          class="tab-button"
+          onclick="fnObj.tabOpen.showInventoryTab()"
+        >
+          재고 현황
+        </button>
+      </div>
+
+      <!-- 재고 조정 탭 -->
+      <div id="adjustmentContent" class="tab-content active">
+        <div class="form-section">
+          <div class="form-row">
+            <div class="form-group">
+              <label>화주사</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="agntNm"
+                  placeholder="화주사명을 입력하세요"
+                  onkeypress="fnObj.handleAgntNmKeypress(event)"
+                />
+                <button
+                  class="search-icon"
+                  onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"
+                >
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>화주사코드</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="agntCd"
+                  placeholder="화주사코드"
+                  readonly
+                />
+                <button class="delete-icon" onclick="fnObj.delAgntCode()">
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>상품</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="selectedProductNm"
+                  placeholder="상품명을 입력하세요"
+                  onkeypress="fnObj.handleProductNmKeypress(event)"
+                />
+                <button
+                  class="search-icon"
+                  onclick="fnObj.winOpen.prodCommSrch('상품','A','MTRL_SO','text')"
+                >
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>상품코드</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="selectedProductCd"
+                  placeholder="상품코드"
+                  readonly
+                />
+                <button class="delete-icon" onclick="fnObj.delProductCode()">
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>현재 재고</label>
+              <input
+                type="number"
+                id="currentQty"
+                placeholder="현재 재고"
+                readonly
+              />
+            </div>
+            <div class="form-group">
+              <label>조정 유형</label>
+              <select id="adjustmentType">
+                <option value="">선택하세요</option>
+                <option value="INCREASE">증가</option>
+                <option value="DECREASE">감소</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>조정 수량</label>
+              <input
+                type="number"
+                id="adjustmentQty"
+                placeholder="조정 수량"
+                min="1"
+                disabled
+              />
+            </div>
+            <div class="form-group">
+              <label>조정 후 수량</label>
+              <input
+                type="number"
+                id="afterQty"
+                placeholder="조정 후 수량"
+                readonly
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>조정 사유</label>
+              <input
+                type="text"
+                id="adjustmentReason"
+                placeholder="조정 사유를 입력하세요"
+                maxlength="500"
+              />
+            </div>
+            <div class="form-group">
+              <label>조정 일자</label>
+              <input type="date" id="adjustmentDate" />
+            </div>
+            <div class="form-group">
+              <button
+                class="btn btn-primary"
+                onclick="fnObj.registerAdjustment()"
+              >
+                재고 조정
+              </button>
+            </div>
+            <div class="form-group">
+              <button
+                class="btn btn-secondary"
+                onclick="fnObj.clearAdjustmentForm()"
+              >
+                초기화
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 조정 내역 탭 -->
+      <div id="historyContent" class="tab-content">
+        <div class="search-section">
+          <div class="search-row">
+            <div class="search-group date-range-group">
+              <label>조정일자</label>
+              <div class="date-range-container">
+                <input type="date" id="historyDateFrom" />
+                <span class="date-separator">~</span>
+                <input type="date" id="historyDateTo" />
+              </div>
+            </div>
+            <div class="search-group">
+              <label>화주사</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="historyAgntNm"
+                  placeholder="화주사명을 입력하세요"
+                  onkeypress="fnObj.handleHistoryAgntNmKeypress(event)"
+                />
+                <button
+                  class="search-icon"
+                  onclick="fnObj.winOpen.historyCommSrch('화주','A','AGENCY','text')"
+                >
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+            <div class="search-group">
+              <label>화주사코드</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="historyAgntCd"
+                  placeholder="화주사코드"
+                  readonly
+                />
+                <button
+                  class="delete-icon"
+                  onclick="fnObj.delHistoryAgntCode()"
+                >
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <div class="search-group">
+              <label>상품</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="historyProductNm"
+                  placeholder="상품명을 입력하세요"
+                  onkeypress="fnObj.handleHistoryProductNmKeypress(event)"
+                />
+                <button
+                  class="search-icon"
+                  onclick="fnObj.winOpen.historyProdCommSrch('상품','A','MTRL_SO','text')"
+                >
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+            <div class="search-group">
+              <label>상품코드</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="historyProductCd"
+                  placeholder="상품코드"
+                  readonly
+                />
+                <button
+                  class="delete-icon"
+                  onclick="fnObj.delHistoryProductCode()"
+                >
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="search-row">
+            <div class="search-group">
+              <label>조정 유형</label>
+              <select id="historyAdjustmentType">
+                <option value="">전체</option>
+                <option value="INCREASE">증가</option>
+                <option value="DECREASE">감소</option>
+              </select>
+            </div>
+            <div class="search-group button-group">
+              <button
+                class="btn btn-primary"
+                onclick="fnObj.loadAdjustmentHistory()"
+              >
+                <i class="fa fa-search"></i> 조회
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="adjustmentHistoryTableContainer" class="table-container">
+          <div class="table-header">
+            <span>조정 내역</span>
+          </div>
+          <table class="data-table" id="adjustmentHistoryTable">
+            <thead>
+              <tr>
+                <th>화주사명</th>
+                <th>상품코드</th>
+                <th>상품명</th>
+                <th>조정 전 수량</th>
+                <th>조정 유형</th>
+                <th>조정 수량</th>
+                <th>조정 후 수량</th>
+                <th>조정 사유</th>
+                <th>조정 일자</th>
+                <th>등록일</th>
+                <th>등록자</th>
+              </tr>
+            </thead>
+            <tbody id="adjustmentHistoryList">
+              <!-- 조정 내역이 여기에 동적으로 로드됩니다 -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 페이징 -->
+        <div class="pagination-container">
+          <div class="pagination-info">
+            <span id="paginationInfo">총 0건</span>
+          </div>
+          <div class="pagination">
+            <button
+              class="pagination-btn"
+              id="prevBtn"
+              onclick="fnObj.goToPage(fnObj.currentPage - 1)"
+            >
+              <i class="fa fa-chevron-left"></i>
+            </button>
+            <div class="page-numbers" id="pageNumbers">
+              <!-- 페이지 번호가 여기에 동적으로 생성됩니다 -->
+            </div>
+            <button
+              class="pagination-btn"
+              id="nextBtn"
+              onclick="fnObj.goToPage(fnObj.currentPage + 1)"
+            >
+              <i class="fa fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 재고 현황 탭 -->
+      <div id="inventoryContent" class="tab-content">
+        <div class="search-section">
+          <div class="search-row">
+            <div class="search-group">
+              <label>화주사</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="inventoryAgntNm"
+                  placeholder="화주사명을 입력하세요"
+                  onkeypress="fnObj.handleInventoryAgntNmKeypress(event)"
+                />
+                <button
+                  class="search-icon"
+                  onclick="fnObj.winOpen.inventoryCommSrch('화주','A','AGENCY','text')"
+                >
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+            <div class="search-group">
+              <label>화주사코드</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="inventoryAgntCd"
+                  placeholder="화주사코드"
+                  readonly
+                />
+                <button
+                  class="delete-icon"
+                  onclick="fnObj.delInventoryAgntCode()"
+                >
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <div class="search-group">
+              <label>상품</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="inventoryProductNm"
+                  placeholder="상품명을 입력하세요"
+                  onkeypress="fnObj.handleInventoryProductNmKeypress(event)"
+                />
+                <button
+                  class="search-icon"
+                  onclick="fnObj.winOpen.inventoryProdCommSrch('상품','A','MTRL_SO','text')"
+                >
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+            <div class="search-group">
+              <label>상품코드</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="inventoryProductCd"
+                  placeholder="상품코드"
+                  readonly
+                />
+                <button
+                  class="delete-icon"
+                  onclick="fnObj.delInventoryProductCode()"
+                >
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <div class="search-group button-group">
+              <button
+                class="btn btn-primary"
+                onclick="fnObj.loadInventoryStatus()"
+              >
+                <i class="fa fa-search"></i> 조회
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="inventoryStatusTableContainer" class="table-container">
+          <div class="table-header">
+            <span>재고 현황</span>
+          </div>
+          <table class="data-table" id="inventoryStatusTable">
+            <thead>
+              <tr>
+                <th>화주사명</th>
+                <th>상품코드</th>
+                <th>상품명</th>
+                <th>현재 재고</th>
+                <th>최종 업데이트</th>
+                <th>업데이트자</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryStatusList">
+              <!-- 재고 현황이 여기에 동적으로 로드됩니다 -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 페이징 -->
+        <div class="pagination-container">
+          <div class="pagination-info">
+            <span id="inventoryPaginationInfo">총 0건</span>
+          </div>
+          <div class="pagination">
+            <button
+              class="pagination-btn"
+              id="inventoryPrevBtn"
+              onclick="fnObj.goToInventoryPage(fnObj.inventoryCurrentPage - 1)"
+            >
+              <i class="fa fa-chevron-left"></i>
+            </button>
+            <div class="page-numbers" id="inventoryPageNumbers">
+              <!-- 페이지 번호가 여기에 동적으로 생성됩니다 -->
+            </div>
+            <button
+              class="pagination-btn"
+              id="inventoryNextBtn"
+              onclick="fnObj.goToInventoryPage(fnObj.inventoryCurrentPage + 1)"
+            >
+              <i class="fa fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 재고 변동 이력 모달 -->
+      <div id="inventoryHistoryModal" class="modal" style="display: none">
+        <div class="modal-content" style="width: 90%; max-width: 1200px">
+          <div class="modal-header">
+            <h4 id="inventoryHistoryTitle">재고 변동 이력</h4>
+            <span class="close" onclick="fnObj.closeInventoryHistoryModal()"
+              >&times;</span
+            >
+          </div>
+          <div class="modal-body">
+            <div
+              class="inventory-info"
+              style="
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 5px;
+                margin-bottom: 20px;
+              "
+            >
+              <div style="display: flex; gap: 20px; flex-wrap: wrap">
+                <div>
+                  <strong>화주사:</strong> <span id="modalAgntNm"></span>
+                </div>
+                <div>
+                  <strong>상품코드:</strong> <span id="modalMtrlCd"></span>
+                </div>
+                <div>
+                  <strong>상품명:</strong> <span id="modalMtrlNm"></span>
+                </div>
+                <div>
+                  <strong>현재 재고:</strong> <span id="modalCurrentQty"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table" id="inventoryHistoryTable">
+                <thead>
+                  <tr>
+                    <th>변동일시</th>
+                    <th>변동 유형</th>
+                    <th>변동 전 수량</th>
+                    <th>변동 수량</th>
+                    <th>변동 후 수량</th>
+                    <th>변동 사유</th>
+                    <th>처리자</th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryHistoryList">
+                  <!-- 재고 변동 이력이 여기에 동적으로 로드됩니다 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-secondary"
+              onclick="fnObj.closeInventoryHistoryModal()"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

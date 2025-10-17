@@ -1226,7 +1226,6 @@
 
                                 var oriDlvyRqstMsg = searchRes[rId - 1].dlvyRqstMsg;
                                 myGrid.cellById(rId, myGrid.getColIndexById("dlvyRqstMsg")).setValue(oriDlvyRqstMsg + "\n[변경]: " + $("#chkDlvyRqstMsg").val());
-                                //myGrid.cellById(rId,myGrid.getColIndexById("dlvyRqstMsg")).setValue($("#chkDlvyRqstMsg").val());
                                 myGrid.cells(rId, myGrid.getColIndexById("dlvyRqstMsg")).setTextColor('red')
                                 myGrid.cells(rId, myGrid.getColIndexById("dlvyRqstMsg")).setBgColor("#EEE8AA");
                             }

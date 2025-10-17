@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html
+  xmlns:sec="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <title>입고 관리 (erp105002)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/skins/web/dhtmlx.css"
+    />
+    <link rel="stylesheet" type="text/css" href="/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="/css/erp-style.css" />
+    <link rel="stylesheet" type="text/css" href="/css/erp105002.css" />
+    <script
+      src="https://cdn.dhtmlx.com/edge/dhtmlx.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+    <script type="text/javascript" src="/js/erp105002.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+
+    <script th:inline="javascript">
+      // Thymeleaf 변수 초기화
+      pagePerRow = /*[[${@environment.getProperty('common.html.pagePerRow')}]]*/ 10;
+
+      // 세션 변수 초기화
+      $(document).ready(function () {
+        initializeSessionVariables(
+          /*[[${session.cmpyCd}]]*/ "A",
+          /*[[${session.userId}]]*/ "admin"
+        );
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="mainDiv">
+      <div id="searchDiv">
+        <div id="btnDiv1">
+          <span class="title-container">
+            <span class="item-heade title-text">입고 관리</span>
+            <span class="sub-title">erp105002</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- 탭 컨테이너 -->
+      <div class="tab-container">
+        <button
+          id="registerTab"
+          class="tab-button active"
+          onclick="fnObj.tabOpen.showRegisterTab()"
+        >
+          입고 등록
+        </button>
+        <button
+          id="historyTab"
+          class="tab-button"
+          onclick="fnObj.tabOpen.showHistoryTab()"
+        >
+          입고 내역
+        </button>
+      </div>
+
+      <!-- 입고 등록 탭 -->
+      <div id="registerContent" class="tab-content active">
+        <div class="form-section">
+          <div class="form-row">
+            <div class="form-group">
+              <label>화주사</label>
+              <input
+                type="text"
+                id="agntNm"
+                placeholder="화주사명을 입력하세요"
+                onkeypress="fnObj.handleAgntNmKeypress(event)"
+              />
+              <button
+                class="search-icon"
+                onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"
+              >
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+            <div class="form-group">
+              <label>화주사코드</label>
+              <input
+                type="text"
+                id="agntCd"
+                placeholder="화주사코드"
+                readonly
+              />
+              <button class="delete-icon" onclick="fnObj.delAgntCode()">
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+            <div class="form-group">
+              <label>상품</label>
+              <input
+                type="text"
+                id="selectedProductNm"
+                placeholder="상품명을 입력하세요"
+                onkeypress="fnObj.handleProductNmKeypress(event)"
+              />
+              <button
+                class="search-icon"
+                onclick="fnObj.winOpen.prodCommSrch('상품','A','MTRL_SO','text')"
+              >
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+            <div class="form-group">
+              <label>상품코드</label>
+              <input
+                type="text"
+                id="selectedProductCd"
+                placeholder="상품코드"
+                readonly
+              />
+              <button class="delete-icon" onclick="fnObj.delProductCode()">
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>수량</label>
+              <input
+                type="number"
+                id="productQuantity"
+                placeholder="수량"
+                min="1"
+                disabled
+              />
+            </div>
+            <div class="form-group">
+              <label>예정일</label>
+              <input type="date" id="expectedDate" disabled />
+            </div>
+            <div class="form-group">
+              <button
+                class="btn btn-success"
+                onclick="fnObj.addProductToList()"
+              >
+                목록에 추가
+              </button>
+            </div>
+            <div class="form-group">
+              <button
+                class="btn btn-primary"
+                onclick="fnObj.registerSelectedProducts()"
+              >
+                선택된 상품들 입고 등록
+              </button>
+            </div>
+            <div class="form-group">
+              <button
+                class="btn btn-secondary"
+                onclick="fnObj.clearRegisterForm()"
+              >
+                초기화
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 선택된 상품 목록 -->
+        <div
+          class="table-container"
+          id="selectedProductsContainer"
+          style="display: none"
+        >
+          <div class="table-header">선택된 상품 목록</div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>상품코드</th>
+                <th>상품명</th>
+                <th>수량</th>
+                <th>예정일</th>
+                <th>삭제</th>
+              </tr>
+            </thead>
+            <tbody id="selectedProductsList">
+              <!-- 선택된 상품들이 여기에 동적으로 추가됩니다 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 입고 내역 탭 -->
+      <div id="historyContent" class="tab-content">
+        <div class="search-section">
+          <div class="search-row">
+            <div class="search-group">
+              <label>등록일자</label>
+              <input type="date" id="historyDateFrom" />
+            </div>
+            <div class="search-group">
+              <label>~</label>
+              <input type="date" id="historyDateTo" />
+            </div>
+            <div class="search-group">
+              <label>화주사</label>
+              <input
+                type="text"
+                id="historyAgntNm"
+                placeholder="화주사명을 입력하세요"
+                onkeypress="fnObj.handleHistoryAgntNmKeypress(event)"
+              />
+              <button
+                class="search-icon"
+                onclick="fnObj.winOpen.historyCommSrch('화주','A','AGENCY','text')"
+              >
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+            <div class="search-group">
+              <label>화주사코드</label>
+              <input
+                type="text"
+                id="historyAgntCd"
+                placeholder="화주사코드"
+                readonly
+              />
+              <button class="delete-icon" onclick="fnObj.delHistoryAgntCode()">
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+            <div class="search-group">
+              <label>상품</label>
+              <input
+                type="text"
+                id="historyProductNm"
+                placeholder="상품명을 입력하세요"
+                onkeypress="fnObj.handleHistoryProductNmKeypress(event)"
+              />
+              <button
+                class="search-icon"
+                onclick="fnObj.winOpen.historyProdCommSrch('상품','A','MTRL_SO','text')"
+              >
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+            <div class="search-group">
+              <label>상품코드</label>
+              <input
+                type="text"
+                id="historyProductCd"
+                placeholder="상품코드"
+                readonly
+              />
+              <button
+                class="delete-icon"
+                onclick="fnObj.delHistoryProductCode()"
+              >
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <div class="search-row">
+            <div class="search-group">
+              <label>상태</label>
+              <select id="historyStatus">
+                <option value="">전체</option>
+                <option value="PENDING">입고 예정</option>
+                <option value="COMPLETED">입고 완료</option>
+              </select>
+            </div>
+            <div class="search-group">
+              <button class="btn" onclick="fnObj.loadInboundHistory()">
+                조회
+              </button>
+              <button
+                class="btn btn-danger"
+                onclick="fnObj.deleteSelectedInbound()"
+                id="deleteSelectedBtn"
+                style="display: none; margin-left: 10px"
+              >
+                선택 삭제
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <div class="table-header">입고 내역</div>
+          <table class="data-table" id="inboundHistoryTable">
+            <thead>
+              <tr>
+                <th>
+                  <input
+                    type="checkbox"
+                    id="selectAllCheckbox"
+                    onchange="fnObj.toggleSelectAll()"
+                  />
+                </th>
+                <th>화주사명</th>
+                <th>상품코드</th>
+                <th>상품명</th>
+                <th>수량</th>
+                <th>예정일</th>
+                <th>등록일</th>
+                <th>상태</th>
+                <th>삭제</th>
+              </tr>
+            </thead>
+            <tbody id="inboundHistoryList">
+              <!-- 입고 내역이 여기에 동적으로 로드됩니다 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

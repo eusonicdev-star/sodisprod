@@ -72,10 +72,23 @@ public class CommCodeController {
 		return modelAndView;
 	}
 
+	@PostMapping(value = {"prodSrchMto"})
+	public ModelAndView prodSrchMto(ModelAndView modelAndView, @Valid CommCodeVO CommCodeVO) {
+		modelAndView.setViewName("commCode/prodSrchMto");
+		modelAndView.addObject("sendObject", CommCodeVO);
+		return modelAndView;
+	}
+
 	@RequestMapping(value = {"commSrchList"}, method = RequestMethod.POST)
 	@ResponseBody
 	public List<CommCodeVO> commSrchList(CommCodeVO CommCodeVO) {
 		return commCodeService.commSrchList(CommCodeVO);
+	}
+
+	@RequestMapping(value = {"commSrchListMto"}, method = RequestMethod.POST)
+	@ResponseBody
+	public List<CommCodeVO> commSrchListMto(CommCodeVO CommCodeVO) {
+		return commCodeService.commSrchListMto(CommCodeVO);
 	}
 
 	// ==================== 알림톡 발송 관련 메서드 ====================

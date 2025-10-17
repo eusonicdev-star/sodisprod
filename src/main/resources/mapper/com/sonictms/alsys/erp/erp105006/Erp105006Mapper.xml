@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.erp.erp105006.mapper.Erp105006Mapper">
+
+    <!-- 재입고 대기 목록 조회 -->
+    <select id="erp105006List" parameterType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO"
+            resultType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">
+        SELECT DISTINCT
+        RW.TBL_RESTOCK_WAIT_ID,
+        SP.TBL_SO_M_ID,
+        SM.SO_NO,
+        SM.SO_TYPE,
+        DBO.F_COL_NM('A', 'COMM', 'SO_ORDR_TYPE', SM.SO_TYPE) AS SO_TYPE_NM,
+        SM.SO_STAT_CD,
+        DBO.F_COL_NM('A', 'COMM', 'SO_STAT_CD', SM.SO_STAT_CD) AS SO_STAT_CD_NM,
+        SP.PROD_CD,
+        SP.PROD_NM,
+        SP.QTY AS RETURN_QTY,
+        RW.INBOUND_YN,
+        RW.INBOUND_DT,
+        RW.INBOUND_USER,
+        RW.INBOUND_TIME,
+        SM.AGNT_CD,
+        AG.AGNT_NM,
+        SM.ACPT_ER,
+        SM.ACPT_TEL1,
+        SM.ACPT_TEL2,
+        SM.POST_CD,
+        SM.ADDR1,
+        SM.ADDR2,
+        SM.DC_CD,
+        DC.DC_NM,
+        SM.ORDR_INPT_DT,
+        SM.RCPT_DT,
+        SM.RQST_DT,
+        SM.DLVY_CNFM_DT,
+        SM.MALL_CD,
+        SM.BRAND,
+        SM.REF_SO_NO,
+        SM.DLVY_RQST_MSG,
+        SM.CUST_SPCL_TXT,
+        SM.SAVE_TIME,
+        UM.USER_NM AS INST_ER
+        FROM TBL_SO_P SP
+        INNER JOIN TBL_SO_M SM ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
+        INNER JOIN TBL_RESTOCK_WAIT RW ON SP.TBL_SO_M_ID = RW.TBL_SO_M_ID AND SP.PROD_CD = RW.PROD_CD
+        LEFT JOIN TBL_AGENCY_M AG ON SM.AGNT_CD = AG.AGNT_CD
+        LEFT JOIN TBL_LGST_DC_M DC ON SM.DC_CD = DC.DC_CD
+        LEFT JOIN TBL_INST_PLAN_M IP ON SM.TBL_SO_M_ID = IP.TBL_SO_M_ID
+        LEFT JOIN TBL_USER_M UM ON IP.TBL_USER_M_ID = UM.TBL_USER_M_ID
+        WHERE 1=1
+        AND SM.SO_STAT_CD NOT IN ('0000', '1900')
+        AND SP.USE_YN = 'Y'
+        <if test="fromDt != null and fromDt != ''">
+            <choose>
+                <when test="dtType != null and (dtType == '1' or dtType == 1)">
+                    AND SM.ORDR_INPT_DT >= #{fromDt}
+                </when>
+                <when test="dtType != null and (dtType == '2' or dtType == 2)">
+                    AND SM.ORDR_INPT_DT >= #{fromDt}
+                </when>
+                <when test="dtType != null and (dtType == '3' or dtType == 3)">
+                    AND SM.DLVY_CNFM_DT >= #{fromDt}
+                </when>
+                <otherwise>
+                    AND SM.ORDR_INPT_DT >= #{fromDt}
+                </otherwise>
+            </choose>
+        </if>
+        <if test="toDt != null and toDt != ''">
+            <choose>
+                <when test="dtType != null and (dtType == '1' or dtType == 1)">
+                    AND SM.ORDR_INPT_DT &lt;= #{toDt}
+                </when>
+                <when test="dtType != null and (dtType == '2' or dtType == 2)">
+                    AND SM.ORDR_INPT_DT &lt;= #{toDt}
+                </when>
+                <when test="dtType != null and (dtType == '3' or dtType == 3)">
+                    AND SM.DLVY_CNFM_DT &lt;= #{toDt}
+                </when>
+                <otherwise>
+                    AND SM.ORDR_INPT_DT &lt;= #{toDt}
+                </otherwise>
+            </choose>
+        </if>
+        <if test="agntList != null and agntList != ''">
+            AND SM.AGNT_CD IN
+            <foreach collection="agntList.split(',')" item="agnt" open="(" close=")" separator=",">
+                #{agnt}
+            </foreach>
+        </if>
+        <if test="dcList != null and dcList != ''">
+            AND SM.DC_CD IN
+            <foreach collection="dcList.split(',')" item="dc" open="(" close=")" separator=",">
+                #{dc}
+            </foreach>
+        </if>
+        <if test="soList != null and soList != ''">
+            AND SM.SO_NO IN
+            <foreach collection="soList.split(',')" item="so" open="(" close=")" separator=",">
+                #{so}
+            </foreach>
+        </if>
+        <if test="soTypeList != null and soTypeList != ''">
+            AND SM.SO_TYPE IN
+            <foreach collection="soTypeList.split(',')" item="soType" open="(" close=")" separator=",">
+                #{soType}
+            </foreach>
+        </if>
+        <if test="acptNm != null and acptNm != ''">
+            AND SM.ACPT_ER LIKE '%' + #{acptNm} + '%'
+        </if>
+        <if test="acptTel != null and acptTel != ''">
+            AND (SM.ACPT_TEL1 LIKE '%' + #{acptTel} + '%' OR SM.ACPT_TEL2 LIKE '%' + #{acptTel} + '%')
+        </if>
+        <if test="prodList != null and prodList != ''">
+            AND SP.PROD_CD IN
+            <foreach collection="prodList.split(',')" item="prod" open="(" close=")" separator=",">
+                #{prod}
+            </foreach>
+        </if>
+        <if test="prodNmSrch != null and prodNmSrch != ''">
+            AND SP.PROD_NM LIKE '%' + #{prodNmSrch} + '%'
+        </if>
+        <if test="srchAddr != null and srchAddr != ''">
+            AND (SM.ADDR1 LIKE '%' + #{srchAddr} + '%' OR SM.ADDR2 LIKE '%' + #{srchAddr} + '%')
+        </if>
+        <if test="inboundStatus != null and inboundStatus != '' and inboundStatus != 'ALL'">
+            AND RW.INBOUND_YN = #{inboundStatus}
+        </if>
+        <if test="soStatCd != null and soStatCd != ''">
+            AND SM.SO_STAT_CD = #{soStatCd}
+        </if>
+        ORDER BY SM.SAVE_TIME DESC
+    </select>
+
+    <!-- 재입고 완료 처리 -->
+    <update id="erp105006InboundComplete" parameterType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">
+        UPDATE TBL_RESTOCK_WAIT
+        SET INBOUND_YN   = 'Y',
+            INBOUND_DT   = #{processDt},
+            INBOUND_USER = #{processUser},
+            INBOUND_TIME = GETDATE(),
+            UPDT_USER    = #{processUser},
+            UPDT_TIME    = GETDATE()
+        WHERE TBL_RESTOCK_WAIT_ID = #{tblRestockWaitId}
+    </update>
+
+
+    <!-- 일괄 재입고 완료 처리 -->
+    <update id="erp105006BatchInboundComplete" parameterType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">
+        UPDATE TBL_RESTOCK_WAIT
+        SET INBOUND_YN = 'Y',
+        INBOUND_DT = #{processDt},
+        INBOUND_USER = #{processUser},
+        INBOUND_TIME = GETDATE(),
+        UPDT_USER = #{processUser},
+        UPDT_TIME = GETDATE()
+        WHERE TBL_RESTOCK_WAIT_ID IN
+        <foreach collection="selectedIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+
+</mapper>

@@ -781,38 +781,25 @@
                       var soStatCd = parseInt(rowData.soStatCd)
                       var userGrntCd = /*[[${session.userGrntCd}]]*/
 
-                      //console.log(soStatCd)
-                      //console.log(userGrntCd)
-
-
                       if (soStatCd >= 1200 && (userGrntCd == "4100" || userGrntCd == "4200")) {
                           alert("주문상태(오더생태)가 주문확정(1200)이후라면 수정이 불가능합니다.");
-                          return;
+                          returnfgbx;
                       }
-
 
                       var tblSoMId = myGrid.cellById(rId, myGrid.getColIndexById("tblSoMId")).getValue();
                       fnObj.winOpen.soUpdatePopup(tblSoMId);
-
-
                   });
-
-
-              },//grid
+              },
               setWidth: function () {
                   c_width = getLayoutCWidth();
                   searchDiv_height = $("#searchDiv").height();
-                  // searchDiv2nd_height = $("#searchDiv2nd").height();
                   page_height = $("#page").height();
                   xhdr_height = $(".xhdr").height();
 
                   myGrid.enableAutoWidth(true, c_width - 25, 100);
                   myGrid.enableAutoHeight(true, window.innerHeight - searchDiv_height - page_height - xhdr_height - 30);	//그리드 자동높이
 
-
                   $("#searchDiv").width(c_width - 25);
-                  // $("#searchDiv2nd").width(c_width - 25);
-
               },	//END of setWidth
           },	//END of gridOpen
           searchOpen: {

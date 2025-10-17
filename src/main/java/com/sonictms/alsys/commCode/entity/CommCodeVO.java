@@ -24,4 +24,5 @@ public class CommCodeVO extends commonVO{
 	private String srchArea;
 	private String agntCd;        //화주사코드
 	private String agntNm;        //화주사명칭
+	private String mtoYn;         //MTO 여부 (Y/N)
 }
