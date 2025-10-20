@@ -25,7 +25,6 @@ public interface Erp102001Mapper {
     //메인화면 상담정보 등록하기
     Erp102001VO erp102001CnslSave(Erp102001VO erp102001VO);
 
-
     //해피콜상담리스트 팝업 조회
     List<Erp102001VO> erp102001p2List(Erp102001VO erp102001VO);
 

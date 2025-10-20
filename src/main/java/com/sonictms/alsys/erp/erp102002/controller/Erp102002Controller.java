@@ -34,7 +34,6 @@ public class Erp102002Controller {
         return modelAndView;
     }
 
-
     // 알림톡 발송 스케줄 수행 날짜 선택 팝업
     @PostMapping(value = {"erp102002p2"})
     public ModelAndView erp102002p2(ModelAndView modelAndView, @Valid Erp102002VO erp102002VO) {
@@ -74,5 +73,4 @@ public class Erp102002Controller {
         erp102002VO = erp102002Service.erp102002p1AlrmSrch(erp102002VO);
         return erp102002VO;
     }
-
 }

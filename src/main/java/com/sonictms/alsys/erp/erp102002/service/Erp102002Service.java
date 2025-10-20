@@ -27,19 +27,15 @@ public class Erp102002Service {
         return erp102002VO;
     }
 
-
     //고유 ID 로 정보 찾기
     public Erp102002VO erp102002p1AlrmSrch(Erp102002VO erp102002VO) {
         erp102002VO = erp102002Mapper.erp102002p1AlrmSrch(erp102002VO);
         return erp102002VO;
     }
 
-
     //알림톡 스케줄 실행 대상 조회
     public List<Erp102002VO> erp102002ScdlExecLoad(Erp102002VO erp102002VO) {
         List<Erp102002VO> list = erp102002Mapper.erp102002ScdlExecLoad(erp102002VO);
         return list;
     }
-
-
-} 
+}

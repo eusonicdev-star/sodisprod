@@ -228,6 +228,14 @@
                     myComboThrDlvyYn.setFontSize("12px", "12px");
                     myComboThrDlvyYn.readonly(true);
                 },
+                comboExchangeReturnExcludeYn: function () {	//교환/반품 제외여부
+                    myComboExchangeReturnExcludeYn = new dhtmlXCombo("exchangeReturnExcludeYn");
+                    myComboExchangeReturnExcludeYn.addOption([{value: "N", text: "N (포함)"}]);
+                    myComboExchangeReturnExcludeYn.addOption([{value: "Y", text: "Y (제외)"}]);
+                    myComboExchangeReturnExcludeYn.selectOption(0);
+                    myComboExchangeReturnExcludeYn.setFontSize("12px", "12px");
+                    myComboExchangeReturnExcludeYn.readonly(true);
+                },
             },	//END of comboOpen : {
             gridOpen: {},		//ENd of gridOpen : {
             searchOpen: {
@@ -307,22 +315,18 @@
                                 $("#pstnNm").val(res.pstnNm);
                                 myComboDlvyYn.selectOption(myComboDlvyYn.getIndexByValue(res.dlvyYn));
                                 myComboDlvyType.selectOption(myComboDlvyType.getIndexByValue(res.dlvyType));
-
-                                //$("#dlvyCost").val(res.dlvyCost%1 == 0 ? parseInt(res.dlvyCost) : res.dlvyCost);
                                 $("#dlvyCost").val(res.dlvyCost);
-
-                                //$("#ndlvyYn").val(res.ndlvyYn);
                                 myComboThrDlvyYn.selectOption(myComboThrDlvyYn.getIndexByValue(res.thrDlvyYn));
-                                //$("#dlvyLt").val(res.dlvyLt);
                                 $("#cnvtMtrlCd").val(res.cnvtMtrlCd);
                                 $("#cnvtMtrlNm").val(res.cnvtMtrlNm);
-                                //$("#cnvtQty").val(res.cnvtQty);
-                                //$("#cnvtUnit").val(res.cnvtUnit);
                                 $("#memo").val(res.memo);
                                 myComboUseYn.selectOption(myComboUseYn.getIndexByValue(res.useYn));
 
                                 //20211204 피킹존 추가
                                 $("#zone").val(res.pickZone);
+                                
+                                //교환/반품 제외여부 설정
+                                myComboExchangeReturnExcludeYn.selectOption(myComboExchangeReturnExcludeYn.getIndexByValue(res.exchangeReturnExcludeYn || 'N'));
                             } else {
                                 alert("상품내용 조회 수행 결과 없음")
                             }
@@ -398,11 +402,9 @@
 
                     //20211204 피킹존 추가
                     saveData.append("pickZone", $("#zone").val());
-
-
-                    /* for(var pair of saveData.entries()) {
-                           console.log(pair[0]+ ' : '+ pair[1]);
-                    } */
+                    
+                    //교환/반품 제외여부 추가
+                    saveData.append("exchangeReturnExcludeYn", myComboExchangeReturnExcludeYn.getSelectedValue());
 
                     $.ajax({
                         url: "/erp901002p1ComdSave",
@@ -724,6 +726,7 @@
             fnObj.comboOpen.comboDlvyYn();
             fnObj.comboOpen.comboDlvyType();
             fnObj.comboOpen.comboThrDlvyYn();
+            fnObj.comboOpen.comboExchangeReturnExcludeYn();
 
             sendObject = /*[[${sendObject}]]*/;
 
@@ -998,6 +1001,19 @@
             <input type="text" class="search-input" maxlength=50 id="dlvyCost"
                    name="dlvyCost"
                    oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"/></input></span>
+        </div>
+    </div>
+
+    <div class="popup-header-container">
+        <div class="popup-header-text sub">
+            교환/반품 설정
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-item">
+            <span class="search-label">교환/반품 제외여부</span>
+            <div id="exchangeReturnExcludeYn"></div>
         </div>
     </div>
 </div>

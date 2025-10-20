@@ -20,22 +20,4 @@ public class Erp102003Service {
         List<Erp102003VO> list = erp102003Mapper.erp102003List(erp102003VO);
         return list;
     }
-
-/*	
-	
-	//팝업  등록/ 수정 하기
-		public Erp102003VO erp102003p1ComdSave(Erp102003VO erp102003VO) { 
-			erp102003VO =	  erp102003Mapper.erp102003p1ComdSave(erp102003VO); 
-			return erp102003VO; 
-		}
-
-	//고유 ID 로 정보 찾기
-	public Erp102003VO erp102003p1AlrmSrch(Erp102003VO erp102003VO) { 
-		erp102003VO =	  erp102003Mapper.erp102003p1AlrmSrch(erp102003VO); 
-		return erp102003VO; 
-	}
-	
-	*/
-
-
-} 
+}

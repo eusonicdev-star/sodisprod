@@ -39,7 +39,7 @@ public class Erp105001Controller {
     @ResponseBody
     public Map<String, Object> erp105001Adjustment(@RequestBody Erp105001VO erp105001VO) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             boolean success = erp105001Service.adjustInventory(erp105001VO);
             result.put("success", success);
@@ -52,7 +52,7 @@ public class Erp105001Controller {
             result.put("success", false);
             result.put("message", "재고 조정 중 오류가 발생했습니다: " + e.getMessage());
         }
-        
+
         return result;
     }
 }

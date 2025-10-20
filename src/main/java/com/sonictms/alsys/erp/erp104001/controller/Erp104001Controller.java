@@ -74,20 +74,20 @@ public class Erp104001Controller {
                 try {
                     String imageUrl = imageUrls[i].trim();
                     String imageName = imageNames[i].trim();
-                    
+
                     if (!imageUrl.isEmpty() && !imageName.isEmpty()) {
                         URL url = new URL(imageUrl);
                         InputStream inputStream = url.openStream();
-                        
+
                         ZipEntry zipEntry = new ZipEntry(imageName);
                         zos.putNextEntry(zipEntry);
-                        
+
                         byte[] buffer = new byte[1024];
                         int length;
                         while ((length = inputStream.read(buffer)) > 0) {
                             zos.write(buffer, 0, length);
                         }
-                        
+
                         inputStream.close();
                         zos.closeEntry();
                     }

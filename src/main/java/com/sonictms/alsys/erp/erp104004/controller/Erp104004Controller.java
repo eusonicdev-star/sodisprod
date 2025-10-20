@@ -35,5 +35,4 @@ public class Erp104004Controller {
         List<Erp104004VO> list = erp104004Service.erp104004List(erp104004VO);
         return list;
     }
-
 }

@@ -88,7 +88,10 @@
 			#{saveUser			,mode=IN	,	jdbcType=VARCHAR},
 			
 			<!-- 20211204 피킹존 추가 -->
-			#{pickZone			,mode=IN	,	jdbcType=VARCHAR}
+			#{pickZone			,mode=IN	,	jdbcType=VARCHAR},
+			
+			<!-- 교환/반품 제외여부 추가 -->
+			#{exchangeReturnExcludeYn	,mode=IN	,	jdbcType=VARCHAR}
 	      )      
       }
     </select>
@@ -151,7 +154,10 @@
 			#{useYn			,mode=IN	,	jdbcType=VARCHAR},	
 			#{zoneType		,mode=IN	,	jdbcType=VARCHAR},	
 			#{pickZone		,mode=IN	,	jdbcType=VARCHAR},	
-			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}  		      		      		      
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR},
+			
+			<!-- 교환/반품 제외여부 추가 -->
+			#{exchangeReturnExcludeYn	,mode=IN	,	jdbcType=VARCHAR}  		      		      		      
 	      )
       }
     </select>

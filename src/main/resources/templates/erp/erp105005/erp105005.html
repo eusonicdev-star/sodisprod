@@ -270,6 +270,7 @@
                     myComboOutboundTarget.addOption("", "전체");
                     myComboOutboundTarget.addOption("Y", "반출대상");
                     myComboOutboundTarget.addOption("N", "반출대상아님");
+                    myComboOutboundTarget.addOption("P", "판별중");
                     myComboOutboundTarget.selectOption(0);
                     myComboOutboundTarget.setFontSize("12px", "12px");
                     myComboOutboundTarget.attachEvent("onChange", function (value, text) {
@@ -541,10 +542,15 @@
                 var outboundYn = myGrid.cellById(i + 1, myGrid.getColIndexById("outboundYn")).getValue();
                 var outboundTargetYn = myGrid.cellById(i + 1, myGrid.getColIndexById("outboundTargetYn")).getValue();
 
-                // 반출 대상이 아닌 경우 (N 또는 null) - 회색
+                // 반출 대상이 아닌 경우 (N 또는 null) - 회색, 체크박스 활성화
                 if (outboundTargetYn == "N" || outboundTargetYn == null || outboundTargetYn == "") {
                     myGrid.setRowColor(i + 1, "#D3D3D3");
-                    myGrid.cellById(i + 1, myGrid.getColIndexById("chk")).setDisabled(true);
+                    myGrid.cellById(i + 1, myGrid.getColIndexById("chk")).setDisabled(false);
+                }
+                // 판별중인 경우 (P) - 연한 파란색, 체크박스 활성화
+                else if (outboundTargetYn == "P") {
+                    myGrid.setRowColor(i + 1, "#E6F3FF");
+                    myGrid.cellById(i + 1, myGrid.getColIndexById("chk")).setDisabled(false);
                 }
                 // 반출 대상이면서 입고와 반출 모두 완료 - 연두색
                 else if (inboundYn == "Y" && outboundYn == "Y") {
@@ -879,6 +885,8 @@
                     if (tblReturnInboundId) {
                         if (outboundTargetYn == "N") {
                             nonTargetRows.push(soNo);
+                        } else if (outboundTargetYn == "P") {
+                            // 판별중인 경우는 처리하지 않음
                         } else {
                             selectedRows.push(tblReturnInboundId);
                         }
@@ -938,8 +946,8 @@
             });
         }
 
-        // 반출 대상 여부 변경
-        function toggleOutboundTarget() {
+        // 반출 대상 여부를 특정 상태로 변경
+        function setOutboundTarget(targetStatus) {
             // 권한 체크: 화주사와 지방물류센터는 접근 불가
             if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200" ||
                 sessionUserGrdCd == "2000" || sessionUserGrntCd == "6000") {
@@ -948,23 +956,14 @@
             }
 
             var selectedRows = [];
-            var currentTargetStatus = [];
 
             // 체크된 행들 찾기
             for (var i = 1; i <= myGrid.getRowsNum(); i++) {
                 var chkValue = myGrid.cellById(i, myGrid.getColIndexById("chk")).getValue();
                 if (chkValue == "1") {
                     var tblReturnInboundId = myGrid.cellById(i, myGrid.getColIndexById("tblReturnInboundId")).getValue();
-                    var outboundTargetYn = myGrid.cellById(i, myGrid.getColIndexById("outboundTargetYn")).getValue();
-                    var soNo = myGrid.cellById(i, myGrid.getColIndexById("soNo")).getValue();
-
                     if (tblReturnInboundId) {
-                        selectedRows.push({
-                            id: tblReturnInboundId,
-                            soNo: soNo,
-                            currentStatus: outboundTargetYn
-                        });
-                        currentTargetStatus.push(outboundTargetYn);
+                        selectedRows.push(tblReturnInboundId);
                     }
                 }
             }
@@ -974,32 +973,21 @@
                 return;
             }
 
-            // 현재 상태 확인
-            var hasY = currentTargetStatus.includes("Y");
-            var hasN = currentTargetStatus.includes("N");
-
-            var message = "";
-            var newStatus = "";
-
-            if (hasY && hasN) {
-                message = "선택된 항목 중 반출대상(Y)과 반출대상아님(N)이 혼재되어 있습니다.\n";
-                message += "모든 항목을 반출대상으로 변경하시겠습니까?";
-                newStatus = "Y";
-            } else if (hasY) {
-                message = "선택한 " + selectedRows.length + "개 항목을 반출대상아님으로 변경하시겠습니까?";
-                newStatus = "N";
-            } else {
-                message = "선택한 " + selectedRows.length + "개 항목을 반출대상으로 변경하시겠습니까?";
-                newStatus = "Y";
+            // 상태별 메시지 설정
+            var statusText = "";
+            switch(targetStatus) {
+                case 'Y': statusText = "반출대상"; break;
+                case 'N': statusText = "반출대상아님"; break;
+                case 'P': statusText = "판별중"; break;
             }
 
-            if (!confirm(message)) {
+            if (!confirm("선택한 " + selectedRows.length + "개 항목을 " + statusText + "으로 변경하시겠습니까?")) {
                 return;
             }
 
             var processData = new FormData();
-            processData.append("selectedIds", selectedRows.map(row => row.id).join(","));
-            processData.append("outboundTargetYn", newStatus);
+            processData.append("selectedIds", selectedRows.join(","));
+            processData.append("outboundTargetYn", targetStatus);
             processData.append("processUser", /*[[${session.userName}]]*/);
 
             $.ajax({
@@ -1011,7 +999,7 @@
                 datatype: "json",
                 success: function (res) {
                     if (res && res.rtnYn == "Y") {
-                        toastr.success("반출 대상 여부가 변경되었습니다.");
+                        toastr.success("선택한 항목이 " + statusText + "으로 변경되었습니다.");
                         fnObj.searchOpen.search();
                     } else {
                         toastr.error("처리 중 오류가 발생했습니다.");
@@ -1107,11 +1095,21 @@
                 $("#btnOutboundComplete").css("opacity", "0.5");
                 $("#btnOutboundComplete").css("cursor", "not-allowed");
 
-                // 반출대상변경 버튼 비활성화
-                $("#btnToggleOutboundTarget").prop("disabled", true);
-                $("#btnToggleOutboundTarget").addClass("disabled");
-                $("#btnToggleOutboundTarget").css("opacity", "0.5");
-                $("#btnToggleOutboundTarget").css("cursor", "not-allowed");
+                // 반출대상 변경 버튼들 비활성화
+                $("#btnSetOutboundTarget").prop("disabled", true);
+                $("#btnSetOutboundTarget").addClass("disabled");
+                $("#btnSetOutboundTarget").css("opacity", "0.5");
+                $("#btnSetOutboundTarget").css("cursor", "not-allowed");
+                
+                $("#btnSetNonTarget").prop("disabled", true);
+                $("#btnSetNonTarget").addClass("disabled");
+                $("#btnSetNonTarget").css("opacity", "0.5");
+                $("#btnSetNonTarget").css("cursor", "not-allowed");
+                
+                $("#btnSetPending").prop("disabled", true);
+                $("#btnSetPending").addClass("disabled");
+                $("#btnSetPending").css("opacity", "0.5");
+                $("#btnSetPending").css("cursor", "not-allowed");
             }
 
             toastr.options = {
@@ -1149,9 +1147,15 @@
                        value="용인센터입고완료">
                 <input id="btnOutboundComplete" class="action-button" type="button" onclick="outboundComplete();"
                        value="반출완료">
-                <input id="btnToggleOutboundTarget" class="action-button" type="button"
-                       onclick="toggleOutboundTarget();"
-                       value="반출대상변경">
+                <input id="btnSetOutboundTarget" class="action-button" type="button"
+                       onclick="setOutboundTarget('Y');"
+                       value="반출대상으로 변경">
+                <input id="btnSetNonTarget" class="action-button" type="button"
+                       onclick="setOutboundTarget('N');"
+                       value="반출대상아님으로 변경">
+                <input id="btnSetPending" class="action-button" type="button"
+                       onclick="setOutboundTarget('P');"
+                       value="판별중으로 변경">
                 <input id="btnExcelDown" class="action-button" type="button" onclick="excelDn();" value="엑셀 다운로드">
                 <input id="btnReport" class="action-button" type="button" onclick="viewReport();" value="리포트 보기">
                 <input id="btnReload" class="action-button" type="button"
