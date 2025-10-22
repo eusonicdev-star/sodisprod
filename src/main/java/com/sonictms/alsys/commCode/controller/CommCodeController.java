@@ -38,7 +38,6 @@ public class CommCodeController {
 	@Value("${common.java.bizMsgUserid}")
 	private String bizMsgUserid;
 
-
     @PostMapping("comComboList")
 	@ResponseBody
     public List<CommCodeVO> comComboList(CommCodeVO commCodeVO) {

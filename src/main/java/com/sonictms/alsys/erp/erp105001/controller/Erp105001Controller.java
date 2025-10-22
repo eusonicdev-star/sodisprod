@@ -30,8 +30,7 @@ public class Erp105001Controller {
     @RequestMapping(value = {"erp105001List"}, method = RequestMethod.POST)
     @ResponseBody
     public List<Erp105001VO> erp105001List(Erp105001VO erp105001VO) {
-        List<Erp105001VO> list = erp105001Service.erp105001List(erp105001VO);
-        return list;
+        return erp105001Service.erp105001List(erp105001VO);
     }
 
     // 재고 조정

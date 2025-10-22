@@ -7,7 +7,6 @@
     <title>재고 현황 조회 (erp105001)</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
 
-
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
@@ -191,19 +190,19 @@
           grid: function () {
             myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
             myGrid.setHeader(
-              "회사코드,화주사코드,화주사명,상품ID,상품코드,상품명,현재수량,등록시간,등록자,수정시간,수정자"
+                "회사코드,화주사코드,화주사명,상품코드,상품명,현재수량,등록시간,등록자,수정시간,수정자"
             );
             myGrid.setColumnIds(
-              "cmpyCd,agntCd,agntNm,tblProductMId,productCd,productNm,currentQty,saveTime,saveUser,updtTime,updtUser"
+                "cmpyCd,agntCd,agntNm,productCd,productNm,currentQty,saveTime,saveUser,updtTime,updtUser"
             );
-            myGrid.setInitWidths("100,100,150,100,150,300,100,150,100,150,100");
+              myGrid.setInitWidths("100,100,150,150,300,100,150,100,150,100");
             myGrid.setColAlign(
-              "center,center,left,center,center,left,right,center,center,center,center"
+                "center,center,left,center,left,right,center,center,center,center"
             );
-            myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
-            myGrid.setColSorting("str,str,str,str,str,str,int,str,str,str,str");
+              myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+              myGrid.setColSorting("str,str,str,str,str,int,str,str,str,str");
             myGrid.attachHeader(
-              "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter"
+                "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter"
             );
 
             myGrid.init(); //이걸써야 세팅한 그리드가 표시가 된다
@@ -327,13 +326,13 @@
           delAgntCode: function () {
             $("#agntCd").val("");
             $("#agntNm").val("");
-          }, //END of delAgntCode : function(){
+          },
 
           delProductCode: function () {
             $("#productCd").val("");
             $("#productNm").val("");
-          }, //END of delProductCode : function(){
-        }, //END of searchOpen
+          },
+        },
         keyOpen: {
           enterKey: function (enterType) {
             if (window.event.keyCode == 13) {

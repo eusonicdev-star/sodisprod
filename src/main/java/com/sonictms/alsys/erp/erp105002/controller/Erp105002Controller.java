@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-@Transactional
 @Controller
 public class Erp105002Controller {
 

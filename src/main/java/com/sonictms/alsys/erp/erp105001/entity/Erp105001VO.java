@@ -18,7 +18,6 @@ public class Erp105001VO implements Serializable {
     private String cmpyCd;
     private String agntCd;
     private String agntNm;
-    private Long tblProductMId;
     private String productCd;
     private String productNm;
     private Integer currentQty;

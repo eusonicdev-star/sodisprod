@@ -43,12 +43,16 @@ public class Erp105002Service {
     }
 
     // 다중 상품 입고 등록
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int insertMultipleInbound(List<Erp105002InboundVO> inboundList) {
+        // 사전 검증: 모든 항목을 먼저 검증
+        for (Erp105002InboundVO inboundVO : inboundList) {
+            validateProductAgencyMapping(inboundVO);
+        }
+        
+        // 모든 검증이 통과하면 일괄 등록
         int result = 0;
         for (Erp105002InboundVO inboundVO : inboundList) {
-            // 상품-화주사 매핑 검증
-            validateProductAgencyMapping(inboundVO);
             result += erp105002Mapper.insertInbound(inboundVO);
         }
         return result;
@@ -101,8 +105,10 @@ public class Erp105002Service {
         List<Erp105002ProductVO> availableProducts = erp105002Mapper.getAvailableProducts(productVO);
         if (availableProducts.isEmpty()) {
             throw new IllegalArgumentException(
-                String.format("상품코드 '%s'는 화주사 '%s'에 등록되지 않았거나 입고 불가능한 상품입니다. (MTO 상품이거나 사용 중지된 상품)", 
-                    inboundVO.getMtrlCd(), inboundVO.getAgntCd())
+                String.format(
+                    "상품코드 '%s'는 화주사 '%s'에 등록되지 않았거나 입고 불가능한 상품입니다. (MTO 상품이거나 사용 중지된 상품)", 
+                    inboundVO.getMtrlCd(), inboundVO.getAgntCd()
+                )
             );
         }
         
@@ -110,13 +116,20 @@ public class Erp105002Service {
         Erp105002ProductVO foundProduct = availableProducts.get(0);
         if (!"Y".equals(foundProduct.getUseYn())) {
             throw new IllegalArgumentException(
-                String.format("상품코드 '%s'는 사용 중지된 상품입니다.", inboundVO.getMtrlCd())
+                String.format("상품코드 '%s'는 사용 중지된 상품입니다. (USE_YN='%s')", 
+                    inboundVO.getMtrlCd(), foundProduct.getUseYn())
             );
         }
         if (!"N".equals(foundProduct.getMtoYn())) {
             throw new IllegalArgumentException(
-                String.format("상품코드 '%s'는 MTO(주문생산) 상품으로 입고 등록이 불가능합니다.", inboundVO.getMtrlCd())
+                String.format("상품코드 '%s'는 MTO(주문생산) 상품으로 입고 등록이 불가능합니다. (MTO_YN='%s')", 
+                    inboundVO.getMtrlCd(), foundProduct.getMtoYn())
             );
+        }
+        
+        // tblMtrlMId가 null인 경우 찾은 상품의 ID로 설정
+        if (inboundVO.getTblMtrlMId() == null) {
+            inboundVO.setTblMtrlMId(foundProduct.getTblMtrlMId());
         }
     }
 }

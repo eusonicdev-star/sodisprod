@@ -53,11 +53,6 @@ public class LogInterceptor implements HandlerInterceptor {
         }
     }
 
-    /*
-        [PostHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)]
-        - Controller 진입 후 View가 Rendering 되기 전 수행
-        - ModelAndView modelAndView를 통해 화면 단에 들어가는 Data 등의 조작이 가능
-     */
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         try {
@@ -70,10 +65,6 @@ public class LogInterceptor implements HandlerInterceptor {
         }
     }
 
-    /*
-        [afterComplete(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)]
-        - Controller 진입 후 View가 정상적으로 Rendering 된 후 수행
-     */
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         try {
@@ -82,7 +73,6 @@ public class LogInterceptor implements HandlerInterceptor {
             log.warn("MDC clear 중 접근 권한 없음", e);
         } catch (Exception e) {
             log.error("LogInterceptor afterCompletion 중 예상치 못한 예외 발생", e);
-            // GlobalExceptionHandler가 처리할 수 있도록 예외를 다시 던짐
             throw e;
         }
     }

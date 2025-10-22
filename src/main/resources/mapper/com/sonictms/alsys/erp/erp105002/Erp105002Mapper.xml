@@ -24,7 +24,7 @@
             AND AGNT_CD = #{agntCd}
         </if>
         <if test="mtrlCd != null and mtrlCd != ''">
-            AND MTRL_CD LIKE '%' + #{mtrlCd} + '%'
+            AND MTRL_CD = #{mtrlCd}
         </if>
         <if test="mtrlNm != null and mtrlNm != ''">
             AND MTRL_NM LIKE '%' + #{mtrlNm} + '%'

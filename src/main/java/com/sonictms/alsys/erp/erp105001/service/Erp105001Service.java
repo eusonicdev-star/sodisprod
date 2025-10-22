@@ -22,12 +22,6 @@ public class Erp105001Service {
     // 재고 조정
     public boolean adjustInventory(Erp105001VO erp105001VO) {
         try {
-            // 재고 조정 로직 구현
-            // 1. 현재 재고 확인
-            // 2. 조정 유형에 따른 수량 계산
-            // 3. 재고 업데이트
-            // 4. 조정 이력 저장
-            
             int result = erp105001Mapper.adjustInventory(erp105001VO);
             return result > 0;
         } catch (Exception e) {

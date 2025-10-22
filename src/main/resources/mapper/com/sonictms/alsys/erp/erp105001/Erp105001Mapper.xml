@@ -3,38 +3,41 @@
 <mapper
 	namespace="com.sonictms.alsys.erp.erp105001.mapper.Erp105001Mapper">
 
-	<!-- 재고 현황 목록 조회하기 -->
+	<!-- 재고 현황 목록 조회하기 (MTO가 아닌 상품만) -->
 	<select id="erp105001List" 
 		parameterType="com.sonictms.alsys.erp.erp105001.entity.Erp105001VO"
 		resultType="com.sonictms.alsys.erp.erp105001.entity.Erp105001VO">
         SELECT
-        TBL_INV_PRODUCT_ID as tblInvProductId,
-        CMPY_CD as cmpyCd,
-        AGNT_CD as agntCd,
-        AGNT_NM as agntNm,
-        TBL_MTRL_M_ID as tblProductMId,
-        MTRL_CD as productCd,
-        MTRL_NM as productNm,
-        CURRENT_QTY as currentQty,
-        SAVE_TIME as saveTime,
-        SAVE_USER as saveUser,
-        UPDT_TIME as updtTime,
-        UPDT_USER as updtUser
-        FROM TBL_INV_PRODUCT
+        IP.TBL_INV_PRODUCT_ID as tblInvProductId,
+        IP.CMPY_CD as cmpyCd,
+        IP.AGNT_CD as agntCd,
+        IP.AGNT_NM as agntNm,
+        IP.MTRL_CD as productCd,
+        IP.MTRL_NM as productNm,
+        IP.CURRENT_QTY as currentQty,
+        IP.SAVE_TIME as saveTime,
+        IP.SAVE_USER as saveUser,
+        IP.UPDT_TIME as updtTime,
+        IP.UPDT_USER as updtUser
+        FROM TBL_INV_PRODUCT IP
+        INNER JOIN TBL_MTRL_M MM ON IP.MTRL_CD = MM.MTRL_CD
+        AND IP.CMPY_CD = MM.CMPY_CD
+        AND IP.AGNT_CD = MM.AGNT_CD
         WHERE 1=1
+        AND MM.MTO_YN = 'N' -- MTO가 아닌 상품만 조회
         <if test="cmpyCd != null and cmpyCd != ''">
-            AND CMPY_CD = #{cmpyCd}
+            AND IP.CMPY_CD = #{cmpyCd}
         </if>
         <if test="agntCd != null and agntCd != ''">
-            AND AGNT_CD = #{agntCd}
+            AND IP.AGNT_CD = #{agntCd}
         </if>
         <if test="productCd != null and productCd != ''">
-            AND MTRL_CD LIKE '%' + #{productCd} + '%'
+            AND IP.MTRL_CD LIKE '%' + #{productCd} + '%'
         </if>
         <if test="productNm != null and productNm != ''">
-            AND MTRL_NM LIKE '%' + #{productNm} + '%'
+            AND IP.MTRL_NM LIKE '%' + #{productNm} + '%'
         </if>
-        ORDER BY MTRL_CD
+        ORDER BY IP.MTRL_CD
     </select>
 
     <!-- 재고 조정 -->
