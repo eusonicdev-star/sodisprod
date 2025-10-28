@@ -107,16 +107,15 @@ public class Erp105006Controller {
         log.info("재입고 완료 처리 요청");
         log.info("처리 정보: {}", erp105006VO);
         
-        // 권한 체크: 화주사와 지방물류센터는 접근 불가
+        // 권한 체크: 권한 9999인 사용자만 접근 가능
         String userGrntCd = (String) request.getSession().getAttribute("userGrntCd");
         String userGrdCd = (String) request.getSession().getAttribute("userGrdCd");
         
-        if ("4100".equals(userGrntCd) || "4200".equals(userGrntCd) || 
-            "2000".equals(userGrdCd) || "6000".equals(userGrntCd)) {
-            log.warn("권한 없음 - 화주사/지방물류센터는 재입고 완료 처리 불가");
+        if (!"9999".equals(userGrntCd)) {
+            log.warn("권한 없음 - 권한 9999인 사용자만 재입고 완료 처리 가능. 현재 권한: {}", userGrntCd);
             Map<String, Object> result = new HashMap<>();
             result.put("rtnYn", "N");
-            result.put("rtnMsg", "권한이 없습니다. 용인센터 직원만 사용할 수 있습니다.");
+            result.put("rtnMsg", "권한이 없습니다. 관리자만 사용할 수 있습니다.");
             return result;
         }
         
@@ -153,16 +152,15 @@ public class Erp105006Controller {
         log.info("반출 완료 처리 요청");
         log.info("처리 정보: {}", erp105006VO);
         
-        // 권한 체크: 화주사와 지방물류센터는 접근 불가
+        // 권한 체크: 권한 9999인 사용자만 접근 가능
         String userGrntCd = (String) request.getSession().getAttribute("userGrntCd");
         String userGrdCd = (String) request.getSession().getAttribute("userGrdCd");
         
-        if ("4100".equals(userGrntCd) || "4200".equals(userGrntCd) || 
-            "2000".equals(userGrdCd) || "6000".equals(userGrntCd)) {
-            log.warn("권한 없음 - 화주사/지방물류센터는 반출 완료 처리 불가");
+        if (!"9999".equals(userGrntCd)) {
+            log.warn("권한 없음 - 권한 9999인 사용자만 반출 완료 처리 가능. 현재 권한: {}", userGrntCd);
             Map<String, Object> result = new HashMap<>();
             result.put("rtnYn", "N");
-            result.put("rtnMsg", "권한이 없습니다. 용인센터 직원만 사용할 수 있습니다.");
+            result.put("rtnMsg", "권한이 없습니다. 관리자만 사용할 수 있습니다.");
             return result;
         }
         
@@ -199,16 +197,15 @@ public class Erp105006Controller {
         log.info("일괄 재입고 완료 처리 요청");
         log.info("처리 정보: {}", erp105006VO);
         
-        // 권한 체크: 화주사와 지방물류센터는 접근 불가
+        // 권한 체크: 권한 9999인 사용자만 접근 가능
         String userGrntCd = (String) request.getSession().getAttribute("userGrntCd");
         String userGrdCd = (String) request.getSession().getAttribute("userGrdCd");
         
-        if ("4100".equals(userGrntCd) || "4200".equals(userGrntCd) || 
-            "2000".equals(userGrdCd) || "6000".equals(userGrntCd)) {
-            log.warn("권한 없음 - 화주사/지방물류센터는 일괄 재입고 완료 처리 불가");
+        if (!"9999".equals(userGrntCd)) {
+            log.warn("권한 없음 - 권한 9999인 사용자만 일괄 재입고 완료 처리 가능. 현재 권한: {}", userGrntCd);
             Map<String, Object> result = new HashMap<>();
             result.put("rtnYn", "N");
-            result.put("rtnMsg", "권한이 없습니다. 용인센터 직원만 사용할 수 있습니다.");
+            result.put("rtnMsg", "권한이 없습니다. 관리자만 사용할 수 있습니다.");
             return result;
         }
         
@@ -245,16 +242,15 @@ public class Erp105006Controller {
         log.info("일괄 반출 완료 처리 요청");
         log.info("처리 정보: {}", erp105006VO);
         
-        // 권한 체크: 화주사와 지방물류센터는 접근 불가
+        // 권한 체크: 권한 9999인 사용자만 접근 가능
         String userGrntCd = (String) request.getSession().getAttribute("userGrntCd");
         String userGrdCd = (String) request.getSession().getAttribute("userGrdCd");
         
-        if ("4100".equals(userGrntCd) || "4200".equals(userGrntCd) || 
-            "2000".equals(userGrdCd) || "6000".equals(userGrntCd)) {
-            log.warn("권한 없음 - 화주사/지방물류센터는 일괄 반출 완료 처리 불가");
+        if (!"9999".equals(userGrntCd)) {
+            log.warn("권한 없음 - 권한 9999인 사용자만 일괄 반출 완료 처리 가능. 현재 권한: {}", userGrntCd);
             Map<String, Object> result = new HashMap<>();
             result.put("rtnYn", "N");
-            result.put("rtnMsg", "권한이 없습니다. 용인센터 직원만 사용할 수 있습니다.");
+            result.put("rtnMsg", "권한이 없습니다. 관리자만 사용할 수 있습니다.");
             return result;
         }
         
@@ -291,16 +287,15 @@ public class Erp105006Controller {
         log.info("반출 대상 여부 변경 요청");
         log.info("처리 정보: {}", erp105006VO);
         
-        // 권한 체크: 화주사와 지방물류센터는 접근 불가
+        // 권한 체크: 권한 9999인 사용자만 접근 가능
         String userGrntCd = (String) request.getSession().getAttribute("userGrntCd");
         String userGrdCd = (String) request.getSession().getAttribute("userGrdCd");
         
-        if ("4100".equals(userGrntCd) || "4200".equals(userGrntCd) || 
-            "2000".equals(userGrdCd) || "6000".equals(userGrntCd)) {
-            log.warn("권한 없음 - 화주사/지방물류센터는 반출 대상 여부 변경 불가");
+        if (!"9999".equals(userGrntCd)) {
+            log.warn("권한 없음 - 권한 9999인 사용자만 반출 대상 여부 변경 가능. 현재 권한: {}", userGrntCd);
             Map<String, Object> result = new HashMap<>();
             result.put("rtnYn", "N");
-            result.put("rtnMsg", "권한이 없습니다. 용인센터 직원만 사용할 수 있습니다.");
+            result.put("rtnMsg", "권한이 없습니다. 관리자만 사용할 수 있습니다.");
             return result;
         }
         

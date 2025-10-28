@@ -107,16 +107,15 @@ public class Erp105005Controller {
         log.info("재입고 완료 처리 요청");
         log.info("처리 정보: {}", erp105005VO);
         
-        // 권한 체크: 화주사와 지방물류센터는 접근 불가
+        // 권한 체크: 권한 9999인 사용자만 접근 가능
         String userGrntCd = (String) request.getSession().getAttribute("userGrntCd");
         String userGrdCd = (String) request.getSession().getAttribute("userGrdCd");
         
-        if ("4100".equals(userGrntCd) || "4200".equals(userGrntCd) || 
-            "2000".equals(userGrdCd) || "6000".equals(userGrntCd)) {
-            log.warn("권한 없음 - 화주사/지방물류센터는 재입고 완료 처리 불가");
+        if (!"9999".equals(userGrntCd)) {
+            log.warn("권한 없음 - 권한 9999인 사용자만 재입고 완료 처리 가능. 현재 권한: {}", userGrntCd);
             Map<String, Object> result = new HashMap<>();
             result.put("rtnYn", "N");
-            result.put("rtnMsg", "권한이 없습니다. 용인센터 직원만 사용할 수 있습니다.");
+            result.put("rtnMsg", "권한이 없습니다. 관리자만 사용할 수 있습니다.");
             return result;
         }
         
@@ -153,16 +152,15 @@ public class Erp105005Controller {
         log.info("반출 완료 처리 요청");
         log.info("처리 정보: {}", erp105005VO);
         
-        // 권한 체크: 화주사와 지방물류센터는 접근 불가
+        // 권한 체크: 권한 9999인 사용자만 접근 가능
         String userGrntCd = (String) request.getSession().getAttribute("userGrntCd");
         String userGrdCd = (String) request.getSession().getAttribute("userGrdCd");
         
-        if ("4100".equals(userGrntCd) || "4200".equals(userGrntCd) || 
-            "2000".equals(userGrdCd) || "6000".equals(userGrntCd)) {
-            log.warn("권한 없음 - 화주사/지방물류센터는 반출 완료 처리 불가");
+        if (!"9999".equals(userGrntCd)) {
+            log.warn("권한 없음 - 권한 9999인 사용자만 반출 완료 처리 가능. 현재 권한: {}", userGrntCd);
             Map<String, Object> result = new HashMap<>();
             result.put("rtnYn", "N");
-            result.put("rtnMsg", "권한이 없습니다. 용인센터 직원만 사용할 수 있습니다.");
+            result.put("rtnMsg", "권한이 없습니다. 관리자만 사용할 수 있습니다.");
             return result;
         }
         
@@ -199,16 +197,15 @@ public class Erp105005Controller {
         log.info("일괄 재입고 완료 처리 요청");
         log.info("처리 정보: {}", erp105005VO);
         
-        // 권한 체크: 화주사와 지방물류센터는 접근 불가
+        // 권한 체크: 권한 9999인 사용자만 접근 가능
         String userGrntCd = (String) request.getSession().getAttribute("userGrntCd");
         String userGrdCd = (String) request.getSession().getAttribute("userGrdCd");
         
-        if ("4100".equals(userGrntCd) || "4200".equals(userGrntCd) || 
-            "2000".equals(userGrdCd) || "6000".equals(userGrntCd)) {
-            log.warn("권한 없음 - 화주사/지방물류센터는 일괄 재입고 완료 처리 불가");
+        if (!"9999".equals(userGrntCd)) {
+            log.warn("권한 없음 - 권한 9999인 사용자만 일괄 재입고 완료 처리 가능. 현재 권한: {}", userGrntCd);
             Map<String, Object> result = new HashMap<>();
             result.put("rtnYn", "N");
-            result.put("rtnMsg", "권한이 없습니다. 용인센터 직원만 사용할 수 있습니다.");
+            result.put("rtnMsg", "권한이 없습니다. 관리자만 사용할 수 있습니다.");
             return result;
         }
         
@@ -245,16 +242,15 @@ public class Erp105005Controller {
         log.info("일괄 반출 완료 처리 요청");
         log.info("처리 정보: {}", erp105005VO);
         
-        // 권한 체크: 화주사와 지방물류센터는 접근 불가
+        // 권한 체크: 권한 9999인 사용자만 접근 가능
         String userGrntCd = (String) request.getSession().getAttribute("userGrntCd");
         String userGrdCd = (String) request.getSession().getAttribute("userGrdCd");
         
-        if ("4100".equals(userGrntCd) || "4200".equals(userGrntCd) || 
-            "2000".equals(userGrdCd) || "6000".equals(userGrntCd)) {
-            log.warn("권한 없음 - 화주사/지방물류센터는 일괄 반출 완료 처리 불가");
+        if (!"9999".equals(userGrntCd)) {
+            log.warn("권한 없음 - 권한 9999인 사용자만 일괄 반출 완료 처리 가능. 현재 권한: {}", userGrntCd);
             Map<String, Object> result = new HashMap<>();
             result.put("rtnYn", "N");
-            result.put("rtnMsg", "권한이 없습니다. 용인센터 직원만 사용할 수 있습니다.");
+            result.put("rtnMsg", "권한이 없습니다. 관리자만 사용할 수 있습니다.");
             return result;
         }
         
@@ -291,16 +287,15 @@ public class Erp105005Controller {
         log.info("반출 대상 여부 변경 요청");
         log.info("처리 정보: {}", erp105005VO);
         
-        // 권한 체크: 화주사와 지방물류센터는 접근 불가
+        // 권한 체크: 권한 9999인 사용자만 접근 가능
         String userGrntCd = (String) request.getSession().getAttribute("userGrntCd");
         String userGrdCd = (String) request.getSession().getAttribute("userGrdCd");
         
-        if ("4100".equals(userGrntCd) || "4200".equals(userGrntCd) || 
-            "2000".equals(userGrdCd) || "6000".equals(userGrntCd)) {
-            log.warn("권한 없음 - 화주사/지방물류센터는 반출 대상 여부 변경 불가");
+        if (!"9999".equals(userGrntCd)) {
+            log.warn("권한 없음 - 권한 9999인 사용자만 반출 대상 여부 변경 가능. 현재 권한: {}", userGrntCd);
             Map<String, Object> result = new HashMap<>();
             result.put("rtnYn", "N");
-            result.put("rtnMsg", "권한이 없습니다. 용인센터 직원만 사용할 수 있습니다.");
+            result.put("rtnMsg", "권한이 없습니다. 관리자만 사용할 수 있습니다.");
             return result;
         }
         
@@ -315,6 +310,96 @@ public class Erp105005Controller {
             result.put("rtnYn", "N");
             result.put("rtnMsg", "처리 중 오류가 발생했습니다.");
             log.error("반출 대상 여부 변경 실패", e);
+        }
+        
+        return result;
+    }
+
+    /**
+     * 입고완료 되돌리기 처리
+     * @param erp105005VO 처리 정보
+     * @param request HttpServletRequest
+     * @return 처리 결과
+     */
+    @RequestMapping(value = {"erp105005RevertInboundComplete"}, method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> erp105005RevertInboundComplete(Erp105005VO erp105005VO, HttpServletRequest request) {
+        log.info("입고완료 되돌리기 처리 요청");
+        log.info("처리 정보: {}", erp105005VO);
+        
+        // 권한 체크: 권한 9999인 사용자만 접근 가능
+        String userGrntCd = (String) request.getSession().getAttribute("userGrntCd");
+        String userGrdCd = (String) request.getSession().getAttribute("userGrdCd");
+        
+        if (!"9999".equals(userGrntCd)) {
+            log.warn("권한 없음 - 권한 9999인 사용자만 입고완료 되돌리기 가능. 현재 권한: {}", userGrntCd);
+            Map<String, Object> result = new HashMap<>();
+            result.put("rtnYn", "N");
+            result.put("rtnMsg", "권한이 없습니다. 관리자만 사용할 수 있습니다.");
+            return result;
+        }
+        
+        // 사용자 정보를 변환하여 저장
+        if (erp105005VO.getProcessUser() != null) {
+            erp105005VO.setProcessUser(formatUserInfo(erp105005VO.getProcessUser()));
+        }
+        
+        Map<String, Object> result = new HashMap<>();
+        try {
+            int processedCount = erp105005Service.erp105005RevertInboundComplete(erp105005VO);
+            result.put("rtnYn", "Y");
+            result.put("rtnMsg", "입고완료가 되돌려졌습니다.");
+            result.put("processedCount", processedCount);
+            log.info("입고완료 되돌리기 성공: {}건 처리", processedCount);
+        } catch (Exception e) {
+            result.put("rtnYn", "N");
+            result.put("rtnMsg", "처리 중 오류가 발생했습니다.");
+            log.error("입고완료 되돌리기 실패", e);
+        }
+        
+        return result;
+    }
+
+    /**
+     * 반출완료 되돌리기 처리
+     * @param erp105005VO 처리 정보
+     * @param request HttpServletRequest
+     * @return 처리 결과
+     */
+    @RequestMapping(value = {"erp105005RevertOutboundComplete"}, method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> erp105005RevertOutboundComplete(Erp105005VO erp105005VO, HttpServletRequest request) {
+        log.info("반출완료 되돌리기 처리 요청");
+        log.info("처리 정보: {}", erp105005VO);
+        
+        // 권한 체크: 권한 9999인 사용자만 접근 가능
+        String userGrntCd = (String) request.getSession().getAttribute("userGrntCd");
+        String userGrdCd = (String) request.getSession().getAttribute("userGrdCd");
+        
+        if (!"9999".equals(userGrntCd)) {
+            log.warn("권한 없음 - 권한 9999인 사용자만 반출완료 되돌리기 가능. 현재 권한: {}", userGrntCd);
+            Map<String, Object> result = new HashMap<>();
+            result.put("rtnYn", "N");
+            result.put("rtnMsg", "권한이 없습니다. 관리자만 사용할 수 있습니다.");
+            return result;
+        }
+        
+        // 사용자 정보를 변환하여 저장
+        if (erp105005VO.getProcessUser() != null) {
+            erp105005VO.setProcessUser(formatUserInfo(erp105005VO.getProcessUser()));
+        }
+        
+        Map<String, Object> result = new HashMap<>();
+        try {
+            int processedCount = erp105005Service.erp105005RevertOutboundComplete(erp105005VO);
+            result.put("rtnYn", "Y");
+            result.put("rtnMsg", "반출완료가 되돌려졌습니다.");
+            result.put("processedCount", processedCount);
+            log.info("반출완료 되돌리기 성공: {}건 처리", processedCount);
+        } catch (Exception e) {
+            result.put("rtnYn", "N");
+            result.put("rtnMsg", "처리 중 오류가 발생했습니다.");
+            log.error("반출완료 되돌리기 실패", e);
         }
         
         return result;

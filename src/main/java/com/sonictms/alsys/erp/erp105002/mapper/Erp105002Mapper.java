@@ -32,4 +32,7 @@ public interface Erp105002Mapper {
 
     // 중복 입고 검증 (같은 예정일 + 같은 상품코드)
     List<Erp105002InboundVO> checkDuplicateInbound(Erp105002InboundVO inboundVO);
+    
+    // 입고 완료 취소 처리
+    int cancelInbound(Erp105002InboundVO inboundVO);
 }

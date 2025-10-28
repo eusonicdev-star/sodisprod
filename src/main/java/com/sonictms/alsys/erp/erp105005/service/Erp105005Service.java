@@ -126,5 +126,47 @@ public class Erp105005Service {
         log.info("반출 대상 여부 변경 처리");
         return erp105005Mapper.erp105005ToggleOutboundTarget(erp105005VO);
     }
+
+    /**
+     * 입고완료 되돌리기 처리
+     *
+     * @param erp105005VO 처리 정보
+     * @return 처리된 건수
+     */
+    @Transactional
+    public int erp105005RevertInboundComplete(Erp105005VO erp105005VO) {
+        log.info("입고완료 되돌리기 처리 시작");
+        log.info("처리 정보: {}", erp105005VO);
+
+        try {
+            int result = erp105005Mapper.erp105005RevertInboundComplete(erp105005VO);
+            log.info("입고완료 되돌리기 성공: {}건 처리", result);
+            return result;
+        } catch (Exception e) {
+            log.error("입고완료 되돌리기 실패", e);
+            throw e;
+        }
+    }
+
+    /**
+     * 반출완료 되돌리기 처리
+     *
+     * @param erp105005VO 처리 정보
+     * @return 처리된 건수
+     */
+    @Transactional
+    public int erp105005RevertOutboundComplete(Erp105005VO erp105005VO) {
+        log.info("반출완료 되돌리기 처리 시작");
+        log.info("처리 정보: {}", erp105005VO);
+
+        try {
+            int result = erp105005Mapper.erp105005RevertOutboundComplete(erp105005VO);
+            log.info("반출완료 되돌리기 성공: {}건 처리", result);
+            return result;
+        } catch (Exception e) {
+            log.error("반출완료 되돌리기 실패", e);
+            throw e;
+        }
+    }
 }
 

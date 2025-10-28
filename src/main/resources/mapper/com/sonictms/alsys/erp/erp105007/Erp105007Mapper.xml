@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.erp.erp105007.mapper.Erp105007Mapper">
+
+    <!-- 미확정리스트 조회 (주문접수 1000, 주문확정 1200만) -->
+    <select id="erp105007List" parameterType="com.sonictms.alsys.erp.erp105007.entity.Erp105007VO"
+            resultType="com.sonictms.alsys.erp.erp105007.entity.Erp105007VO">
+        SELECT DISTINCT
+        M.CMPY_CD,
+        M.AGNT_CD,
+        DBO.F_COL_NM('A', 'AGNT_CD', 'AGNT_CD', M.AGNT_CD) AS AGNT_NM,
+        M.SO_TYPE,
+        DBO.F_COL_NM('A', 'COMM', 'SO_ORDR_TYPE', M.SO_TYPE) AS SO_TYPE_NM,
+        M.SO_STAT_CD,
+        DBO.F_COL_NM('A', 'COMM', 'SO_STAT_CD', M.SO_STAT_CD) AS SO_STAT_NM,
+        M.DC_CD,
+        DBO.F_COL_NM('A', 'DC_CD', 'DC_CD', M.DC_CD) AS DC_NM,
+        M.ORDR_INPT_DT,
+        M.RCPT_DT,
+        M.RQST_DT,
+        M.DLVY_CNFM_DT,
+        M.GI_LIFT_DT,
+        M.MALL_CD,
+        M.BRAND,
+        M.SO_NO,
+        P.REF_SO_NO,
+        M.ACPT_ER,
+        M.ACPT_TEL1,
+        M.ACPT_TEL2,
+        M.POST_CD,
+        M.ADDR1 + ISNULL(M.ADDR2, '') AS ADDR1,
+        M.ADDR2,
+        M.DLVY_RQST_MSG,
+        M.CUST_SPCL_TXT,
+        M.DLVY_COST_TYPE,
+        DBO.F_COL_NM('A', 'COMM', 'DLVY_COST_TYPE', M.DLVY_COST_TYPE) AS DLVY_COST_TYPE_NM,
+        M.RCPT_COST,
+        M.PASS_COST,
+        I.INST_DT,
+        I.PALT_NOXX,
+        CASE
+            WHEN ISNULL(UM.USER_NM, '') = '' THEN ISNULL(M.DIST_CHAN_CD, '')
+            ELSE ISNULL(UM2.USER_NM, UM.USER_NM) END AS INST_ER,
+        ISNULL(UM2.TBL_USER_M_ID, UM.TBL_USER_M_ID) AS INST_ER_ID,
+        CASE
+            WHEN ISNULL(UM.TEAM, '') = '' THEN ISNULL(M.BRAND, '')
+            ELSE ISNULL(UM2.TEAM, UM.TEAM) + '팀' END AS TEAM,
+        ISNULL(ISNULL(MC.MEMO, MXC.MEMO), '') AS INST_MEMO,
+        I.INST_COST,
+        I.DLVY_COST,
+        DBO.F_COL_NM(M.CMPY_CD, 'COMM', 'DLVY_STAT_CD', IM.DLVY_STAT_CD) AS DLVY_STAT_NM,
+        ISNULL(IMD.PROD_LIFT_CMPL_YN, 'N') AS LIFT_YN,
+        P.PROD_SEQ,
+        ISNULL(BM.MTRL_CD, P.PROD_CD) AS PROD_CD,
+        ISNULL(MM.MTRL_NM, P.PROD_NM) AS PROD_NM,
+        P.QTY,
+        ISNULL(BM.C_MTRL_CD, P.PROD_CD) AS CPROD_CD,
+        ISNULL(MM2.MTRL_NM, P.PROD_NM) AS CPROD_NM,
+        ISNULL(BM.QTY * P.QTY, P.QTY) AS CQTY,
+        M.FROM_ER,
+        M.FROM_TEL1,
+        M.FROM_TEL2,
+        M.FROM_POST_CD,
+        M.FROM_ADDR1,
+        M.FROM_ADDR2,
+        M.DIST_CHAN_CD,
+        M.ORGN_SO_NO,
+        M.USE_YN,
+        M.DEL_RESN,
+        M.MEMO,
+        M.SAVE_USER,
+        M.SAVE_TIME,
+        M.UPDT_USER,
+        M.UPDT_TIME,
+        P.INST_CTGR,
+        DBO.F_COL_NM('A', 'COMM', 'INST_CAPA_CTGR', P.INST_CTGR) AS INST_CTGR_NM
+        FROM DBO.TBL_SO_M AS M WITH (NOLOCK)
+        INNER JOIN DBO.TBL_SO_P AS P WITH (NOLOCK) ON M.TBL_SO_M_ID = P.TBL_SO_M_ID
+        LEFT OUTER JOIN TBL_BOM_M AS BM WITH (NOLOCK)
+            ON P.PROD_CD = BM.MTRL_CD AND M.AGNT_CD = BM.AGNT_CD AND BM.USE_YN = 'Y'
+        LEFT OUTER JOIN TBL_MTRL_M AS MM WITH (NOLOCK)
+            ON BM.MTRL_CD = MM.MTRL_CD AND BM.AGNT_CD = MM.AGNT_CD
+        LEFT OUTER JOIN TBL_MTRL_M AS MM2 WITH (NOLOCK)
+            ON BM.C_MTRL_CD = MM2.MTRL_CD AND BM.AGNT_CD = MM2.AGNT_CD
+        LEFT OUTER JOIN DBO.TBL_INST_PLAN_M AS I WITH (NOLOCK) ON M.TBL_SO_M_ID = I.TBL_SO_M_ID
+        LEFT OUTER JOIN TBL_USER_M AS UM WITH (NOLOCK) ON I.TBL_USER_M_ID = UM.TBL_USER_M_ID
+        LEFT OUTER JOIN TBL_INST_MOBILE_M AS IM WITH (NOLOCK) ON M.TBL_SO_M_ID = IM.TBL_SO_M_ID
+        LEFT OUTER JOIN TBL_INST_MOBILE_D AS IMD WITH (NOLOCK)
+            ON P.TBL_SO_M_ID = IMD.TBL_SO_M_ID AND P.TBL_SO_P_ID = IMD.TBL_SO_P_ID AND
+               IM.INST_MOBILE_M_ID = IMD.INST_MOBILE_M_ID
+               AND IMD.PROD_CD = ISNULL(BM.C_MTRL_CD, P.PROD_CD)
+        LEFT OUTER JOIN TBL_INST_MOBILE_COMPLETE AS MC WITH (NOLOCK)
+            ON IM.INST_MOBILE_M_ID = MC.INST_MOBILE_M_ID
+        LEFT OUTER JOIN TBL_INST_MOBILE_X_COMPLETE AS MXC WITH (NOLOCK)
+            ON IM.INST_MOBILE_M_ID = MXC.INST_MOBILE_M_ID
+        LEFT OUTER JOIN TBL_USER_M AS UM2 WITH (NOLOCK) ON UM2.TBL_USER_M_ID = IM.EXEC_USER_M_ID
+        WHERE 1 = 1
+        AND P.USE_YN = 'Y'
+        AND M.CMPY_CD = #{cmpyCd}
+        AND M.SO_STAT_CD IN ('1000', '1200')  -- 주문접수, 주문확정만
+        <if test="fromDt != null and fromDt != ''">
+            <choose>
+                <when test="dtType != null and (dtType == '1' or dtType == 1)">
+                    AND M.ORDR_INPT_DT >= #{fromDt}
+                </when>
+                <when test="dtType != null and (dtType == '3' or dtType == 3)">
+                    AND M.DLVY_CNFM_DT >= #{fromDt}
+                </when>
+            </choose>
+        </if>
+        <if test="toDt != null and toDt != ''">
+            <choose>
+                <when test="dtType != null and (dtType == '1' or dtType == 1)">
+                    AND M.ORDR_INPT_DT &lt;= #{toDt}
+                </when>
+                <when test="dtType != null and (dtType == '3' or dtType == 3)">
+                    AND M.DLVY_CNFM_DT &lt;= #{toDt}
+                </when>
+            </choose>
+        </if>
+        <if test="agntList != null and agntList != ''">
+            AND M.AGNT_CD LIKE #{agntList} + '%'
+        </if>
+        <if test="dcList != null and dcList != ''">
+            AND M.DC_CD IN
+            <foreach collection="dcList.split(',')" item="dc" open="(" close=")" separator=",">
+                #{dc}
+            </foreach>
+        </if>
+        <if test="soList != null and soList != ''">
+            AND M.SO_NO IN
+            <foreach collection="soList.split(',')" item="so" open="(" close=")" separator=",">
+                #{so}
+            </foreach>
+        </if>
+        <if test="soTypeList != null and soTypeList != ''">
+            AND M.SO_TYPE IN
+            <foreach collection="soTypeList.split(',')" item="soType" open="(" close=")" separator=",">
+                #{soType}
+            </foreach>
+        </if>
+        <if test="mallNm != null and mallNm != ''">
+            AND (M.MALL_CD LIKE #{mallNm} + '%' OR M.MALL_CD IS NULL)
+        </if>
+        <if test="acptNm != null and acptNm != ''">
+            AND (M.ACPT_ER LIKE #{acptNm} + '%' OR M.ACPT_ER IS NULL)
+        </if>
+        <if test="acptTel != null and acptTel != ''">
+            AND (M.ACPT_TEL2 LIKE REPLACE(#{acptTel}, '-', '') + '%' OR M.ACPT_TEL2 IS NULL)
+        </if>
+        <if test="refSoList != null and refSoList != ''">
+            AND P.REF_SO_NO IN
+            <foreach collection="refSoList.split(',')" item="refSo" open="(" close=")" separator=",">
+                #{refSo}
+            </foreach>
+        </if>
+        <if test="prodList != null and prodList != ''">
+            AND P.PROD_CD IN
+            <foreach collection="prodList.split(',')" item="prod" open="(" close=")" separator=",">
+                #{prod}
+            </foreach>
+        </if>
+        <if test="prodNm != null and prodNm != ''">
+            AND P.PROD_NM LIKE #{prodNm} + '%'
+        </if>
+        <if test="srchAddr != null and srchAddr != ''">
+            AND M.ADDR1 LIKE #{srchAddr} + '%'
+        </if>
+        ORDER BY M.ORDR_INPT_DT, M.AGNT_CD, M.SO_NO, P.PROD_SEQ, PROD_CD
+    </select>
+
+</mapper>

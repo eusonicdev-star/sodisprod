@@ -599,57 +599,7 @@
 
               },
               addRowMyGrid: function () {
-
-
                   fnObj.winOpen.prodCommSrch("제품정보찾기", "A", "MTRL_SO", "textArea");
-
-                  /****************
-                   //제일 큰 순번 구하기
-                   var maxSeq = 0;
-                   var maxRow = 0;
-                   myGrid.forEachRow(function(RowId){
-
-                   //제일 큰 로우아이디 구하기
-                   var nowRowId = 	parseInt(myGrid.cellById(RowId,myGrid.getColIndexById("rowId")).getValue());
-                   if(nowRowId > maxRow)
-                   {
-                   maxRow = nowRowId;
-                   }
-
-                   //제일 큰 품목순번 구하기
-                   var nowSeq = 	parseInt(myGrid.cellById(RowId,myGrid.getColIndexById("prodSeq")).getValue());
-                   if(nowSeq > maxSeq)
-                   {
-                   maxSeq = nowSeq;
-                   }
-
-                   });
-
-
-                   var rowNo = maxRow;
-                   var seqNo = maxSeq;
-
-                   myGrid.addRow((rowNo+1),"");
-                   myGrid2.addRow((rowNo+1),"");
-                   var rowData = {"cud":"C","prodSeq":(seqNo+1),"rowId":(rowNo+1) };
-
-                   myGrid.setRowData((rowNo+1),rowData);
-                   myGrid2.setRowData((rowNo+1),rowData);
-
-                   myGrid.selectRowById((rowNo+1));
-
-
-                   fnObj.winOpen.prodCommSrch("제품정보찾기","A","MTRL_SO","textArea");
-                   //상품명컬럼으로 이동
-
-                   //myGrid.selectCell(myGrid.getRowIndex(rowNo+1),myGrid.getColIndexById("prodNm"),true,true);
-
-                   //myGrid.editCell();
-
-                   //setTimeout("myGrid.editCell()",100)
-
-                   *********/
-
 
                   var sumMainRcptCost = 0;	//20211226 정연호 추가. 착불비 합계 계산하기
                   myGrid.forEachRow(function (eachRowId) {
@@ -660,15 +610,12 @@
               },
               //체크한 것 삭제(CUD 가 C 면 그냥 로우만 삭제, CUD 가 C 가 아니면 DB에서 읽었다는것-DB에서 삭제 & 로우에서삭제)
               delRowMyGrid: function () {
-
-                  //체크한 것 몇개인지 체크
                   var chkCnt = 0;
                   var chkDelResn = 0;	//삭제할것의 삭제이유
                   var delResnRowId;
                   myGrid.forEachRow(function (chkRowId) {
                       var chkRow = myGrid.cellById(chkRowId, myGrid.getColIndexById("chk")).getValue();
-                      if (chkRow == "1")	//체크를 했으면
-                      {
+                      if (chkRow == "1") {
                           chkCnt++;
                       }
                       //체크를 했고 tblSoPId 가 있고(DB에서 불러왔다는것 ) 삭제 이유가 없으면
@@ -676,8 +623,6 @@
                           && myGrid.cellById(chkRowId, myGrid.getColIndexById("tblSoPId")).getValue().trim() != ""
                           && myGrid.cellById(chkRowId, myGrid.getColIndexById("delResn")).getValue().trim() == ""
                       ) {
-
-                          //myGrid.cellById(chkRowId,myGrid.getColIndexById("chk")).setValue("0");
                           chkDelResn++;
                           if (!delResnRowId) {
                               delResnRowId = chkRowId;
@@ -693,12 +638,6 @@
                       myGrid.selectCell(myGrid.getRowIndex(delResnRowId), myGrid.getColIndexById("delResn"), true, true);
                       return;
                   }
-
-                  /* if(!confirm("체크한 것을 삭제하시겠습니까?"))
-                  {
-                      //alert("취소하였습니다.")
-                      return;
-                  } */
 
                   var errMsg = "";
                   myGrid.forEachRow(function (delRowId) {

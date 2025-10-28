@@ -49,5 +49,19 @@ public interface Erp105005Mapper {
      * @return 처리된 행 수
      */
     int erp105005ToggleOutboundTarget(Erp105005VO erp105005VO);
+
+    /**
+     * 입고완료 되돌리기 처리
+     * @param erp105005VO 처리 정보
+     * @return 처리된 행 수
+     */
+    int erp105005RevertInboundComplete(Erp105005VO erp105005VO);
+
+    /**
+     * 반출완료 되돌리기 처리
+     * @param erp105005VO 처리 정보
+     * @return 처리된 행 수
+     */
+    int erp105005RevertOutboundComplete(Erp105005VO erp105005VO);
 }
 

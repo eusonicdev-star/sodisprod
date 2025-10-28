@@ -3,52 +3,68 @@
 <mapper
 	namespace="com.sonictms.alsys.erp.erp105001.mapper.Erp105001Mapper">
 
-	<!-- 재고 현황 목록 조회하기 (MTO가 아닌 상품만) -->
+	<!-- 재고 현황 목록 조회하기 (TBL_MTRL_M 기반, MTO가 아닌 상품만) -->
 	<select id="erp105001List" 
 		parameterType="com.sonictms.alsys.erp.erp105001.entity.Erp105001VO"
 		resultType="com.sonictms.alsys.erp.erp105001.entity.Erp105001VO">
         SELECT
-        IP.TBL_INV_PRODUCT_ID as tblInvProductId,
-        IP.CMPY_CD as cmpyCd,
-        IP.AGNT_CD as agntCd,
-        IP.AGNT_NM as agntNm,
-        IP.MTRL_CD as productCd,
-        IP.MTRL_NM as productNm,
-        IP.CURRENT_QTY as currentQty,
-        IP.SAVE_TIME as saveTime,
-        IP.SAVE_USER as saveUser,
-        IP.UPDT_TIME as updtTime,
-        IP.UPDT_USER as updtUser
-        FROM TBL_INV_PRODUCT IP
-        INNER JOIN TBL_MTRL_M MM ON IP.MTRL_CD = MM.MTRL_CD
-        AND IP.CMPY_CD = MM.CMPY_CD
-        AND IP.AGNT_CD = MM.AGNT_CD
+        MM.TBL_MTRL_M_ID as tblInvProductId,
+        MM.CMPY_CD as cmpyCd,
+        MM.AGNT_CD as agntCd,
+        (SELECT AGNT_NM FROM TBL_AGENCY_M WHERE AGNT_CD = MM.AGNT_CD AND CMPY_CD = MM.CMPY_CD) as agntNm,
+        MM.MTRL_CD as productCd,
+        MM.MTRL_NM as productNm,
+        ISNULL(MM.CURRENT_QUANTITY, 0) as currentQty,
+        MM.SAVE_TIME as saveTime,
+        MM.SAVE_USER as saveUser,
+        MM.UPDT_TIME as updtTime,
+        MM.UPDT_USER as updtUser
+        FROM TBL_MTRL_M MM
         WHERE 1=1
         AND MM.MTO_YN = 'N' -- MTO가 아닌 상품만 조회
         <if test="cmpyCd != null and cmpyCd != ''">
-            AND IP.CMPY_CD = #{cmpyCd}
+            AND MM.CMPY_CD = #{cmpyCd}
         </if>
         <if test="agntCd != null and agntCd != ''">
-            AND IP.AGNT_CD = #{agntCd}
+            AND MM.AGNT_CD = #{agntCd}
         </if>
         <if test="productCd != null and productCd != ''">
-            AND IP.MTRL_CD LIKE '%' + #{productCd} + '%'
+            AND MM.MTRL_CD LIKE '%' + #{productCd} + '%'
         </if>
         <if test="productNm != null and productNm != ''">
-            AND IP.MTRL_NM LIKE '%' + #{productNm} + '%'
+            AND MM.MTRL_NM LIKE '%' + #{productNm} + '%'
         </if>
-        ORDER BY IP.MTRL_CD
+        ORDER BY MM.MTRL_CD
     </select>
 
-    <!-- 재고 조정 -->
+    <!-- 재고 조정 (TBL_MTRL_M 기반) -->
     <update id="adjustInventory" 
         parameterType="com.sonictms.alsys.erp.erp105001.entity.Erp105001VO">
-        UPDATE TBL_INV_PRODUCT 
-        SET CURRENT_QTY = #{afterQty},
+        UPDATE TBL_MTRL_M 
+        SET CURRENT_QUANTITY = #{afterQty},
             UPDT_TIME = GETDATE(),
             UPDT_USER = ISNULL(#{saveUser}, 'SYSTEM')
         WHERE CMPY_CD = #{cmpyCd}
           AND AGNT_CD = #{agntCd}
           AND MTRL_CD = #{productCd}
+          AND MTO_YN = 'N'
     </update>
+
+    <!-- 재고 조정 이력 기록 -->
+    <insert id="insertAdjustmentHistory" 
+        parameterType="com.sonictms.alsys.erp.erp105001.entity.Erp105001VO">
+        INSERT INTO TBL_INV_ADJUSTMENT (
+            CMPY_CD, AGNT_CD, AGNT_NM, TBL_MTRL_M_ID, MTRL_CD, MTRL_NM,
+            ADJUSTMENT_TYPE, BEFORE_QTY, ADJUSTMENT_QTY, AFTER_QTY, 
+            ADJUSTMENT_REASON, ADJUSTMENT_DATE,
+            SAVE_TIME, SAVE_USER, UPDT_TIME, UPDT_USER, DELETED_YN
+        ) VALUES (
+            #{cmpyCd}, #{agntCd}, #{agntNm}, 
+            (SELECT TBL_MTRL_M_ID FROM TBL_MTRL_M WHERE CMPY_CD = #{cmpyCd} AND AGNT_CD = #{agntCd} AND MTRL_CD = #{productCd} AND MTO_YN = 'N'),
+            #{productCd}, #{productNm},
+            #{adjustmentType}, #{currentQty}, #{adjustmentQty}, #{afterQty},
+            #{adjustmentReason}, #{adjustmentDate},
+            GETDATE(), #{saveUser}, GETDATE(), #{saveUser}, 'N'
+        )
+    </insert>
 </mapper>

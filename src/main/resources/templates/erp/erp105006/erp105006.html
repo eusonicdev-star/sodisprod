@@ -271,7 +271,7 @@
                 grid: function () {
                     myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
 
-                     myGrid.setHeader("#master_checkbox,CUD,ID,ID2,물류센터코드,물류센터명,주문번호,고객사주문번호,주문유형,주문상태,배송확정일,시공기사," +
+                     myGrid.setHeader("#master_checkbox,CUD,ID,ID2,물류센터코드,물류센터명,AL오더,고객사주문번호,주문유형,주문상태,배송확정일,시공기사," +
                          "화주코드,화주명,수취인,수취인전화,상품코드,상품명,반품수량,입고상태,용인센터입고일,입고처리자," +
                          "우편번호,주소,배송요청사항,고객특이사항,저장일");
 
@@ -280,7 +280,7 @@
                          "postCd,addr1,dlvyRqstMsg,custSpclTxt,saveTime");
 
                     myGrid.setInitWidths("40,40,80,80,80,120,100,120,100,100,100,100," +
-                        "80,120,120,120,100,200,80,80,100,100," +
+                        "80,120,120,1205,100,200,80,80,100,100," +
                         "80,200,200,200,160");
 
                     myGrid.setColAlign("center,center,center,center,center,center,center,center,center,center,center,center," +
@@ -301,6 +301,9 @@
                     myGrid.setColumnHidden(myGrid.getColIndexById("tblSoMId"), true);
                     myGrid.setColumnHidden(myGrid.getColIndexById("agntCd"), true);
                     myGrid.setColumnHidden(myGrid.getColIndexById("dcCd"), true);
+
+                    // 텍스트 필터 추가
+                    myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
 
                     myGrid.init();
                     myGrid.enableSmartRendering(true);
@@ -349,28 +352,43 @@
                     }
 
                     var srchData = new FormData();
-                    srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
-                    srchData.append("dtType", myComboDtType.getSelectedValue());
-                    srchData.append("fromDt", $("#dateFrom").val().replace(/-/g, ""));
-                    srchData.append("toDt", $("#dateTo").val().replace(/-/g, ""));
+                    
+                    // 주문번호가 입력된 경우 주문번호만으로 조회
+                    var soListValue = $("#soList").val().trim();
+                    if (soListValue && soListValue !== "") {
+                        srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+                        srchData.append("soList", soListValue.replace(/\n/g, ","));
+                        
+                        // 화주사 권한인 경우 본인 화주사로만 조회 강제
+                        var agntListValue = $("#srchCode").val();
+                        if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200") {
+                            agntListValue = sessionAgntCd;
+                        }
+                        srchData.append("agntList", agntListValue);
+                    } else {
+                        // 기존 조건들로 조회
+                        srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+                        srchData.append("dtType", myComboDtType.getSelectedValue());
+                        srchData.append("fromDt", $("#dateFrom").val().replace(/-/g, ""));
+                        srchData.append("toDt", $("#dateTo").val().replace(/-/g, ""));
 
-                    // 화주사 권한인 경우 본인 화주사로만 조회 강제
-                    var agntListValue = $("#srchCode").val();
-                    if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200") {
-                        agntListValue = sessionAgntCd; // 본인 화주사로 강제 설정
-                        console.log("화주사 권한 - 강제로 본인 화주사만 조회: " + agntListValue);
+                        // 화주사 권한인 경우 본인 화주사로만 조회 강제
+                        var agntListValue = $("#srchCode").val();
+                        if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200") {
+                            agntListValue = sessionAgntCd; // 본인 화주사로 강제 설정
+                        }
+                        srchData.append("agntList", agntListValue);
+                        srchData.append("dcList", myComboDcCd.getChecked());
+                        srchData.append("soList", $("#soList").val().replace(/\n/g, ","));
+                        srchData.append("soTypeList", myComboSoType.getChecked());
+                        srchData.append("acptNm", $("#rcptNm").val());
+                        srchData.append("acptTel", $("#rcptTel").val());
+                        srchData.append("prodList", $("#prodList").val().replace(/\n/g, ","));
+                        srchData.append("prodNmSrch", $("#prodNm").val());
+                        srchData.append("srchAddr", $("#srchAddr").val());
+                        srchData.append("inboundStatus", myComboInboundStatus.getSelectedValue());
+                        srchData.append("soStatCd", myComboSoStatCd.getSelectedValue());
                     }
-                    srchData.append("agntList", agntListValue);
-                    srchData.append("dcList", myComboDcCd.getChecked());
-                    srchData.append("soList", $("#soList").val().replace(/\n/g, ","));
-                    srchData.append("soTypeList", myComboSoType.getChecked());
-                    srchData.append("acptNm", $("#rcptNm").val());
-                    srchData.append("acptTel", $("#rcptTel").val());
-                    srchData.append("prodList", $("#prodList").val().replace(/\n/g, ","));
-                    srchData.append("prodNmSrch", $("#prodNm").val());
-                    srchData.append("srchAddr", $("#srchAddr").val());
-                    srchData.append("inboundStatus", myComboInboundStatus.getSelectedValue());
-                    srchData.append("soStatCd", myComboSoStatCd.getSelectedValue());
 
                     $.ajax({
                         url: "/erp105006List",
@@ -405,6 +423,11 @@
                         var rtnVal = true;
 
                         if (chkGubn == "search") {
+                            var soListValue = $("#soList").val().trim();
+                            if (soListValue && soListValue !== "") {
+                                return true;
+                            }
+
                             if (!myComboCmpyCd.getSelectedValue()) {
                                 chkValMsg = chkValMsg + "회사코드가 없습니다\n";
                                 rtnVal = false;
@@ -554,7 +577,7 @@
             
             // 요청된 순서로 헤더 설정
             var headers = [
-                "물류센터코드", "물류센터명", "주문번호", "고객사주문번호", "주문유형", "주문상태", "배송확정일",
+                "물류센터코드", "물류센터명", "AL오더", "고객사주문번호", "주문유형", "주문상태", "배송확정일",
                 "시공기사", "화주코드", "화주명", "수취인", "수취인전화",
                 "상품코드", "상품명", "반품수량", "입고여부체크", "비고", "재입고일", "재입고처리자",
                 "저장일"
@@ -708,7 +731,7 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>주문번호</th>
+                                    <th>AL오더</th>
                                     <th>주문유형</th>
                                     <th>상품명</th>
                                     <th>반품수량</th>
@@ -762,10 +785,9 @@
 
         // 재입고 완료 처리
         function inboundComplete() {
-            // 권한 체크: 화주사와 지방물류센터는 접근 불가
-            if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200" ||
-                sessionUserGrdCd == "2000" || sessionUserGrntCd == "6000") {
-                alert("권한이 없습니다. 용인센터 직원만 사용할 수 있습니다.");
+            // 권한 체크: 권한 9999인 사용자만 접근 가능
+            if (sessionUserGrntCd != "9999") {
+                alert("권한이 없습니다. 관리자만 사용할 수 있습니다.");
                 return;
             }
 
@@ -886,15 +908,10 @@
                 myComboDcCd.disable();
             }
 
-            // 화주사와 지방물류센터는 상태 변경 버튼 비활성화
-            if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200" ||
-                sessionUserGrdCd == "2000" || sessionUserGrntCd == "6000") {
-
-                // 용인센터입고완료 버튼 비활성화
-                $("#btnInboundComplete").prop("disabled", true);
-                $("#btnInboundComplete").addClass("disabled");
-                $("#btnInboundComplete").css("opacity", "0.5");
-                $("#btnInboundComplete").css("cursor", "not-allowed");
+            // 권한 9999인 사용자만 특정 버튼 표시
+            if (sessionUserGrntCd != "9999") {
+                // 용인센터입고완료 버튼 숨기기
+                $("#btnInboundComplete").hide();
             }
 
             toastr.options = {
@@ -1008,7 +1025,7 @@
             </span>
 
             <span class="cell h-cell" style="width: 220px;">
-                <span class="item-head" style="width: 80px;">주문번호</span>
+                <span class="item-head" style="width: 80px;">AL오더</span>
                 <span class="item-data" style="width: 140px;">
                     <textArea id="soList" style="width: 122px;"/></textArea>
                 </span>

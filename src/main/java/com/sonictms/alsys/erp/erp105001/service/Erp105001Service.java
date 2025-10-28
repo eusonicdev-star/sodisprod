@@ -22,8 +22,15 @@ public class Erp105001Service {
     // 재고 조정
     public boolean adjustInventory(Erp105001VO erp105001VO) {
         try {
+            // 1. TBL_MTRL_M의 CURRENT_QUANTITY 업데이트
             int result = erp105001Mapper.adjustInventory(erp105001VO);
-            return result > 0;
+            
+            if (result > 0) {
+                // 2. TBL_INV_ADJUSTMENT에 이력 기록
+                erp105001Mapper.insertAdjustmentHistory(erp105001VO);
+                return true;
+            }
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

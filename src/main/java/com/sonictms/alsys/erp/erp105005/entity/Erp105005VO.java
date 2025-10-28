@@ -30,6 +30,7 @@ public class Erp105005VO extends CommonVO {
     private String inboundDt;             // 재입고일
     private String inboundUser;           // 재입고처리자
     private String inboundTime;           // 재입고처리시간
+    private String inboundRemark;         // 재입고 비고
 
     // 반출 정보
     private String outboundYn;            // 반출여부 (Y/N)
@@ -37,6 +38,7 @@ public class Erp105005VO extends CommonVO {
     private String outboundUser;          // 반출처리자
     private String outboundTime;          // 반출처리시간
     private String outboundTargetYn;      // 반출대상여부 (Y/N)
+    private String outboundRemark;        // 반출 비고
 
     // 주문 정보 (TBL_SO_M에서 조인)
     private String agntCd;                // 화주코드
@@ -79,8 +81,9 @@ public class Erp105005VO extends CommonVO {
 
     // 처리용
     private String[] selectedIds;         // 선택된 ID 목록
-    private String processType;           // 처리 유형 (INBOUND, OUTBOUND)
+    private String processType;           // 처리 유형 (INBOUND, OUTBOUND, INBOUND_REVERT, OUTBOUND_REVERT)
     private String processUser;           // 처리자
     private String processDt;             // 처리일
+    private String revertRemark;          // 되돌리기 사유
 }
 

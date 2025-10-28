@@ -86,6 +86,16 @@ public class Erp105002Service {
         return existingInbounds.size() > 0;
     }
     
+    // 입고 완료 취소 처리
+    @Transactional
+    public int cancelInbound(Erp105002InboundVO inboundVO) {
+        // 완료된 입고만 취소 가능
+        if (!"COMPLETED".equals(inboundVO.getInboundStatus())) {
+            throw new IllegalArgumentException("완료된 입고만 취소할 수 있습니다.");
+        }
+        return erp105002Mapper.cancelInbound(inboundVO);
+    }
+    
     // 상품-화주사 매핑 검증
     private void validateProductAgencyMapping(Erp105002InboundVO inboundVO) {
         if (inboundVO.getMtrlCd() == null || inboundVO.getMtrlCd().trim().isEmpty()) {

@@ -14,7 +14,7 @@ public class Erp105001VO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long tblInvProductId;
+    private Long tblInvProductId;  // TBL_MTRL_M_ID로 사용
     private String cmpyCd;
     private String agntCd;
     private String agntNm;

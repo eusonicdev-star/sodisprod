@@ -138,6 +138,23 @@ public class Erp105002Controller {
         return result;
     }
 
+    // 입고 완료 취소 처리
+    @PostMapping(value = {"erp105002CancelInbound"})
+    @ResponseBody
+    public Map<String, Object> cancelInbound(@RequestBody Erp105002InboundVO inboundVO) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            int count = erp105002Service.cancelInbound(inboundVO);
+            result.put("success", true);
+            result.put("message", "입고 완료 취소가 완료되었습니다.");
+            result.put("count", count);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "입고 완료 취소 중 오류가 발생했습니다: " + e.getMessage());
+        }
+        return result;
+    }
+
     // 엑셀 업로드 처리
     @PostMapping(value = {"erp105002ExcelUpload"})
     @ResponseBody

@@ -334,6 +334,30 @@ function exportExcel() {
   );
 }
 
+// 엑셀 다운로드 함수 (excelHandler 객체를 받아서 처리)
+function excelDownload(handler) {
+  if (!handler) {
+    alert("엑셀 핸들러가 정의되지 않았습니다.");
+    return;
+  }
+
+  // step 1. workbook 생성
+  var wb = XLSX.utils.book_new();
+
+  // step 2. 시트 만들기
+  var newWorksheet = handler.getWorksheet();
+  // step 3. workbook에 새로만든 워크시트에 이름을 주고 붙인다.
+  XLSX.utils.book_append_sheet(wb, newWorksheet, handler.getSheetName());
+  // step 4. 엑셀 파일 만들기
+  var wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+
+  // step 5. 엑셀 파일 내보내기
+  saveAs(
+    new Blob([s2ab(wbout)], { type: "application/octet-stream" }),
+    handler.getExcelFileName()
+  );
+}
+
 // add once, make sure dhtmlxcalendar.js is loaded
 dhtmlXCalendarObject.prototype.langData["ko"] = {
   // date format for inputs

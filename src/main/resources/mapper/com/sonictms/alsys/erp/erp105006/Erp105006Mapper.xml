@@ -52,6 +52,8 @@
         WHERE 1=1
         AND SM.SO_STAT_CD NOT IN ('0000', '1900')
         AND SP.USE_YN = 'Y'
+        AND SP.USE_YN IS NOT NULL
+        AND LTRIM(RTRIM(SP.USE_YN)) = 'Y'
         <if test="fromDt != null and fromDt != ''">
             <choose>
                 <when test="dtType != null and (dtType == '1' or dtType == 1)">
@@ -146,7 +148,6 @@
             UPDT_TIME    = GETDATE()
         WHERE TBL_RESTOCK_WAIT_ID = #{tblRestockWaitId}
     </update>
-
 
     <!-- 일괄 재입고 완료 처리 -->
     <update id="erp105006BatchInboundComplete" parameterType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">

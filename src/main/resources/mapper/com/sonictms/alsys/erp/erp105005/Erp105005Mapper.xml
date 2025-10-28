@@ -16,16 +16,18 @@
         DBO.F_COL_NM('A', 'COMM', 'SO_STAT_CD', SM.SO_STAT_CD) AS SO_STAT_CD_NM,
         SP.PROD_CD,
         SP.PROD_NM,
-        SP.QTY AS RETURN_QTY,
-        RI.INBOUND_YN,
+        RI.RETURN_QTY,
+        ISNULL(RI.INBOUND_YN, 'N') AS INBOUND_YN,
         RI.INBOUND_DT,
         RI.INBOUND_USER,
         RI.INBOUND_TIME,
-        RI.OUTBOUND_YN,
+        RI.INBOUND_REMARK,
+        ISNULL(RI.OUTBOUND_YN, 'N') AS OUTBOUND_YN,
         RI.OUTBOUND_DT,
         RI.OUTBOUND_USER,
         RI.OUTBOUND_TIME,
-        RI.OUTBOUND_TARGET_YN,
+        RI.OUTBOUND_REMARK,
+        ISNULL(RI.OUTBOUND_TARGET_YN, 'Y') AS OUTBOUND_TARGET_YN,
         SM.AGNT_CD,
         AG.AGNT_NM,
         SM.ACPT_ER,
@@ -58,7 +60,8 @@
         WHERE 1=1
         AND SM.SO_STAT_CD NOT IN ('0000', '1900')
         AND SP.USE_YN = 'Y'
-        AND (PM.EXCHANGE_RETURN_EXCLUDE_YN IS NULL OR PM.EXCHANGE_RETURN_EXCLUDE_YN != 'Y')
+        AND SM.SO_TYPE IN ('2000', '3200', '4200', '9903', '9906', '6000')
+        AND (PM.EXCHANGE_RETURN_EXCLUDE_YN IS NULL OR PM.EXCHANGE_RETURN_EXCLUDE_YN = 'N')
         <if test="fromDt != null and fromDt != ''">
             <choose>
                 <when test="dtType != null and (dtType == '1' or dtType == 1)">
@@ -104,13 +107,13 @@
             </foreach>
         </if>
         <if test="soList != null and soList != ''">
-            AND RI.SO_NO IN
+            AND SM.SO_NO IN
             <foreach collection="soList.split(',')" item="so" open="(" close=")" separator=",">
                 #{so}
             </foreach>
         </if>
         <if test="soTypeList != null and soTypeList != ''">
-            AND RI.SO_TYPE IN
+            AND SM.SO_TYPE IN
             <foreach collection="soTypeList.split(',')" item="soType" open="(" close=")" separator=",">
                 #{soType}
             </foreach>
@@ -122,13 +125,13 @@
             AND (SM.ACPT_TEL1 LIKE '%' + #{acptTel} + '%' OR SM.ACPT_TEL2 LIKE '%' + #{acptTel} + '%')
         </if>
         <if test="prodList != null and prodList != ''">
-            AND RI.PROD_CD IN
+            AND SP.PROD_CD IN
             <foreach collection="prodList.split(',')" item="prod" open="(" close=")" separator=",">
                 #{prod}
             </foreach>
         </if>
         <if test="prodNmSrch != null and prodNmSrch != ''">
-            AND RI.PROD_NM LIKE '%' + #{prodNmSrch} + '%'
+            AND SP.PROD_NM LIKE '%' + #{prodNmSrch} + '%'
         </if>
         <if test="srchAddr != null and srchAddr != ''">
             AND (SM.ADDR1 LIKE '%' + #{srchAddr} + '%' OR SM.ADDR2 LIKE '%' + #{srchAddr} + '%')
@@ -173,11 +176,12 @@
     <update id="erp105005BatchInboundComplete" parameterType="com.sonictms.alsys.erp.erp105005.entity.Erp105005VO">
         UPDATE TBL_RETURN_INBOUND
         SET INBOUND_YN = 'Y',
-        INBOUND_DT = #{processDt},
-        INBOUND_USER = #{processUser},
-        INBOUND_TIME = GETDATE(),
-        UPDT_USER = #{processUser},
-        UPDT_TIME = GETDATE()
+            INBOUND_DT = #{processDt},
+            INBOUND_USER = #{processUser},
+            INBOUND_TIME = GETDATE(),
+            INBOUND_REMARK = #{inboundRemark},
+            UPDT_USER = #{processUser},
+            UPDT_TIME = GETDATE()
         WHERE TBL_RETURN_INBOUND_ID IN
         <foreach collection="selectedIds" item="id" open="(" close=")" separator=",">
             #{id}
@@ -188,11 +192,12 @@
     <update id="erp105005BatchOutboundComplete" parameterType="com.sonictms.alsys.erp.erp105005.entity.Erp105005VO">
         UPDATE TBL_RETURN_INBOUND
         SET OUTBOUND_YN = 'Y',
-        OUTBOUND_DT = #{processDt},
-        OUTBOUND_USER = #{processUser},
-        OUTBOUND_TIME = GETDATE(),
-        UPDT_USER = #{processUser},
-        UPDT_TIME = GETDATE()
+            OUTBOUND_DT = #{processDt},
+            OUTBOUND_USER = #{processUser},
+            OUTBOUND_TIME = GETDATE(),
+            OUTBOUND_REMARK = #{outboundRemark},
+            UPDT_USER = #{processUser},
+            UPDT_TIME = GETDATE()
         WHERE TBL_RETURN_INBOUND_ID IN
         <foreach collection="selectedIds" item="id" open="(" close=")" separator=",">
             #{id}
@@ -209,6 +214,44 @@
         <foreach collection="selectedIds" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
+    </update>
+
+    <!-- 입고완료 되돌리기 처리 -->
+    <update id="erp105005RevertInboundComplete" parameterType="com.sonictms.alsys.erp.erp105005.entity.Erp105005VO">
+        UPDATE TBL_RETURN_INBOUND
+        SET INBOUND_YN = 'N',
+            INBOUND_DT = NULL,
+            INBOUND_USER = NULL,
+            INBOUND_TIME = NULL,
+            INBOUND_REMARK = CONCAT(ISNULL(INBOUND_REMARK, ''), 
+                CASE WHEN INBOUND_REMARK IS NOT NULL AND INBOUND_REMARK != '' THEN ' | ' ELSE '' END,
+                '[되돌리기] ', #{revertRemark}, ' (', #{processUser}, ', ', FORMAT(GETDATE(), 'yyyy-MM-dd HH:mm:ss'), ')'),
+            UPDT_USER = #{processUser},
+            UPDT_TIME = GETDATE()
+        WHERE TBL_RETURN_INBOUND_ID IN
+        <foreach collection="selectedIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        AND INBOUND_YN = 'Y'  -- 입고완료된 것만 되돌리기
+    </update>
+
+    <!-- 반출완료 되돌리기 처리 -->
+    <update id="erp105005RevertOutboundComplete" parameterType="com.sonictms.alsys.erp.erp105005.entity.Erp105005VO">
+        UPDATE TBL_RETURN_INBOUND
+        SET OUTBOUND_YN = 'N',
+            OUTBOUND_DT = NULL,
+            OUTBOUND_USER = NULL,
+            OUTBOUND_TIME = NULL,
+            OUTBOUND_REMARK = CONCAT(ISNULL(OUTBOUND_REMARK, ''), 
+                CASE WHEN OUTBOUND_REMARK IS NOT NULL AND OUTBOUND_REMARK != '' THEN ' | ' ELSE '' END,
+                '[되돌리기] ', #{revertRemark}, ' (', #{processUser}, ', ', FORMAT(GETDATE(), 'yyyy-MM-dd HH:mm:ss'), ')'),
+            UPDT_USER = #{processUser},
+            UPDT_TIME = GETDATE()
+        WHERE TBL_RETURN_INBOUND_ID IN
+        <foreach collection="selectedIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        AND OUTBOUND_YN = 'Y'  -- 반출완료된 것만 되돌리기
     </update>
 
 </mapper>

@@ -14,4 +14,7 @@ public interface Erp105001Mapper {
     // 재고 조정
     int adjustInventory(Erp105001VO erp105001VO);
 
+    // 재고 조정 이력 기록
+    int insertAdjustmentHistory(Erp105001VO erp105001VO);
+
 }
