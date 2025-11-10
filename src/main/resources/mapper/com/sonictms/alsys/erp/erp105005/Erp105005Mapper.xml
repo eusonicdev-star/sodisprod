@@ -7,51 +7,37 @@
     <select id="erp105005List" parameterType="com.sonictms.alsys.erp.erp105005.entity.Erp105005VO"
             resultType="com.sonictms.alsys.erp.erp105005.entity.Erp105005VO">
         SELECT DISTINCT
-        RI.TBL_RETURN_INBOUND_ID,
+        SP.TBL_SO_P_ID AS TBL_RETURN_INBOUND_ID,
         SP.TBL_SO_M_ID,
+        ISNULL(SP.IS_OUTBOUND_TARGET, 'Y') AS OUTBOUND_TARGET_YN,
+        ISNULL(SP.YONGIN_INBOUNDED, 'N') AS INBOUND_YN,
+        SP.YONGIN_INBOUND_DT AS INBOUND_DT,
+        SP.YONGIN_INBOUND_REMARK AS INBOUND_REMARK,
+        ISNULL(SP.AGENCY_OUTBOUNDED, 'N') AS OUTBOUND_YN,
+        SP.AGENCY_OUTBOUND_DT AS OUTBOUND_DT,
+        SP.AGENCY_OUTBOUND_REMARK AS OUTBOUND_REMARK,
+        DC.DC_NM,
         SM.SO_NO,
-        SM.SO_TYPE,
+        SM.REF_SO_NO,
         DBO.F_COL_NM('A', 'COMM', 'SO_ORDR_TYPE', SM.SO_TYPE) AS SO_TYPE_NM,
-        SM.SO_STAT_CD,
         DBO.F_COL_NM('A', 'COMM', 'SO_STAT_CD', SM.SO_STAT_CD) AS SO_STAT_CD_NM,
-        SP.PROD_CD,
-        SP.PROD_NM,
-        RI.RETURN_QTY,
-        ISNULL(RI.INBOUND_YN, 'N') AS INBOUND_YN,
-        RI.INBOUND_DT,
-        RI.INBOUND_USER,
-        RI.INBOUND_TIME,
-        RI.INBOUND_REMARK,
-        ISNULL(RI.OUTBOUND_YN, 'N') AS OUTBOUND_YN,
-        RI.OUTBOUND_DT,
-        RI.OUTBOUND_USER,
-        RI.OUTBOUND_TIME,
-        RI.OUTBOUND_REMARK,
-        ISNULL(RI.OUTBOUND_TARGET_YN, 'Y') AS OUTBOUND_TARGET_YN,
-        SM.AGNT_CD,
+        SM.DLVY_CNFM_DT,
+        UM.USER_NM AS INST_ER,
         AG.AGNT_NM,
         SM.ACPT_ER,
-        SM.ACPT_TEL1,
-        SM.ACPT_TEL2,
+        SP.PROD_CD,
+        SP.PROD_NM,
+        SP.QTY AS RETURN_QTY,
+        SP.YONGIN_INBOUND_USER AS INBOUND_USER,
+        SP.AGENCY_OUTBOUND_USER AS OUTBOUND_USER,
         SM.POST_CD,
         SM.ADDR1,
-        SM.ADDR2,
-        SM.DC_CD,
-        DC.DC_NM,
-        SM.ORDR_INPT_DT,
-        SM.RCPT_DT,
-        SM.RQST_DT,
-        SM.DLVY_CNFM_DT,
-        SM.MALL_CD,
-        SM.BRAND,
-        SM.REF_SO_NO,
-        SM.DLVY_RQST_MSG,
-        SM.CUST_SPCL_TXT,
+        SM.ACPT_TEL1,
         SM.SAVE_TIME,
-        UM.USER_NM AS INST_ER
+        SM.DC_CD,
+        SM.AGNT_CD
         FROM TBL_SO_P SP
         INNER JOIN TBL_SO_M SM ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
-        INNER JOIN TBL_RETURN_INBOUND RI ON SP.TBL_SO_M_ID = RI.TBL_SO_M_ID AND SP.PROD_CD = RI.PROD_CD
         LEFT JOIN TBL_MTRL_M PM ON SP.PROD_CD = PM.MTRL_CD
         LEFT JOIN TBL_AGENCY_M AG ON SM.AGNT_CD = AG.AGNT_CD
         LEFT JOIN TBL_LGST_DC_M DC ON SM.DC_CD = DC.DC_CD
@@ -62,6 +48,7 @@
         AND SP.USE_YN = 'Y'
         AND SM.SO_TYPE IN ('2000', '3200', '4200', '9903', '9906', '6000')
         AND (PM.EXCHANGE_RETURN_EXCLUDE_YN IS NULL OR PM.EXCHANGE_RETURN_EXCLUDE_YN = 'N')
+        AND (AG.AGNT_NM IS NULL OR PATINDEX('%[가-힣]%', AG.AGNT_NM) > 0) -- 한글이 포함된 화주사명만 조회
         <if test="fromDt != null and fromDt != ''">
             <choose>
                 <when test="dtType != null and (dtType == '1' or dtType == 1)">
@@ -137,52 +124,52 @@
             AND (SM.ADDR1 LIKE '%' + #{srchAddr} + '%' OR SM.ADDR2 LIKE '%' + #{srchAddr} + '%')
         </if>
         <if test="inboundStatus != null and inboundStatus != '' and inboundStatus != 'ALL'">
-            AND RI.INBOUND_YN = #{inboundStatus}
+            AND ISNULL(SP.YONGIN_INBOUNDED, 'N') = #{inboundStatus}
         </if>
         <if test="outboundStatus != null and outboundStatus != '' and outboundStatus != 'ALL'">
-            AND RI.OUTBOUND_YN = #{outboundStatus}
+            AND ISNULL(SP.AGENCY_OUTBOUNDED, 'N') = #{outboundStatus}
         </if>
         <if test="outboundTarget != null and outboundTarget != '' and outboundTarget != 'ALL'">
-            AND RI.OUTBOUND_TARGET_YN = #{outboundTarget}
+            AND ISNULL(SP.IS_OUTBOUND_TARGET, 'Y') = #{outboundTarget}
         </if>
         ORDER BY SM.SAVE_TIME DESC
     </select>
 
     <!-- 재입고 완료 처리 -->
     <update id="erp105005InboundComplete" parameterType="com.sonictms.alsys.erp.erp105005.entity.Erp105005VO">
-        UPDATE TBL_RETURN_INBOUND
-        SET INBOUND_YN   = 'Y',
-            INBOUND_DT   = #{processDt},
-            INBOUND_USER = #{processUser},
-            INBOUND_TIME = GETDATE(),
+        UPDATE TBL_SO_P
+        SET YONGIN_INBOUNDED   = 'Y',
+            YONGIN_INBOUND_DT   = #{processDt},
+            YONGIN_INBOUND_USER = #{processUser},
+            YONGIN_INBOUND_TIME = GETDATE(),
             UPDT_USER    = #{processUser},
             UPDT_TIME    = GETDATE()
-        WHERE TBL_RETURN_INBOUND_ID = #{tblReturnInboundId}
+        WHERE TBL_SO_P_ID = #{tblReturnInboundId}
     </update>
 
     <!-- 반출 완료 처리 -->
     <update id="erp105005OutboundComplete" parameterType="com.sonictms.alsys.erp.erp105005.entity.Erp105005VO">
-        UPDATE TBL_RETURN_INBOUND
-        SET OUTBOUND_YN   = 'Y',
-            OUTBOUND_DT   = #{processDt},
-            OUTBOUND_USER = #{processUser},
-            OUTBOUND_TIME = GETDATE(),
+        UPDATE TBL_SO_P
+        SET AGENCY_OUTBOUNDED   = 'Y',
+            AGENCY_OUTBOUND_DT   = #{processDt},
+            AGENCY_OUTBOUND_USER = #{processUser},
+            AGENCY_OUTBOUND_TIME = GETDATE(),
             UPDT_USER     = #{processUser},
             UPDT_TIME     = GETDATE()
-        WHERE TBL_RETURN_INBOUND_ID = #{tblReturnInboundId}
+        WHERE TBL_SO_P_ID = #{tblReturnInboundId}
     </update>
 
     <!-- 일괄 재입고 완료 처리 -->
     <update id="erp105005BatchInboundComplete" parameterType="com.sonictms.alsys.erp.erp105005.entity.Erp105005VO">
-        UPDATE TBL_RETURN_INBOUND
-        SET INBOUND_YN = 'Y',
-            INBOUND_DT = #{processDt},
-            INBOUND_USER = #{processUser},
-            INBOUND_TIME = GETDATE(),
-            INBOUND_REMARK = #{inboundRemark},
+        UPDATE TBL_SO_P
+        SET YONGIN_INBOUNDED = 'Y',
+            YONGIN_INBOUND_DT = #{processDt},
+            YONGIN_INBOUND_USER = #{processUser},
+            YONGIN_INBOUND_TIME = GETDATE(),
+            YONGIN_INBOUND_REMARK = #{inboundRemark},
             UPDT_USER = #{processUser},
             UPDT_TIME = GETDATE()
-        WHERE TBL_RETURN_INBOUND_ID IN
+        WHERE TBL_SO_P_ID IN
         <foreach collection="selectedIds" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
@@ -190,15 +177,15 @@
 
     <!-- 일괄 반출 완료 처리 -->
     <update id="erp105005BatchOutboundComplete" parameterType="com.sonictms.alsys.erp.erp105005.entity.Erp105005VO">
-        UPDATE TBL_RETURN_INBOUND
-        SET OUTBOUND_YN = 'Y',
-            OUTBOUND_DT = #{processDt},
-            OUTBOUND_USER = #{processUser},
-            OUTBOUND_TIME = GETDATE(),
-            OUTBOUND_REMARK = #{outboundRemark},
+        UPDATE TBL_SO_P
+        SET AGENCY_OUTBOUNDED = 'Y',
+            AGENCY_OUTBOUND_DT = #{processDt},
+            AGENCY_OUTBOUND_USER = #{processUser},
+            AGENCY_OUTBOUND_TIME = GETDATE(),
+            AGENCY_OUTBOUND_REMARK = #{outboundRemark},
             UPDT_USER = #{processUser},
             UPDT_TIME = GETDATE()
-        WHERE TBL_RETURN_INBOUND_ID IN
+        WHERE TBL_SO_P_ID IN
         <foreach collection="selectedIds" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
@@ -206,11 +193,11 @@
 
     <!-- 반출 대상 여부 변경 -->
     <update id="erp105005ToggleOutboundTarget" parameterType="com.sonictms.alsys.erp.erp105005.entity.Erp105005VO">
-        UPDATE TBL_RETURN_INBOUND
-        SET OUTBOUND_TARGET_YN = #{outboundTargetYn},
+        UPDATE TBL_SO_P
+        SET IS_OUTBOUND_TARGET = #{outboundTargetYn},
             UPDT_USER = #{processUser},
             UPDT_TIME = GETDATE()
-        WHERE TBL_RETURN_INBOUND_ID IN
+        WHERE TBL_SO_P_ID IN
         <foreach collection="selectedIds" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
@@ -218,40 +205,40 @@
 
     <!-- 입고완료 되돌리기 처리 -->
     <update id="erp105005RevertInboundComplete" parameterType="com.sonictms.alsys.erp.erp105005.entity.Erp105005VO">
-        UPDATE TBL_RETURN_INBOUND
-        SET INBOUND_YN = 'N',
-            INBOUND_DT = NULL,
-            INBOUND_USER = NULL,
-            INBOUND_TIME = NULL,
-            INBOUND_REMARK = CONCAT(ISNULL(INBOUND_REMARK, ''), 
-                CASE WHEN INBOUND_REMARK IS NOT NULL AND INBOUND_REMARK != '' THEN ' | ' ELSE '' END,
+        UPDATE TBL_SO_P
+        SET YONGIN_INBOUNDED = 'N',
+            YONGIN_INBOUND_DT = NULL,
+            YONGIN_INBOUND_USER = NULL,
+            YONGIN_INBOUND_TIME = NULL,
+            YONGIN_INBOUND_REMARK = CONCAT(ISNULL(YONGIN_INBOUND_REMARK, ''),
+                CASE WHEN YONGIN_INBOUND_REMARK IS NOT NULL AND YONGIN_INBOUND_REMARK != '' THEN ' | ' ELSE '' END,
                 '[되돌리기] ', #{revertRemark}, ' (', #{processUser}, ', ', FORMAT(GETDATE(), 'yyyy-MM-dd HH:mm:ss'), ')'),
             UPDT_USER = #{processUser},
             UPDT_TIME = GETDATE()
-        WHERE TBL_RETURN_INBOUND_ID IN
+        WHERE TBL_SO_P_ID IN
         <foreach collection="selectedIds" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
-        AND INBOUND_YN = 'Y'  -- 입고완료된 것만 되돌리기
+        AND YONGIN_INBOUNDED = 'Y'  -- 입고완료된 것만 되돌리기
     </update>
 
     <!-- 반출완료 되돌리기 처리 -->
     <update id="erp105005RevertOutboundComplete" parameterType="com.sonictms.alsys.erp.erp105005.entity.Erp105005VO">
-        UPDATE TBL_RETURN_INBOUND
-        SET OUTBOUND_YN = 'N',
-            OUTBOUND_DT = NULL,
-            OUTBOUND_USER = NULL,
-            OUTBOUND_TIME = NULL,
-            OUTBOUND_REMARK = CONCAT(ISNULL(OUTBOUND_REMARK, ''), 
-                CASE WHEN OUTBOUND_REMARK IS NOT NULL AND OUTBOUND_REMARK != '' THEN ' | ' ELSE '' END,
+        UPDATE TBL_SO_P
+        SET AGENCY_OUTBOUNDED = 'N',
+            AGENCY_OUTBOUND_DT = NULL,
+            AGENCY_OUTBOUND_USER = NULL,
+            AGENCY_OUTBOUND_TIME = NULL,
+            AGENCY_OUTBOUND_REMARK = CONCAT(ISNULL(AGENCY_OUTBOUND_REMARK, ''),
+                CASE WHEN AGENCY_OUTBOUND_REMARK IS NOT NULL AND AGENCY_OUTBOUND_REMARK != '' THEN ' | ' ELSE '' END,
                 '[되돌리기] ', #{revertRemark}, ' (', #{processUser}, ', ', FORMAT(GETDATE(), 'yyyy-MM-dd HH:mm:ss'), ')'),
             UPDT_USER = #{processUser},
             UPDT_TIME = GETDATE()
-        WHERE TBL_RETURN_INBOUND_ID IN
+        WHERE TBL_SO_P_ID IN
         <foreach collection="selectedIds" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
-        AND OUTBOUND_YN = 'Y'  -- 반출완료된 것만 되돌리기
+        AND AGENCY_OUTBOUNDED = 'Y'  -- 반출완료된 것만 되돌리기
     </update>
 
 </mapper>

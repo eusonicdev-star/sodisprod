@@ -776,70 +776,37 @@
 										}
 									}
 								},
-								/*
-                                error : function(request, status, error)
-                                    {
-                                        $(top.document).find('#loader').hide();
-                                       if (request.status == '403')
-                                       {
-                                           alert(request.status + " : 세션 종료\n로그인을 다시해주세요." );
-                                           location.href = "/exception";
-                                       }
-
-                                       else
-                                       {
-                                           alert("데이터량이 너무 많아 조회에 실패하였습니다.\n날짜 범위를 줄이시거나 검색옵션을 변경,추가하십시오");
-                                           return;
-                                       }
-                                   }
-                                */
-
 							});
-
 						}	//end of FOR
 						searchPaging(1);
-
-
 					} else {
-
-
 						if (!(excelDown92 == "N" && sixCheck == "Y")) {
 							if (!confirm("달력 날짜의 범위가 31일을 초과하여(" + gapDate + "일) 엑셀다운로드 합니다.\n진행 하시겠습니까?\n(화면이 멈춘것 처럼 보일수있으나 진행중입니다.)")) {
 								return;
 							}
 						}
-
 						var rDate = [];
 						var rDate10 = [];
 						var sDate = new Date(dateTypeChange($("#dateFrom").val().replace(/-/g, ""), 10));
 						var eDate = new Date(dateTypeChange($("#dateTo").val().replace(/-/g, ""), 10));
-
 						var sDate10 = dateTypeChange($("#dateFrom").val().replace(/-/g, ""), 10);
 						var eDate10 = dateTypeChange($("#dateTo").val().replace(/-/g, ""), 10);
-
-
 						var rDate10 = getDatesStartToLast(sDate10, eDate10)
-
 						var nDate = [];
 						var n = {}
-						for (var i = 0; i < rDate10.length; i = i + daySetting + 1)//20220216 정연호 daySetting 몇일씩 자를것인가
-						{
+                        for (var i = 0; i < rDate10.length; i = i + daySetting + 1) {
 							if (!rDate10[i + daySetting]) {
-
 								n.sDate = rDate10[i];
 								n.eDate = rDate10[rDate10.length - 1];
 							} else {
-
 								n.sDate = rDate10[i];
-								n.eDate = rDate10[i + daySetting];//20220216 정연호 daySetting 몇일씩 자를것인가
+                                n.eDate = rDate10[i + daySetting];
 							}
 							nDate.push(n);
 							n = {}
 						}
 						if ($("#soList").val() || $("#refSoList").val()) {
 							nDate = [];
-
-
 							n = {}
 							n.sDate = $("#dateFrom").val().replace(/-/g, "");
 							n.eDate = $("#dateTo").val().replace(/-/g, "")
@@ -847,8 +814,6 @@
 							n = {}
 						}
 						for (var j = 0; j < nDate.length; j++) {
-
-
 							var srchData = new FormData();
 							srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
 							srchData.append("dtType", myComboDtType.getSelectedValue());
@@ -864,14 +829,10 @@
 							srchData.append("acptTel", $("#rcptTel").val());		//전화번호
 							srchData.append("useYn", "");		//사용유무
 							srchData.append("refSoList", $("#refSoList").val().replace(/\n/g, ","));
-
 							srchData.append("prodList", $("#prodList").val().replace(/\n/g, ","));		//20211119 추가 상품코드
 							srchData.append("prodNm", $("#prodNm").val());		//20211119 추가 상품명칭
 							srchData.append("srchAddr", $("#srchAddr").val());
-
-							//20220106 정연호 시공카테고리
 							srchData.append("instCtgrList", myComboInstCapaCtgr.getChecked());
-
 							$.ajax({
 								url: "/erp104002List",
 								processData: false,
@@ -890,56 +851,30 @@
 									}
 
 								},
-								/*
-                                error : function(request, status, error)
-                                    {
-                                        $(top.document).find('#loader').hide();
-                                       if (request.status == '403')
-                                       {
-                                           alert(request.status + " : 세션 종료\n로그인을 다시해주세요." );
-                                           location.href = "/exception";
-                                       }
-
-                                       else
-                                       {
-                                           alert("데이터량이 너무 많아 조회에 실패하였습니다.\n날짜 범위를 줄이시거나 검색옵션을 변경,추가하십시오");
-                                           return;
-                                       }
-                                   }
-                                */
 							});
-
-						}	//end of FOR
-
-						//31일이 넘거나 (92이은 안넘고 6개중에 하나라도 뭐가 있을떄)
+                        }
 						if (excelDown31 == "Y" && excelDown92 == "N" && sixCheck == "N") {
 							exportExcel();
 						} else {
 							searchPaging(1);
 						}
-
 					}
 					toastr.remove()
 					console.log("search : " + ((new Date()).valueOf() - z) / 1000 + " 초");
-				},	//END of search : function() {
-
-
+                },
                 delSrchCode: function () {
                     $("#srchCode").val("");
                     $("#srchName").val("");
-                },	//END of delSrchCode : function(){
-
+                },
                 searchChkVal: {
                     chkVal: function (chkGubn) {
-                        chkValMsg = "";	//메세지 초기화
+                        chkValMsg = "";
                         var rtnVal = true;
-
                         if (chkGubn == "search") {
                             if (!myComboCmpyCd.getSelectedValue()) {
                                 chkValMsg = chkValMsg + "회사코드가 없습니다\n";
                                 rtnVal = false;
                             }
-
                             if (!myComboDtType.getSelectedValue()) {
                                 chkValMsg = chkValMsg + "달력유형을 선택해주세요\n";
                                 rtnVal = false;
@@ -952,7 +887,6 @@
                                 chkValMsg = chkValMsg + "검색종료일을 입력해주세요\n";
                                 rtnVal = false;
                             }
-
                             if ($("#dateFrom").val() && $("#dateTo").val()) {
                                 var date1 = new Date($("#dateFrom").val());
                                 var date2 = new Date($("#dateTo").val());
@@ -962,13 +896,11 @@
                                     rtnVal = false;
                                 }
                             }
-
                         }
                         return rtnVal;
-                    },	//END of chkVal : function(){
-                },	//END of searchChkVal
-
-            },	//END of searchOpen
+                    },
+                },
+            },
             keyOpen: {
                 enterKey: function (enterType) {
                     if (window.event.keyCode == 13) {
@@ -976,7 +908,6 @@
                             $("#srchName").blur();
                             $("#srchCode").blur();
                             $("#srchCode").val("");
-
                             fnObj.winOpen.commSrch('화주', 'A', 'AGENCY', 'text');
                         }
                     }
@@ -995,7 +926,6 @@
         }
 
         function getDatesStartToLast(startDate, lastDate) {
-
             var regex = RegExp(/^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/);
             if (!(regex.test(startDate) && regex.test(lastDate))) return "Not Date Format";
             var result = [];
@@ -1004,11 +934,9 @@
                 result.push(curDate.toISOString().split("T")[0]);
                 curDate.setDate(curDate.getDate() + 1);
             }
+
             return result;
-
         }
-
-        //엑셀 헨들러
         var excelHandler = {
             getExcelFileName: function () {
                 return '주문현황-상품리스트.xlsx';		//엑셀파일명
@@ -1025,20 +953,14 @@
         }
 
         function searchPaging(page) {
-
-            //pagePerRow	=	15;	//페이지당 몇줄을 보여줄것인가
-
             if ($("#rowPerPage").val()) {
                 pagePerRow = parseInt($("#rowPerPage").val());
             }
-
-            var pageRange = 10;	//페이지범위를 몇개씩짜를것인가. 예) 23페이지 라면 1 2 3 4 5 6 7 8 9 10  이 한번 나오고 >> 누르면 11 12 13 14 15 16 17 18 19 20 나오고 >> 누르면 21 22 23 나옴
+            var pageRange = 10;	// 페이지 범위를 몇개씩 짜를 것인가?
 
             var totalPageCnt = searchRes.length % pagePerRow == 0 ? parseInt(searchRes.length / pagePerRow) : parseInt(searchRes.length / pagePerRow) + 1
 
             var a = "<div class='pagination-container'>";
-
-            //패이징 처리
             var start = (page - 1);
             var end = (page - 1) + pageRange;
 

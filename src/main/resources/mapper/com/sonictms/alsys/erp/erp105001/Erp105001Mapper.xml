@@ -14,11 +14,178 @@
         (SELECT AGNT_NM FROM TBL_AGENCY_M WHERE AGNT_CD = MM.AGNT_CD AND CMPY_CD = MM.CMPY_CD) as agntNm,
         MM.MTRL_CD as productCd,
         MM.MTRL_NM as productNm,
-        ISNULL(MM.CURRENT_QUANTITY, 0) as currentQty,
-        MM.SAVE_TIME as saveTime,
-        MM.SAVE_USER as saveUser,
-        MM.UPDT_TIME as updtTime,
-        MM.UPDT_USER as updtUser
+        ISNULL(MM.CURRENT_QUANTITY, 0) as totalQty,
+        -- 용인센터 재입고 대기: DC_CD='1000' AND SO_TYPE='9904' AND SO_STAT_CD NOT IN ('0000', '1900') AND RESTOCK_INBOUNDED='N' (최근 3개월 이내)
+        ISNULL((
+            SELECT SUM(SP.QTY)
+            FROM DBO.TBL_SO_M SM WITH (NOLOCK)
+            INNER JOIN DBO.TBL_SO_P SP WITH (NOLOCK) ON SM.TBL_SO_M_ID = SP.TBL_SO_M_ID
+            WHERE SM.CMPY_CD = MM.CMPY_CD
+              AND SM.AGNT_CD = MM.AGNT_CD
+              AND SP.PROD_CD = MM.MTRL_CD
+              AND SP.USE_YN = 'Y'
+              AND SM.DC_CD = '1000'
+              AND SM.SO_TYPE = '9904'
+              AND SM.SO_STAT_CD NOT IN ('0000', '1900')
+              AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = 'N'
+              AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE())
+        ), 0) AS yonginReentryQty,
+        -- 경남센터: DC_CD='300' AND ((SO_TYPE='9904' AND SO_STAT_CD NOT IN ('0000', '1900') AND RESTOCK_INBOUNDED='N' AND 최근 3개월 이내) OR SO_STAT_CD='8050')
+        ISNULL((
+            SELECT SUM(SP.QTY)
+            FROM DBO.TBL_SO_M SM WITH (NOLOCK)
+            INNER JOIN DBO.TBL_SO_P SP WITH (NOLOCK) ON SM.TBL_SO_M_ID = SP.TBL_SO_M_ID
+            WHERE SM.CMPY_CD = MM.CMPY_CD
+              AND SM.AGNT_CD = MM.AGNT_CD
+              AND SP.PROD_CD = MM.MTRL_CD
+              AND SP.USE_YN = 'Y'
+              AND SM.DC_CD = '300'
+              AND (
+                  (SM.SO_TYPE = '9904'
+                   AND SM.SO_STAT_CD NOT IN ('0000', '1900')
+                   AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = 'N'
+                   AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+                  OR (SM.SO_STAT_CD = '8050' AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+              )
+        ), 0) AS gyeongnamQty,
+        -- 경북센터: DC_CD='8000' AND ((SO_TYPE='9904' AND SO_STAT_CD NOT IN ('0000', '1900') AND RESTOCK_INBOUNDED='N' AND 최근 3개월 이내) OR SO_STAT_CD='8050')
+        ISNULL((
+            SELECT SUM(SP.QTY)
+            FROM DBO.TBL_SO_M SM WITH (NOLOCK)
+            INNER JOIN DBO.TBL_SO_P SP WITH (NOLOCK) ON SM.TBL_SO_M_ID = SP.TBL_SO_M_ID
+            WHERE SM.CMPY_CD = MM.CMPY_CD
+              AND SM.AGNT_CD = MM.AGNT_CD
+              AND SP.PROD_CD = MM.MTRL_CD
+              AND SP.USE_YN = 'Y'
+              AND SM.DC_CD = '8000'
+              AND (
+                  (SM.SO_TYPE = '9904'
+                   AND SM.SO_STAT_CD NOT IN ('0000', '1900')
+                   AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = 'N'
+                   AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+                  OR (SM.SO_STAT_CD = '8050' AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+              )
+        ), 0) AS gyeongbukQty,
+        -- 전남센터: DC_CD='12' AND ((SO_TYPE='9904' AND SO_STAT_CD NOT IN ('0000', '1900') AND RESTOCK_INBOUNDED='N' AND 최근 3개월 이내) OR SO_STAT_CD='8050')
+        ISNULL((
+            SELECT SUM(SP.QTY)
+            FROM DBO.TBL_SO_M SM WITH (NOLOCK)
+            INNER JOIN DBO.TBL_SO_P SP WITH (NOLOCK) ON SM.TBL_SO_M_ID = SP.TBL_SO_M_ID
+            WHERE SM.CMPY_CD = MM.CMPY_CD
+              AND SM.AGNT_CD = MM.AGNT_CD
+              AND SP.PROD_CD = MM.MTRL_CD
+              AND SP.USE_YN = 'Y'
+              AND SM.DC_CD = '12'
+              AND (
+                  (SM.SO_TYPE = '9904'
+                   AND SM.SO_STAT_CD NOT IN ('0000', '1900')
+                   AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = 'N'
+                   AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+                  OR (SM.SO_STAT_CD = '8050' AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+              )
+        ), 0) AS jeonnamQty,
+        -- 제주센터: DC_CD='6000' AND ((SO_TYPE='9904' AND SO_STAT_CD NOT IN ('0000', '1900') AND RESTOCK_INBOUNDED='N' AND 최근 3개월 이내) OR SO_STAT_CD='8050')
+        ISNULL((
+            SELECT SUM(SP.QTY)
+            FROM DBO.TBL_SO_M SM WITH (NOLOCK)
+            INNER JOIN DBO.TBL_SO_P SP WITH (NOLOCK) ON SM.TBL_SO_M_ID = SP.TBL_SO_M_ID
+            WHERE SM.CMPY_CD = MM.CMPY_CD
+              AND SM.AGNT_CD = MM.AGNT_CD
+              AND SP.PROD_CD = MM.MTRL_CD
+              AND SP.USE_YN = 'Y'
+              AND SM.DC_CD = '6000'
+              AND (
+                  (SM.SO_TYPE = '9904'
+                   AND SM.SO_STAT_CD NOT IN ('0000', '1900')
+                   AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = 'N'
+                   AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+                  OR (SM.SO_STAT_CD = '8050' AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+              )
+        ), 0) AS jejuQty,
+        -- 용인센터: 전체 재고 - 용인센터 재입고 대기 - 경남센터 - 경북센터 - 전남센터 - 제주센터
+        ISNULL(MM.CURRENT_QUANTITY, 0)
+        - ISNULL((
+            SELECT SUM(SP.QTY)
+            FROM DBO.TBL_SO_M SM WITH (NOLOCK)
+            INNER JOIN DBO.TBL_SO_P SP WITH (NOLOCK) ON SM.TBL_SO_M_ID = SP.TBL_SO_M_ID
+            WHERE SM.CMPY_CD = MM.CMPY_CD
+              AND SM.AGNT_CD = MM.AGNT_CD
+              AND SP.PROD_CD = MM.MTRL_CD
+              AND SP.USE_YN = 'Y'
+              AND SM.DC_CD = '1000'
+              AND SM.SO_TYPE = '9904'
+              AND SM.SO_STAT_CD NOT IN ('0000', '1900')
+              AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = 'N'
+              AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE())
+        ), 0)
+        - ISNULL((
+            SELECT SUM(SP.QTY)
+            FROM DBO.TBL_SO_M SM WITH (NOLOCK)
+            INNER JOIN DBO.TBL_SO_P SP WITH (NOLOCK) ON SM.TBL_SO_M_ID = SP.TBL_SO_M_ID
+            WHERE SM.CMPY_CD = MM.CMPY_CD
+              AND SM.AGNT_CD = MM.AGNT_CD
+              AND SP.PROD_CD = MM.MTRL_CD
+              AND SP.USE_YN = 'Y'
+              AND SM.DC_CD = '300'
+              AND (
+                  (SM.SO_TYPE = '9904'
+                   AND SM.SO_STAT_CD NOT IN ('0000', '1900')
+                   AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = 'N'
+                   AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+                  OR (SM.SO_STAT_CD = '8050' AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+              )
+        ), 0)
+        - ISNULL((
+            SELECT SUM(SP.QTY)
+            FROM DBO.TBL_SO_M SM WITH (NOLOCK)
+            INNER JOIN DBO.TBL_SO_P SP WITH (NOLOCK) ON SM.TBL_SO_M_ID = SP.TBL_SO_M_ID
+            WHERE SM.CMPY_CD = MM.CMPY_CD
+              AND SM.AGNT_CD = MM.AGNT_CD
+              AND SP.PROD_CD = MM.MTRL_CD
+              AND SP.USE_YN = 'Y'
+              AND SM.DC_CD = '8000'
+              AND (
+                  (SM.SO_TYPE = '9904'
+                   AND SM.SO_STAT_CD NOT IN ('0000', '1900')
+                   AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = 'N'
+                   AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+                  OR (SM.SO_STAT_CD = '8050' AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+              )
+        ), 0)
+        - ISNULL((
+            SELECT SUM(SP.QTY)
+            FROM DBO.TBL_SO_M SM WITH (NOLOCK)
+            INNER JOIN DBO.TBL_SO_P SP WITH (NOLOCK) ON SM.TBL_SO_M_ID = SP.TBL_SO_M_ID
+            WHERE SM.CMPY_CD = MM.CMPY_CD
+              AND SM.AGNT_CD = MM.AGNT_CD
+              AND SP.PROD_CD = MM.MTRL_CD
+              AND SP.USE_YN = 'Y'
+              AND SM.DC_CD = '12'
+              AND (
+                  (SM.SO_TYPE = '9904'
+                   AND SM.SO_STAT_CD NOT IN ('0000', '1900')
+                   AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = 'N'
+                   AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+                  OR (SM.SO_STAT_CD = '8050' AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+              )
+        ), 0)
+        - ISNULL((
+            SELECT SUM(SP.QTY)
+            FROM DBO.TBL_SO_M SM WITH (NOLOCK)
+            INNER JOIN DBO.TBL_SO_P SP WITH (NOLOCK) ON SM.TBL_SO_M_ID = SP.TBL_SO_M_ID
+            WHERE SM.CMPY_CD = MM.CMPY_CD
+              AND SM.AGNT_CD = MM.AGNT_CD
+              AND SP.PROD_CD = MM.MTRL_CD
+              AND SP.USE_YN = 'Y'
+              AND SM.DC_CD = '6000'
+              AND (
+                  (SM.SO_TYPE = '9904'
+                   AND SM.SO_STAT_CD NOT IN ('0000', '1900')
+                   AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = 'N'
+                   AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+                  OR (SM.SO_STAT_CD = '8050' AND SM.SAVE_TIME >= DATEADD(MONTH, -3, GETDATE()))
+              )
+        ), 0) AS yonginQty
         FROM TBL_MTRL_M MM
         WHERE 1=1
         AND MM.MTO_YN = 'N' -- MTO가 아닌 상품만 조회

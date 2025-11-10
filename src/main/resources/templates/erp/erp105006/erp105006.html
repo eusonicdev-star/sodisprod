@@ -271,29 +271,29 @@
                 grid: function () {
                     myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
 
-                     myGrid.setHeader("#master_checkbox,CUD,ID,ID2,물류센터코드,물류센터명,AL오더,고객사주문번호,주문유형,주문상태,배송확정일,시공기사," +
-                         "화주코드,화주명,수취인,수취인전화,상품코드,상품명,반품수량,입고상태,용인센터입고일,입고처리자," +
-                         "우편번호,주소,배송요청사항,고객특이사항,저장일");
+                     myGrid.setHeader("#master_checkbox,CUD,ID,ID2,입고상태,용인센터입고일,입고처리자,물류센터명,AL오더,고객사주문번호,주문유형,주문상태,배송확정일,시공기사," +
+                         "화주명,수취인,상품코드,상품명,반품수량,우편번호,주소,수취인전화,배송요청사항,고객특이사항,저장일," +
+                         "물류센터코드,화주코드");
 
-                     myGrid.setColumnIds("chk,cud,tblRestockWaitId,tblSoMId,dcCd,dcNm,soNo,refSoNo,soTypeNm,soStatCdNm,dlvyCnfmDt,instEr," +
-                         "agntCd,agntNm,acptEr,acptTel1,prodCd,prodNm,returnQty,inboundYn,inboundDt,inboundUser," +
-                         "postCd,addr1,dlvyRqstMsg,custSpclTxt,saveTime");
+                     myGrid.setColumnIds("chk,cud,tblRestockWaitId,tblSoMId,inboundYn,inboundDt,inboundUser,dcNm,soNo,refSoNo,soTypeNm,soStatCdNm,dlvyCnfmDt,instEr," +
+                         "agntNm,acptEr,prodCd,prodNm,returnQty,postCd,addr1,acptTel1,dlvyRqstMsg,custSpclTxt,saveTime," +
+                         "dcCd,agntCd");
 
-                    myGrid.setInitWidths("40,40,80,80,80,120,100,120,100,100,100,100," +
-                        "80,120,120,1205,100,200,80,80,100,100," +
-                        "80,200,200,200,160");
+                    myGrid.setInitWidths("40,40,80,80,80,100,100,120,100,120,100,100,100,80," +
+                        "120,80,60,200,80,80,80,80,200,200,200," +
+                        "80,120");
 
-                    myGrid.setColAlign("center,center,center,center,center,center,center,center,center,center,center,center," +
-                        "center,center,center,center,center,left,right,center,center,center," +
-                        "center,left,left,left,center");
+                    myGrid.setColAlign("center,center,center,center,center,center,center,center,center,center,center,center,center,center," +
+                        "center,center,left,right,center,center,left,center,left,left,center," +
+                        "center,center");
 
-                    myGrid.setColTypes("ch,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro," +
-                        "ro,ro,ro,ro,ro,ro,ro,ro,ro,ro," +
-                        "ro,ro,ro,ro,ro");
+                    myGrid.setColTypes("ch,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro," +
+                        "ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro," +
+                        "ro,ro");
 
-                    myGrid.setColSorting(",,,,,str,str,str,str,str,str,str,str," +
-                        "str,str,str,str,str,str,int,str,str,str," +
-                        "str,str,str,str,str");
+                    myGrid.setColSorting(",,,,str,str,str,str,str,str,str,str,str,str," +
+                        "str,str,str,str,str,int,str,str,str,str,str,str,str," +
+                        "str,str");
 
                     myGrid.setColumnHidden(myGrid.getColIndexById("chk"), false);
                     myGrid.setColumnHidden(myGrid.getColIndexById("cud"), true);
@@ -538,26 +538,52 @@
             }
 
             myGrid.clearAll(false);
-            var columns = myGrid.getColumnCount()
+            var columns = myGrid.getColumnCount();
             var x = (new Date()).valueOf();
             for (var i = is; i < ie; i++) {
-                var jsonData = {};
+                if (!searchRes[i]) continue;
+                
+                var rowId = i + 1;
+                myGrid.addRow(rowId, "");
+                
+                // 각 컬럼별로 직접 값을 설정
                 for (var c = 0; c < columns; c++) {
-                    jsonData[myGrid.getColumnId(c)] = searchRes[i][myGrid.getColumnId(c)];
+                    var colId = myGrid.getColumnId(c);
+                    var colIndex = myGrid.getColIndexById(colId);
+                    var rawValue = searchRes[i][colId] !== undefined && searchRes[i][colId] !== null 
+                        ? searchRes[i][colId] 
+                        : "";
+                    
+                    // 뱃지가 필요한 컬럼은 HTML로 변환
+                    var value = rawValue;
+                    if (colId === "inboundYn") {
+                        if (rawValue === "Y") {
+                            value = '<span class="badge badge-success">완료</span>';
+                        } else {
+                            value = '<span class="badge badge-warning">대기</span>';
+                        }
+                    }
+                    
+                    try {
+                        var cell = myGrid.cellById(rowId, colIndex);
+                        if (cell) {
+                            cell.setValue(value);
+                        }
+                    } catch (e) {
+                        console.error("Error setting cell value for " + colId + " at row " + rowId + ":", e);
+                    }
                 }
-                myGrid.addRow(i + 1, "");
-                myGrid.setRowData(i + 1, jsonData);
 
-                // 재입고 상태에 따른 행 색상 설정
-                var inboundYn = myGrid.cellById(i + 1, myGrid.getColIndexById("inboundYn")).getValue();
+                // 재입고 상태에 따른 행 색상 설정 (원본 값 사용)
+                var inboundYn = searchRes[i]["inboundYn"] || "";
 
                 // 재입고 완료 - 연두색
-                if (inboundYn == "Y") {
-                    myGrid.setRowColor(i + 1, "#E8F5E8");
+                if (inboundYn === "Y") {
+                    myGrid.setRowColor(rowId, "#E8F5E8");
                 }
                 // 재입고 대기 - 연한 붉은색
-                else if (inboundYn == "N") {
-                    myGrid.setRowColor(i + 1, "#FFE6E6");
+                else if (inboundYn === "N") {
+                    myGrid.setRowColor(rowId, "#FFE6E6");
                 }
             }
         }
@@ -577,38 +603,50 @@
             
             // 요청된 순서로 헤더 설정
             var headers = [
-                "물류센터코드", "물류센터명", "AL오더", "고객사주문번호", "주문유형", "주문상태", "배송확정일",
-                "시공기사", "화주코드", "화주명", "수취인", "수취인전화",
-                "상품코드", "상품명", "반품수량", "입고여부체크", "비고", "재입고일", "재입고처리자",
-                "저장일"
+                "입고상태", "용인센터입고일", "입고처리자", "물류센터명", "AL오더", "고객사주문번호", "주문유형", "주문상태", "배송확정일",
+                "시공기사", "화주명", "수취인", "상품코드", "상품명", "반품수량", "우편번호", "주소", "수취인전화",
+                "배송요청사항", "고객특이사항", "저장일", "입고여부체크", "비고"
             ];
             excelData.push(headers);
 
             // 데이터 행 추가 (요청된 순서로)
             for (var i = 1; i <= myGrid.getRowsNum(); i++) {
-                var rowData = [
-                    myGrid.cellById(i, myGrid.getColIndexById("dcCd")).getValue() || '',      // 물류센터코드
-                    myGrid.cellById(i, myGrid.getColIndexById("dcNm")).getValue() || '',      // 물류센터명
-                    myGrid.cellById(i, myGrid.getColIndexById("soNo")).getValue() || '',      // 주문번호
-                    myGrid.cellById(i, myGrid.getColIndexById("refSoNo")).getValue() || '',   // 고객사주문번호
-                    myGrid.cellById(i, myGrid.getColIndexById("soTypeNm")).getValue() || '',  // 주문유형
-                    myGrid.cellById(i, myGrid.getColIndexById("soStatCdNm")).getValue() || '',  // 주문상태
+                // searchRes에서 원본 데이터 찾기
+                var tblRestockWaitId = myGrid.cellById(i, myGrid.getColIndexById("tblRestockWaitId")).getValue();
+                var rowData = null;
+                for (var j = 0; j < searchRes.length; j++) {
+                    if (searchRes[j] && searchRes[j]["tblRestockWaitId"] == tblRestockWaitId) {
+                        rowData = searchRes[j];
+                        break;
+                    }
+                }
+                
+                var rowDataArray = [
+                    rowData && rowData["inboundYn"] === "Y" ? "완료" : "대기", // 입고상태
+                    myGrid.cellById(i, myGrid.getColIndexById("inboundDt")).getValue() || '', // 용인센터입고일
+                    myGrid.cellById(i, myGrid.getColIndexById("inboundUser")).getValue() || '', // 입고처리자
+                    myGrid.cellById(i, myGrid.getColIndexById("dcNm")).getValue() || '', // 물류센터명
+                    myGrid.cellById(i, myGrid.getColIndexById("soNo")).getValue() || '', // AL오더
+                    myGrid.cellById(i, myGrid.getColIndexById("refSoNo")).getValue() || '', // 고객사주문번호
+                    myGrid.cellById(i, myGrid.getColIndexById("soTypeNm")).getValue() || '', // 주문유형
+                    myGrid.cellById(i, myGrid.getColIndexById("soStatCdNm")).getValue() || '', // 주문상태
                     myGrid.cellById(i, myGrid.getColIndexById("dlvyCnfmDt")).getValue() || '', // 배송확정일
-                    myGrid.cellById(i, myGrid.getColIndexById("instEr")).getValue() || '',    // 시공기사
-                    myGrid.cellById(i, myGrid.getColIndexById("agntCd")).getValue() || '',   // 화주코드
-                    myGrid.cellById(i, myGrid.getColIndexById("agntNm")).getValue() || '',   // 화주명
-                    myGrid.cellById(i, myGrid.getColIndexById("acptEr")).getValue() || '',   // 수취인
-                    myGrid.cellById(i, myGrid.getColIndexById("acptTel1")).getValue() || '', // 수취인전화
-                    myGrid.cellById(i, myGrid.getColIndexById("prodCd")).getValue() || '',   // 상품코드
-                    myGrid.cellById(i, myGrid.getColIndexById("prodNm")).getValue() || '',   // 상품명
+                    myGrid.cellById(i, myGrid.getColIndexById("instEr")).getValue() || '', // 시공기사
+                    myGrid.cellById(i, myGrid.getColIndexById("agntNm")).getValue() || '', // 화주명
+                    myGrid.cellById(i, myGrid.getColIndexById("acptEr")).getValue() || '', // 수취인
+                    myGrid.cellById(i, myGrid.getColIndexById("prodCd")).getValue() || '', // 상품코드
+                    myGrid.cellById(i, myGrid.getColIndexById("prodNm")).getValue() || '', // 상품명
                     myGrid.cellById(i, myGrid.getColIndexById("returnQty")).getValue() || '', // 반품수량
+                    myGrid.cellById(i, myGrid.getColIndexById("postCd")).getValue() || '', // 우편번호
+                    myGrid.cellById(i, myGrid.getColIndexById("addr1")).getValue() || '', // 주소
+                    myGrid.cellById(i, myGrid.getColIndexById("acptTel1")).getValue() || '', // 수취인전화
+                    myGrid.cellById(i, myGrid.getColIndexById("dlvyRqstMsg")).getValue() || '', // 배송요청사항
+                    myGrid.cellById(i, myGrid.getColIndexById("custSpclTxt")).getValue() || '', // 고객특이사항
+                    myGrid.cellById(i, myGrid.getColIndexById("saveTime")).getValue() || '', // 저장일
                     '', // 입고여부체크 (현장 체크용 빈 칸)
-                    '', // 비고 (현장 체크용 빈 칸)
-                    myGrid.cellById(i, myGrid.getColIndexById("inboundDt")).getValue() || '', // 재입고일
-                    myGrid.cellById(i, myGrid.getColIndexById("inboundUser")).getValue() || '', // 재입고처리자
-                    myGrid.cellById(i, myGrid.getColIndexById("saveTime")).getValue() || ''   // 저장일
+                    ''  // 비고 (현장 체크용 빈 칸)
                 ];
-                excelData.push(rowData);
+                excelData.push(rowDataArray);
             }
 
             // 엑셀 파일 생성 및 다운로드
@@ -617,26 +655,29 @@
 
             // 컬럼 너비 설정
             ws['!cols'] = [
-                {wch: 12}, // 물류센터코드
+                {wch: 10}, // 입고상태
+                {wch: 12}, // 용인센터입고일
+                {wch: 15}, // 입고처리자
                 {wch: 15}, // 물류센터명
-                {wch: 15}, // 주문번호
+                {wch: 15}, // AL오더
                 {wch: 15}, // 고객사주문번호
                 {wch: 12}, // 주문유형
                 {wch: 12}, // 주문상태
                 {wch: 12}, // 배송확정일
                 {wch: 15}, // 시공기사
-                {wch: 10}, // 화주코드
                 {wch: 15}, // 화주명
                 {wch: 15}, // 수취인
-                {wch: 15}, // 수취인전화
                 {wch: 15}, // 상품코드
                 {wch: 25}, // 상품명
                 {wch: 10}, // 반품수량
+                {wch: 12}, // 우편번호
+                {wch: 20}, // 주소
+                {wch: 15}, // 수취인전화
+                {wch: 20}, // 배송요청사항
+                {wch: 20}, // 고객특이사항
+                {wch: 20}, // 저장일
                 {wch: 12}, // 입고여부체크
-                {wch: 20}, // 비고
-                {wch: 12}, // 재입고일
-                {wch: 15}, // 재입고처리자
-                {wch: 20}  // 저장일
+                {wch: 20}  // 비고
             ];
 
             XLSX.utils.book_append_sheet(wb, ws, "재입고대기관리");

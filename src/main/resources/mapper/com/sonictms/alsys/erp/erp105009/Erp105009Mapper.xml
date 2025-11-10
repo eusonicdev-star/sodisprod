@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.sonictms.alsys.erp.erp105008.mapper.Erp105008Mapper">
+<mapper namespace="com.sonictms.alsys.erp.erp105009.mapper.Erp105009Mapper">
 
-    <!-- 출고대기리스트 조회 -->
-    <select id="erp105008List" parameterType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO"
-            resultType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO">
+    <!-- 출고리스트 조회 -->
+    <select id="erp105009List" parameterType="com.sonictms.alsys.erp.erp105009.entity.Erp105009VO"
+            resultType="com.sonictms.alsys.erp.erp105009.entity.Erp105009VO">
         SELECT DISTINCT
         DBO.F_COL_NM('A', 'AGNT_CD', 'AGNT_CD', SM.AGNT_CD) AS AGNT_NM,
         DBO.F_COL_NM('A', 'COMM', 'SO_ORDR_TYPE', SM.SO_TYPE) AS SO_TYPE_NM,
@@ -36,7 +36,7 @@
         ON BM.C_MTRL_CD = MM2.MTRL_CD AND BM.AGNT_CD = MM2.AGNT_CD
         LEFT OUTER JOIN TBL_INST_MOBILE_M AS IM WITH (NOLOCK) ON SM.TBL_SO_M_ID = IM.TBL_SO_M_ID
         WHERE 1=1
-        AND (SM.SO_STAT_CD = '2000' OR SM.SO_STAT_CD = '2500' OR SM.SO_STAT_CD = '3000' OR SM.SO_STAT_CD = '3500' OR SM.SO_STAT_CD = '4000')
+        AND (SM.SO_STAT_CD = '7000' OR SM.SO_STAT_CD = '7500')
         AND SP.USE_YN = 'Y'
         AND SM.SO_TYPE IN ('1000', '3100', '4000', '5000', '6000', '9901', '9902', '9905', '9908') -- 지정된 주문유형만
         <if test="fromDt != null and fromDt != ''">
@@ -73,5 +73,5 @@
         </if>
         ORDER BY SM.SAVE_TIME DESC
     </select>
-
 </mapper>
+

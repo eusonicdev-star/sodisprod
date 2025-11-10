@@ -190,19 +190,19 @@
           grid: function () {
             myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
             myGrid.setHeader(
-                "회사코드,화주사코드,화주사명,상품코드,상품명,현재수량,등록시간,등록자,수정시간,수정자"
+                "회사코드,화주사코드,화주사명,상품코드,상품명,전체재고,용인센터재입고대기,경남센터,경북센터,전남센터,제주센터,용인센터"
             );
             myGrid.setColumnIds(
-                "cmpyCd,agntCd,agntNm,productCd,productNm,currentQty,saveTime,saveUser,updtTime,updtUser"
+                "cmpyCd,agntCd,agntNm,productCd,productNm,totalQty,yonginReentryQty,gyeongnamQty,gyeongbukQty,jeonnamQty,jejuQty,yonginQty"
             );
-              myGrid.setInitWidths("100,100,150,150,300,100,150,100,150,100");
+              myGrid.setInitWidths("100,100,150,150,300,100,120,100,100,100,100,100");
             myGrid.setColAlign(
-                "center,center,left,center,left,right,center,center,center,center"
+                "center,center,left,center,left,right,right,right,right,right,right,right"
             );
-              myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
-              myGrid.setColSorting("str,str,str,str,str,int,str,str,str,str");
+              myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+              myGrid.setColSorting("str,str,str,str,str,int,int,int,int,int,int,int");
             myGrid.attachHeader(
-                "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter"
+                "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter"
             );
 
             myGrid.init(); //이걸써야 세팅한 그리드가 표시가 된다
@@ -251,7 +251,7 @@
             $("#modalAgntNm").val(rowData.agntNm);
             $("#modalProductCd").val(rowData.productCd);
             $("#modalProductNm").val(rowData.productNm);
-            $("#modalCurrentQty").val(rowData.currentQty);
+            $("#modalCurrentQty").val(rowData.totalQty);
 
             // 조정 일자를 오늘 날짜로 설정
             var today = new Date();
@@ -379,6 +379,7 @@
               productCd: $("#modalProductCd").val(),
               productNm: $("#modalProductNm").val(),
               currentQty: parseInt($("#modalCurrentQty").val()),
+              totalQty: parseInt($("#modalCurrentQty").val()),
               adjustmentType: $("#modalAdjustmentType").val(),
               adjustmentQty: parseInt($("#modalAdjustmentQty").val()),
               afterQty: parseInt($("#modalAfterQty").val()),
@@ -546,33 +547,6 @@
         },
       };
 
-      // 날짜 배열을 YYYY-MM-DD HH:mm:ss 형식으로 변환하는 함수
-      function formatDateTime(dateArray) {
-        if (!dateArray || !Array.isArray(dateArray) || dateArray.length < 6) {
-          return "";
-        }
-
-        var year = dateArray[0];
-        var month = String(dateArray[1]).padStart(2, "0");
-        var day = String(dateArray[2]).padStart(2, "0");
-        var hour = String(dateArray[3]).padStart(2, "0");
-        var minute = String(dateArray[4]).padStart(2, "0");
-        var second = String(dateArray[5]).padStart(2, "0");
-
-        return (
-          year +
-          "-" +
-          month +
-          "-" +
-          day +
-          " " +
-          hour +
-          ":" +
-          minute +
-          ":" +
-          second
-        );
-      }
 
       function searchPaging(page) {
         //pagePerRow	=	15;	//페이지당 몇줄을 보여줄것인가
@@ -677,11 +651,6 @@
           for (var c = 0; c < columns; c++) {
             var columnId = myGrid.getColumnId(c);
             var value = searchRes[i][columnId];
-
-            // 등록시간과 수정시간 컬럼에 대해 날짜 포맷팅 적용
-            if (columnId === "saveTime" || columnId === "updtTime") {
-              value = formatDateTime(value);
-            }
 
             jsonData[columnId] = value;
           }

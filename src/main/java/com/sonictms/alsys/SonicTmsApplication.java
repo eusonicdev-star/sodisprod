@@ -1,12 +1,13 @@
 package com.sonictms.alsys;
 
-
 import com.sonictms.alsys.common.entity.ErrorMsgVO;
 import com.sonictms.alsys.common.service.ErrorMsgService;
 import com.sonictms.alsys.config.MyContextListener;
 import com.sonictms.alsys.config.MyRequestListener;
 import com.sonictms.alsys.config.SessionListener;
 import org.mybatis.spring.annotation.MapperScan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,9 +28,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 @MapperScan(basePackageClasses = SonicTmsApplication.class)
 @SpringBootApplication
@@ -50,17 +48,13 @@ public class SonicTmsApplication extends SpringBootServletInitializer {
     //세션타임아웃 설정하기
     @Bean
     public HttpSessionListener httpSessionListener() {
-
         return new SessionListener();
-
     }
 
     //20220315 정연호 추가 서블릿 리스너 추가-. 애플리케이션 실행,종료 알수있음
     @Bean
     public ServletContextListener servletContextListener() {
-
         return new MyContextListener();
-
     }
 
     //20220315 정연호 추가 리퀘스트 리스너 추가-. 요청정보 생성,종료 알수있음
@@ -69,8 +63,7 @@ public class SonicTmsApplication extends SpringBootServletInitializer {
         return new MyRequestListener();
     }
 
-
-    //20220112 정연호 추가. java의 exception을 http로 response 보냄
+    // 20220112 정연호 추가. java의 exception을 http로 response 보냄
     @ControllerAdvice
     @RestController
     public class GlobalExceptionHandler {

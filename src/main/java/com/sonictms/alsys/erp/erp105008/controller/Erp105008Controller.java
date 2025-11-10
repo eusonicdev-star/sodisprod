@@ -20,7 +20,7 @@ public class Erp105008Controller {
 
     private final Erp105008Service erp105008Service;
 
-    // 진행중리스트 화면 열기
+    // 출고대기리스트 화면 열기
     @GetMapping(value = {"erp105008"})
     public ModelAndView getErp105008(ModelAndView modelAndView) {
         modelAndView.setViewName("erp/erp105008/erp105008");

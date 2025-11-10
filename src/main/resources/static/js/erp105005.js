@@ -284,15 +284,17 @@ fnObj = {
       myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
 
       myGrid.setHeader(
-        "#master_checkbox,CUD,ID,ID2,물류센터코드,물류센터명,AL오더,고객사주문번호,주문유형,주문상태,배송확정일,시공기사," +
-          "화주코드,화주명,수취인,수취인전화,상품코드,상품명,반품수량,입고상태,용인센터입고일,입고처리자,입고비고," +
-          "반출상태,반출일,반출처리자,반출비고,반출대상,우편번호,주소,저장일"
+          "#master_checkbox,CUD,ID,ID2,반출대상,입고상태,용인센터입고일,입고비고,반출상태,반출일,반출비고," +
+          "물류센터명,AL오더,고객사주문번호,주문유형,주문상태,배송확정일,시공기사,화주명,수취인," +
+          "상품코드,상품명,반품수량,입고처리자,반출처리자,우편번호,주소,수취인전화,저장일," +
+          "물류센터코드,화주코드"
       );
 
       myGrid.setColumnIds(
-        "chk,cud,tblReturnInboundId,tblSoMId,dcCd,dcNm,soNo,refSoNo,soTypeNm,soStatCdNm,dlvyCnfmDt,instEr," +
-          "agntCd,agntNm,acptEr,acptTel1,prodCd,prodNm,returnQty,inboundYn,inboundDt,inboundUser,inboundRemark," +
-          "outboundYn,outboundDt,outboundUser,outboundRemark,outboundTargetYn,postCd,addr1,saveTime"
+          "chk,cud,tblReturnInboundId,tblSoMId,outboundTargetYn,inboundYn,inboundDt,inboundRemark," +
+          "outboundYn,outboundDt,outboundRemark,dcNm,soNo,refSoNo,soTypeNm,soStatCdNm,dlvyCnfmDt,instEr," +
+          "agntNm,acptEr,prodCd,prodNm,returnQty,inboundUser,outboundUser,postCd,addr1,acptTel1,saveTime," +
+          "dcCd,agntCd"
       );
 
       myGrid.setInitWidths(
@@ -300,7 +302,13 @@ fnObj = {
           "40," + // CUD
           "80," + // ID (tblReturnInboundId)
           "80," + // ID2 (tblSoMId)
-          "80," + // 물류센터코드
+          "80," + // 반출대상
+          "80," + // 입고상태
+          "100," + // 용인센터입고일
+          "100," + // 입고비고
+          "80," + // 반출상태
+          "100," + // 반출일
+          "100," + // 반출비고
           "120," + // 물류센터명
           "100," + // AL오더
           "120," + // 고객사주문번호
@@ -308,44 +316,40 @@ fnObj = {
           "100," + // 주문상태
           "100," + // 배송확정일
           "80," + // 시공기사
-          "120," + // 화주코드
           "120," + // 화주명
           "80," + // 수취인
-          "80," + // 수취인전화
           "60," + // 상품코드
           "200," + // 상품명
           "80," + // 반품수량
-          "80," + // 입고상태
-          "100," + // 용인센터입고일
           "100," + // 입고처리자
-          "100," + // 입고비고
-          "80," + // 반출상태
-          "100," + // 반출일
           "100," + // 반출처리자
-          "100," + // 반출비고
-          "80," + // 반출대상
           "80," + // 우편번호
           "80," + // 주소
+          "80," + // 수취인전화
           "200," + // 저장일
-          "160" // (마지막)
+          "80," + // 물류센터코드
+          "120" // 화주코드
       );
 
       myGrid.setColAlign(
-        "center,center,center,center,center,center,center,center,center,center,center," +
-          "center,center,center,center,center,left,right,center,center,center,center,left," +
-          "center,center,center,left,center,center,left,center"
+          "center,center,center,center,center,center,center,left," +
+          "center,center,left,center,center,center,center,center,center,center," +
+          "center,center,left,right,center,center,center,center,left,center," +
+          "center,center,center"
       );
 
       myGrid.setColTypes(
-        "ch,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro," +
-          "ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro," +
-          "ro,ro,ro,ro,ro,ro,ro,ro"
+          "ch,ro,ro,ro,ro,ro,ro,ro," +
+          "ro,ro,ro,ro,ro,ro,ro,ro,ro,ro," +
+          "ro,ro,ro,ro,ro,ro,ro,ro,ro,ro," +
+          "ro,ro"
       );
 
       myGrid.setColSorting(
-        ",,,,,str,str,str,str,str,str,str," +
-          "str,str,str,str,str,str,int,str,str,str,str,str," +
-          "str,str,str,str,str,str,str"
+          ",,,,,str,str,str," +
+          "str,str,str,str,str,str,str,str,str,str," +
+          "str,str,str,str,str,str,int,str,str,str,str,str,str," +
+          "str,str"
       );
 
       myGrid.setColumnHidden(myGrid.getColIndexById("chk"), false);
@@ -360,83 +364,36 @@ fnObj = {
 
       // 텍스트 필터 추가
       myGrid.attachHeader(
-        "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter"
+          "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter"
       );
 
       myGrid.init();
       myGrid.enableSmartRendering(true);
       myGrid.enablePreRendering(10);
 
-      // 뱃지 렌더링 함수
-      function renderBadges() {
-        for (var i = 1; i <= myGrid.getRowsNum(); i++) {
-          // 입고 상태 뱃지 렌더링
-          var inboundYnCell = myGrid.cellById(
-            i,
-            myGrid.getColIndexById("inboundYn")
-          );
-          if (inboundYnCell) {
-            var inboundValue = inboundYnCell.getValue();
-            if (inboundValue === "Y") {
-              inboundYnCell.setValue(
-                '<span class="badge badge-success">완료</span>'
-              );
-            } else {
-              inboundYnCell.setValue(
-                '<span class="badge badge-warning">대기</span>'
-              );
+        // 뱃지 렌더링 헬퍼 함수
+        function getBadgeHtml(value, type) {
+            if (type === "inbound") {
+                if (value === "Y") {
+                    return '<span class="badge badge-success">완료</span>';
+                } else {
+                    return '<span class="badge badge-warning">대기</span>';
+                }
+            } else if (type === "outbound") {
+                if (value === "Y") {
+                    return '<span class="badge badge-success">완료</span>';
+                } else {
+                    return '<span class="badge badge-warning">대기</span>';
+                }
+            } else if (type === "target") {
+                if (value === "Y") {
+                    return '<span class="badge badge-primary">대상</span>';
+                } else {
+                    return '<span class="badge badge-secondary">제외</span>';
+                }
             }
-          }
-
-          // 반출 상태 뱃지 렌더링
-          var outboundYnCell = myGrid.cellById(
-            i,
-            myGrid.getColIndexById("outboundYn")
-          );
-          if (outboundYnCell) {
-            var outboundValue = outboundYnCell.getValue();
-            if (outboundValue === "Y") {
-              outboundYnCell.setValue(
-                '<span class="badge badge-success">완료</span>'
-              );
-            } else {
-              outboundYnCell.setValue(
-                '<span class="badge badge-warning">대기</span>'
-              );
-            }
-          }
-
-          // 반출 대상 뱃지 렌더링
-          var outboundTargetCell = myGrid.cellById(
-            i,
-            myGrid.getColIndexById("outboundTargetYn")
-          );
-          if (outboundTargetCell) {
-            var targetValue = outboundTargetCell.getValue();
-            if (targetValue === "Y") {
-              outboundTargetCell.setValue(
-                '<span class="badge badge-primary">대상</span>'
-              );
-            } else {
-              outboundTargetCell.setValue(
-                '<span class="badge badge-secondary">제외</span>'
-              );
-            }
-          }
+            return value || "";
         }
-      }
-
-      // 그리드 데이터 로드 후 뱃지 렌더링
-      myGrid.attachEvent("onXLE", function () {
-        setTimeout(renderBadges, 100);
-      });
-
-      // 행 표시 시 뱃지 렌더링
-      myGrid.attachEvent("onRowDisplay", function (rowId, rowData) {
-        setTimeout(function () {
-          renderBadges();
-        }, 50);
-      });
 
       fnObj.gridOpen.setWidth();
       myGrid.addRow(1, "");
@@ -724,23 +681,59 @@ function searchPaging(page) {
   var columns = myGrid.getColumnCount();
   var x = new Date().valueOf();
   for (var i = is; i < ie; i++) {
-    var jsonData = {};
-    for (var c = 0; c < columns; c++) {
-      jsonData[myGrid.getColumnId(c)] = searchRes[i][myGrid.getColumnId(c)];
-    }
-    myGrid.addRow(i + 1, "");
-    myGrid.setRowData(i + 1, jsonData);
+      if (!searchRes[i]) continue;
 
-    // 용인센터 입고 상태에 따른 행 색상 설정
-    var inboundYn = myGrid
-      .cellById(i + 1, myGrid.getColIndexById("inboundYn"))
-      .getValue();
-    var outboundYn = myGrid
-      .cellById(i + 1, myGrid.getColIndexById("outboundYn"))
-      .getValue();
-    var outboundTargetYn = myGrid
-      .cellById(i + 1, myGrid.getColIndexById("outboundTargetYn"))
-      .getValue();
+      var rowId = i + 1;
+      myGrid.addRow(rowId, "");
+
+      // 각 컬럼별로 직접 값을 설정
+    for (var c = 0; c < columns; c++) {
+        var colId = myGrid.getColumnId(c);
+        var colIndex = myGrid.getColIndexById(colId);
+        var rawValue =
+            searchRes[i][colId] !== undefined && searchRes[i][colId] !== null
+                ? searchRes[i][colId]
+                : "";
+
+        // 뱃지가 필요한 컬럼은 HTML로 변환
+        var value = rawValue;
+        if (colId === "inboundYn") {
+            if (rawValue === "Y") {
+                value = '<span class="badge badge-success">완료</span>';
+            } else {
+                value = '<span class="badge badge-warning">대기</span>';
+            }
+        } else if (colId === "outboundYn") {
+            if (rawValue === "Y") {
+                value = '<span class="badge badge-success">완료</span>';
+            } else {
+                value = '<span class="badge badge-warning">대기</span>';
+            }
+        } else if (colId === "outboundTargetYn") {
+            if (rawValue === "Y") {
+                value = '<span class="badge badge-primary">대상</span>';
+            } else {
+                value = '<span class="badge badge-secondary">제외</span>';
+            }
+        }
+
+        try {
+            var cell = myGrid.cellById(rowId, colIndex);
+            if (cell) {
+                cell.setValue(value);
+            }
+        } catch (e) {
+            console.error(
+                "Error setting cell value for " + colId + " at row " + rowId + ":",
+                e
+            );
+        }
+    }
+
+      // 용인센터 입고 상태에 따른 행 색상 설정 (원본 값 사용)
+      var inboundYn = searchRes[i]["inboundYn"] || "";
+      var outboundYn = searchRes[i]["outboundYn"] || "";
+      var outboundTargetYn = searchRes[i]["outboundTargetYn"] || "";
 
     // 반출 대상이 아닌 경우 (N 또는 null) - 회색, 체크박스 활성화
     if (
@@ -748,86 +741,27 @@ function searchPaging(page) {
       outboundTargetYn == null ||
       outboundTargetYn == ""
     ) {
-      myGrid.setRowColor(i + 1, "#D3D3D3");
-      myGrid.cellById(i + 1, myGrid.getColIndexById("chk")).setDisabled(false);
+        myGrid.setRowColor(rowId, "#D3D3D3");
+        myGrid.cellById(rowId, myGrid.getColIndexById("chk")).setDisabled(false);
     }
     // 판별중인 경우 (P) - 연한 파란색, 체크박스 활성화
     else if (outboundTargetYn == "P") {
-      myGrid.setRowColor(i + 1, "#E6F3FF");
-      myGrid.cellById(i + 1, myGrid.getColIndexById("chk")).setDisabled(false);
+        myGrid.setRowColor(rowId, "#E6F3FF");
+        myGrid.cellById(rowId, myGrid.getColIndexById("chk")).setDisabled(false);
     }
     // 반출 대상이면서 입고와 반출 모두 완료 - 연두색
     else if (inboundYn == "Y" && outboundYn == "Y") {
-      myGrid.setRowColor(i + 1, "#E8F5E8");
+        myGrid.setRowColor(rowId, "#E8F5E8");
     }
     // 반출 대상이면서 입고만 완료 - 연한 노랑색
     else if (inboundYn == "Y" && outboundYn == "N") {
-      myGrid.setRowColor(i + 1, "#FFF2CC");
+        myGrid.setRowColor(rowId, "#FFF2CC");
     }
     // 반출 대상이면서 입고도 안 된 것 - 연한 붉은색
     else if (inboundYn == "N") {
-      myGrid.setRowColor(i + 1, "#FFE6E6");
+        myGrid.setRowColor(rowId, "#FFE6E6");
     }
   }
-
-  // 뱃지 렌더링 적용
-  setTimeout(function () {
-    for (var i = 1; i <= myGrid.getRowsNum(); i++) {
-      // 입고 상태 뱃지 렌더링
-      var inboundYnCell = myGrid.cellById(
-        i,
-        myGrid.getColIndexById("inboundYn")
-      );
-      if (inboundYnCell) {
-        var inboundValue = inboundYnCell.getValue();
-        if (inboundValue === "Y") {
-          inboundYnCell.setValue(
-            '<span class="badge badge-success">완료</span>'
-          );
-        } else {
-          inboundYnCell.setValue(
-            '<span class="badge badge-warning">대기</span>'
-          );
-        }
-      }
-
-      // 반출 상태 뱃지 렌더링
-      var outboundYnCell = myGrid.cellById(
-        i,
-        myGrid.getColIndexById("outboundYn")
-      );
-      if (outboundYnCell) {
-        var outboundValue = outboundYnCell.getValue();
-        if (outboundValue === "Y") {
-          outboundYnCell.setValue(
-            '<span class="badge badge-success">완료</span>'
-          );
-        } else {
-          outboundYnCell.setValue(
-            '<span class="badge badge-warning">대기</span>'
-          );
-        }
-      }
-
-      // 반출 대상 뱃지 렌더링
-      var outboundTargetCell = myGrid.cellById(
-        i,
-        myGrid.getColIndexById("outboundTargetYn")
-      );
-      if (outboundTargetCell) {
-        var targetValue = outboundTargetCell.getValue();
-        if (targetValue === "Y") {
-          outboundTargetCell.setValue(
-            '<span class="badge badge-primary">대상</span>'
-          );
-        } else {
-          outboundTargetCell.setValue(
-            '<span class="badge badge-secondary">제외</span>'
-          );
-        }
-      }
-    }
-  }, 100);
 }
 
 // 엑셀 다운로드
@@ -846,7 +780,13 @@ function excelDn() {
 
   // 요청된 순서로 헤더 설정
   var headers = [
-    "물류센터코드",
+      "반출대상",
+      "입고상태",
+      "용인센터입고일",
+      "입고비고",
+      "반출상태",
+      "반출일",
+      "반출비고",
     "물류센터명",
     "AL오더",
     "고객사주문번호",
@@ -854,54 +794,71 @@ function excelDn() {
     "주문상태",
     "배송확정일",
     "시공기사",
-    "화주코드",
     "화주명",
     "수취인",
-    "수취인전화",
     "상품코드",
     "상품명",
     "반품수량",
-    "입고여부체크",
-    "비고",
-    "재입고일",
-    "재입고처리자",
-    "반출상태",
-    "반출일",
+      "입고처리자",
     "반출처리자",
+      "우편번호",
+      "주소",
+      "수취인전화",
     "저장일",
+      "입고여부체크",
+      "비고",
   ];
   excelData.push(headers);
 
-  // 데이터 행 추가 (요청된 순서로)
-  for (var i = 1; i <= myGrid.getRowsNum(); i++) {
-    var rowData = [
-      myGrid.cellById(i, myGrid.getColIndexById("dcCd")).getValue() || "", // 물류센터코드
-      myGrid.cellById(i, myGrid.getColIndexById("dcNm")).getValue() || "", // 물류센터명
-      myGrid.cellById(i, myGrid.getColIndexById("soNo")).getValue() || "", // 주문번호
-      myGrid.cellById(i, myGrid.getColIndexById("refSoNo")).getValue() || "", // 고객사주문번호
-      myGrid.cellById(i, myGrid.getColIndexById("soTypeNm")).getValue() || "", // 주문유형
-      myGrid.cellById(i, myGrid.getColIndexById("soStatCdNm")).getValue() || "", // 주문상태
-      myGrid.cellById(i, myGrid.getColIndexById("dlvyCnfmDt")).getValue() || "", // 배송확정일
-      myGrid.cellById(i, myGrid.getColIndexById("instEr")).getValue() || "", // 시공기사
-      myGrid.cellById(i, myGrid.getColIndexById("agntCd")).getValue() || "", // 화주코드
-      myGrid.cellById(i, myGrid.getColIndexById("agntNm")).getValue() || "", // 화주명
-      myGrid.cellById(i, myGrid.getColIndexById("acptEr")).getValue() || "", // 수취인
-      myGrid.cellById(i, myGrid.getColIndexById("acptTel1")).getValue() || "", // 수취인전화
-      myGrid.cellById(i, myGrid.getColIndexById("prodCd")).getValue() || "", // 상품코드
-      myGrid.cellById(i, myGrid.getColIndexById("prodNm")).getValue() || "", // 상품명
-      myGrid.cellById(i, myGrid.getColIndexById("returnQty")).getValue() || "", // 반품수량
-      "", // 입고여부체크 (현장 체크용 빈 칸)
-      "", // 비고 (현장 체크용 빈 칸)
-      myGrid.cellById(i, myGrid.getColIndexById("inboundDt")).getValue() || "", // 재입고일
-      myGrid.cellById(i, myGrid.getColIndexById("inboundUser")).getValue() ||
-        "", // 재입고처리자
-      myGrid.cellById(i, myGrid.getColIndexById("outboundYn")).getValue() || "", // 반출상태
-      myGrid.cellById(i, myGrid.getColIndexById("outboundDt")).getValue() || "", // 반출일
-      myGrid.cellById(i, myGrid.getColIndexById("outboundUser")).getValue() ||
-        "", // 반출처리자
-      myGrid.cellById(i, myGrid.getColIndexById("saveTime")).getValue() || "", // 저장일
+  // 데이터 행 추가 (요청된 순서로) - searchRes의 모든 데이터 사용
+  for (var i = 0; i < searchRes.length; i++) {
+    var rowData = searchRes[i];
+    if (!rowData) continue;
+    
+    // 원본 데이터에서 직접 가져오기 (HTML 뱃지가 아닌 원본 값 사용)
+    var outboundTargetValue = rowData["outboundTargetYn"] || "";
+    if (outboundTargetValue === "Y") outboundTargetValue = "대상";
+    else if (outboundTargetValue === "N") outboundTargetValue = "제외";
+    else if (outboundTargetValue === "P") outboundTargetValue = "판별중";
+    
+    var inboundValue = rowData["inboundYn"] || "";
+    if (inboundValue === "Y") inboundValue = "완료";
+    else if (inboundValue === "N") inboundValue = "대기";
+    
+    var outboundValue = rowData["outboundYn"] || "";
+    if (outboundValue === "Y") outboundValue = "완료";
+    else if (outboundValue === "N") outboundValue = "대기";
+    
+    var excelRow = [
+      outboundTargetValue,
+      inboundValue,
+      rowData["inboundDt"] || "",
+      rowData["inboundRemark"] || "",
+      outboundValue,
+      rowData["outboundDt"] || "",
+      rowData["outboundRemark"] || "",
+      rowData["dcNm"] || "",
+      rowData["soNo"] || "",
+      rowData["refSoNo"] || "",
+      rowData["soTypeNm"] || "",
+      rowData["soStatCdNm"] || "",
+      rowData["dlvyCnfmDt"] || "",
+      rowData["instEr"] || "",
+      rowData["agntNm"] || "",
+      rowData["acptEr"] || "",
+      rowData["prodCd"] || "",
+      rowData["prodNm"] || "",
+      rowData["returnQty"] || "",
+      rowData["inboundUser"] || "",
+      rowData["outboundUser"] || "",
+      rowData["postCd"] || "",
+      rowData["addr1"] || "",
+      rowData["acptTel1"] || "",
+      rowData["saveTime"] || "",
+      "", // 입고여부체크
+      "", // 비고
     ];
-    excelData.push(rowData);
+    excelData.push(excelRow);
   }
 
   // 엑셀 파일 생성 및 다운로드
@@ -910,29 +867,33 @@ function excelDn() {
 
   // 컬럼 너비 설정
   ws["!cols"] = [
-    { wch: 12 }, // 물류센터코드
+      {wch: 10}, // 반출대상
+      {wch: 10}, // 입고상태
+      {wch: 12}, // 용인센터입고일
+      {wch: 20}, // 입고비고
+      {wch: 10}, // 반출상태
+      {wch: 12}, // 반출일
+      {wch: 20}, // 반출비고
     { wch: 15 }, // 물류센터명
-    { wch: 15 }, // 주문번호
+      {wch: 15}, // AL오더
     { wch: 15 }, // 고객사주문번호
     { wch: 12 }, // 주문유형
     { wch: 12 }, // 주문상태
     { wch: 12 }, // 배송확정일
     { wch: 15 }, // 시공기사
-    { wch: 10 }, // 화주코드
     { wch: 15 }, // 화주명
     { wch: 15 }, // 수취인
-    { wch: 15 }, // 수취인전화
     { wch: 15 }, // 상품코드
     { wch: 25 }, // 상품명
     { wch: 10 }, // 반품수량
-    { wch: 12 }, // 입고여부체크
-    { wch: 20 }, // 비고
-    { wch: 12 }, // 재입고일
-    { wch: 15 }, // 재입고처리자
-    { wch: 10 }, // 반출상태
-    { wch: 12 }, // 반출일
+      {wch: 15}, // 입고처리자
     { wch: 15 }, // 반출처리자
+      {wch: 12}, // 우편번호
+      {wch: 20}, // 주소
+      {wch: 15}, // 수취인전화
     { wch: 20 }, // 저장일
+      {wch: 12}, // 입고여부체크
+      {wch: 20}, // 비고
   ];
 
   XLSX.utils.book_append_sheet(wb, ws, "교환반품용인센터입고관리");
@@ -1450,19 +1411,30 @@ function inboundRevert() {
   var selectedRows = [];
   var completedRows = [];
 
-  // 체크된 행들 찾기
+    // 체크된 행들 찾기 (searchRes에서 원본 데이터 사용)
   for (var i = 1; i <= myGrid.getRowsNum(); i++) {
     var chkValue = myGrid.cellById(i, myGrid.getColIndexById("chk")).getValue();
     if (chkValue == "1" || chkValue == "true" || chkValue === true) {
       var tblReturnInboundId = myGrid
         .cellById(i, myGrid.getColIndexById("tblReturnInboundId"))
         .getValue();
-      var inboundYn = myGrid
-        .cellById(i, myGrid.getColIndexById("inboundYn"))
-        .getValue();
-      var soNo = myGrid.cellById(i, myGrid.getColIndexById("soNo")).getValue();
 
-      if (tblReturnInboundId) {
+        // searchRes에서 원본 데이터 찾기
+        var rowData = null;
+        for (var j = 0; j < searchRes.length; j++) {
+            if (
+                searchRes[j] &&
+                searchRes[j]["tblReturnInboundId"] == tblReturnInboundId
+            ) {
+                rowData = searchRes[j];
+                break;
+            }
+        }
+
+        if (rowData && tblReturnInboundId) {
+            var inboundYn = rowData["inboundYn"] || "";
+            var soNo = rowData["soNo"] || "";
+
         if (inboundYn === "Y") {
           completedRows.push(soNo);
           selectedRows.push(tblReturnInboundId);
@@ -1481,13 +1453,29 @@ function inboundRevert() {
   for (var i = 1; i <= myGrid.getRowsNum(); i++) {
     var chkValue = myGrid.cellById(i, myGrid.getColIndexById("chk")).getValue();
     if (chkValue == "1" || chkValue == "true" || chkValue === true) {
-      var inboundYn = myGrid
-        .cellById(i, myGrid.getColIndexById("inboundYn"))
+        var tblReturnInboundId = myGrid
+            .cellById(i, myGrid.getColIndexById("tblReturnInboundId"))
         .getValue();
-      var soNo = myGrid.cellById(i, myGrid.getColIndexById("soNo")).getValue();
 
-      if (inboundYn !== "Y") {
-        nonCompletedRows.push(soNo);
+        // searchRes에서 원본 데이터 찾기
+        var rowData = null;
+        for (var j = 0; j < searchRes.length; j++) {
+            if (
+                searchRes[j] &&
+                searchRes[j]["tblReturnInboundId"] == tblReturnInboundId
+            ) {
+                rowData = searchRes[j];
+                break;
+            }
+        }
+
+        if (rowData) {
+            var inboundYn = rowData["inboundYn"] || "";
+            var soNo = rowData["soNo"] || "";
+
+            if (inboundYn !== "Y") {
+                nonCompletedRows.push(soNo);
+            }
       }
     }
   }
@@ -1526,19 +1514,30 @@ function outboundRevert() {
   var selectedRows = [];
   var completedRows = [];
 
-  // 체크된 행들 찾기
+    // 체크된 행들 찾기 (searchRes에서 원본 데이터 사용)
   for (var i = 1; i <= myGrid.getRowsNum(); i++) {
     var chkValue = myGrid.cellById(i, myGrid.getColIndexById("chk")).getValue();
     if (chkValue == "1" || chkValue == "true" || chkValue === true) {
       var tblReturnInboundId = myGrid
         .cellById(i, myGrid.getColIndexById("tblReturnInboundId"))
         .getValue();
-      var outboundYn = myGrid
-        .cellById(i, myGrid.getColIndexById("outboundYn"))
-        .getValue();
-      var soNo = myGrid.cellById(i, myGrid.getColIndexById("soNo")).getValue();
 
-      if (tblReturnInboundId) {
+        // searchRes에서 원본 데이터 찾기
+        var rowData = null;
+        for (var j = 0; j < searchRes.length; j++) {
+            if (
+                searchRes[j] &&
+                searchRes[j]["tblReturnInboundId"] == tblReturnInboundId
+            ) {
+                rowData = searchRes[j];
+                break;
+            }
+        }
+
+        if (rowData && tblReturnInboundId) {
+            var outboundYn = rowData["outboundYn"] || "";
+            var soNo = rowData["soNo"] || "";
+
         if (outboundYn === "Y") {
           completedRows.push(soNo);
           selectedRows.push(tblReturnInboundId);
@@ -1557,13 +1556,29 @@ function outboundRevert() {
   for (var i = 1; i <= myGrid.getRowsNum(); i++) {
     var chkValue = myGrid.cellById(i, myGrid.getColIndexById("chk")).getValue();
     if (chkValue == "1" || chkValue == "true" || chkValue === true) {
-      var outboundYn = myGrid
-        .cellById(i, myGrid.getColIndexById("outboundYn"))
+        var tblReturnInboundId = myGrid
+            .cellById(i, myGrid.getColIndexById("tblReturnInboundId"))
         .getValue();
-      var soNo = myGrid.cellById(i, myGrid.getColIndexById("soNo")).getValue();
 
-      if (outboundYn !== "Y") {
-        nonCompletedRows.push(soNo);
+        // searchRes에서 원본 데이터 찾기
+        var rowData = null;
+        for (var j = 0; j < searchRes.length; j++) {
+            if (
+                searchRes[j] &&
+                searchRes[j]["tblReturnInboundId"] == tblReturnInboundId
+            ) {
+                rowData = searchRes[j];
+                break;
+            }
+        }
+
+        if (rowData) {
+            var outboundYn = rowData["outboundYn"] || "";
+            var soNo = rowData["soNo"] || "";
+
+            if (outboundYn !== "Y") {
+                nonCompletedRows.push(soNo);
+            }
       }
     }
   }
@@ -1614,19 +1629,31 @@ function confirmInboundRevert() {
 
   var selectedRows = [];
 
-  // 체크된 행들 찾기 (입고완료된 것만)
+    // 체크된 행들 찾기 (입고완료된 것만, searchRes에서 원본 데이터 사용)
   for (var i = 1; i <= myGrid.getRowsNum(); i++) {
     var chkValue = myGrid.cellById(i, myGrid.getColIndexById("chk")).getValue();
     if (chkValue == "1" || chkValue == "true" || chkValue === true) {
       var tblReturnInboundId = myGrid
         .cellById(i, myGrid.getColIndexById("tblReturnInboundId"))
         .getValue();
-      var inboundYn = myGrid
-        .cellById(i, myGrid.getColIndexById("inboundYn"))
-        .getValue();
 
-      if (tblReturnInboundId && inboundYn === "Y") {
-        selectedRows.push(tblReturnInboundId);
+        // searchRes에서 원본 데이터 찾기
+        var rowData = null;
+        for (var j = 0; j < searchRes.length; j++) {
+            if (
+                searchRes[j] &&
+                searchRes[j]["tblReturnInboundId"] == tblReturnInboundId
+            ) {
+                rowData = searchRes[j];
+                break;
+            }
+        }
+
+        if (rowData && tblReturnInboundId) {
+            var inboundYn = rowData["inboundYn"] || "";
+            if (inboundYn === "Y") {
+                selectedRows.push(tblReturnInboundId);
+            }
       }
     }
   }
@@ -1682,19 +1709,31 @@ function confirmOutboundRevert() {
 
   var selectedRows = [];
 
-  // 체크된 행들 찾기 (반출완료된 것만)
+    // 체크된 행들 찾기 (반출완료된 것만, searchRes에서 원본 데이터 사용)
   for (var i = 1; i <= myGrid.getRowsNum(); i++) {
     var chkValue = myGrid.cellById(i, myGrid.getColIndexById("chk")).getValue();
     if (chkValue == "1" || chkValue == "true" || chkValue === true) {
       var tblReturnInboundId = myGrid
         .cellById(i, myGrid.getColIndexById("tblReturnInboundId"))
         .getValue();
-      var outboundYn = myGrid
-        .cellById(i, myGrid.getColIndexById("outboundYn"))
-        .getValue();
 
-      if (tblReturnInboundId && outboundYn === "Y") {
-        selectedRows.push(tblReturnInboundId);
+        // searchRes에서 원본 데이터 찾기
+        var rowData = null;
+        for (var j = 0; j < searchRes.length; j++) {
+            if (
+                searchRes[j] &&
+                searchRes[j]["tblReturnInboundId"] == tblReturnInboundId
+            ) {
+                rowData = searchRes[j];
+                break;
+            }
+        }
+
+        if (rowData && tblReturnInboundId) {
+            var outboundYn = rowData["outboundYn"] || "";
+            if (outboundYn === "Y") {
+                selectedRows.push(tblReturnInboundId);
+            }
       }
     }
   }

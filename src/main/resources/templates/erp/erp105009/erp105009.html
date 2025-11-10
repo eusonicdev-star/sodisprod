@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>미확정리스트 (erp105007)</title>
+    <title>출고리스트 (erp105009)</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -293,7 +293,7 @@
                     srchData.append("toDt", formatDateForApi(today));
 
                     $.ajax({
-                        url: "/erp105007List",
+                        url: "/erp105009List",
                         processData: false,
                         contentType: false,
                         data: srchData,
@@ -439,7 +439,7 @@
             var excelData = [];
 
             // 제목행 추가
-            excelData.push(["미확정리스트"]);
+            excelData.push(["출고리스트"]);
             excelData.push([""]); // 빈 행
 
             // 헤더 설정
@@ -507,9 +507,9 @@
                 {wch: 10}  // 수량(HAWA)
             ];
 
-            XLSX.utils.book_append_sheet(wb, ws, "미확정리스트");
+            XLSX.utils.book_append_sheet(wb, ws, "출고리스트");
 
-            var fileName = "미확정리스트_" + new Date().toISOString().split("T")[0] + ".xlsx";
+            var fileName = "출고리스트_" + new Date().toISOString().split("T")[0] + ".xlsx";
             XLSX.writeFile(wb, fileName);
         }
 
@@ -548,9 +548,9 @@
         <div id="btnDiv1">
             <div class="title-container">
 				<span class="item-head title-text">
-					미확정리스트
+					출고리스트
 				</span>
-                <span class="sub-title">erp105007</span>
+                <span class="sub-title">erp105009</span>
             </div>
             <div class="btn-container">
                 <input id="btnSearch" class="action-button primary" type="button" onclick="fnObj.searchOpen.sTime()"
@@ -689,3 +689,6 @@
 </div>
 </body>
 </html>
+
+
+

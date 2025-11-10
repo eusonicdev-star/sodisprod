@@ -7,53 +7,45 @@
     <select id="erp105006List" parameterType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO"
             resultType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">
         SELECT DISTINCT
-        RW.TBL_RESTOCK_WAIT_ID,
+        SP.TBL_SO_P_ID AS TBL_RESTOCK_WAIT_ID,
         SP.TBL_SO_M_ID,
         SM.SO_NO,
-        SM.SO_TYPE,
         DBO.F_COL_NM('A', 'COMM', 'SO_ORDR_TYPE', SM.SO_TYPE) AS SO_TYPE_NM,
-        SM.SO_STAT_CD,
         DBO.F_COL_NM('A', 'COMM', 'SO_STAT_CD', SM.SO_STAT_CD) AS SO_STAT_CD_NM,
         SP.PROD_CD,
         SP.PROD_NM,
         SP.QTY AS RETURN_QTY,
-        RW.INBOUND_YN,
-        RW.INBOUND_DT,
-        RW.INBOUND_USER,
-        RW.INBOUND_TIME,
-        SM.AGNT_CD,
+        ISNULL(SP.RESTOCK_INBOUNDED, 'N') AS INBOUND_YN,
+        SP.RESTOCK_INBOUND_DT AS INBOUND_DT,
+        SP.RESTOCK_INBOUND_USER AS INBOUND_USER,
         AG.AGNT_NM,
         SM.ACPT_ER,
         SM.ACPT_TEL1,
-        SM.ACPT_TEL2,
         SM.POST_CD,
         SM.ADDR1,
-        SM.ADDR2,
-        SM.DC_CD,
         DC.DC_NM,
-        SM.ORDR_INPT_DT,
-        SM.RCPT_DT,
-        SM.RQST_DT,
         SM.DLVY_CNFM_DT,
-        SM.MALL_CD,
-        SM.BRAND,
         SM.REF_SO_NO,
         SM.DLVY_RQST_MSG,
         SM.CUST_SPCL_TXT,
         SM.SAVE_TIME,
-        UM.USER_NM AS INST_ER
+        UM.USER_NM AS INST_ER,
+        SM.DC_CD,
+        SM.AGNT_CD
         FROM TBL_SO_P SP
         INNER JOIN TBL_SO_M SM ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
-        INNER JOIN TBL_RESTOCK_WAIT RW ON SP.TBL_SO_M_ID = RW.TBL_SO_M_ID AND SP.PROD_CD = RW.PROD_CD
+        LEFT JOIN TBL_MTRL_M PM ON SP.PROD_CD = PM.MTRL_CD
         LEFT JOIN TBL_AGENCY_M AG ON SM.AGNT_CD = AG.AGNT_CD
         LEFT JOIN TBL_LGST_DC_M DC ON SM.DC_CD = DC.DC_CD
         LEFT JOIN TBL_INST_PLAN_M IP ON SM.TBL_SO_M_ID = IP.TBL_SO_M_ID
         LEFT JOIN TBL_USER_M UM ON IP.TBL_USER_M_ID = UM.TBL_USER_M_ID
         WHERE 1=1
-        AND SM.SO_STAT_CD NOT IN ('0000', '1900')
         AND SP.USE_YN = 'Y'
-        AND SP.USE_YN IS NOT NULL
-        AND LTRIM(RTRIM(SP.USE_YN)) = 'Y'
+        AND (
+        (SM.SO_TYPE = '9904' AND SM.SO_STAT_CD NOT IN ('0000', '1900'))
+        OR SM.SO_STAT_CD = '8050'
+        )
+        AND (AG.AGNT_NM IS NULL OR PATINDEX('%[가-힣]%', AG.AGNT_NM) > 0) -- 한글이 포함된 화주사명만 조회
         <if test="fromDt != null and fromDt != ''">
             <choose>
                 <when test="dtType != null and (dtType == '1' or dtType == 1)">
@@ -129,7 +121,7 @@
             AND (SM.ADDR1 LIKE '%' + #{srchAddr} + '%' OR SM.ADDR2 LIKE '%' + #{srchAddr} + '%')
         </if>
         <if test="inboundStatus != null and inboundStatus != '' and inboundStatus != 'ALL'">
-            AND RW.INBOUND_YN = #{inboundStatus}
+            AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = #{inboundStatus}
         </if>
         <if test="soStatCd != null and soStatCd != ''">
             AND SM.SO_STAT_CD = #{soStatCd}
@@ -139,26 +131,26 @@
 
     <!-- 재입고 완료 처리 -->
     <update id="erp105006InboundComplete" parameterType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">
-        UPDATE TBL_RESTOCK_WAIT
-        SET INBOUND_YN   = 'Y',
-            INBOUND_DT   = #{processDt},
-            INBOUND_USER = #{processUser},
-            INBOUND_TIME = GETDATE(),
-            UPDT_USER    = #{processUser},
-            UPDT_TIME    = GETDATE()
-        WHERE TBL_RESTOCK_WAIT_ID = #{tblRestockWaitId}
+        UPDATE TBL_SO_P
+        SET RESTOCK_INBOUNDED   = 'Y',
+            RESTOCK_INBOUND_DT   = #{processDt},
+            RESTOCK_INBOUND_USER = #{processUser},
+            RESTOCK_INBOUND_TIME = GETDATE(),
+            UPDT_USER            = #{processUser},
+            UPDT_TIME            = GETDATE()
+        WHERE TBL_SO_P_ID = #{tblRestockWaitId}
     </update>
 
     <!-- 일괄 재입고 완료 처리 -->
     <update id="erp105006BatchInboundComplete" parameterType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">
-        UPDATE TBL_RESTOCK_WAIT
-        SET INBOUND_YN = 'Y',
-        INBOUND_DT = #{processDt},
-        INBOUND_USER = #{processUser},
-        INBOUND_TIME = GETDATE(),
-        UPDT_USER = #{processUser},
-        UPDT_TIME = GETDATE()
-        WHERE TBL_RESTOCK_WAIT_ID IN
+        UPDATE TBL_SO_P
+        SET RESTOCK_INBOUNDED = 'Y',
+            RESTOCK_INBOUND_DT = #{processDt},
+            RESTOCK_INBOUND_USER = #{processUser},
+            RESTOCK_INBOUND_TIME = GETDATE(),
+            UPDT_USER = #{processUser},
+            UPDT_TIME = GETDATE()
+        WHERE TBL_SO_P_ID IN
         <foreach collection="selectedIds" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>

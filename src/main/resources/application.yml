@@ -9,7 +9,6 @@ spring:
     check-template-location: true
   profiles:
     active: prod
-
 common:
   html:
     pagePerRow: 500
