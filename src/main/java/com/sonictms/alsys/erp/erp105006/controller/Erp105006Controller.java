@@ -314,4 +314,49 @@ public class Erp105006Controller {
         
         return result;
     }
+
+    /**
+     * 입고완료 되돌리기 처리
+     * @param erp105006VO 처리 정보
+     * @param request HttpServletRequest
+     * @return 처리 결과
+     */
+    @RequestMapping(value = {"erp105006RevertInboundComplete"}, method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> erp105006RevertInboundComplete(Erp105006VO erp105006VO, HttpServletRequest request) {
+        log.info("입고완료 되돌리기 처리 요청");
+        log.info("처리 정보: {}", erp105006VO);
+        
+        // 권한 체크: 권한 9999인 사용자만 접근 가능
+        String userGrntCd = (String) request.getSession().getAttribute("userGrntCd");
+        String userGrdCd = (String) request.getSession().getAttribute("userGrdCd");
+        
+        if (!"9999".equals(userGrntCd)) {
+            log.warn("권한 없음 - 권한 9999인 사용자만 입고완료 되돌리기 가능. 현재 권한: {}", userGrntCd);
+            Map<String, Object> result = new HashMap<>();
+            result.put("rtnYn", "N");
+            result.put("rtnMsg", "권한이 없습니다. 관리자만 사용할 수 있습니다.");
+            return result;
+        }
+        
+        // 사용자 정보를 변환하여 저장
+        if (erp105006VO.getProcessUser() != null) {
+            erp105006VO.setProcessUser(formatUserInfo(erp105006VO.getProcessUser()));
+        }
+        
+        Map<String, Object> result = new HashMap<>();
+        try {
+            int processedCount = erp105006Service.erp105006RevertInboundComplete(erp105006VO);
+            result.put("rtnYn", "Y");
+            result.put("rtnMsg", "입고완료가 되돌려졌습니다.");
+            result.put("processedCount", processedCount);
+            log.info("입고완료 되돌리기 성공: {}건 처리", processedCount);
+        } catch (Exception e) {
+            result.put("rtnYn", "N");
+            result.put("rtnMsg", "처리 중 오류가 발생했습니다.");
+            log.error("입고완료 되돌리기 실패", e);
+        }
+        
+        return result;
+    }
 }

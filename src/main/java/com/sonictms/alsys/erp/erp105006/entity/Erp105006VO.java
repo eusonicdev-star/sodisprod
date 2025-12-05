@@ -82,4 +82,11 @@ public class Erp105006VO extends CommonVO {
     private String processType;           // 처리 유형 (INBOUND, OUTBOUND)
     private String processUser;           // 처리자
     private String processDt;             // 처리일
+    private String revertRemark;          // 되돌리기 사유
+
+    // 재고 관련
+    private String mtoYn;                 // MTO 여부
+    private Long tblMtrlMId;              // 자재 마스터 ID
+    private Integer currentQty;           // 현재 재고
+    private Integer afterQty;             // 변경 후 재고
 }

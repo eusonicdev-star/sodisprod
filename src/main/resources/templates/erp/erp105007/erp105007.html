@@ -221,13 +221,13 @@
                 grid: function () {
                     myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
 
-                    myGrid.setHeader("화주,주문유형,주문상태,물류센터,배송확정일,공장출고일,AL오더,고객사주문번호,수취인,팔렛트번호,시공기사,배송상태,상품코드(HAWA),상품명(HAWA),수량(HAWA)");
-                    myGrid.setColumnIds("agntNm,soTypeNm,soStatNm,dcNm,dlvyCnfmDt,giLiftDt,soNo,refSoNo,acptEr,paltNoxx,instEr,dlvyStatNm,cprodCd,cprodNm,cqty");
-                    myGrid.setInitWidths("100,100,100,100,120,120,120,150,120,100,100,100,120,200,80");
-                    myGrid.setColAlign("left,center,center,center,center,center,center,center,left,center,left,center,center,left,right");
-                    myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
-                    myGrid.setColSorting("str,str,str,str,str,str,str,str,str,str,str,str,str,str,str");
-                    myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
+                    myGrid.setHeader("화주,주문유형,주문상태,물류센터,배송확정일,공장출고일,상차완료일,AL오더,고객사주문번호,수취인,팔렛트번호,시공기사,배송상태,상품코드(HAWA),상품명(HAWA),수량(HAWA)");
+                    myGrid.setColumnIds("agntNm,soTypeNm,soStatNm,dcNm,dlvyCnfmDt,giLiftDt,liftCmplDt,soNo,refSoNo,acptEr,paltNoxx,instEr,dlvyStatNm,cprodCd,cprodNm,cqty");
+                    myGrid.setInitWidths("100,100,100,100,120,120,120,120,150,120,100,100,100,120,200,80");
+                    myGrid.setColAlign("left,center,center,center,center,center,center,center,center,left,center,left,center,center,left,right");
+                    myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+                    myGrid.setColSorting("str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str");
+                    myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
 
                     myGrid.init();
                     myGrid.enableSmartRendering(true);
@@ -268,29 +268,32 @@
                     searchRes = null;
                     searchRes = [];
 
-                    // 자동으로 3개월 이전부터 오늘까지 날짜 계산
-                    var today = new Date();
-                    var threeMonthsAgo = new Date(today);
-                    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-                    
-                    var formatDate = function(date) {
-                        var year = date.getFullYear();
-                        var month = ("0" + (date.getMonth() + 1)).slice(-2);
-                        var day = ("0" + date.getDate()).slice(-2);
-                        return year + "-" + month + "-" + day;
-                    };
-                    
-                    var formatDateForApi = function(date) {
-                        var year = date.getFullYear();
-                        var month = ("0" + (date.getMonth() + 1)).slice(-2);
-                        var day = ("0" + date.getDate()).slice(-2);
-                        return year + month + day;
-                    };
-
                     var srchData = new FormData();
-                    srchData.append("cmpyCd", "A"); // 기본 회사코드
-                    srchData.append("fromDt", formatDateForApi(threeMonthsAgo));
-                    srchData.append("toDt", formatDateForApi(today));
+                    
+                    // 주문번호가 입력된 경우 주문번호만으로 조회
+                    var soListValue = $("#soList").val().trim();
+                    if (soListValue && soListValue !== "") {
+                        srchData.append("cmpyCd", myComboCmpyCd ? myComboCmpyCd.getSelectedValue() : "A");
+                        srchData.append("soList", soListValue.replace(/\n/g, ","));
+                        
+                        var agntListValue = $("#srchCode").val();
+                        srchData.append("agntList", agntListValue);
+                    } else {
+                        // 기존 조건들로 조회
+                        srchData.append("cmpyCd", myComboCmpyCd ? myComboCmpyCd.getSelectedValue() : "A");
+                        srchData.append("dtType", myComboDtType ? myComboDtType.getSelectedValue() : "");
+                        srchData.append("fromDt", $("#dateFrom").val() ? $("#dateFrom").val().replace(/-/g, "") : "");
+                        srchData.append("toDt", $("#dateTo").val() ? $("#dateTo").val().replace(/-/g, "") : "");
+                        
+                        var agntListValue = $("#srchCode").val();
+                        srchData.append("agntList", agntListValue);
+                        srchData.append("dcList", myComboDcCd ? myComboDcCd.getChecked() : "");
+                        srchData.append("soList", $("#soList").val() ? $("#soList").val().replace(/\n/g, ",") : "");
+                        srchData.append("soTypeList", myComboSoType ? myComboSoType.getChecked() : "");
+                        srchData.append("acptNm", $("#rcptNm").val() || "");
+                        srchData.append("prodList", $("#prodList").val() ? $("#prodList").val().replace(/\n/g, ",") : "");
+                        srchData.append("prodNm", $("#prodNm").val() || "");
+                    }
 
                     $.ajax({
                         url: "/erp105007List",
@@ -450,6 +453,7 @@
                 "물류센터",
                 "배송확정일",
                 "공장출고일",
+                "상차완료일",
                 "AL오더",
                 "고객사주문번호",
                 "수취인",
@@ -471,6 +475,7 @@
                     myGrid.cellById(i, myGrid.getColIndexById("dcNm")).getValue() || "",
                     myGrid.cellById(i, myGrid.getColIndexById("dlvyCnfmDt")).getValue() || "",
                     myGrid.cellById(i, myGrid.getColIndexById("giLiftDt")).getValue() || "",
+                    myGrid.cellById(i, myGrid.getColIndexById("liftCmplDt")).getValue() || "",
                     myGrid.cellById(i, myGrid.getColIndexById("soNo")).getValue() || "",
                     myGrid.cellById(i, myGrid.getColIndexById("refSoNo")).getValue() || "",
                     myGrid.cellById(i, myGrid.getColIndexById("acptEr")).getValue() || "",
@@ -496,6 +501,7 @@
                 {wch: 15}, // 물류센터
                 {wch: 12}, // 배송확정일
                 {wch: 12}, // 공장출고일
+                {wch: 12}, // 상차완료일
                 {wch: 15}, // AL오더
                 {wch: 18}, // 고객사주문번호
                 {wch: 15}, // 수취인
@@ -516,6 +522,34 @@
         $(document).ready(function () {
             myWins = new dhtmlXWindows();
             myGrid = new dhtmlXGridObject('grid');
+
+            // 날짜 선택 캘린더 초기화
+            myCalendar = new dhtmlXCalendarObject([
+                { input: "dateFrom", button: "dateFromIcon" },
+                { input: "dateTo", button: "dateToIcon" }
+            ]);
+            
+            // 달력 기본값을 당일로 설정
+            var now = new Date();
+            var year = now.getFullYear() + "";
+            var month = (now.getMonth() + 1) + "";
+            var date = now.getDate() + "";
+            if (month.length == 1) {
+                month = "0" + month;
+            }
+            if (date.length == 1) {
+                date = "0" + date;
+            }
+            var today = year + "-" + month + "-" + date;
+            $("#dateFrom").val(today);
+            $("#dateTo").val(today);
+            
+            myCalendar.loadUserLanguage("ko");
+
+            fnObj.comboOpen.comboCmpyCd();
+            fnObj.comboOpen.comboDtType();
+            fnObj.comboOpen.comboDcCd();
+            fnObj.comboOpen.comboSoType();
 
             fnObj.gridOpen.grid()
 
@@ -556,9 +590,11 @@
                 <input id="btnSearch" class="action-button primary" type="button" onclick="fnObj.searchOpen.sTime()"
                        value="조회(F2)">
 				<input id="btnExcelDown" class="action-button" type="button" onclick="excelDn();" value="엑셀 다운로드">
+				<input id="btnReload" class="action-button" type="button" onclick="location.reload(true);"
+                       value="초기화">
             </div>
         </div>
-        <div id="searchDiv1" style="display: none;">
+        <div id="searchDiv1">
             <span class="cell" style="width: 220px; display: none;">
 					<span class="item-head">회사</span>
 					<span class="item-data">
@@ -606,32 +642,10 @@
 					</span>
 				</span>
 
-			<span class="cell" style="width: 220px;">
-					<span class="item-head" style="width: 80px;">쇼핑몰</span>
-					<span class="item-data" style="width: 140px;">
-						<input type="text" id="mall" style="height: 20px; width: 132px;"></input>
-					</span>
-				</span>
-
             <span class="cell" style="width: 220px;">
 					<span class="item-head" style="width: 80px;">수령인</span>
 					<span class="item-data" style="width: 140px;">
 						<input type="text" id="rcptNm" style="height: 20px; width: 132px;">
-					</span>
-				</span>
-
-            <span class="cell" style="width: 220px;">
-					<span class="item-head" style="width: 80px;">주소검색</span>
-					<span class="item-data" style="width: 140px;">
-						<input type="text" id="srchAddr" style="height: 20px; width: 132px;">
-					</span>
-				</span>
-
-            <span class="cell" style="width: 220px;">
-					<span class="item-head" style="width: 80px;">전화번호</span>
-					<span class="item-data" style="width: 140px;">
-						<input type="text" id="rcptTel" style="height: 20px; width: 132px;"
-                               oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/>
 					</span>
 				</span>
 
@@ -640,13 +654,6 @@
 					<span class="item-data" style="width: 140px;">
 						<textArea id="soList" style="width: 122px;"
 								  oninput="this.value = this.value.replace(/[^0-9\n]/g, '').replace(/(\..*)\./g, '$1');"/></textArea>
-					</span>
-			</span>
-
-			<span class="cell h-cell" style="width: 300px;">
-					<span class="item-head" style="width: 120px;">고객사 주문번호</span>
-					<span class="item-data" style="width: 180px;">
-						<textArea id="refSoList" style="width: 180px;"/></textArea>
 					</span>
 			</span>
 

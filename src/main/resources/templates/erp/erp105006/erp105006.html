@@ -881,6 +881,123 @@
             });
         }
 
+        // 입고완료 되돌리기 (모달 열기)
+        function inboundRevert() {
+            // 권한 체크: 권한 9999인 사용자만 접근 가능
+            if (sessionUserGrntCd != "9999") {
+                alert("권한이 없습니다. 관리자만 사용할 수 있습니다.");
+                return;
+            }
+
+            var selectedRows = [];
+            var completedRows = [];
+
+            // 체크된 행들 찾기 (searchRes에서 원본 데이터 사용)
+            for (var i = 1; i <= myGrid.getRowsNum(); i++) {
+                var chkValue = myGrid.cellById(i, myGrid.getColIndexById("chk")).getValue();
+                if (chkValue == "1" || chkValue == "true" || chkValue === true) {
+                    var tblRestockWaitId = myGrid.cellById(i, myGrid.getColIndexById("tblRestockWaitId")).getValue();
+
+                    // searchRes에서 원본 데이터 찾기
+                    var rowData = null;
+                    for (var j = 0; j < searchRes.length; j++) {
+                        if (searchRes[j] && searchRes[j]["tblRestockWaitId"] == tblRestockWaitId) {
+                            rowData = searchRes[j];
+                            break;
+                        }
+                    }
+
+                    if (rowData && tblRestockWaitId) {
+                        var inboundYn = rowData["inboundYn"] || "";
+                        var soNo = rowData["soNo"] || "";
+
+                        if (inboundYn === "Y") {
+                            completedRows.push(soNo);
+                            selectedRows.push(tblRestockWaitId);
+                        }
+                    }
+                }
+            }
+
+            if (selectedRows.length == 0) {
+                alert("입고완료된 항목을 선택해주세요.");
+                return;
+            }
+
+            // 입고완료되지 않은 항목이 포함된 경우 경고
+            var nonCompletedRows = [];
+            for (var i = 1; i <= myGrid.getRowsNum(); i++) {
+                var chkValue = myGrid.cellById(i, myGrid.getColIndexById("chk")).getValue();
+                if (chkValue == "1" || chkValue == "true" || chkValue === true) {
+                    var tblRestockWaitId = myGrid.cellById(i, myGrid.getColIndexById("tblRestockWaitId")).getValue();
+
+                    // searchRes에서 원본 데이터 찾기
+                    var rowData = null;
+                    for (var j = 0; j < searchRes.length; j++) {
+                        if (searchRes[j] && searchRes[j]["tblRestockWaitId"] == tblRestockWaitId) {
+                            rowData = searchRes[j];
+                            break;
+                        }
+                    }
+
+                    if (rowData) {
+                        var inboundYn = rowData["inboundYn"] || "";
+                        var soNo = rowData["soNo"] || "";
+
+                        if (inboundYn !== "Y") {
+                            nonCompletedRows.push(soNo);
+                        }
+                    }
+                }
+            }
+
+            if (nonCompletedRows.length > 0) {
+                var message = "다음 주문번호는 입고완료되지 않은 항목입니다:\n" + nonCompletedRows.join(", ") + "\n\n";
+                if (completedRows.length > 0) {
+                    message += "입고완료된 항목 " + completedRows.length + "개만 되돌리시겠습니까?";
+                } else {
+                    message += "되돌릴 수 있는 항목이 없습니다.";
+                    alert(message);
+                    return;
+                }
+
+                if (!confirm(message)) {
+                    return;
+                }
+            } else {
+                // 입고완료된 항목만 선택된 경우
+                if (!confirm("선택한 " + selectedRows.length + "개 항목의 입고완료를 되돌리시겠습니까?")) {
+                    return;
+                }
+            }
+
+            // 바로 처리
+            var processData = new FormData();
+            processData.append("selectedIds", selectedRows.join(","));
+            processData.append("processType", "INBOUND_REVERT");
+            processData.append("processUser", /*[[${session.userName}]]*/);
+
+            $.ajax({
+                url: "/erp105006RevertInboundComplete",
+                processData: false,
+                contentType: false,
+                data: processData,
+                type: "POST",
+                datatype: "json",
+                success: function (res) {
+                    if (res && res.rtnYn == "Y") {
+                        toastr.success("입고완료가 되돌려졌습니다.");
+                        fnObj.searchOpen.search();
+                    } else {
+                        toastr.error("처리 중 오류가 발생했습니다.");
+                    }
+                },
+                error: function () {
+                    toastr.error("처리 중 오류가 발생했습니다.");
+                }
+            });
+        }
+
 
         $(document).ready(function () {
             myWins = new dhtmlXWindows();
@@ -953,6 +1070,8 @@
             if (sessionUserGrntCd != "9999") {
                 // 용인센터입고완료 버튼 숨기기
                 $("#btnInboundComplete").hide();
+                // 입고완료 되돌리기 버튼 숨기기
+                $("#btnInboundRevert").hide();
             }
 
             toastr.options = {
@@ -988,6 +1107,8 @@
                        value="조회(F2)">
                 <input id="btnInboundComplete" class="action-button" type="button" onclick="inboundComplete();"
                        value="용인센터입고완료">
+                <input id="btnInboundRevert" class="action-button danger" type="button" onclick="inboundRevert();"
+                       value="입고완료 되돌리기">
                 <input id="btnExcelDown" class="action-button" type="button" onclick="excelDn();" value="엑셀 다운로드">
                 <input id="btnReport" class="action-button" type="button" onclick="viewReport();" value="리포트 보기">
                 <input id="btnReload" class="action-button" type="button"
@@ -1123,5 +1244,7 @@
     </div>
     <div id="page" style="width: 100%; height: 30px;"></div>
 </div>
+
+
 </body>
 </html>

@@ -34,7 +34,7 @@
         SM.AGNT_CD
         FROM TBL_SO_P SP
         INNER JOIN TBL_SO_M SM ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
-        LEFT JOIN TBL_MTRL_M PM ON SP.PROD_CD = PM.MTRL_CD
+        LEFT JOIN TBL_MTRL_M PM ON SP.PROD_CD = PM.MTRL_CD AND SM.AGNT_CD = PM.AGNT_CD
         LEFT JOIN TBL_AGENCY_M AG ON SM.AGNT_CD = AG.AGNT_CD
         LEFT JOIN TBL_LGST_DC_M DC ON SM.DC_CD = DC.DC_CD
         LEFT JOIN TBL_INST_PLAN_M IP ON SM.TBL_SO_M_ID = IP.TBL_SO_M_ID
@@ -46,6 +46,7 @@
         OR SM.SO_STAT_CD = '8050'
         )
         AND (AG.AGNT_NM IS NULL OR PATINDEX('%[가-힣]%', AG.AGNT_NM) > 0) -- 한글이 포함된 화주사명만 조회
+        AND (PM.EXCHANGE_RETURN_EXCLUDE_YN IS NULL OR PM.EXCHANGE_RETURN_EXCLUDE_YN = 'N')
         <if test="fromDt != null and fromDt != ''">
             <choose>
                 <when test="dtType != null and (dtType == '1' or dtType == 1)">
@@ -156,5 +157,112 @@
         </foreach>
     </update>
 
+    <!-- 입고완료 되돌리기 처리 -->
+    <update id="erp105006RevertInboundComplete" parameterType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">
+        UPDATE TBL_SO_P
+        SET RESTOCK_INBOUNDED = 'N',
+            RESTOCK_INBOUND_DT = NULL,
+            RESTOCK_INBOUND_USER = NULL,
+            RESTOCK_INBOUND_TIME = NULL,
+            UPDT_USER = #{processUser},
+            UPDT_TIME = GETDATE()
+        WHERE TBL_SO_P_ID IN
+        <foreach collection="selectedIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        AND RESTOCK_INBOUNDED = 'Y'  -- 입고완료된 것만 되돌리기
+    </update>
+
+    <!-- 재입고 대상 상품 정보 조회 (MTO 여부 포함) -->
+    <select id="selectRestockProductInfo" parameterType="java.lang.String"
+            resultType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">
+        SELECT
+            SP.TBL_SO_P_ID as tblRestockWaitId,
+            SM.TBL_SO_M_ID as tblSoMId,
+            SM.AGNT_CD as agntCd,
+            AG.AGNT_NM as agntNm,
+            SM.SO_NO as soNo,
+            SP.PROD_CD as prodCd,
+            SP.PROD_NM as prodNm,
+            SP.QTY as returnQty,
+            ISNULL(PM.MTO_YN, 'N') as mtoYn,
+            PM.TBL_MTRL_M_ID as tblMtrlMId
+        FROM TBL_SO_P SP WITH (NOLOCK)
+        INNER JOIN TBL_SO_M SM WITH (NOLOCK) ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
+        LEFT JOIN TBL_AGENCY_M AG WITH (NOLOCK) ON SM.AGNT_CD = AG.AGNT_CD
+        LEFT JOIN TBL_MTRL_M PM WITH (NOLOCK) ON SP.PROD_CD = PM.MTRL_CD AND SM.AGNT_CD = PM.AGNT_CD
+        WHERE SP.TBL_SO_P_ID = #{tblSoPId}
+    </select>
+
+    <!-- 현재 재고 조회 -->
+    <select id="selectInventory" parameterType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO"
+            resultType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">
+        SELECT
+            TBL_MTRL_M_ID as tblMtrlMId,
+            ISNULL(CURRENT_QUANTITY, 0) as currentQty
+        FROM TBL_MTRL_M WITH (NOLOCK)
+        WHERE CMPY_CD = 'A'
+        AND AGNT_CD = #{agntCd}
+        AND MTRL_CD = #{prodCd}
+        AND MTO_YN = 'N'
+    </select>
+
+    <!-- 재고 증가 (재입고) -->
+    <update id="updateInventoryIncrease" parameterType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">
+        UPDATE TBL_MTRL_M
+        SET CURRENT_QUANTITY = ISNULL(CURRENT_QUANTITY, 0) + CAST(#{returnQty} AS INT),
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{processUser}
+        WHERE CMPY_CD = 'A'
+        AND AGNT_CD = #{agntCd}
+        AND MTRL_CD = #{prodCd}
+        AND MTO_YN = 'N'
+    </update>
+
+    <!-- 재고 감소 (재입고 취소) -->
+    <update id="updateInventoryDecrease" parameterType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">
+        UPDATE TBL_MTRL_M
+        SET CURRENT_QUANTITY = ISNULL(CURRENT_QUANTITY, 0) - CAST(#{returnQty} AS INT),
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{processUser}
+        WHERE CMPY_CD = 'A'
+        AND AGNT_CD = #{agntCd}
+        AND MTRL_CD = #{prodCd}
+        AND MTO_YN = 'N'
+    </update>
+
+    <!-- 재고 변동 이력 저장 (재입고) -->
+    <insert id="insertRestockInventoryHistory" parameterType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">
+        INSERT INTO TBL_INV_ADJUSTMENT (
+            CMPY_CD, AGNT_CD, AGNT_NM, TBL_MTRL_M_ID, MTRL_CD, MTRL_NM,
+            ADJUSTMENT_TYPE, BEFORE_QTY, ADJUSTMENT_QTY, AFTER_QTY,
+            ADJUSTMENT_REASON, ADJUSTMENT_DATE,
+            SAVE_TIME, SAVE_USER, UPDT_TIME, UPDT_USER, DELETED_YN
+        )
+        VALUES (
+            'A', #{agntCd}, #{agntNm}, #{tblMtrlMId}, #{prodCd}, #{prodNm},
+            'RESTOCK', #{currentQty}, #{returnQty}, #{afterQty},
+            '용인센터재입고-재고증가 (주문번호:' + #{soNo} + ', 반품수량:' + CAST(#{returnQty} AS VARCHAR) + ')',
+            #{processDt},
+            GETDATE(), #{processUser}, GETDATE(), #{processUser}, 'N'
+        )
+    </insert>
+
+    <!-- 재고 변동 이력 저장 (재입고 취소) -->
+    <insert id="insertRestockRevertInventoryHistory" parameterType="com.sonictms.alsys.erp.erp105006.entity.Erp105006VO">
+        INSERT INTO TBL_INV_ADJUSTMENT (
+            CMPY_CD, AGNT_CD, AGNT_NM, TBL_MTRL_M_ID, MTRL_CD, MTRL_NM,
+            ADJUSTMENT_TYPE, BEFORE_QTY, ADJUSTMENT_QTY, AFTER_QTY,
+            ADJUSTMENT_REASON, ADJUSTMENT_DATE,
+            SAVE_TIME, SAVE_USER, UPDT_TIME, UPDT_USER, DELETED_YN
+        )
+        VALUES (
+            'A', #{agntCd}, #{agntNm}, #{tblMtrlMId}, #{prodCd}, #{prodNm},
+            'RESTOCK_REVERT', #{currentQty}, -CAST(#{returnQty} AS INT), #{afterQty},
+            '용인센터재입고취소-재고감소 (주문번호:' + #{soNo} + ', 반품수량:' + CAST(#{returnQty} AS VARCHAR) + ')',
+            CONVERT(VARCHAR(8), GETDATE(), 112),
+            GETDATE(), #{processUser}, GETDATE(), #{processUser}, 'N'
+        )
+    </insert>
 
 </mapper>

@@ -1,51 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.sonictms.alsys.erp.erp105008.mapper.Erp105008Mapper">
 
-    <!-- 출고대기리스트 조회 -->
-    <select id="erp105008List" parameterType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO"
+    <!-- 출고대기 리스트 조회 -->
+    <select id="selectOutboundWaitList" parameterType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO"
             resultType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO">
-        SELECT DISTINCT
-        DBO.F_COL_NM('A', 'AGNT_CD', 'AGNT_CD', SM.AGNT_CD) AS AGNT_NM,
-        DBO.F_COL_NM('A', 'COMM', 'SO_ORDR_TYPE', SM.SO_TYPE) AS SO_TYPE_NM,
-        DBO.F_COL_NM('A', 'COMM', 'SO_STAT_CD', SM.SO_STAT_CD) AS SO_STAT_NM,
-        DBO.F_COL_NM('A', 'DC_CD', 'DC_CD', SM.DC_CD) AS DC_NM,
-        SM.DLVY_CNFM_DT,
-        SM.GI_LIFT_DT,
-        SM.SO_NO,
-        SP.REF_SO_NO,
-        SM.ACPT_ER,
-        IP.PALT_NOXX,
-        UM.USER_NM AS INST_ER,
-        DBO.F_COL_NM(SM.CMPY_CD, 'COMM', 'DLVY_STAT_CD', IM.DLVY_STAT_CD) AS DLVY_STAT_NM,
-        ISNULL(BM.C_MTRL_CD, SP.PROD_CD) AS CPROD_CD,
-        ISNULL(MM2.MTRL_NM, SP.PROD_NM) AS CPROD_NM,
-        ISNULL(BM.QTY * SP.QTY, SP.QTY) AS CQTY,
-        SM.SAVE_TIME
-        FROM TBL_SO_P SP
-        INNER JOIN TBL_SO_M SM ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
-        LEFT JOIN TBL_MTRL_M PM ON SP.PROD_CD = PM.MTRL_CD
-        LEFT JOIN TBL_AGENCY_M AG ON SM.AGNT_CD = AG.AGNT_CD
-        LEFT JOIN TBL_LGST_DC_M DC ON SM.DC_CD = DC.DC_CD
-        LEFT JOIN TBL_INST_PLAN_M IP ON SM.TBL_SO_M_ID = IP.TBL_SO_M_ID
-        LEFT JOIN TBL_USER_M UM ON IP.TBL_USER_M_ID = UM.TBL_USER_M_ID
-        LEFT OUTER JOIN TBL_BOM_M AS BM WITH (NOLOCK)
-        ON SP.PROD_CD = BM.MTRL_CD AND SM.AGNT_CD = BM.AGNT_CD AND BM.USE_YN = 'Y'
-        LEFT OUTER JOIN TBL_MTRL_M AS MM2 WITH (NOLOCK)
-        ON BM.C_MTRL_CD = MM2.MTRL_CD AND BM.AGNT_CD = MM2.AGNT_CD
+        SELECT 
+            SP.TBL_SO_P_ID as tblSoPId,
+            SM.TBL_SO_M_ID as tblSoMId,
+            SM.CMPY_CD as cmpyCd,
+            SM.AGNT_CD as agntCd,
+            AM.AGNT_NM as agntNm,
+            SM.SO_TYPE as soType,
+            DBO.F_COL_NM(SM.CMPY_CD, 'COMM', 'SO_ORDR_TYPE', SM.SO_TYPE) as soTypeNm,
+            SM.SO_STAT_CD as soStatCd,
+            DBO.F_COL_NM(SM.CMPY_CD, 'COMM', 'SO_STAT_CD', SM.SO_STAT_CD) as soStatNm,
+            DM.DC_NM as dcNm,
+            SM.DLVY_CNFM_DT as dlvyCnfmDt,
+            SM.GI_LIFT_DT as giLiftDt,
+            CONVERT(VARCHAR(10), IM.UPDT_TIME, 112) as liftCmplDt,
+            SM.SO_NO as soNo,
+            SM.REF_SO_NO as refSoNo,
+            SM.ACPT_ER as acptEr,
+            IM.PALT_NOXX as paltNoxx,
+            UM.USER_NM as instEr,
+            DBO.F_COL_NM(SM.CMPY_CD, 'COMM', 'DLVY_STAT_CD', IM.DLVY_STAT_CD) as dlvyStatNm,
+            SP.PROD_CD as cprodCd,
+            SP.PROD_NM as cprodNm,
+            SP.QTY as cqty,
+            SP.COURIER_CD as courierCd,
+            SP.COURIER_NM as courierNm,
+            SP.WAYBILL_NO as waybillNo,
+            SP.OUTBOUND_DT as outboundDt,
+            SP.OUTBOUND_USER as outboundUser,
+            PM.MTO_YN as mtoYn,
+            SP.PROD_CD as mtrlCd
+        FROM TBL_SO_M AS SM WITH (NOLOCK)
+        INNER JOIN TBL_SO_P AS SP WITH (NOLOCK) ON SM.TBL_SO_M_ID = SP.TBL_SO_M_ID
+        LEFT OUTER JOIN TBL_AGENCY_M AS AM WITH (NOLOCK) ON SM.CMPY_CD = AM.CMPY_CD AND SM.AGNT_CD = AM.AGNT_CD
+        LEFT OUTER JOIN TBL_LGST_DC_M AS DM WITH (NOLOCK) ON SM.DC_CD = DM.DC_CD
         LEFT OUTER JOIN TBL_INST_MOBILE_M AS IM WITH (NOLOCK) ON SM.TBL_SO_M_ID = IM.TBL_SO_M_ID
+        LEFT OUTER JOIN TBL_USER_M AS UM WITH (NOLOCK) ON IM.EXEC_USER_M_ID = UM.TBL_USER_M_ID
+        LEFT OUTER JOIN TBL_MTRL_M AS PM WITH (NOLOCK) ON SP.PROD_CD = PM.MTRL_CD AND SM.AGNT_CD = PM.AGNT_CD
         WHERE 1=1
-        AND (SM.SO_STAT_CD = '2000' OR SM.SO_STAT_CD = '2500' OR SM.SO_STAT_CD = '3000' OR SM.SO_STAT_CD = '3500' OR SM.SO_STAT_CD = '4000')
+        AND (SM.SO_STAT_CD = '2000' OR SM.SO_STAT_CD = '2500' OR SM.SO_STAT_CD = '3000' 
+             OR SM.SO_STAT_CD = '3500' OR SM.SO_STAT_CD = '4000')
         AND SP.USE_YN = 'Y'
-        AND SM.SO_TYPE IN ('1000', '3100', '4000', '5000', '6000', '9901', '9902', '9905', '9908') -- 지정된 주문유형만
+        AND SM.SO_TYPE IN ('1000', '3100', '4000', '5000', '6000', '9901', '9902', '9905', '9908')
+        AND ISNULL(PM.MTO_YN, 'N') = 'N'
+        AND SP.OUTBOUND_DT IS NULL
+        
+        <if test="cmpyCd != null and cmpyCd != ''">
+            AND SM.CMPY_CD = #{cmpyCd}
+        </if>
         <if test="fromDt != null and fromDt != ''">
             <choose>
                 <when test="dtType != null and (dtType == '1' or dtType == 1)">
                     AND SM.ORDR_INPT_DT >= #{fromDt}
                 </when>
                 <when test="dtType != null and (dtType == '2' or dtType == 2)">
-                    AND SM.ORDR_INPT_DT >= #{fromDt}
+                    AND SM.GI_LIFT_DT >= #{fromDt}
                 </when>
                 <when test="dtType != null and (dtType == '3' or dtType == 3)">
                     AND SM.DLVY_CNFM_DT >= #{fromDt}
@@ -61,7 +75,7 @@
                     AND SM.ORDR_INPT_DT &lt;= #{toDt}
                 </when>
                 <when test="dtType != null and (dtType == '2' or dtType == 2)">
-                    AND SM.ORDR_INPT_DT &lt;= #{toDt}
+                    AND SM.GI_LIFT_DT &lt;= #{toDt}
                 </when>
                 <when test="dtType != null and (dtType == '3' or dtType == 3)">
                     AND SM.DLVY_CNFM_DT &lt;= #{toDt}
@@ -71,7 +85,152 @@
                 </otherwise>
             </choose>
         </if>
-        ORDER BY SM.SAVE_TIME DESC
+        <if test="agntList != null and agntList != ''">
+            AND SM.AGNT_CD IN
+            <foreach collection="agntList.split(',')" item="agnt" open="(" separator="," close=")">
+                #{agnt}
+            </foreach>
+        </if>
+        <if test="dcList != null and dcList != ''">
+            AND SM.DC_CD IN
+            <foreach collection="dcList.split(',')" item="dc" open="(" separator="," close=")">
+                #{dc}
+            </foreach>
+        </if>
+        <if test="soList != null and soList != ''">
+            AND SM.SO_NO IN
+            <foreach collection="soList.split(',')" item="so" open="(" separator="," close=")">
+                #{so}
+            </foreach>
+        </if>
+        <if test="soTypeList != null and soTypeList != ''">
+            AND SM.SO_TYPE IN
+            <foreach collection="soTypeList.split(',')" item="type" open="(" separator="," close=")">
+                #{type}
+            </foreach>
+        </if>
+        <if test="acptNm != null and acptNm != ''">
+            AND SM.ACPT_ER LIKE '%' + #{acptNm} + '%'
+        </if>
+        <if test="prodList != null and prodList != ''">
+            AND SP.PROD_CD IN
+            <foreach collection="prodList.split(',')" item="prod" open="(" separator="," close=")">
+                #{prod}
+            </foreach>
+        </if>
+        <if test="prodNm != null and prodNm != ''">
+            AND SP.PROD_NM LIKE '%' + #{prodNm} + '%'
+        </if>
+        
+        ORDER BY SM.DLVY_CNFM_DT, SM.SO_NO
     </select>
+
+    <!-- 상품 정보 조회 (단건) -->
+    <select id="selectProductInfo" parameterType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO"
+            resultType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO">
+        SELECT 
+            SP.TBL_SO_P_ID as tblSoPId,
+            SM.TBL_SO_M_ID as tblSoMId,
+            SM.CMPY_CD as cmpyCd,
+            SM.AGNT_CD as agntCd,
+            AM.AGNT_NM as agntNm,
+            SM.SO_TYPE as soType,
+            SM.SO_NO as soNo,
+            SP.PROD_CD as cprodCd,
+            SP.PROD_CD as mtrlCd,
+            SP.PROD_NM as cprodNm,
+            SP.QTY as cqty,
+            SP.QTY as qty,
+            PM.MTO_YN as mtoYn
+        FROM TBL_SO_P AS SP WITH (NOLOCK)
+        INNER JOIN TBL_SO_M AS SM WITH (NOLOCK) ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
+        LEFT OUTER JOIN TBL_AGENCY_M AS AM WITH (NOLOCK) ON SM.CMPY_CD = AM.CMPY_CD AND SM.AGNT_CD = AM.AGNT_CD
+        LEFT OUTER JOIN TBL_MTRL_M AS PM WITH (NOLOCK) ON SP.PROD_CD = PM.MTRL_CD AND SM.AGNT_CD = PM.AGNT_CD
+        WHERE SP.TBL_SO_P_ID = #{tblSoPId}
+    </select>
+
+    <!-- 재고 조회 -->
+    <select id="selectInventory" parameterType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO"
+            resultType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO">
+        SELECT 
+            TBL_MTRL_M_ID as tblMtrlMId,
+            ISNULL(CURRENT_QUANTITY, 0) as currentQty
+        FROM TBL_MTRL_M WITH (NOLOCK)
+        WHERE CMPY_CD = #{cmpyCd}
+        AND AGNT_CD = #{agntCd}
+        AND MTRL_CD = #{mtrlCd}
+        AND MTO_YN = 'N'
+    </select>
+
+    <!-- 재고 차감 (음수 허용) -->
+    <update id="updateInventoryDecrease" parameterType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO">
+        UPDATE TBL_MTRL_M
+        SET CURRENT_QUANTITY = ISNULL(CURRENT_QUANTITY, 0) - #{qty},
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{processUser}
+        WHERE CMPY_CD = #{cmpyCd}
+        AND AGNT_CD = #{agntCd}
+        AND MTRL_CD = #{mtrlCd}
+        AND MTO_YN = 'N'
+    </update>
+
+    <!-- 재고 변동 이력 기록 -->
+    <insert id="insertInventoryHistory" parameterType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO">
+        INSERT INTO TBL_INV_ADJUSTMENT (
+            CMPY_CD, AGNT_CD, AGNT_NM, TBL_MTRL_M_ID, MTRL_CD, MTRL_NM,
+            ADJUSTMENT_TYPE, BEFORE_QTY, ADJUSTMENT_QTY, AFTER_QTY,
+            ADJUSTMENT_REASON, ADJUSTMENT_DATE,
+            SAVE_TIME, SAVE_USER, UPDT_TIME, UPDT_USER, DELETED_YN
+        )
+        VALUES (
+            #{cmpyCd}, #{agntCd}, #{agntNm}, #{tblMtrlMId}, #{mtrlCd}, #{cprodNm},
+            #{processType}, #{currentQty}, -#{qty}, #{afterQty},
+            <choose>
+                <when test="processType == 'COURIER'">
+                    '택배출고-재고차감 (주문번호:' + #{soNo} + ', 송장번호:' + #{waybillNo} + ')'
+                </when>
+                <otherwise>
+                    '업체직출출고-재고차감 (주문번호:' + #{soNo} + ')'
+                </otherwise>
+            </choose>,
+            #{outboundDt},
+            GETDATE(), #{processUser}, GETDATE(), #{processUser}, 'N'
+        )
+    </insert>
+
+    <!-- 출고 정보 업데이트 (택배) -->
+    <update id="updateOutboundInfoCourier" parameterType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO">
+        UPDATE TBL_SO_P
+        SET COURIER_CD = #{courierCd},
+            COURIER_NM = #{courierNm},
+            WAYBILL_NO = #{waybillNo},
+            OUTBOUND_DT = #{outboundDt},
+            OUTBOUND_USER = #{processUser},
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{processUser}
+        WHERE TBL_SO_P_ID = #{tblSoPId}
+    </update>
+
+    <!-- 출고 정보 업데이트 (업체직출) -->
+    <update id="updateOutboundInfoDirect" parameterType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO">
+        UPDATE TBL_SO_P
+        SET COURIER_CD = NULL,
+            COURIER_NM = '업체직출',
+            WAYBILL_NO = NULL,
+            OUTBOUND_DT = #{outboundDt},
+            OUTBOUND_USER = #{processUser},
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{processUser}
+        WHERE TBL_SO_P_ID = #{tblSoPId}
+    </update>
+
+    <!-- 주문 상태 변경 (배송완료) -->
+    <update id="updateOrderStatus" parameterType="com.sonictms.alsys.erp.erp105008.entity.Erp105008VO">
+        UPDATE TBL_SO_M
+        SET SO_STAT_CD = '9999',
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{processUser}
+        WHERE TBL_SO_M_ID = #{tblSoMId}
+    </update>
 
 </mapper>

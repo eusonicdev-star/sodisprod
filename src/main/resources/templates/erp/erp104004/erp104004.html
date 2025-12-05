@@ -24,48 +24,39 @@
 
 	<script th:inline="javascript">
 		var pagePerRow =	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/
-	var myWins;
+        var myWins;
 		var myGrid;
-
 		var myCalendar;
 
-
-		fnObj = {
+        fnObj = {
 			winOpen: {
 				report: function (report, title) {
-
 					if (myGrid.getRowsNum() == 0) {
 						alert("조회결과가 없습니다");
 						return;
 					}
 
-					var reportNm = ["erp104004_01", "erp104004_02", "erp104004_03", "erp104004_04", "erp104004_05"];	//01팀별,02기사별,03권역별,04지역별,05그룹별
-					//20220106 정연호 추가.erp104004_05 그룹별 추가
+                    // 01: 팀별, 02: 기사별, 03: 권역별, 04:지역별, 05: 그룹별
+                    var reportNm = ["erp104004_01", "erp104004_02", "erp104004_03", "erp104004_04", "erp104004_05"];
 
 					if (reportNm.includes(report)) {
 						window.open("/", "").location.href = "/report?report=" + report
-							+ "&p1=" +	/*[[${session.cmpyCd}]]*/
-							+	"&p2=" + myComboDtType2.getSelectedValue()
+                            + "&p1=" + /*[[${session.cmpyCd}]]*/
+                            +"&p2=" + myComboDtType2.getSelectedValue()
 							+ "&p3=" + $("#dateFrom").val().replace(/-/g, "")
 							+ "&p4=" + $("#dateTo").val().replace(/-/g, "")
 							+ "&p5=" + myComboDcCd.getSelectedValue()
 							+ "&p6=" + myComboTeam.getSelectedValue()
 							+ "&p7=" + myComboZone.getSelectedValue()
 							+ "&p8=" + myComboGrpArea.getSelectedValue()
-							+ "&p9=" +	/*[[${session.tblUserMId}]]*/
-
-							//20220106 정연호 추가. 시공카테고리
-							//+	"&p10="	+	myComboInstCapaCtgr.getSelectedValue()
-							//20220324 정연호 수정 시공카테고리
-							+	"&p10=" + myComboInstCapaCtgr.getChecked()
-							;
+                            + "&p9=" + /*[[${session.tblUserMId}]]*/
+                            +"&p10=" + myComboInstCapaCtgr.getChecked();
 					}
 					return;
 				},
-
 			},	//END of winOpen
 			comboOpen: {
-				comboCmpyCd: function () {		//회사콤보목록
+                comboCmpyCd: function () {
 					myComboCmpyCd = new dhtmlXCombo("cmpyCd");
 					comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
 					myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/));
@@ -74,14 +65,11 @@
 						myGrid.clearAll(false);
 					});
 					myComboCmpyCd.disable();
-
 				},
-
-				comboDtType2: function () {	//달력유형구분 콤보
+                comboDtType2: function () {
 					myComboDtType2 = new dhtmlXCombo("dtType2");
 					comboList(myComboDtType2, 'A', 'COMM', 'SO_SRCH_DT_TYPE2', '', 'Y', '');
-					myComboDtType2.selectOption(myComboDtType2.getIndexByValue("3"));//첫번째인 고객배송일 이 기본으로 선택되게 한다
-					//myComboDtType2.selectOption(0);	//첫번째인 고객배송일 이 기본으로 선택되게 한다
+                    myComboDtType2.selectOption(myComboDtType2.getIndexByValue("3"));
 					myComboDtType2.readonly(true);
 					myComboDtType2.setFontSize("12px", "12px");
 					myComboDtType2.attachEvent("onChange", function (value, text) {
@@ -89,8 +77,7 @@
 					});
 				},
 
-
-				comboDcCd: function () {		//물류센터 콤보
+                comboDcCd: function () {
 					myComboDcCd = new dhtmlXCombo("dcCd");
 					comboList(myComboDcCd, 'A', 'DC_CD', '', '', 'Y', 'all');
 					myComboDcCd.selectOption(0);
@@ -99,10 +86,8 @@
 					myComboDcCd.attachEvent("onChange", function (value, text) {
 						myGrid.clearAll(false);
 					});
-
 				},
-				//20220423 정연호. 시공카테고리를 체크콤보로 변
-				comboInstCapaCtgr: function () {		//시공카테고리 콤보
+                comboInstCapaCtgr: function () {
 					myComboInstCapaCtgr = new dhtmlXComboFromSelect("instCapaCtgr");
 					comboList(myComboInstCapaCtgr, 'A', 'COMM', 'INST_CAPA_CTGR', '', 'Y', 'all');
 
@@ -125,37 +110,27 @@
 						}
 					});
 					myComboInstCapaCtgr.attachEvent("onCheck", function (value, text) {
-
-						if (!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
-						{
+                        if (!value) {
 							if (myComboInstCapaCtgr.isChecked(0)) {
-
 								var c = 0;
 								for (var i = 1; i < myComboInstCapaCtgr.getOptionsCount(); i++) {
 									myComboInstCapaCtgr.setChecked(i, true);
 									c++;
 								}
 								myComboInstCapaCtgr.updateOption("", "", c + "개 선택", "");
-								//myComboInstCapaCtgr.selectOption(0);
 								myComboInstCapaCtgr.openSelect();
 							}
-							if (!myComboInstCapaCtgr.isChecked(0))		//전체에 체크를 안했을때
-							{
-
+                            if (!myComboInstCapaCtgr.isChecked(0)) {
 								var c = 0;
 								for (var i = 1; i < myComboInstCapaCtgr.getOptionsCount(); i++) {
 									myComboInstCapaCtgr.setChecked(i, false);
 								}
 								myComboInstCapaCtgr.updateOption("", "", c + "개 선택", "");
-								//myComboInstCapaCtgr.selectOption(0);
 								myComboInstCapaCtgr.openSelect();
 								return;
 							}
-
-						}
-						else {
+                        } else {
 							var cnt = 0;
-
 							for (var i = 1; i < myComboInstCapaCtgr.getOptionsCount(); i++) {
 								if (myComboInstCapaCtgr.isChecked(i)) {
 									cnt++;
@@ -163,24 +138,17 @@
 							}
 							if ((myComboInstCapaCtgr.getOptionsCount() - 1) == cnt) {
 								myComboInstCapaCtgr.setChecked(0, true);
-							}
-							else {
+                            } else {
 								myComboInstCapaCtgr.setChecked(0, false);
 							}
-
 							myComboInstCapaCtgr.updateOption("", "", cnt + "개 선택", "");
-							//myComboInstCapaCtgr.selectOption(0);
 							myComboInstCapaCtgr.openSelect();
-
 							return;
 						}
-
 					});
 					myComboInstCapaCtgr.readonly(true);
 				},
-				//20220106 정연호 추가 . 시공카테고리.끝
-
-				comboTeam: function () {		//팀명 콤보
+                comboTeam: function () {
 					myComboTeam = new dhtmlXCombo("team");
 					comboList(myComboTeam, 'A', 'TEAM', 'TEAM', '', 'Y', 'all');
 					myComboTeam.selectOption(0);
@@ -189,10 +157,8 @@
 					myComboTeam.attachEvent("onChange", function (value, text) {
 						myGrid.clearAll(false);
 					});
-
 				},
-
-				comboZone: function () {		//zone 콤보
+                comboZone: function () {
 					myComboZone = new dhtmlXCombo("zone");
 					comboList(myComboZone, 'A', 'COMM', 'PICK_ZONE', '', 'Y', 'all');
 					myComboZone.selectOption(0);
@@ -201,10 +167,8 @@
 					myComboZone.attachEvent("onChange", function (value, text) {
 						myGrid.clearAll(false);
 					});
-
 				},
-
-				comboGrpArea: function () {		//권역 콤보
+                comboGrpArea: function () {
 					myComboGrpArea = new dhtmlXCombo("grpArea");
 					comboList(myComboGrpArea, 'A', 'COMM', 'PICK_GRP_AREA', '', 'Y', 'all');
 					myComboGrpArea.selectOption(0);
@@ -213,14 +177,10 @@
 					myComboGrpArea.attachEvent("onChange", function (value, text) {
 						myGrid.clearAll(false);
 					});
-
 				},
-
-
 			},	//END of comboOpen
 			gridOpen: {
 				grid: function () {
-
 					myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
 					myGrid.setHeader(
 						"물류센터코드" +
@@ -233,17 +193,13 @@
 						",팔렛트순번" +
 						",zone" +
 						",권역" +
-						",고객명" +	//20220423 정연호. 추가.
+                        ",고객명" +
 						",심플코드" +
 						",품목코드" +
 						",품목명칭" +
 						",수량" +
 						",CBM"
 					);
-
-
-
-
 
 					myGrid.setColumnIds(
 						"dcCd" +
@@ -256,7 +212,7 @@
 						",seq" +
 						",pickZone" +
 						",pickGrpArea" +
-						",acptEr" +		//20220423 정연호. 추가.
+                        ",acptEr" +
 						",smplCd" +
 						",prodCd" +
 						",prodNm" +
@@ -274,7 +230,7 @@
 						",100" +
 						",80" +
 						",100" +
-						",100" +		//20220423 정연호. 추가.
+                        ",100" +
 						",100" +
 						",120" +
 						",280" +
@@ -292,7 +248,7 @@
 						",right" +
 						",center" +
 						",center" +
-						",center" +		//20220423 정연호. 추가.
+                        ",center" +
 						",center" +
 						",center" +
 						",left" +
@@ -310,7 +266,7 @@
 						",ro" +
 						",ro" +
 						",ro" +
-						",ro" +		//20220423 정연호. 추가.
+                        ",ro" +
 						",ro" +
 						",ro" +
 						",ro" +
@@ -328,7 +284,7 @@
 						",str" +
 						",str" +
 						",str" +
-						",str" +		//20220423 정연호. 추가.
+                        ",str" +
 						",str" +
 						",str" +
 						",str" +
@@ -346,7 +302,7 @@
 						",#text_filter" +
 						",#text_filter" +
 						",#text_filter" +
-						",#text_filter" +	//20220423 정연호. 추가.
+                        ",#text_filter" +
 						",#text_filter" +
 						",#numeric_filter" +
 						",#text_filter" +
@@ -354,54 +310,33 @@
 						",#text_filter"
 					);
 
-
-					myGrid.setColumnHidden(myGrid.getColIndexById("dcCd"), true);	//컬럼 아이디로 해당 컬럼 가리기
-					myGrid.setColumnHidden(myGrid.getColIndexById("instCtgr"), true);	//컬럼 아이디로 해당 컬럼 가리기
-
-					//20220106 정연호 시공카테고리코드 가림
+                    myGrid.setColumnHidden(myGrid.getColIndexById("dcCd"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("instCtgr"), true);
 					myGrid.setColumnHidden(myGrid.getColIndexById("instCtgr"), true);
-
-
-
-					myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
-
-
-					myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
-					myGrid.enablePreRendering(10);	//20220423 정연호 추가
-
+                    myGrid.init();
+                    myGrid.enableSmartRendering(true);
+                    myGrid.enablePreRendering(10);
 					fnObj.gridOpen.setWidth();
-					//그래야 진짜 화면에 보이는 높이가 만들어진다
-					myGrid.addRow(1, "");	//로우 추가
+                    myGrid.addRow(1, "");
 					myGrid.deleteRow(1);
-
-
-					myGrid.enableEditEvents(true, false, false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+                    myGrid.enableEditEvents(true, false, false);
 					myGrid.enableBlockSelection(true);
-
-					//myGrid.attachEvent("onKeyPress",onKeyPressed);
 					myGrid.attachEvent("onKeyPress", fnObj.keyOpen.onKeyPressed);
-
-
-
-				},//grid
+                },
 				setWidth: function () {
 					c_width = top.myLayout.cells("c").getWidth();
 					searchDiv_height = $("#searchDiv").height();
 					searchDiv2nd_height = $("#searchDiv2nd").height();
 					page_height = $("#page").height();
 					xhdr_height = $(".xhdr").height();
-
 					myGrid.enableAutoWidth(true, c_width - 25, 100);
 					myGrid.enableAutoHeight(true, window.innerHeight - searchDiv_height - searchDiv2nd_height - page_height - xhdr_height - 30);	//그리드 자동높이
-
-
 					$("#searchDiv").width(c_width - 25);
 					$("#searchDiv2nd").width(c_width - 25);
-
 				},	//END of setWidth
 			},	//END of gridOpen
 			searchOpen: {
-				search: function (dtType) {	//그리드 목록 조회하기
+                search: function (dtType) {
 					myGrid.clearAll(false);
 					if (!fnObj.searchOpen.searchChkVal.chkVal("search")) {
 						alert(chkValMsg);
@@ -414,12 +349,7 @@
 					srchData.append("fromDt", $("#dateFrom").val().replace(/-/g, ""));
 					srchData.append("toDt", $("#dateTo").val().replace(/-/g, ""));
 					srchData.append("dcList", myComboDcCd.getSelectedValue());
-
-					//20220106 정연호 시공카테고리
-					//srchData.append("instCtgr"		,	myComboInstCapaCtgr.getSelectedValue()	);
-					//20220423 정연호 시공카테고리 수정
 					srchData.append("instCtgr", myComboInstCapaCtgr.getChecked());
-
 					srchData.append("teamList", myComboTeam.getSelectedValue());
 					srchData.append("zoneList", myComboZone.getSelectedValue());
 					srchData.append("pickGrpArea", myComboGrpArea.getSelectedValue());
@@ -430,42 +360,25 @@
 						data: srchData,
 						type: "POST",
 						datatype: "json",
-						//async:false,
 						success: function (res) {
-							//console.log(res)
-
 							if (res) {
-
 								searchRes = res;
 								searchPaging(1);
-
-							}
-							else {
+                            } else {
 								alert("조회 수행 결과 없음");
 							}
 						},
 					});
-
-
-				},	//END of search : function() {
-
-				/*
-				delSrchCode : function(){
-					$("#srchCode").val("");
-					$("#srchName").val("");
-				},	//END of delSrchCode : function(){
-				*/
+                },
 				searchChkVal: {
 					chkVal: function (chkGubn) {
-						chkValMsg = "";	//메세지 초기화
+                        chkValMsg = "";
 						var rtnVal = true;
-
 						if (chkGubn == "search") {
 							if (!myComboCmpyCd.getSelectedValue()) {
 								chkValMsg = chkValMsg + "회사코드가 없습니다\n";
 								rtnVal = false;
 							}
-
 							if (!myComboDtType2.getSelectedValue()) {
 								chkValMsg = chkValMsg + "달력유형을 선택해주세요\n";
 								rtnVal = false;
@@ -478,12 +391,10 @@
 								chkValMsg = chkValMsg + "검색종료일을 입력해주세요\n";
 								rtnVal = false;
 							}
-
 							if ($("#dateFrom").val() && $("#dateTo").val()) {
 								var date1 = new Date($("#dateFrom").val());
 								var date2 = new Date($("#dateTo").val());
-								if (date1 > date2)	//시작날짜가 크고 종료날짜가 작을떄
-								{
+                                if (date1 > date2) {
 									chkValMsg = chkValMsg + "검색시작일이 검색종료일보다 작습니다.\n";
 									rtnVal = false;
 								}
@@ -493,36 +404,20 @@
 								var date1 = new Date($("#dateFrom").val());
 								var date2 = new Date($("#dateTo").val());
 								var gapDate = (date2.getTime() - date1.getTime()) / (1000 * 60 * 60 * 24);
-								if (gapDate > 31)	//시작날짜가 크고 종료날짜가 작을떄
-								{
+                                if (gapDate > 31) {
 									chkValMsg = chkValMsg + "검색일은 최대 31일 입니다.\n";
 									rtnVal = false;
 								}
 							}
-
-
-							//20220106 정연호 추가 . 시공카테고리 체크
-							/*
-							if(!myComboInstCapaCtgr.getSelectedValue())	//시공카테고리 선택된것 없을때
-							{
-								chkValMsg = chkValMsg + "시공카테고리를 선택해주세요.\n";
-								rtnVal = false;
-							}
-							*/
-							//20220423 정연호 추가. 시공카테고리 콤보체크한 것 확인
 							console.log("myComboInstCapaCtgr.getChecked()\n" + myComboInstCapaCtgr.getChecked())
-							if (myComboInstCapaCtgr.getChecked() == "")	//시공카테고리 선택된것 없을때
-							{
+                            if (myComboInstCapaCtgr.getChecked() == "") {
 								chkValMsg = chkValMsg + "시공카테고리를 체크해주세요.\n";
 								rtnVal = false;
 							}
-
-							//20220106 정연호 추가 . 시공카테고리 체크.끝							
 						}
 						return rtnVal;
 					},	//END of chkVal : function(){
 				},	//END of searchChkVal
-
 			},	//END of searchOpen
 			keyOpen: {
 				enterKey: function () {
@@ -543,64 +438,44 @@
 			}
 		}
 
-
-		//엑셀 헨들러
 		var excelHandler = {
 			getExcelFileName: function () {
-				return '주문현황 리스트.xlsx';		//엑셀파일명
-			},
+                return '주문현황 리스트.xlsx';
+            },
 			getSheetName: function () {
-				return '주문현황 리스트';		//시트명
+                return '주문현황 리스트';
 			},
 			getExcelData: function () {
-				return get_json_res(myGrid, searchRes);		//그리드를 엑셀다운로드dyd json 으로 변경
+                return get_json_res(myGrid, searchRes);
 			},
 			getWorksheet: function () {
 				return XLSX.utils.json_to_sheet(this.getExcelData());
 			}
 		}
 
-
-
-
-
-		function searchPaging(page) {
-
-			//pagePerRow	=	15;	//페이지당 몇줄을 보여줄것인가
-
+        function searchPaging(page) {
 			if ($("#rowPerPage").val()) {
 				pagePerRow = parseInt($("#rowPerPage").val());
 			}
-
-			var pageRange = 10;	//페이지범위를 몇개씩짜를것인가. 예) 23페이지 라면 1 2 3 4 5 6 7 8 9 10  이 한번 나오고 >> 누르면 11 12 13 14 15 16 17 18 19 20 나오고 >> 누르면 21 22 23 나옴
-
+            var pageRange = 10;
 			var totalPageCnt = searchRes.length % pagePerRow == 0 ? parseInt(searchRes.length / pagePerRow) : parseInt(searchRes.length / pagePerRow) + 1
-
 			var a = "<div class='pagination-container'>";
-
-			//패이징 처리
 			var start = (page - 1);
 			var end = (page - 1) + pageRange;
-
 			if (start % pageRange != 0) {
 				start = parseInt(start / pageRange) * pageRange;
 			}
-
 			if (end % pageRange != 0 || page == 1) {
 				end = parseInt(end / pageRange) * pageRange;
 			}
-
 			if (start >= pageRange) {
 				a += "<input type='button' onclick='searchPaging(" + 1 + ");' value='<<' class='pagination-button'>";
 				a += "<input type='button' onclick='searchPaging(" + (start - 1) + ");' value='<' class='pagination-button'>";
 			}
-
 			var r = 0;
-
 			for (r = start; r < end; r++) {
 				if (r < totalPageCnt) {
-					if (r + 1 == page)		//현재페이지 강조
-					{
+                    if (r + 1 == page) {
 						a += "<input type='button' onclick='searchPaging(" + (r + 1) + ");' value=" + (r + 1) + " class='pagination-button active'>";
 					} else {
 						a += "<input type='button' onclick='searchPaging(" + (r + 1) + ");' value=" + (r + 1) + " class='pagination-button'>";
@@ -642,7 +517,6 @@
 			}
 		}
 
-
 		$(document).ready(function () {
 
 			myWins = new dhtmlXWindows();
@@ -669,61 +543,35 @@
 
 			myCalendar.loadUserLanguage("ko");
 
-			fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
-			fnObj.comboOpen.comboDtType2();	//달력유형콤보2 바인드
-			fnObj.comboOpen.comboTeam();	//팀명콤보 바인드
-			fnObj.comboOpen.comboDcCd();	//물류센터 콤보	
-
-			//20220106 정연호 추가. 시공카테고리
-			fnObj.comboOpen.comboInstCapaCtgr();
-
-			fnObj.comboOpen.comboZone();	//zone 콤보	
-			fnObj.comboOpen.comboGrpArea();	//권역콤보 바인드
-
-
+            fnObj.comboOpen.comboCmpyCd();
+            fnObj.comboOpen.comboDtType2();
+            fnObj.comboOpen.comboTeam();
+            fnObj.comboOpen.comboDcCd();
+            fnObj.comboOpen.comboInstCapaCtgr();
+            fnObj.comboOpen.comboZone();
+            fnObj.comboOpen.comboGrpArea();
 			fnObj.gridOpen.grid()
-
-
-
-			window.onresize = function (event) {		//윈도우의 사이즈가 변경했을떄
+            window.onresize = function (event) {
 				fnObj.gridOpen.setWidth();
 				fnObj.gridOpen.setWidth();
 			};
-
-
-
-			//20211128 정연호 추가 본인의 물류센터만 보임
 			sessionUserGrntCd =  /*[[${session.userGrntCd}]]*/
 				sessionUserGrdCd = /*[[${session.userGrdCd}]]*/
 				sessionDcCd = /*[[${session.dcCd}]]*/
 				sessionDcNm = /*[[${session.dcNm}]]*/
 
-	
-
-	if (sessionUserGrdCd == "2000" || sessionUserGrntCd == "6000") {
-				//console.log("sessionUserGrdCd : " + sessionUserGrdCd)
-				//console.log("sessionUserGrntCd : " + sessionUserGrntCd)
-				//console.log("sessionDcCd : " + sessionDcCd)
+            if (sessionUserGrdCd == "2000" || sessionUserGrntCd == "6000") {
 				myComboDcCd.setChecked(myComboDcCd.getIndexByValue(sessionDcCd), true);
 				myComboDcCd.updateOption("", "", sessionDcNm, "");
 				myComboDcCd.disable();
 			}
-
-
-
-
-
 		});
 
-
-		//20211226 정연호 추가. 키보드에서 F2 누르면 조회하기
 		$(document).keydown(function (event) {
 			if (event.keyCode == 113 || event.which == 113) {
 				fnObj.searchOpen.search(3)
 			}
 		});
-
-
 	</script>
 </head>
 
@@ -842,5 +690,4 @@
 		<div id="page"></div>
 	</div>
 </body>
-
 </html>

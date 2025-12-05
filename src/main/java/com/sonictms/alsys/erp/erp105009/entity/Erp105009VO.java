@@ -26,6 +26,8 @@ public class Erp105009VO extends CommonVO {
     private String rqstDt;                        // 고객배송요청일
     private String dlvyCnfmDt;                    // 배송확정일
     private String giLiftDt;                      // 공장출고일
+    private String liftCmplDt;                    // 상차완료일(출고일)
+    private String liftCmplYn;                    // 상차완료여부
     private String mallCd;                        // 쇼핑몰
     private String brand;                         // 브랜드
     private String soNo;                          // AL 오더
@@ -72,6 +74,11 @@ public class Erp105009VO extends CommonVO {
     private String memo;                          // 비고
     private String instCtgr;                      // 시공카테고리
     private String instCtgrNm;                    // 시공카테고리명
+    private String courierCd;                     // 택배사 코드
+    private String courierNm;                     // 택배사명
+    private String waybillNo;                     // 송장번호
+    private String outboundDt;                    // 출고일자
+    private String outboundUser;                  // 출고처리자
 
     // 검색 조건
     private String dtType;                        // 달력유형
@@ -88,6 +95,7 @@ public class Erp105009VO extends CommonVO {
     private String prodList;                      // 상품코드 목록
     private String srchAddr;                      // 주소검색
 }
+
 
 
 

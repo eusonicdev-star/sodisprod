@@ -8,7 +8,7 @@ spring:
     cache: false
     check-template-location: true
   profiles:
-    active: prod
+    active: dev
 common:
   html:
     pagePerRow: 500

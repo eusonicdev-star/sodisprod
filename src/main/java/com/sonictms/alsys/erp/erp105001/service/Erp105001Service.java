@@ -2,6 +2,7 @@ package com.sonictms.alsys.erp.erp105001.service;
 
 import com.sonictms.alsys.erp.erp105001.entity.Erp105001VO;
 import com.sonictms.alsys.erp.erp105001.mapper.Erp105001Mapper;
+import com.sonictms.alsys.erp.erp105008.entity.Erp105008VO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,5 +36,10 @@ public class Erp105001Service {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // 출고 대기 주문 조회 (모달용 - 가용재고 계산과 동일한 로직)
+    public List<Erp105008VO> selectOutboundWaitListForModal(Erp105001VO erp105001VO) {
+        return erp105001Mapper.selectOutboundWaitListForModal(erp105001VO);
     }
 }

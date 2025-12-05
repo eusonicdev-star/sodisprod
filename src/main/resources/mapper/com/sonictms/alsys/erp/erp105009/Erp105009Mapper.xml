@@ -13,6 +13,9 @@
         DBO.F_COL_NM('A', 'DC_CD', 'DC_CD', SM.DC_CD) AS DC_NM,
         SM.DLVY_CNFM_DT,
         SM.GI_LIFT_DT,
+        CONVERT(VARCHAR(10), IM.UPDT_TIME, 112) AS LIFT_CMPL_DT,
+        IM.UPDT_TIME AS LIFT_CMPL_TIME,
+        IM.LIFT_CMPL_YN,
         SM.SO_NO,
         SP.REF_SO_NO,
         SM.ACPT_ER,
@@ -22,6 +25,15 @@
         ISNULL(BM.C_MTRL_CD, SP.PROD_CD) AS CPROD_CD,
         ISNULL(MM2.MTRL_NM, SP.PROD_NM) AS CPROD_NM,
         ISNULL(BM.QTY * SP.QTY, SP.QTY) AS CQTY,
+        SP.COURIER_CD AS COURIER_CD,
+        SP.COURIER_NM AS COURIER_NM,
+        SP.WAYBILL_NO AS WAYBILL_NO,
+        SP.OUTBOUND_DT AS OUTBOUND_DT,
+        CASE 
+            WHEN SP.OUTBOUND_USER IS NOT NULL AND SP.OUTBOUND_USER != '' AND OU.USER_NM IS NOT NULL 
+            THEN OU.USER_NM + '(' + SP.OUTBOUND_USER + ')'
+            ELSE SP.OUTBOUND_USER 
+        END AS OUTBOUND_USER,
         SM.SAVE_TIME
         FROM TBL_SO_P SP
         INNER JOIN TBL_SO_M SM ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
@@ -30,15 +42,20 @@
         LEFT JOIN TBL_LGST_DC_M DC ON SM.DC_CD = DC.DC_CD
         LEFT JOIN TBL_INST_PLAN_M IP ON SM.TBL_SO_M_ID = IP.TBL_SO_M_ID
         LEFT JOIN TBL_USER_M UM ON IP.TBL_USER_M_ID = UM.TBL_USER_M_ID
+        LEFT JOIN TBL_USER_M OU ON SP.OUTBOUND_USER IS NOT NULL 
+                                AND SP.OUTBOUND_USER != '' 
+                                AND ISNUMERIC(SP.OUTBOUND_USER) = 1 
+                                AND TRY_CAST(SP.OUTBOUND_USER AS BIGINT) = OU.TBL_USER_M_ID
         LEFT OUTER JOIN TBL_BOM_M AS BM WITH (NOLOCK)
         ON SP.PROD_CD = BM.MTRL_CD AND SM.AGNT_CD = BM.AGNT_CD AND BM.USE_YN = 'Y'
         LEFT OUTER JOIN TBL_MTRL_M AS MM2 WITH (NOLOCK)
         ON BM.C_MTRL_CD = MM2.MTRL_CD AND BM.AGNT_CD = MM2.AGNT_CD
         LEFT OUTER JOIN TBL_INST_MOBILE_M AS IM WITH (NOLOCK) ON SM.TBL_SO_M_ID = IM.TBL_SO_M_ID
         WHERE 1=1
-        AND (SM.SO_STAT_CD = '7000' OR SM.SO_STAT_CD = '7500')
+        AND CAST(SM.SO_STAT_CD AS INT) >= 7000
         AND SP.USE_YN = 'Y'
         AND SM.SO_TYPE IN ('1000', '3100', '4000', '5000', '6000', '9901', '9902', '9905', '9908') -- 지정된 주문유형만
+        AND ISNULL(PM.MTO_YN, 'N') = 'N' -- MTO가 아닌 상품만 조회
         <if test="fromDt != null and fromDt != ''">
             <choose>
                 <when test="dtType != null and (dtType == '1' or dtType == 1)">
@@ -49,6 +66,9 @@
                 </when>
                 <when test="dtType != null and (dtType == '3' or dtType == 3)">
                     AND SM.DLVY_CNFM_DT >= #{fromDt}
+                </when>
+                <when test="dtType != null and (dtType == '4' or dtType == 4)">
+                    AND CONVERT(VARCHAR(10), IM.UPDT_TIME, 112) >= #{fromDt}
                 </when>
                 <otherwise>
                     AND SM.ORDR_INPT_DT >= #{fromDt}
@@ -66,12 +86,67 @@
                 <when test="dtType != null and (dtType == '3' or dtType == 3)">
                     AND SM.DLVY_CNFM_DT &lt;= #{toDt}
                 </when>
+                <when test="dtType != null and (dtType == '4' or dtType == 4)">
+                    AND CONVERT(VARCHAR(10), IM.UPDT_TIME, 112) &lt;= #{toDt}
+                </when>
                 <otherwise>
                     AND SM.ORDR_INPT_DT &lt;= #{toDt}
                 </otherwise>
             </choose>
         </if>
-        ORDER BY SM.SAVE_TIME DESC
+        <if test="agntList != null and agntList != ''">
+            AND SM.AGNT_CD IN
+            <foreach collection="agntList.split(',')" item="agnt" open="(" close=")" separator=",">
+                #{agnt}
+            </foreach>
+        </if>
+        <if test="dcList != null and dcList != ''">
+            AND SM.DC_CD IN
+            <foreach collection="dcList.split(',')" item="dc" open="(" close=")" separator=",">
+                #{dc}
+            </foreach>
+        </if>
+        <if test="soList != null and soList != ''">
+            AND SM.SO_NO IN
+            <foreach collection="soList.split(',')" item="so" open="(" close=")" separator=",">
+                #{so}
+            </foreach>
+        </if>
+        <if test="refSoList != null and refSoList != ''">
+            AND SP.REF_SO_NO IN
+            <foreach collection="refSoList.split(',')" item="refSo" open="(" close=")" separator=",">
+                #{refSo}
+            </foreach>
+        </if>
+        <if test="soTypeList != null and soTypeList != ''">
+            AND SM.SO_TYPE IN
+            <foreach collection="soTypeList.split(',')" item="soType" open="(" close=")" separator=",">
+                #{soType}
+            </foreach>
+        </if>
+        <if test="acptNm != null and acptNm != ''">
+            AND SM.ACPT_ER LIKE '%' + #{acptNm} + '%'
+        </if>
+        <if test="acptTel != null and acptTel != ''">
+            AND (SM.ACPT_TEL1 LIKE '%' + #{acptTel} + '%' OR SM.ACPT_TEL2 LIKE '%' + #{acptTel} + '%')
+        </if>
+        <if test="prodList != null and prodList != ''">
+            AND SP.PROD_CD IN
+            <foreach collection="prodList.split(',')" item="prod" open="(" close=")" separator=",">
+                #{prod}
+            </foreach>
+        </if>
+        <if test="prodNm != null and prodNm != ''">
+            AND SP.PROD_NM LIKE '%' + #{prodNm} + '%'
+        </if>
+        <if test="srchAddr != null and srchAddr != ''">
+            AND (SM.ADDR1 LIKE '%' + #{srchAddr} + '%' OR SM.ADDR2 LIKE '%' + #{srchAddr} + '%')
+        </if>
+        <if test="mallNm != null and mallNm != ''">
+            AND SM.MALL_CD LIKE '%' + #{mallNm} + '%'
+        </if>
+        ORDER BY LIFT_CMPL_TIME DESC, SM.SAVE_TIME DESC
     </select>
 </mapper>
+
 

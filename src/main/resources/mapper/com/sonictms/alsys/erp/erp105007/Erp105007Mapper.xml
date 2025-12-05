@@ -13,6 +13,9 @@
         DBO.F_COL_NM('A', 'DC_CD', 'DC_CD', SM.DC_CD) AS DC_NM,
         SM.DLVY_CNFM_DT,
         SM.GI_LIFT_DT,
+        CONVERT(VARCHAR(10), IM.UPDT_TIME, 112) AS LIFT_CMPL_DT,
+        IM.UPDT_TIME AS LIFT_CMPL_TIME,
+        IM.LIFT_CMPL_YN,
         SM.SO_NO,
         SP.REF_SO_NO,
         SM.ACPT_ER,
@@ -36,9 +39,10 @@
         ON BM.C_MTRL_CD = MM2.MTRL_CD AND BM.AGNT_CD = MM2.AGNT_CD
         LEFT OUTER JOIN TBL_INST_MOBILE_M AS IM WITH (NOLOCK) ON SM.TBL_SO_M_ID = IM.TBL_SO_M_ID
         WHERE 1=1
-        AND (SM.SO_STAT_CD = '1000' OR SM.SO_STAT_CD = '1200' OR SM.SO_STAT_CD = '1900') -- 주문접수, 주문확정만
+        AND (SM.SO_STAT_CD = '1000' OR SM.SO_STAT_CD = '1200' OR SM.SO_STAT_CD = '1900')
         AND SP.USE_YN = 'Y'
         AND SM.SO_TYPE IN ('1000', '3100', '4000', '5000', '6000', '9901', '9902', '9905', '9908')
+        AND ISNULL(PM.MTO_YN, 'N') = 'N'
         <if test="fromDt != null and fromDt != ''">
             <choose>
                 <when test="dtType != null and (dtType == '1' or dtType == 1)">
@@ -49,6 +53,9 @@
                 </when>
                 <when test="dtType != null and (dtType == '3' or dtType == 3)">
                     AND SM.DLVY_CNFM_DT >= #{fromDt}
+                </when>
+                <when test="dtType != null and (dtType == '4' or dtType == 4)">
+                    AND CONVERT(VARCHAR(10), IM.UPDT_TIME, 112) >= #{fromDt}
                 </when>
                 <otherwise>
                     AND SM.ORDR_INPT_DT >= #{fromDt}
@@ -66,12 +73,51 @@
                 <when test="dtType != null and (dtType == '3' or dtType == 3)">
                     AND SM.DLVY_CNFM_DT &lt;= #{toDt}
                 </when>
+                <when test="dtType != null and (dtType == '4' or dtType == 4)">
+                    AND CONVERT(VARCHAR(10), IM.UPDT_TIME, 112) &lt;= #{toDt}
+                </when>
                 <otherwise>
                     AND SM.ORDR_INPT_DT &lt;= #{toDt}
                 </otherwise>
             </choose>
         </if>
-        ORDER BY SM.SAVE_TIME DESC
+        <if test="agntList != null and agntList != ''">
+            AND SM.AGNT_CD IN
+            <foreach collection="agntList.split(',')" item="agnt" open="(" close=")" separator=",">
+                #{agnt}
+            </foreach>
+        </if>
+        <if test="dcList != null and dcList != ''">
+            AND SM.DC_CD IN
+            <foreach collection="dcList.split(',')" item="dc" open="(" close=")" separator=",">
+                #{dc}
+            </foreach>
+        </if>
+        <if test="soList != null and soList != ''">
+            AND SM.SO_NO IN
+            <foreach collection="soList.split(',')" item="so" open="(" close=")" separator=",">
+                #{so}
+            </foreach>
+        </if>
+        <if test="soTypeList != null and soTypeList != ''">
+            AND SM.SO_TYPE IN
+            <foreach collection="soTypeList.split(',')" item="soType" open="(" close=")" separator=",">
+                #{soType}
+            </foreach>
+        </if>
+        <if test="acptNm != null and acptNm != ''">
+            AND SM.ACPT_ER LIKE '%' + #{acptNm} + '%'
+        </if>
+        <if test="prodList != null and prodList != ''">
+            AND SP.PROD_CD IN
+            <foreach collection="prodList.split(',')" item="prod" open="(" close=")" separator=",">
+                #{prod}
+            </foreach>
+        </if>
+        <if test="prodNm != null and prodNm != ''">
+            AND SP.PROD_NM LIKE '%' + #{prodNm} + '%'
+        </if>
+        ORDER BY LIFT_CMPL_TIME DESC, SM.SAVE_TIME DESC
     </select>
 
 </mapper>
