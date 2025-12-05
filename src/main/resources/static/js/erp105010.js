@@ -588,12 +588,13 @@ fnObj = {
             var tbody = $("#excelOutboundPreviewTableBody");
             tbody.empty();
 
-            previewData.forEach(function (item) {
+            previewData.forEach(function (item, index) {
                 var statusClass = item.isValid ? "status-valid" : "status-invalid";
                 var statusText = item.isValid ? "유효" : "오류";
                 var errorText = item.errors.length > 0 ? " (" + item.errors.join(", ") + ")" : "";
 
                 var row = $("<tr>");
+                row.append("<td style='text-align: center;'>" + (index + 1) + "</td>");
                 row.append("<td>" + item.soNo + "</td>");
                 row.append("<td>" + item.cprodCd + "</td>");
                 row.append("<td>" + item.cprodNm + "</td>");
