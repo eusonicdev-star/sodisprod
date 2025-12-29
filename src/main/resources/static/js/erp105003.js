@@ -12,6 +12,12 @@ var sessionUserId = "admin";
 
 // 메인 함수 객체
 var fnObj = {
+  // 페이징 관련 변수
+  currentPage: 1,
+  totalPages: 1,
+  totalCount: 0,
+  pageSize: 10,
+
   // 페이지 초기화
   initializePage: function () {
     // 오늘 날짜를 기본값으로 설정
@@ -581,7 +587,7 @@ var fnObj = {
     var html = "";
     if (data.length === 0) {
       html =
-        '<tr><td colspan="12" style="text-align: center; padding: 20px; color: #666;">조회된 입고 내역이 없습니다.</td></tr>';
+        '<tr><td colspan="13" style="text-align: center; padding: 20px; color: #666;">조회된 입고 내역이 없습니다.</td></tr>';
     } else {
       data.forEach(function (item) {
         var statusClass =
@@ -591,7 +597,29 @@ var fnObj = {
         var statusText =
           item.inboundStatus === "COMPLETED" ? "입고 완료" : "입고 예정";
 
-        html += "<tr>";
+        // 완료된 항목만 체크박스 활성화
+        var isCompleted = item.inboundStatus === "COMPLETED";
+
+        html +=
+          "<tr data-id='" +
+          item.tblInboundProductId +
+          "' data-agnt-cd='" +
+          (item.agntCd || "") +
+          "' data-cmpy-cd='" +
+          (item.cmpyCd || "") +
+          "' data-mtrl-cd='" +
+          (item.mtrlCd || "") +
+          "' data-mtrl-nm='" +
+          (item.mtrlNm || "") +
+          "' data-actual-quantity='" +
+          (item.actualQuantity || "") +
+          "'>";
+        html +=
+          '<td><input type="checkbox" class="history-checkbox" value="' +
+          item.tblInboundProductId +
+          '" onchange="fnObj.updateRevertButton()" ' +
+          (isCompleted ? "" : "disabled") +
+          " /></td>";
         html += "<td>" + (item.agntNm || "") + "</td>";
         html += "<td>" + (item.mtrlCd || "") + "</td>";
         html += "<td>" + (item.mtrlNm || "") + "</td>";
@@ -613,6 +641,7 @@ var fnObj = {
       });
     }
     $("#inboundHistoryList").html(html);
+    fnObj.updateRevertButton(); // 되돌리기 버튼 상태 업데이트
   },
 
   // 입고 완료 내역 페이징 렌더링
@@ -928,6 +957,91 @@ var fnObj = {
         }
       }
     },
+  },
+
+  // 전체 선택/해제 (입고 완료 내역)
+  toggleSelectAllHistory: function () {
+    var isChecked = $("#selectAllHistoryCheckbox").prop("checked");
+    $(".history-checkbox:not(:disabled)").prop("checked", isChecked);
+    fnObj.updateRevertButton();
+  },
+
+  // 되돌리기 버튼 표시/숨김 업데이트
+  updateRevertButton: function () {
+    var checkedCount = $(".history-checkbox:checked").length;
+    var revertBtn = $("#revertSelectedBtn");
+
+    if (checkedCount > 0) {
+      revertBtn.show();
+      revertBtn.html(
+        '<i class="fa fa-undo"></i> 선택 항목 되돌리기 (' +
+          checkedCount +
+          ")"
+      );
+    } else {
+      revertBtn.hide();
+    }
+  },
+
+  // 선택된 입고 되돌리기 (일괄)
+  revertSelectedInbound: function () {
+    var selectedItems = [];
+    $(".history-checkbox:checked").each(function () {
+      var tblInboundProductId = $(this).val();
+      var row = $("#inboundHistoryList tr[data-id='" + tblInboundProductId + "']");
+
+      selectedItems.push({
+        tblInboundProductId: parseInt(tblInboundProductId),
+        cmpyCd: row.data("cmpy-cd") || sessionCmpyCd,
+        agntCd: row.data("agnt-cd") || "",
+        mtrlCd: row.data("mtrl-cd") || "",
+        mtrlNm: row.data("mtrl-nm") || "",
+        actualQuantity: parseInt(row.data("actual-quantity") || 0),
+        revertUser: sessionUserId,
+      });
+    });
+
+    if (selectedItems.length === 0) {
+      alert("되돌릴 항목을 선택해주세요.");
+      return;
+    }
+
+    if (
+      !confirm(
+        "선택된 " +
+          selectedItems.length +
+          "개의 입고 완료를 되돌리시겠습니까?\n\n재고가 차감되고 입고 예정 상태로 변경됩니다."
+      )
+    ) {
+      return;
+    }
+
+    console.log("입고 되돌리기 데이터:", selectedItems);
+
+    $.ajax({
+      url: "/erp105003RevertInbound",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(selectedItems),
+      success: function (res) {
+        if (res.success) {
+          alert(res.message);
+          // 체크박스 초기화
+          $("#selectAllHistoryCheckbox").prop("checked", false);
+          // 입고 완료 내역 새로고침
+          fnObj.loadInboundHistory(fnObj.currentPage);
+          // 입고 예정 목록도 새로고침 (되돌려진 항목이 나타나도록)
+          if ($("#pendingContent").hasClass("active")) {
+            fnObj.loadPendingInboundList(1);
+          }
+        } else {
+          alert(res.message);
+        }
+      },
+      error: function () {
+        alert("입고 되돌리기 처리 중 오류가 발생했습니다.");
+      },
+    });
   },
 };
 

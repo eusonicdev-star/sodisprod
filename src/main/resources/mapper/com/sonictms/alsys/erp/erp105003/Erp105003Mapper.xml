@@ -303,4 +303,65 @@
         </if>
     </select>
 
+    <!-- 입고 되돌리기 (일괄) -->
+    <update id="revertInbound" 
+            parameterType="java.util.List">
+        UPDATE TBL_INBOUND_PRODUCT
+        SET
+            INBOUND_STATUS = 'PENDING',
+            ACTUAL_QUANTITY = NULL,
+            ACTUAL_DATE = NULL,
+            REMARKS = NULL,
+            COMPLETE_TIME = NULL,
+            COMPLETE_USER = NULL,
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = CASE TBL_INBOUND_PRODUCT_ID
+                <foreach collection="list" item="item" separator=" ">
+                    WHEN #{item.tblInboundProductId} THEN #{item.revertUser}
+                </foreach>
+            END
+        WHERE TBL_INBOUND_PRODUCT_ID IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item.tblInboundProductId}
+        </foreach>
+        AND INBOUND_STATUS = 'COMPLETED'
+    </update>
+
+    <!-- 재고 수량 차감 (입고 되돌리기 시) -->
+    <update id="revertInventoryQuantity" 
+            parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            -- TBL_MTRL_M의 CURRENT_QUANTITY 차감 (MTO가 아닌 상품만)
+            UPDATE TBL_MTRL_M
+            SET CURRENT_QUANTITY = ISNULL(CURRENT_QUANTITY, 0) - #{item.actualQuantity},
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{item.revertUser}
+            WHERE CMPY_CD = #{item.cmpyCd}
+            AND AGNT_CD = #{item.agntCd}
+            AND MTRL_CD = #{item.mtrlCd}
+            AND MTO_YN = 'N' -- MTO가 아닌 상품만 재고 관리
+
+            -- 재고 변동 이력 기록
+            INSERT INTO TBL_INV_ADJUSTMENT (
+            CMPY_CD, AGNT_CD, AGNT_NM, TBL_MTRL_M_ID, MTRL_CD, MTRL_NM,
+            ADJUSTMENT_TYPE, BEFORE_QTY, ADJUSTMENT_QTY, AFTER_QTY,
+            ADJUSTMENT_REASON, ADJUSTMENT_DATE,
+            SAVE_TIME, SAVE_USER, UPDT_TIME, UPDT_USER, DELETED_YN
+            )
+            SELECT
+            #{item.cmpyCd}, #{item.agntCd},
+            (SELECT AGNT_NM FROM TBL_AGENCY_M WHERE AGNT_CD = #{item.agntCd} AND CMPY_CD = #{item.cmpyCd}),
+            TBL_MTRL_M_ID, #{item.mtrlCd}, #{item.mtrlNm},
+            'REVERT', ISNULL(CURRENT_QUANTITY, 0) + #{item.actualQuantity}, -#{item.actualQuantity},
+            ISNULL(CURRENT_QUANTITY, 0),
+            '입고취소-자동차감', CONVERT(VARCHAR(10), GETDATE(), 120),
+            GETDATE(), #{item.revertUser}, GETDATE(), #{item.revertUser}, 'N'
+            FROM TBL_MTRL_M
+            WHERE CMPY_CD = #{item.cmpyCd}
+            AND AGNT_CD = #{item.agntCd}
+            AND MTRL_CD = #{item.mtrlCd}
+            AND MTO_YN = 'N'
+        </foreach>
+    </update>
+
 </mapper>

@@ -115,7 +115,11 @@
                 comboDtType: function () {
                     myComboDtType = new dhtmlXCombo("dtType");
                     comboList(myComboDtType, 'A', 'COMM', 'SO_SRCH_DT_TYPE', '', 'Y', '');
-                    myComboDtType.selectOption(0);
+                    // 배송확정일(코드값 3)을 기본값으로 설정
+                    setTimeout(function() {
+                        var index = myComboDtType.getIndexByValue("3");
+                        if (index >= 0) myComboDtType.selectOption(index);
+                    }, 100);
                     myComboDtType.setFontSize("12px", "12px");
                     myComboDtType.attachEvent("onChange", function (value, text) {
                         myGrid.clearAll(false);
@@ -253,7 +257,6 @@
                     });
                 },
 
-
                 comboSoStatCd: function () {
                     myComboSoStatCd = new dhtmlXCombo("soStatCd");
                     myComboSoStatCd.addOption("", "전체");
@@ -271,13 +274,13 @@
                 grid: function () {
                     myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
 
-                     myGrid.setHeader("#master_checkbox,CUD,ID,ID2,입고상태,용인센터입고일,입고처리자,물류센터명,AL오더,고객사주문번호,주문유형,주문상태,배송확정일,시공기사," +
-                         "화주명,수취인,상품코드,상품명,반품수량,우편번호,주소,수취인전화,배송요청사항,고객특이사항,저장일," +
-                         "물류센터코드,화주코드");
+                    myGrid.setHeader("#master_checkbox,CUD,ID,ID2,입고상태,용인센터입고일,입고처리자,물류센터명,AL오더,고객사주문번호,주문유형,주문상태,배송확정일,시공기사," +
+                        "화주명,수취인,상품코드,상품명,반품수량,우편번호,주소,수취인전화,배송요청사항,고객특이사항,저장일," +
+                        "물류센터코드,화주코드");
 
-                     myGrid.setColumnIds("chk,cud,tblRestockWaitId,tblSoMId,inboundYn,inboundDt,inboundUser,dcNm,soNo,refSoNo,soTypeNm,soStatCdNm,dlvyCnfmDt,instEr," +
-                         "agntNm,acptEr,prodCd,prodNm,returnQty,postCd,addr1,acptTel1,dlvyRqstMsg,custSpclTxt,saveTime," +
-                         "dcCd,agntCd");
+                    myGrid.setColumnIds("chk,cud,tblRestockWaitId,tblSoMId,inboundYn,inboundDt,inboundUser,dcNm,soNo,refSoNo,soTypeNm,soStatCdNm,dlvyCnfmDt,instEr," +
+                        "agntNm,acptEr,prodCd,prodNm,returnQty,postCd,addr1,acptTel1,dlvyRqstMsg,custSpclTxt,saveTime," +
+                        "dcCd,agntCd");
 
                     myGrid.setInitWidths("40,40,80,80,80,100,100,120,100,120,100,100,100,80," +
                         "120,80,60,200,80,80,80,80,200,200,200," +
@@ -324,7 +327,6 @@
                     searchDiv2nd_height = $("#searchDiv2nd").height();
                     page_height = $("#page").height();
                     xhdr_height = $(".xhdr").height();
-
                     myGrid.enableAutoWidth(true, c_width - 25, 100);
                     myGrid.enableAutoHeight(true, window.innerHeight - searchDiv_height - searchDiv2nd_height - page_height - xhdr_height - 30);
 
@@ -352,14 +354,13 @@
                     }
 
                     var srchData = new FormData();
-                    
+
                     // 주문번호가 입력된 경우 주문번호만으로 조회
                     var soListValue = $("#soList").val().trim();
                     if (soListValue && soListValue !== "") {
                         srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
                         srchData.append("soList", soListValue.replace(/\n/g, ","));
-                        
-                        // 화주사 권한인 경우 본인 화주사로만 조회 강제
+
                         var agntListValue = $("#srchCode").val();
                         if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200") {
                             agntListValue = sessionAgntCd;
@@ -449,6 +450,23 @@
                                 var date2 = new Date($("#dateTo").val());
                                 if (date1 > date2) {
                                     chkValMsg = chkValMsg + "검색시작일이 검색종료일보다 작습니다.\n";
+                                    rtnVal = false;
+                                }
+                            }
+                            
+                            // 배송확정일 기준 2025년 10월 2일 이전 날짜 검색 불가
+                            var minDate = new Date("2025-10-02");
+                            if ($("#dateFrom").val()) {
+                                var fromDate = new Date($("#dateFrom").val());
+                                if (fromDate < minDate) {
+                                    chkValMsg = chkValMsg + "배송확정일 기준 2025년 10월 2일 이전 날짜는 검색할 수 없습니다.\n";
+                                    rtnVal = false;
+                                }
+                            }
+                            if ($("#dateTo").val()) {
+                                var toDate = new Date($("#dateTo").val());
+                                if (toDate < minDate) {
+                                    chkValMsg = chkValMsg + "배송확정일 기준 2025년 10월 2일 이전 날짜는 검색할 수 없습니다.\n";
                                     rtnVal = false;
                                 }
                             }
@@ -542,19 +560,17 @@
             var x = (new Date()).valueOf();
             for (var i = is; i < ie; i++) {
                 if (!searchRes[i]) continue;
-                
+
                 var rowId = i + 1;
                 myGrid.addRow(rowId, "");
-                
-                // 각 컬럼별로 직접 값을 설정
+
                 for (var c = 0; c < columns; c++) {
                     var colId = myGrid.getColumnId(c);
                     var colIndex = myGrid.getColIndexById(colId);
-                    var rawValue = searchRes[i][colId] !== undefined && searchRes[i][colId] !== null 
-                        ? searchRes[i][colId] 
+                    var rawValue = searchRes[i][colId] !== undefined && searchRes[i][colId] !== null
+                        ? searchRes[i][colId]
                         : "";
-                    
-                    // 뱃지가 필요한 컬럼은 HTML로 변환
+
                     var value = rawValue;
                     if (colId === "inboundYn") {
                         if (rawValue === "Y") {
@@ -563,7 +579,6 @@
                             value = '<span class="badge badge-warning">대기</span>';
                         }
                     }
-                    
                     try {
                         var cell = myGrid.cellById(rowId, colIndex);
                         if (cell) {
@@ -573,16 +588,10 @@
                         console.error("Error setting cell value for " + colId + " at row " + rowId + ":", e);
                     }
                 }
-
-                // 재입고 상태에 따른 행 색상 설정 (원본 값 사용)
                 var inboundYn = searchRes[i]["inboundYn"] || "";
-
-                // 재입고 완료 - 연두색
                 if (inboundYn === "Y") {
                     myGrid.setRowColor(rowId, "#E8F5E8");
-                }
-                // 재입고 대기 - 연한 붉은색
-                else if (inboundYn === "N") {
+                } else if (inboundYn === "N") {
                     myGrid.setRowColor(rowId, "#FFE6E6");
                 }
             }
@@ -600,7 +609,7 @@
             // 제목행 추가
             excelData.push(["재입고 대기 관리"]);
             excelData.push([""]); // 빈 행
-            
+
             // 요청된 순서로 헤더 설정
             var headers = [
                 "입고상태", "용인센터입고일", "입고처리자", "물류센터명", "AL오더", "고객사주문번호", "주문유형", "주문상태", "배송확정일",
@@ -620,7 +629,7 @@
                         break;
                     }
                 }
-                
+
                 var rowDataArray = [
                     rowData && rowData["inboundYn"] === "Y" ? "완료" : "대기", // 입고상태
                     myGrid.cellById(i, myGrid.getColIndexById("inboundDt")).getValue() || '', // 용인센터입고일
@@ -1007,19 +1016,9 @@
                 button: "dateToIcon"
             }]);
 
-            var now = new Date()
-            var year = now.getFullYear() + "";
-            var month = (now.getMonth() + 1) + "";
-            var date = now.getDate() + "";
-            if (month.length == 1) {
-                month = "0" + month;
-            }
-            if (date.length == 1) {
-                date = "0" + date;
-            }
-
-            var today = year + "-" + month + "-" + date;
-            $("#dateFrom").val(today);
+            // 배송확정일 기준 2025년 10월 2일부터 조회 가능하므로, 시작일은 2025-10-02로 설정
+            var today = new Date().toISOString().split('T')[0];
+            $("#dateFrom").val("2025-10-02");
             $("#dateTo").val(today);
 
             myCalendar.loadUserLanguage("ko");
@@ -1097,10 +1096,15 @@
     <div id="searchDiv">
         <div id="btnDiv1">
             <div class="title-container">
-                <span class="item-head title-text">
-                    재입고 대기 관리
-                </span>
-                <span class="sub-title">erp105006</span>
+                <div>
+                    <span class="item-head title-text">
+                        재입고 대기 관리
+                    </span>
+                    <span class="sub-title">erp105006</span>
+                    <div style="margin-top: 5px; color: #666; font-size: 12px;">
+                        배송확정일 기준 2025년 10월 2일부터 조회 가능
+                    </div>
+                </div>
             </div>
             <div class="btn-container">
                 <input id="btnSearch" class="action-button primary" type="button" onclick="fnObj.searchOpen.sTime()"

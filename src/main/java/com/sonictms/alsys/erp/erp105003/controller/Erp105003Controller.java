@@ -132,4 +132,31 @@ public class Erp105003Controller {
         }
         return result;
     }
+    
+    /**
+     * 입고 되돌리기 (일괄)
+     * @param voList 입고 되돌리기 정보 목록
+     * @return 처리 결과
+     */
+    @PostMapping("/erp105003RevertInbound")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> revertInbound(@RequestBody List<Erp105003VO> voList) {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            int updateCount = erp105003Service.revertInbound(voList);
+            if (updateCount > 0) {
+                result.put("success", true);
+                result.put("message", updateCount + "건의 입고가 되돌려졌습니다.");
+            } else {
+                result.put("success", false);
+                result.put("message", "입고 되돌리기에 실패했습니다. 이미 되돌려진 항목이거나 존재하지 않는 항목입니다.");
+            }
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "입고 되돌리기 처리 중 오류가 발생했습니다: " + e.getMessage());
+        }
+        
+        return ResponseEntity.ok(result);
+    }
 }

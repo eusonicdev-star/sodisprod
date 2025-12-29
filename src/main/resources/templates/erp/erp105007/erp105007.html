@@ -27,7 +27,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
 
     <script th:inline="javascript">
-        var pagePerRow =	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/
+        var pagePerRow =	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/ null;
+        var sessionUserGrntCd = /*[[${session.userGrntCd}]]*/ null;
+        var sessionAgntCd = /*[[${session.agntCd}]]*/ null;
+        var sessionAgntNm = /*[[${session.agntNm}]]*/ null;
         var myWins;
         var myGrid;
         var searchRes = [];
@@ -276,7 +279,11 @@
                         srchData.append("cmpyCd", myComboCmpyCd ? myComboCmpyCd.getSelectedValue() : "A");
                         srchData.append("soList", soListValue.replace(/\n/g, ","));
                         
+                        // 화주사 권한인 경우 본인 화주사로만 조회 강제
                         var agntListValue = $("#srchCode").val();
+                        if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200" || sessionUserGrntCd == "7788") {
+                            agntListValue = sessionAgntCd;
+                        }
                         srchData.append("agntList", agntListValue);
                     } else {
                         // 기존 조건들로 조회
@@ -285,7 +292,11 @@
                         srchData.append("fromDt", $("#dateFrom").val() ? $("#dateFrom").val().replace(/-/g, "") : "");
                         srchData.append("toDt", $("#dateTo").val() ? $("#dateTo").val().replace(/-/g, "") : "");
                         
+                        // 화주사 권한인 경우 본인 화주사로만 조회 강제
                         var agntListValue = $("#srchCode").val();
+                        if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200" || sessionUserGrntCd == "7788") {
+                            agntListValue = sessionAgntCd;
+                        }
                         srchData.append("agntList", agntListValue);
                         srchData.append("dcList", myComboDcCd ? myComboDcCd.getChecked() : "");
                         srchData.append("soList", $("#soList").val() ? $("#soList").val().replace(/\n/g, ",") : "");
@@ -557,6 +568,17 @@
                 fnObj.gridOpen.setWidth();
                 fnObj.gridOpen.setWidth();
             };
+
+            if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200" || sessionUserGrntCd == "7788") {
+                $("#srchName").val(sessionAgntNm);
+                $("#srchCode").val(sessionAgntCd);
+                $("#srchName").attr("readonly", true);
+                $("#srchCode").attr("readonly", true);
+                $("#srchName").css("color", "gray");
+                $("#srchCode").css("color", "gray");
+                $("#srchIcon").hide();
+                $("#delIcon").hide();
+            }
 
             toastr.options = {
                 closeButton: true,

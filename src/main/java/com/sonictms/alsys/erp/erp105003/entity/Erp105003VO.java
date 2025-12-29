@@ -40,6 +40,10 @@ public class Erp105003VO {
     private String completeTime;
     private String completeUser;
     
+    // 되돌리기 정보
+    private String revertUser;
+    private String deletedYn;
+    
     // 검색 조건
     private String dateFrom;
     private String dateTo;

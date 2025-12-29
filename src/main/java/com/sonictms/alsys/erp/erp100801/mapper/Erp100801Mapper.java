@@ -19,5 +19,4 @@ public interface Erp100801Mapper {
 
     //테이블에 저장된 외부업체(KPP)의 정보를 얼라이언스의 오더로 입력하기 - 화면의 그리드 한줄한줄을 넘겨받아 한번씩 한번씩 입력한다
     Erp100801VO erp100801AlOrdrSave(Erp100801VO erp100801VO);
-
 }

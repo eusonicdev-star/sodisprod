@@ -31,6 +31,9 @@
     <script th:inline="javascript">
       var environmentPagePerRow = /*[[${@environment.getProperty('common.html.pagePerRow')}]]*/ 15;
       var cmpyCd = /*[[${session.cmpyCd}]]*/ '';
+      var sessionUserGrntCd = /*[[${session.userGrntCd}]]*/ null;
+      var sessionAgntCd = /*[[${session.agntCd}]]*/ null;
+      var sessionAgntNm = /*[[${session.agntNm}]]*/ null;
     </script>
     <script type="text/javascript" src="/js/erp105010.js"></script>
 </head>

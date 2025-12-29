@@ -963,108 +963,6 @@
           }
       }
 
-
-      /********************************
-       function searchPaging(page)
-       {
-
-       //pagePerRow	=	15;	//페이지당 몇줄을 보여줄것인가
-
-       if($("#rowPerPage").val())
-       {
-       pagePerRow = parseInt($("#rowPerPage").val());
-       }
-
-       var pageRange	=	10;	//페이지범위를 몇개씩짜를것인가. 예) 23페이지 라면 1 2 3 4 5 6 7 8 9 10  이 한번 나오고 >> 누르면 11 12 13 14 15 16 17 18 19 20 나오고 >> 누르면 21 22 23 나옴
-
-       var totalPageCnt	=	searchRes.length % pagePerRow == 0 ? parseInt(searchRes.length / pagePerRow) : parseInt(searchRes.length / pagePerRow) + 1
-
-       var a="";
-
-       //패이징 처리
-       var start=(page-1);
-       var end  = (page-1)+pageRange;
-
-       if(start%pageRange != 0)
-       {
-       start = parseInt(start/pageRange)*pageRange ;
-       }
-
-       if(end%pageRange !=  0 || page == 1)
-       {
-       end = parseInt(end/pageRange)*pageRange;
-       }
-
-       if(start >= pageRange)
-       {
-       a=a +	"<input type='button' onclick='searchPaging("+1+");' value='<<'></input>";
-       a=a +	"<input type='button' onclick='searchPaging("+(start -1)+");' value='<'></input>";
-       }
-
-       var r=0;
-
-       for(r=start;r<end;r++)
-       {
-       if(r < totalPageCnt)
-       {
-       if(r+1 == page)		//현재페이지 강조
-       {
-       a=a+"<input type='button' onclick='searchPaging("+(r+1)+");' style='color:red;font-weight:bold;' value="+(r+1)+"></input>";
-       }
-       else
-       {
-       a=a+"<input type='button' onclick='searchPaging("+(r+1)+");' value="+(r+1)+"></input>";
-       }
-       }
-       }
-
-       if(end*pagePerRow  < searchRes.length )
-       {
-       a=a +	"<input type='button' onclick='searchPaging("+(end+1)+");' value='>'></input>";
-       a=a +	"<input type='button' onclick='searchPaging("+totalPageCnt+");' value='>>'></input>";
-       }
-
-       a=a+"&nbsp;&nbsp;<input type='number' maxlength=4 style='width:60px;' id='rowPerPage' value="+pagePerRow+"></input><input type='button' value='적용' onclick='searchPaging("+1+");'></input>";
-       a=a+"&nbsp;&nbsp;<i class='fa fa-calculator fa-lg' aria-hidden='true'></i>&nbsp;" + searchRes.length;
-       $("#page").html(a);
-
-       var is=(page-1)*pagePerRow;	//시작점
-       var ie=(page-1)*pagePerRow+pagePerRow;	//종료점
-
-       if(searchRes.length < ie)
-       {
-       ie = searchRes.length;
-
-       }
-
-       myGrid.clearAll(false);$("#page").html("");
-
-       var columns = myGrid.getColumnCount()
-       var i;
-       for(i=is;i<ie;i++){
-
-
-       var jsonData = {};
-       for (var c=0; c<columns; c++){
-       if(myGrid.getColumnId(c) == "no")
-       {
-       jsonData[myGrid.getColumnId(c)] = (i+1);
-       }
-       else
-       {
-       jsonData[myGrid.getColumnId(c)] = searchRes[i][myGrid.getColumnId(c)];
-       }
-       }
-
-       myGrid.addRow(i+1,"");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
-       myGrid.setRowData(i+1,jsonData);
-
-
-
-       }
-       //myGrid.addRow(i+1,"");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
-       }
-       *******************************/
       function excelDn() {
           if (!myGrid.getRowsNum()) {
               alert("엑셀다운로드 대상이 없습니다.\n조회를해주세요");
@@ -1074,11 +972,8 @@
       }
 
       $(document).ready(function () {
-
           myWins = new dhtmlXWindows();
-
           myGrid = new dhtmlXGridObject('grid');	//그리드
-
           myCalendar = new dhtmlXCalendarObject({input: "dateFrom", button: "dateFromIcon"});
           myCalendar2 = new dhtmlXCalendarObject({input: "dateTo", button: "dateToIcon"});
           var now = new Date()
@@ -1114,16 +1009,6 @@
           sessionUserGrntCd =  /*[[${session.userGrntCd}]]*/
               sessionAgntCd = /*[[${session.agntCd}]]*/
                   sessionAgntNm = /*[[${session.agntNm}]]*/
-
-                      /*
-                      $("#btnExcelDown" ).mouseover(function() {
-                          $("#btnExcelDown").val("화면에 조회된 내용을 엑셀 다운로드");
-                      });
-                      $("#btnExcelDown" ).mouseout(function() {
-                          $("#btnExcelDown").val("엑셀다운로드");
-                      });
-                      */
-
                       myCalendar.attachEvent("onChange", function (date, state) {
                           myGrid.clearAll(false);
                           $("#page").html("");
@@ -1134,13 +1019,6 @@
               $("#page").html("");
               return;
           });
-
-          /*
-          $("#refSoNoList").on("change", function() {
-              alert("refSoNoList 변경");
-              return;
-          });
-          */
           $("#refSoNoList").keyup(function () {
               myGrid.clearAll(false);
               $("#page").html("");
@@ -1285,7 +1163,6 @@
             <span class="item-head">KPP 주문번호</span>
             <span class="item-data">
               <textarea id="outSoNoList"></textarea>
-              <!-- oninput="this.value = this.value.replace(/[^0-9\n]/g, '').replace(/(\..*)\./g, '$1');" -->
             </span>
           </span>
 

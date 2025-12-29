@@ -145,17 +145,15 @@ public class Erp100801VO extends CommonVO {
 
 	//20220427 추가
 	@SerializedName("WMS_IF_FLAG")
-	private String wmsIfFlag;   //kpp데이터를 alliance가 IF해 갔냐 여부
+    private String wmsIfFlag;
 
 	@SerializedName("DLV_ORD_SUBSEQ")
-	private String dlvOrdSubseq;   //kpp쪽 보조순번
+    private String dlvOrdSubseq;
 
-	//20220625 추가
 	@SerializedName("DLV_REQ_DT")
-	private String dlvReqDt;    //배송요청일 추가
+    private String dlvReqDt;
 	@SerializedName("MEMO")
 	private String memo;        //인수증 메모
-	//20220706 정연호 추가. KPP에서 운영에 적용시켜서 갑자기 수정함
 
 	@SerializedName("DLV_PRODUCT_CD1")
 	private String dlvProductCd1;

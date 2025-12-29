@@ -48,10 +48,15 @@
     <div id="searchDiv">
         <div id="btnDiv1">
             <div class="title-container">
-                <span class="item-head title-text">
-                    교환/반품 입고 관리
-                </span>
-                <span class="sub-title">erp105005</span>
+                <div>
+                    <span class="item-head title-text">
+                        교환/반품 입고 관리
+                    </span>
+                    <span class="sub-title">erp105005</span>
+                    <div style="margin-top: 5px; color: #666; font-size: 12px;">
+                        배송확정일 기준 2025년 10월 2일부터 조회 가능
+                    </div>
+                </div>
             </div>
             <div class="btn-container">
                 <input id="btnSearch" class="action-button primary" type="button" onclick="fnObj.searchOpen.sTime()"
@@ -74,7 +79,6 @@
                        onclick="setOutboundTarget('P');"
                        value="판별중으로 변경">
                 <input id="btnExcelDown" class="action-button" type="button" onclick="excelDn();" value="엑셀 다운로드">
-                <input id="btnReport" class="action-button" type="button" onclick="viewReport();" value="리포트 보기">
                 <input id="btnReload" class="action-button" type="button"
                        onclick="location.reload(true);"
                        value="초기화">

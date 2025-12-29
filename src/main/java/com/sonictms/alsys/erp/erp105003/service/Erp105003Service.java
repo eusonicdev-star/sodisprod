@@ -45,17 +45,12 @@ public class Erp105003Service {
             throw new IllegalArgumentException("실제 입고 날짜를 입력해주세요.");
         }
         
-        System.out.println("입고 완료 처리 시작 - 상품: " + vo.getMtrlCd() + ", 수량: " + vo.getActualQuantity());
-        
         // 입고 완료 처리
         int result = erp105003Mapper.completeInbound(vo);
-        System.out.println("입고 완료 처리 결과: " + result + "건");
         
         // 재고 수량 업데이트
         if (result > 0) {
-            System.out.println("재고 업데이트 시작 - 회사: " + vo.getCmpyCd() + ", 화주: " + vo.getAgntCd() + ", 상품: " + vo.getMtrlCd());
-            int inventoryResult = erp105003Mapper.updateInventoryQuantity(vo);
-            System.out.println("재고 업데이트 결과: " + inventoryResult + "건, 상품: " + vo.getMtrlCd());
+            erp105003Mapper.updateInventoryQuantity(vo);
         }
         
         return result;
@@ -82,21 +77,14 @@ public class Erp105003Service {
             }
         }
         
-        System.out.println("일괄 입고 완료 처리 시작 - 건수: " + voList.size());
-        
         // 입고 완료 처리
         int result = erp105003Mapper.completeMultipleInbound(voList);
-        System.out.println("일괄 입고 완료 처리 결과: " + result + "건");
         
         // 재고 수량 업데이트
         if (result > 0) {
-            System.out.println("일괄 재고 업데이트 시작 - 건수: " + voList.size());
-            int inventoryResult = erp105003Mapper.updateMultipleInventoryQuantity(voList);
-            System.out.println("일괄 재고 업데이트 결과: " + inventoryResult + "건, 처리 건수: " + voList.size());
+            erp105003Mapper.updateMultipleInventoryQuantity(voList);
         }
         
-        // 실제 처리된 건수는 요청된 건수와 동일하다고 가정
-        // (단일 UPDATE 문으로 변경했으므로 정확한 건수가 반환됨)
         return result > 0 ? voList.size() : 0;
     }
     
@@ -111,5 +99,27 @@ public class Erp105003Service {
         int totalPages = (int) Math.ceil((double) totalCount / vo.getPageSize());
         vo.setTotalPages(totalPages);
         return erp105003Mapper.getInboundHistoryList(vo);
+    }
+    
+    /**
+     * 입고 되돌리기 (일괄)
+     * @param voList 입고 되돌리기 정보 목록
+     * @return 처리 결과
+     */
+    @Transactional
+    public int revertInbound(List<Erp105003VO> voList) {
+        if (voList == null || voList.isEmpty()) {
+            throw new IllegalArgumentException("되돌릴 항목이 없습니다.");
+        }
+        
+        // 입고 상태를 PENDING으로 변경
+        int result = erp105003Mapper.revertInbound(voList);
+        
+        // 재고 수량 차감
+        if (result > 0) {
+            erp105003Mapper.revertInventoryQuantity(voList);
+        }
+        
+        return result > 0 ? voList.size() : 0;
     }
 }

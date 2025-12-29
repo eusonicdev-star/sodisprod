@@ -54,4 +54,18 @@ public interface Erp105003Mapper {
      */
     List<Erp105003VO> getInboundHistoryList(Erp105003VO vo);
     int getInboundHistoryListCount(Erp105003VO vo);
+    
+    /**
+     * 입고 되돌리기 (일괄)
+     * @param voList 입고 되돌리기 정보 목록
+     * @return 처리 결과
+     */
+    int revertInbound(List<Erp105003VO> voList);
+    
+    /**
+     * 재고 수량 차감 (입고 되돌리기 시)
+     * @param voList 입고 되돌리기 정보 목록
+     * @return 처리 결과
+     */
+    int revertInventoryQuantity(List<Erp105003VO> voList);
 }

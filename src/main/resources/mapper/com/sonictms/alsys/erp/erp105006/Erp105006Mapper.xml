@@ -47,6 +47,7 @@
         )
         AND (AG.AGNT_NM IS NULL OR PATINDEX('%[가-힣]%', AG.AGNT_NM) > 0) -- 한글이 포함된 화주사명만 조회
         AND (PM.EXCHANGE_RETURN_EXCLUDE_YN IS NULL OR PM.EXCHANGE_RETURN_EXCLUDE_YN = 'N')
+        AND SM.DLVY_CNFM_DT >= '20251002' -- 배송확정일 기준 2025-10-02 이전 데이터 검색 불가
         <if test="fromDt != null and fromDt != ''">
             <choose>
                 <when test="dtType != null and (dtType == '1' or dtType == 1)">

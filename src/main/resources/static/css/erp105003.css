@@ -377,6 +377,7 @@
   margin-bottom: 20px;
 }
 
+/* 테이블 헤더 */
 .table-header {
   background: #f8f9fa;
   padding: 16px 20px;
@@ -387,6 +388,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
 
 .table-header span {
@@ -402,6 +404,18 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
+}
+
+.table-header .btn-danger {
+  background: #dc3545;
+  border-color: #dc3545;
+  color: #fff;
+}
+
+.table-header .btn-danger:hover {
+  background: #c82333;
+  border-color: #c82333;
 }
 
 /* 데이터 테이블 */

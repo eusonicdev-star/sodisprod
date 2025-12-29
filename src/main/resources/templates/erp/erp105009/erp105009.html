@@ -28,6 +28,9 @@
 
     <script th:inline="javascript">
         var pagePerRow =	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/
+        var sessionUserGrntCd = /*[[${session.userGrntCd}]]*/ null;
+        var sessionAgntCd = /*[[${session.agntCd}]]*/ null;
+        var sessionAgntNm = /*[[${session.agntNm}]]*/ null;
         var myWins;
         var myGrid;
         var searchRes = [];
@@ -220,7 +223,6 @@
             gridOpen: {
                 grid: function () {
                     myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
-
                     myGrid.setHeader("화주,주문유형,주문상태,물류센터,배송확정일,공장출고일,상차완료일,AL오더,고객사주문번호,수취인,팔렛트번호,시공기사,배송상태,상품코드(HAWA),상품명(HAWA),수량(HAWA),택배사,송장번호,출고일자");
                     myGrid.setColumnIds("agntNm,soTypeNm,soStatNm,dcNm,dlvyCnfmDt,giLiftDt,liftCmplDt,soNo,refSoNo,acptEr,paltNoxx,instEr,dlvyStatNm,cprodCd,cprodNm,cqty,courierNm,waybillNo,outboundDt");
                     myGrid.setInitWidths("100,100,100,100,120,120,120,120,150,120,100,100,100,120,200,80,120,150,100");
@@ -228,7 +230,6 @@
                     myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
                     myGrid.setColSorting("str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str");
                     myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
-
                     myGrid.init();
                     myGrid.enableSmartRendering(true);
                     myGrid.enablePreRendering(10);
@@ -238,7 +239,6 @@
                     myGrid.enableEditEvents(true, false, false);
                     myGrid.enableBlockSelection(true);
                     myGrid.attachEvent("onKeyPress", fnObj.keyOpen.onKeyPressed);
-
                 },
                 setWidth: function () {
                     c_width = top.myLayout.cells("c").getWidth();
@@ -246,10 +246,8 @@
                     searchDiv2nd_height = $("#searchDiv2nd").height();
                     page_height = $("#page").height();
                     xhdr_height = $(".xhdr").height();
-
                     myGrid.enableAutoWidth(true, c_width - 25, 100);
                     myGrid.enableAutoHeight(true, window.innerHeight - searchDiv_height - searchDiv2nd_height - page_height - xhdr_height - 30);
-
                     $("#searchDiv").width(c_width - 25);
                     $("#searchDiv2nd").width(c_width - 25);
                 },
@@ -276,7 +274,11 @@
                         srchData.append("cmpyCd", myComboCmpyCd ? myComboCmpyCd.getSelectedValue() : "A");
                         srchData.append("soList", soListValue.replace(/\n/g, ","));
                     
+                        // 화주사 권한인 경우 본인 화주사로만 조회 강제
                         var agntListValue = $("#srchCode").val();
+                        if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200" || sessionUserGrntCd == "7788") {
+                            agntListValue = sessionAgntCd;
+                        }
                         srchData.append("agntList", agntListValue);
                     } else {
                         // 기존 조건들로 조회
@@ -285,7 +287,11 @@
                         srchData.append("fromDt", $("#dateFrom").val() ? $("#dateFrom").val().replace(/-/g, "") : "");
                         srchData.append("toDt", $("#dateTo").val() ? $("#dateTo").val().replace(/-/g, "") : "");
                         
+                        // 화주사 권한인 경우 본인 화주사로만 조회 강제
                         var agntListValue = $("#srchCode").val();
+                        if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200" || sessionUserGrntCd == "7788") {
+                            agntListValue = sessionAgntCd;
+                        }
                         srchData.append("agntList", agntListValue);
                         srchData.append("dcList", myComboDcCd ? myComboDcCd.getChecked() : "");
                         srchData.append("soList", $("#soList").val() ? $("#soList").val().replace(/\n/g, ",") : "");
@@ -566,6 +572,17 @@
                 fnObj.gridOpen.setWidth();
                 fnObj.gridOpen.setWidth();
             };
+
+            if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200" || sessionUserGrntCd == "7788") {
+                $("#srchName").val(sessionAgntNm);
+                $("#srchCode").val(sessionAgntCd);
+                $("#srchName").attr("readonly", true);
+                $("#srchCode").attr("readonly", true);
+                $("#srchName").css("color", "gray");
+                $("#srchCode").css("color", "gray");
+                $("#srchIcon").hide();
+                $("#delIcon").hide();
+            }
 
             toastr.options = {
                 closeButton: true,
