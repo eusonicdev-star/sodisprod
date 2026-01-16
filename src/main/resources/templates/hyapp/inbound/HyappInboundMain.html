@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>입고 예정 조회</title>
+    <style>
+        body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:#f7f7f7; }
+        header { position: sticky; top:0; background:#fff; border-bottom:1px solid #e5e5e5; padding:12px 16px; }
+        h1 { margin:0; font-size:16px; }
+        main { padding:16px; padding-bottom: 24px; }
+
+        .row { display:flex; gap:10px; align-items:center; }
+        .row > * { flex: none; }
+        .date { flex: 1; padding:12px; border:1px solid #ddd; border-radius:10px; background:#fff; font-size:16px; height:44px; }
+        .btn { padding:12px 14px; border:1px solid #ddd; border-radius:10px; background:#fff; font-size:16px; cursor:pointer; height:44px; }
+        .btn:disabled { opacity: .6; cursor: not-allowed; }
+
+        .status { margin:12px 0; font-size:13px; color:#555; }
+        .card { background:#fff; border:1px solid #e8e8e8; border-radius:14px; padding:14px; margin:10px 0; }
+        .title { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+        .title b { font-size:15px; }
+
+        .meta { margin-top:10px; font-size:14px; color:#333; display:grid; gap:8px; }
+        .meta div { display:flex; justify-content:space-between; gap:10px; }
+        .meta span { color:#666; }
+
+        .badge {
+            font-size:12px; padding:4px 8px; border-radius:999px;
+            border:1px solid #ddd; background:#fafafa; color:#444; white-space:nowrap;
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <h1>입고 예정 조회</h1>
+</header>
+
+<main>
+    <!-- ? 선택된 TBL_INBOUND_PRODUCT_ID 보관 -->
+    <input type="hidden" id="tblInboundProductIdHidden" value="" />
+    <div class="row">
+        <input id="dateInput" class="date" type="date" />
+        <button id="searchBtn" class="btn">조회</button>
+    </div>
+    <!-- ? 상품 바코드로 조회 버튼(조회 버튼 밑) -->
+    <div class="row" style="margin-top:10px;">
+        <button id="barcodeBtn" class="btn" style="flex:1;">상품 바코드로 조회</button>
+    </div>
+
+    <div id="status" class="status"></div>
+    <div id="list"></div>
+</main>
+
+<script>
+    // ? 날짜 1개로 from/to 동일하게 보내서 /erp105003PendingList 호출
+    // 컨트롤러 응답: { success, data, totalCount, totalPages, currentPage, pageSize } :contentReference[oaicite:2]{index=2}
+    async function fetchInboundPlanByDate(yyyy_mm_dd) {
+        const body = {
+            dateFrom: yyyy_mm_dd,
+            dateTo: yyyy_mm_dd,
+            pageNum: 1,
+            pageSize: 50
+        };
+
+        const res = await fetch("/erp105003PendingList", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+
+        if (!json?.success) throw new Error(json?.message || "조회 실패");
+
+        return {
+            items: Array.isArray(json.data) ? json.data : [],
+            totalCount: Number(json.totalCount ?? 0)
+        };
+    }
+
+
+    // ===== UI 로직(기존 파일 스타일 유지) =====
+    const dateInput = document.getElementById('dateInput');
+    const searchBtn  = document.getElementById('searchBtn');
+    const statusEl   = document.getElementById('status');
+    const listEl     = document.getElementById('list');
+
+
+    // ? 추가
+    const barcodeBtn = document.getElementById('barcodeBtn');
+    barcodeBtn.addEventListener('click', () => {
+        location.href = "/hyapp/in_barcode";
+    });
+
+    function todayLocalISO() {
+        const d = new Date();
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    // ? 검색 날짜 저장 키 (뒤로가기/재진입 시 동일 날짜로 조회되게)
+    const INBOUND_SEARCH_DATE_KEY = "INBOUND_SEARCH_DATE";
+
+    function restoreDateAndLoad() {
+        const saved = sessionStorage.getItem(INBOUND_SEARCH_DATE_KEY);
+        if (saved) {
+            dateInput.value = saved;
+        } else {
+            dateInput.value = todayLocalISO();
+        }
+        load();
+    }
+
+    // ? 뒤로가기(bfcache)로 복원된 경우도 동일하게 처리
+    window.addEventListener("pageshow", (event) => {
+        if (event.persisted) {
+            restoreDateAndLoad();
+        }
+    });
+
+    function setStatus(text) { statusEl.textContent = text || ""; }
+
+    function escapeHtml(s) {
+        return String(s ?? "").replace(/[&<>"']/g, m => ({
+            "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+        }[m]));
+    }
+
+    function pick(obj, keys) {
+        for (const k of keys) {
+            const v = obj?.[k];
+            if (v !== undefined && v !== null && String(v) !== "") return v;
+        }
+        return "";
+    }
+
+    // ? 화면에: 화주사명, 상품코드, 상품명, 수량만 표시
+    function render(items) {
+        if (!items || items.length === 0) {
+            listEl.innerHTML = `<div class="card">조회된 입고 예정 정보가 없습니다.</div>`;
+            return;
+        }
+
+        listEl.innerHTML = items.map(it => {
+            // ? VO/쿼리 결과에 맞춘 키 (필요 시 mapper select alias에 맞춰 한 번만 수정)
+            const agntNm = pick(it, ["agntNm", "AGNT_NM"]);
+            const mtrlCd = pick(it, ["mtrlCd", "MTRL_CD"]);
+            const mtrlNm = pick(it, ["mtrlNm", "MTRL_NM"]);
+            const qty    = pick(it, ["inboundQuantity", "INBOUND_QUANTITY", "qty", "QTY"]);
+
+            return `
+      <div class="card">
+        <div class="title">
+          <b>${escapeHtml(agntNm || "-")}</b>
+          <span class="badge">입고예정</span>
+        </div>
+        <div class="meta">
+          <div><span>상품코드</span><b>${escapeHtml(mtrlCd || "-")}</b></div>
+          <div><span>상품명</span><b>${escapeHtml(mtrlNm || "-")}</b></div>
+          <div><span>수량</span><b>${escapeHtml(qty ?? "-")}</b></div>
+        </div>
+      </div>
+    `;
+        }).join("");
+    }
+
+    let lastReq = 0;
+    async function load() {
+        const date = dateInput.value;
+        // ? 현재 조회 날짜를 저장(뒤로가기 시 화면/조회 날짜 불일치 방지)
+        sessionStorage.setItem(INBOUND_SEARCH_DATE_KEY, date);
+        if (!date) return;
+
+        const reqId = ++lastReq;
+        searchBtn.disabled = true;
+        setStatus("조회 중...");
+        listEl.innerHTML = "";
+
+        try {
+            const res = await fetchInboundPlanByDate(date);
+            if (reqId !== lastReq) return; // 최신 요청만 반영
+
+            const items = res?.items ?? [];
+            const total = (res?.totalCount ?? items.length);
+            setStatus(`조회일자: ${date} · ${total}건`);
+            render(items);
+
+        } catch (e) {
+            if (reqId !== lastReq) return;
+            setStatus(`조회 중 오류: ${e.message}`);
+            listEl.innerHTML = `<div class="card">네트워크/서버 상태를 확인해주세요.</div>`;
+        } finally {
+            if (reqId === lastReq) searchBtn.disabled = false;
+        }
+    }
+    // 초기값/복원
+    // 이벤트
+    searchBtn.addEventListener('click', load);
+    dateInput.addEventListener('change', load); // 날짜 바꾸면 자동 조회 (원치 않으면 삭제)
+    // 진입 시 1회 (저장된 날짜가 있으면 그 날짜로)
+    restoreDateAndLoad();
+
+    function render(items) {
+        if (!items || items.length === 0) {
+            listEl.innerHTML = `<div class="card">조회된 입고 예정 정보가 없습니다.</div>`;
+            return;
+        }
+
+        // 카드 클릭 이벤트를 위해, index 기반으로 렌더링
+        listEl.innerHTML = items.map((it, idx) => {
+            const agntNm = pick(it, ["agntNm", "AGNT_NM"]);
+            const mtrlCd = pick(it, ["mtrlCd", "MTRL_CD"]);
+            const mtrlNm = pick(it, ["mtrlNm", "MTRL_NM"]);
+            const qty    = pick(it, ["inboundQuantity", "INBOUND_QUANTITY", "qty", "QTY"]);
+
+            return `
+        <div class="card inbound-card" data-idx="${idx}" style="cursor:pointer;">
+          <div class="title">
+            <b>${escapeHtml(agntNm || "-")}</b>
+            <span class="badge">입고예정</span>
+          </div>
+          <div class="meta">
+            <div><span>상품코드</span><b>${escapeHtml(mtrlCd || "-")}</b></div>
+            <div><span>상품명</span><b>${escapeHtml(mtrlNm || "-")}</b></div>
+            <div><span>수량</span><b>${escapeHtml(qty ?? "-")}</b></div>
+          </div>
+        </div>
+      `;
+
+        }).join("");
+
+        // ? 클릭 핸들러 바인딩 (이벤트 위임)
+        listEl.onclick = (e) => {
+            const card = e.target.closest(".inbound-card");
+            if (!card) return;
+
+            const idx = Number(card.dataset.idx);
+            const selected = items[idx];
+
+            // ? 키값 추출 (API 응답 키에 맞춰 pick)
+            const inboundId = pick(selected, ["tblInboundProductId", "TBL_INBOUND_PRODUCT_ID", "tbl_inbound_product_id"]);
+
+            // ? hidden input에 보관
+            const hiddenEl = document.getElementById("tblInboundProductIdHidden");
+            if (hiddenEl) hiddenEl.value = inboundId ?? "";
+
+            // 기존 방식 유지: 선택 데이터도 저장(상세에서 화면 표시 용도)
+            sessionStorage.setItem("HYAPP_INBOUND_SELECTED", JSON.stringify({
+                selected,
+                selectedAt: Date.now()
+            }));
+
+            // ? 상세 페이지 호출 시 쿼리스트링으로 ID 전달
+            const qs = inboundId ? (`?tblInboundProductId=${encodeURIComponent(inboundId)}`) : "";
+            location.href = "/hyapp/in_ass" + qs; // => HyappInboundAcc.html
+        };
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.hyapp.outbound.mapper.HyappOutboundMapper">
+
+    <select id="selectPickListByDlvyCnfmDt"
+            parameterType="map"
+            resultType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO">
+	        <![CDATA[
+        SELECT
+            ISNULL(M.OUT_CMPY_CD, '')            AS outCmpyCd,
+            M.CMPY_CD                            AS cmpyCd,
+            M.TBL_SO_M_ID                        AS tblSoMId,
+            M.AGNT_CD                            AS agntCd,
+            DBO.F_COL_NM(M.CMPY_CD,'AGNT_CD','AGNT_CD',M.AGNT_CD) AS agntNm,
+            M.SO_NO                              AS soNo,
+            M.SO_TYPE                            AS soType,
+            M.SO_STAT_CD                         AS soStatCd,
+            M.MALL_CD                            AS mallCd,
+            M.ACPT_ER                            AS acptEr,
+            M.POST_CD                            AS postCd,
+            M.ADDR1                              AS addr1,
+            M.ADDR2                              AS addr2,
+            LEFT(M.ADDR1, 15)                    AS smplAddr,
+            M.DLVY_RQST_MSG                      AS dlvyRqstMsg,
+            M.CUST_SPCL_TXT                      AS custSpclTxt,
+            M.MAP_Y                              AS mapY,
+            M.MAP_X                              AS mapX,
+            M.ZONE_TYPE                          AS zoneType,
+            M.ZONE_CD                            AS zoneCd,
+            M.DC_CD                              AS dcCd,
+            M.DLVY_CNFM_DT                       AS dlvyCnfmDt,
+            M.RQST_DT                            AS rqstDt,
+
+            -- 합계
+            SUM(P.QTY)                           AS qty,
+            ROUND(SUM(MM.CBM * P.QTY), 2)        AS cbm,
+            SUM(P.INST_COST * P.QTY)             AS instCost,
+
+            -- 기사앱/전송 상태(있으면)
+            ISNULL(IP.MOBILE_TRAN_YN,'N')        AS mobileTranYn
+        FROM TBL_SO_M M WITH(NOLOCK)
+            JOIN TBL_SO_P P WITH(NOLOCK)
+        ON M.TBL_SO_M_ID = P.TBL_SO_M_ID
+            JOIN TBL_MTRL_M MM WITH(NOLOCK)
+        ON P.PROD_CD = MM.MTRL_CD AND MM.USE_YN='Y'
+            LEFT JOIN TBL_INST_PLAN_M IP WITH(NOLOCK)
+        ON M.TBL_SO_M_ID = IP.TBL_SO_M_ID
+        WHERE
+            M.USE_YN='Y'
+          AND P.USE_YN='Y'
+          AND M.CMPY_CD = #{cmpyCd}
+          AND M.DC_CD = #{dcCd}
+          AND M.SO_STAT_CD >= '2000'
+          AND M.SO_TYPE NOT IN ('4000','4200','9905','9906')
+          AND M.SO_STAT_CD NOT IN ('8050')
+          AND M.DLVY_CNFM_DT BETWEEN REPLACE(#{fromDt},'-','') AND REPLACE(#{toDt},'-','')
+        -- 피킹 대상으로만 뽑으려면(권장)
+          AND ISNULL(IP.MOBILE_TRAN_YN,'N') <> 'Y'
+        GROUP BY
+            ISNULL(M.OUT_CMPY_CD,''),
+            M.CMPY_CD, M.TBL_SO_M_ID, M.AGNT_CD, M.SO_NO, M.SO_TYPE, M.SO_STAT_CD,
+            M.MALL_CD, M.ACPT_ER, M.POST_CD, M.ADDR1, M.ADDR2, M.DLVY_RQST_MSG, M.CUST_SPCL_TXT,
+            M.MAP_Y, M.MAP_X, M.ZONE_TYPE, M.ZONE_CD, M.DC_CD, M.DLVY_CNFM_DT, M.RQST_DT,
+            ISNULL(IP.MOBILE_TRAN_YN,'N')
+        ORDER BY
+            M.DLVY_CNFM_DT, M.SO_NO;
+        ]]>
+
+    </select>
+</mapper>

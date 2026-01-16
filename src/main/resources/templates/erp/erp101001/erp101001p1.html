@@ -23,7 +23,7 @@
     <script type="text/javascript" src="/js/commCode.js"></script>
 
     <script th:inline="javascript">
-        var pagePerRow =	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/	//페이지당 몇줄을 보여줄것인가
+        var pagePerRow =	10;/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/	//페이지당 몇줄을 보여줄것인가
         var srchInput;
         fnObj = {
             winOpen: {},	//END of winOpen:{

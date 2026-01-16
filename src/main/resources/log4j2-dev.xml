@@ -28,7 +28,7 @@
 		</Root>
 		
 		<!-- 스프링 프레임워크에서 찍는건 level을 info로 설정 -->
-		<logger name="org.springframework.*" level="info"	additivity="false">
+		<logger name="org.springframework.*" level="error"	additivity="false">
 			<AppenderRef ref="console" />
 			<AppenderRef ref="file" />
 		</logger>
@@ -40,7 +40,7 @@
 		</logger>
 
 		<!-- SQL Logger - DEV 환경에서는 비활성화 -->
-		<logger name="jdbc.sqlonly" level="error" additivity="false">
+		<logger name="jdbc.sqlonly" level="debug" additivity="false">
 			<AppenderRef ref="console" />
 			<AppenderRef ref="file" />
 		</logger>
