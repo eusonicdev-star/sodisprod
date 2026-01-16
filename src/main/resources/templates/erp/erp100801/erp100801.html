@@ -612,8 +612,10 @@
 
                   var ajaxUrl;
                   var srchData = {};
+                  alert(myComboOutCmpyCd.getSelectedValue());
                   if (myComboOutCmpyCd.getSelectedValue() == "KPP") {
                       ajaxUrl = "/kppSearch";
+                    alert(myComboOutCmpyCd);
                       srchData.outCmpyCd = myComboOutCmpyCd.getSelectedValue();
                       srchData.dlvDtFrom = $("#dateFrom").val().replace(/-/g, "");
                       srchData.dlvDtTo = $("#dateTo").val().replace(/-/g, "");

@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>로케이션/존 이동 (HyappMove)</title>
+    <style>
+        :root { --bg:#f7f7f7; --card:#fff; --bd:#e8e8e8; --txt:#111; --sub:#666; --blue:#0369a1; --light-blue:#eef7ff; }
+        body { margin:0; font-family: system-ui, -apple-system, sans-serif; background:var(--bg); color:var(--txt); }
+        header { position: sticky; top:0; background:#fff; border-bottom:1px solid #e5e5e5; padding:12px 16px; z-index:10; }
+        h1 { margin:0; font-size:16px; }
+        main { padding:16px; padding-bottom:40px; }
+
+        .step-container { display: flex; justify-content: space-between; margin-bottom: 16px; background: #fff; padding: 12px; border-radius: 14px; border: 1px solid var(--bd); }
+        .step { font-size: 11px; color: #ccc; text-align: center; flex: 1; }
+        .step.active { color: var(--blue); font-weight: bold; border-bottom: 2px solid var(--blue); padding-bottom: 4px; }
+
+        .card { background:var(--card); border:1px solid var(--bd); border-radius:14px; padding:14px; margin-bottom:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .label { font-size:13px; font-weight:600; margin-bottom:8px; display:block; color: var(--sub); }
+        .row { display:flex; gap:8px; align-items:center; }
+        .input, select { width:100%; padding:12px; border:1px solid #ddd; border-radius:10px; font-size:16px; box-sizing:border-box; height: 44px; background:#fff; }
+        .btn { padding:12px 14px; border:1px solid #ddd; border-radius:10px; background:#fff; font-size:14px; cursor:pointer; height: 44px; white-space:nowrap; }
+        .btn.dark { background:#111; color:#fff; border-color:#111; }
+        .btn.primary { background:var(--blue); color:#fff; border-color:var(--blue); width: 100%; font-weight: 600; margin-top: 10px; }
+        .btn:disabled { opacity: 0.5; cursor:not-allowed; }
+
+        .stock-item { border: 1px solid #eee; border-radius: 10px; padding: 12px; margin-top: 8px; cursor: pointer; }
+        .stock-item.selected { border-color: var(--blue); background: var(--light-blue); }
+        .stock-item b { font-size: 14px; display: block; }
+        .stock-item span { font-size: 12px; color: var(--sub); }
+
+        .status { margin: 10px 0; font-size: 13px; color: #555; min-height: 18px; text-align: center; }
+        .hint { font-size: 12px; color: #666; margin-top: 8px; line-height: 1.4; }
+
+        /* 토글(LOC / ZONE) */
+        .toggle {
+            display:flex; gap:8px; align-items:center;
+            padding:6px; border:1px solid var(--bd); border-radius:999px;
+            background:#fff; width:max-content;
+            margin-bottom:10px;
+        }
+        .toggle button{
+            border:0; background:transparent; padding:8px 12px; border-radius:999px;
+            font-size:13px; cursor:pointer; color:#555;
+        }
+        .toggle button.active{
+            background:var(--blue); color:#fff; font-weight:700;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>재고 이동 (로케이션 / 존)</h1>
+</header>
+
+<main>
+    <div class="step-container">
+        <div id="step1" class="step active">1.출발지</div>
+        <div id="step2" class="step">2.상품 선택</div>
+        <div id="step3" class="step">3.목적지</div>
+    </div>
+
+    <div id="status" class="status">이동할 출발지를 선택하세요.</div>
+
+    <div class="card" id="sec1">
+        <!-- ✅ 토글: 출발 로케이션 위 -->
+        <div class="toggle" aria-label="이동 모드 토글">
+            <button type="button" id="modeLocBtn" class="active" onclick="setMoveMode('LOC')">로케이션</button>
+            <button type="button" id="modeZoneBtn" onclick="setMoveMode('ZONE')">존</button>
+        </div>
+
+        <label class="label" id="fromLabel">출발 로케이션 (From)</label>
+
+        <!-- LOC 모드 UI -->
+        <div id="fromLocBox">
+            <div class="row">
+                <input id="fromLocInput" class="input" placeholder="바코드 스캔 또는 입력" />
+                <button class="btn dark" id="fromScanBtn" type="button" onclick="requestScan('FROM')">스캔</button>
+                <button class="btn" id="loadBtn" type="button" onclick="loadStock()">조회</button>
+            </div>
+            <div class="hint">* 로케이션 모드: 출발/도착 로케이션 바코드를 스캔하여 이동합니다.</div>
+        </div>
+
+        <!-- ZONE 모드 UI -->
+        <div id="fromZoneBox" style="display:none;">
+            <div class="row">
+                <select id="fromZoneSelect">
+                    <option value="">출발 존 선택</option>
+                </select>
+                <button class="btn" type="button" onclick="loadStock()">조회</button>
+            </div>
+            <div class="hint">
+                * 존 모드: 출발 존을 선택하면 “존에 1:1 매핑된 대표 로케이션”으로 변환하여 재고를 조회/이동합니다.<br/>
+                * 대표 로케이션 조회 API(예): <code>/hyapp/api/wh/loc/by-zone?zoneId=</code>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" id="sec2" style="display:none;">
+        <label class="label">이동할 상품 선택</label>
+        <div id="stockList"></div>
+
+        <div id="qtySection" style="display:none; margin-top:15px; border-top:1px solid #eee; padding-top:15px;">
+            <label class="label">이동 수량 (최대 <span id="maxQty">0</span>)</label>
+            <div class="row">
+                <input id="moveQtyInput" class="input" type="number" inputmode="numeric" />
+                <button class="btn" type="button" onclick="fillMax()">최대</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" id="sec3" style="display:none;">
+        <label class="label" id="toLabel">목적 로케이션 (To)</label>
+
+        <!-- LOC 모드 목적지 -->
+        <div id="toLocBox">
+            <div class="row">
+                <input id="toLocInput" class="input" placeholder="바코드 스캔 또는 입력" />
+                <button class="btn dark" id="toScanBtn" type="button" onclick="requestScan('TO')">스캔</button>
+            </div>
+        </div>
+
+        <!-- ZONE 모드 목적지 -->
+        <div id="toZoneBox" style="display:none;">
+            <div class="row">
+                <select id="toZoneSelect">
+                    <option value="">도착 존 선택</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn primary" id="saveBtn" type="button" onclick="saveMove()">재고 이동 저장</button>
+    </div>
+</main>
+
+<script>
+    // =====================
+    // 전역 상태 및 파라미터
+    // =====================
+    const urlParams = new URLSearchParams(window.location.search);
+    const CMPY_CD = urlParams.get('cmpyCd') || 'A';
+    const USER_ID = urlParams.get('userId') || 'ADMIN';
+
+    let moveMode = 'LOC'; // 'LOC' | 'ZONE'
+    let scanTarget = null;
+    let selectedStock = null;
+    let items = [];
+
+    let zones = []; // zone list cache
+
+    const statusEl = document.getElementById("status");
+    const saveBtn = document.getElementById("saveBtn");
+
+    const fromLocInput = document.getElementById("fromLocInput");
+    const toLocInput = document.getElementById("toLocInput");
+    const fromZoneSelect = document.getElementById("fromZoneSelect");
+    const toZoneSelect = document.getElementById("toZoneSelect");
+
+    // =====================
+    // util
+    // =====================
+    function escapeHtml(s) {
+        return String(s ?? "").replace(/[&<>"']/g, m => ({
+            "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+        }[m]));
+    }
+
+    function isStorageZone(z){
+        const type = String(z?.zoneType || z?.ZONE_TYPE || "").toUpperCase();
+        const cd   = String(z?.zoneCd   || z?.ZONE_CD   || "").toUpperCase();
+        const nm   = String(z?.zoneNm   || z?.ZONE_NM   || "");
+        return type === "STORAGE" || cd === "STORAGE" || nm.includes("보관");
+    }
+
+    function getZoneById(zoneId){
+        return zones.find(z => String(z.zoneId ?? z.ZONE_ID ?? "") === String(zoneId));
+    }
+
+    function forceLocModeForStorage(message){
+        alert(message || "보관랙(보관존)은 '존 이동' 대상이 아닙니다.\n로케이션 이동으로 처리해주세요.");
+        setMoveMode('LOC');
+        fromZoneSelect.value = "";
+        toZoneSelect.value = "";
+        fromLocInput.focus();
+    }
+
+    // =====================
+    // 모드 토글
+    // =====================
+    function setMoveMode(mode){
+        moveMode = mode;
+
+        // toggle UI
+        document.getElementById('modeLocBtn').classList.toggle('active', mode === 'LOC');
+        document.getElementById('modeZoneBtn').classList.toggle('active', mode === 'ZONE');
+
+        // from UI
+        document.getElementById('fromLocBox').style.display  = (mode === 'LOC') ? 'block' : 'none';
+        document.getElementById('fromZoneBox').style.display = (mode === 'ZONE') ? 'block' : 'none';
+
+        // to UI
+        document.getElementById('toLocBox').style.display  = (mode === 'LOC') ? 'block' : 'none';
+        document.getElementById('toZoneBox').style.display = (mode === 'ZONE') ? 'block' : 'none';
+
+        // labels
+        document.getElementById('fromLabel').textContent = (mode === 'LOC') ? '출발 로케이션 (From)' : '출발 존 (From Zone)';
+        document.getElementById('toLabel').textContent   = (mode === 'LOC') ? '목적 로케이션 (To)'   : '도착 존 (To Zone)';
+
+        // reset step & selections
+        resetFlow();
+
+        statusEl.textContent = (mode === 'LOC')
+            ? '이동할 로케이션을 스캔/입력하세요.'
+            : '이동할 출발 존을 선택하세요.';
+    }
+
+    function resetFlow(){
+        selectedStock = null;
+        items = [];
+        document.getElementById("stockList").innerHTML = "";
+        document.getElementById("qtySection").style.display = "none";
+        document.getElementById("moveQtyInput").value = "";
+        document.getElementById("maxQty").textContent = "0";
+        document.getElementById("toLocInput").value = "";
+        setStep(1);
+    }
+
+    // =====================
+    // 바코드 스캔 (Native 연동) - LOC 모드에서만 사용
+    // =====================
+    function requestScan(target) {
+        if (moveMode !== 'LOC') {
+            alert("존 모드에서는 스캔을 사용하지 않습니다. 존을 선택해주세요.");
+            return;
+        }
+
+        scanTarget = target;
+        if (window.ReactNativeWebView && typeof window.ReactNativeWebView.postMessage === "function") {
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: "requestBarcodeScan", target: target }));
+            statusEl.textContent = `${target === 'FROM' ? '출발지' : '목적지'} 스캔 중...`;
+        } else {
+            alert("앱 환경에서만 스캔이 가능합니다.");
+        }
+    }
+
+    function handleFromNative(raw) {
+        try {
+            const data = (typeof raw === "string") ? JSON.parse(raw) : raw;
+            if (data && (data.type === "locBarcode" || data.type === "barcode")) {
+                const code = String(data.value ?? "").trim();
+                if (scanTarget === "FROM") {
+                    fromLocInput.value = code;
+                    loadStock();
+                } else if (scanTarget === "TO") {
+                    toLocInput.value = code;
+                    statusEl.textContent = "목적지 스캔 완료";
+                }
+                scanTarget = null;
+            }
+        } catch (e) {
+            const code = String(raw ?? "").trim();
+            if (!code) return;
+            if (scanTarget === "FROM") { fromLocInput.value = code; loadStock(); }
+            else if (scanTarget === "TO") { toLocInput.value = code; statusEl.textContent = "목적지 스캔 완료"; }
+            scanTarget = null;
+        }
+    }
+    window.addEventListener("message", (e) => handleFromNative(e.data));
+    document.addEventListener("message", (e) => handleFromNative(e.data));
+
+    // =====================
+    // 존 목록 로딩 (DB)
+    // =====================
+    async function loadZones(){
+        try{
+            const res = await fetch('/hyapp/api/wh/zone/list', { method:'GET' });
+            const list = await res.json();
+
+            const rawZones = Array.isArray(list) ? list : (list.items || list.list || []);
+            zones = rawZones;
+
+            // ✅ UI에서는 STORAGE(보관랙) 제거
+            const uiZones = rawZones.filter(z => !isStorageZone(z));
+
+            const fromSel = fromZoneSelect;
+            const toSel   = toZoneSelect;
+
+            const optHtml = [`<option value="">선택</option>`].concat(
+                uiZones.map(z => {
+                    const zoneId = z.zoneId ?? z.ZONE_ID ?? '';
+                    const zoneCd = z.zoneCd ?? z.ZONE_CD ?? '';
+                    const zoneNm = z.zoneNm ?? z.ZONE_NM ?? '';
+                    const label = (zoneNm || zoneCd || String(zoneId)).trim();
+                    const extra = zoneCd ? ` (${escapeHtml(zoneCd)})` : '';
+                    return `<option value="${escapeHtml(String(zoneId))}">${escapeHtml(label)}${extra}</option>`;
+                })
+            ).join('');
+
+            fromSel.innerHTML = optHtml.replace('<option value="">선택</option>', '<option value="">출발 존 선택</option>');
+            toSel.innerHTML   = optHtml.replace('<option value="">선택</option>', '<option value="">도착 존 선택</option>');
+
+        }catch(e){
+            console.error(e);
+            fromZoneSelect.innerHTML = `<option value="">존 조회 실패</option>`;
+            toZoneSelect.innerHTML   = `<option value="">존 조회 실패</option>`;
+        }
+    }
+
+    // =====================
+    // 존 -> 대표 로케이션(LOC_CD) 변환
+    // =====================
+    async function resolveZoneToLocCd(zoneId){
+        const url = `/hyapp/api/wh/loc/by-zone?zoneId=${encodeURIComponent(zoneId)}`;
+        const res = await fetch(url, { method:'GET' });
+
+        if (!res.ok) throw new Error(`대표 로케이션 조회 실패 (HTTP ${res.status})`);
+
+        const data = await res.json();
+        const locCd = data?.locCd ?? data?.LOC_CD ?? data?.locBarcode ?? data?.LOC_BARCODE;
+        if (!locCd) throw new Error("대표 로케이션(LOC_CD) 응답이 없습니다.");
+        return String(locCd).trim();
+    }
+
+    // ✅ (안전장치) 존 선택 이벤트: 혹시 storage가 들어오면 로케이션 모드로 전환
+    fromZoneSelect.addEventListener("change", () => {
+        const z = getZoneById(fromZoneSelect.value);
+        if (z && isStorageZone(z)) {
+            forceLocModeForStorage("보관랙(보관존)은 존 이동 기능이 아닙니다.\n로케이션 이동으로 처리해주세요.");
+        }
+    });
+    toZoneSelect.addEventListener("change", () => {
+        const z = getZoneById(toZoneSelect.value);
+        if (z && isStorageZone(z)) {
+            forceLocModeForStorage("보관랙(보관존)은 존 이동 기능이 아닙니다.\n로케이션 이동으로 처리해주세요.");
+        }
+    });
+
+    // =====================
+    // 재고 조회
+    // =====================
+    async function loadStock() {
+        resetFlow();
+
+        let fromLocCd = '';
+        if (moveMode === 'LOC') {
+            fromLocCd = (fromLocInput.value || '').trim();
+            if(!fromLocCd) return alert("로케이션을 입력하세요.");
+        } else {
+            const fromZoneId = (fromZoneSelect.value || '').trim();
+            if(!fromZoneId) return alert("출발 존을 선택하세요.");
+
+            const z = getZoneById(fromZoneId);
+            if (z && isStorageZone(z)) {
+                forceLocModeForStorage("보관랙(보관존)은 존 이동 기능이 아닙니다.\n로케이션 이동으로 처리해주세요.");
+                return;
+            }
+
+            statusEl.textContent = "출발 존 대표 로케이션 확인 중...";
+            try{
+                fromLocCd = await resolveZoneToLocCd(fromZoneId);
+            }catch(err){
+                alert(
+                    "존 모드에서 재고를 조회하려면 '존 → 대표 로케이션(LOC_CD)' 변환이 필요합니다.\n\n" +
+                    "현재 프론트는 다음 API를 호출합니다:\n" +
+                    "GET /hyapp/api/wh/loc/by-zone?zoneId=...\n\n" +
+                    "에러: " + err.message
+                );
+                statusEl.textContent = "조회 실패";
+                return;
+            }
+        }
+
+        statusEl.textContent = "재고 조회 중...";
+        try {
+            const response = await fetch(`/hyapp/api/stock/location/list?cmpyCd=${encodeURIComponent(CMPY_CD)}&locationCd=${encodeURIComponent(fromLocCd)}`);
+            const data = await response.json();
+
+            items = data.items || [];
+            if (items.length === 0) {
+                statusEl.textContent = "조회된 재고가 없습니다.";
+                document.getElementById("stockList").innerHTML = "<p style='text-align:center; padding:20px; color:#999;'>재고 없음</p>";
+                return;
+            }
+
+            renderList(items);
+            setStep(2);
+            statusEl.textContent = "이동할 상품을 선택하세요.";
+        } catch(e) {
+            console.error(e);
+            statusEl.textContent = "조회 실패: 서버 연결을 확인하세요.";
+        }
+    }
+
+    function renderList(list) {
+        const cont = document.getElementById("stockList");
+        cont.innerHTML = list.map((it, idx) => `
+      <div class="stock-item" onclick="selectItem(${idx})" id="item_${idx}">
+        <b>${escapeHtml(it.mtrlNm || it.mtrlCd || '')}</b>
+        <span>코드: ${escapeHtml(it.mtrlCd || '')} | 현재고: <b>${escapeHtml(String(it.stockQty ?? 0))}</b></span>
+      </div>
+    `).join("");
+    }
+
+    function selectItem(idx) {
+        selectedStock = items[idx];
+        document.querySelectorAll('.stock-item').forEach(el => el.classList.remove('selected'));
+        document.getElementById(`item_${idx}`).classList.add('selected');
+
+        document.getElementById("qtySection").style.display = "block";
+        document.getElementById("maxQty").textContent = selectedStock.stockQty ?? 0;
+        document.getElementById("moveQtyInput").value = selectedStock.stockQty ?? 0;
+
+        setStep(3);
+        statusEl.textContent = (moveMode === 'LOC') ? "목적지 로케이션을 스캔하세요." : "도착 존을 선택하세요.";
+    }
+
+    function fillMax() {
+        if(selectedStock) document.getElementById("moveQtyInput").value = selectedStock.stockQty ?? 0;
+    }
+
+    // =====================
+    // 이동 저장
+    // =====================
+    async function saveMove() {
+        if (!selectedStock) return alert("이동할 상품을 먼저 선택하세요.");
+
+        let fromLoc = '';
+        let toLoc = '';
+
+        if (moveMode === 'LOC') {
+            fromLoc = (fromLocInput.value || '').trim();
+            toLoc   = (toLocInput.value || '').trim();
+            if(!toLoc) return alert("목적지 로케이션을 스캔하세요.");
+        } else {
+            const fromZoneId = (fromZoneSelect.value || '').trim();
+            const toZoneId   = (toZoneSelect.value || '').trim();
+            if(!fromZoneId) return alert("출발 존을 선택하세요.");
+            if(!toZoneId) return alert("도착 존을 선택하세요.");
+
+            const fromZ = getZoneById(fromZoneId);
+            const toZ   = getZoneById(toZoneId);
+            if ((fromZ && isStorageZone(fromZ)) || (toZ && isStorageZone(toZ))) {
+                forceLocModeForStorage("보관랙(보관존)은 존 이동 기능이 아닙니다.\n로케이션 이동으로 처리해주세요.");
+                return;
+            }
+
+            statusEl.textContent = "존 대표 로케이션 확인 중...";
+            try{
+                fromLoc = await resolveZoneToLocCd(fromZoneId);
+                toLoc   = await resolveZoneToLocCd(toZoneId);
+            }catch(err){
+                alert(
+                    "존 모드에서 이동하려면 '존 → 대표 로케이션(LOC_CD)' 변환이 필요합니다.\n\n" +
+                    "현재 프론트는 다음 API를 호출합니다:\n" +
+                    "GET /hyapp/api/wh/loc/by-zone?zoneId=...\n\n" +
+                    "에러: " + err.message
+                );
+                statusEl.textContent = "이동 실패";
+                return;
+            }
+        }
+
+        const qty = Number(document.getElementById("moveQtyInput").value);
+        const max = Number(selectedStock.stockQty ?? 0);
+
+        if(qty <= 0 || qty > max) return alert("수량이 올바르지 않습니다.");
+        if(fromLoc === toLoc) return alert("출발지와 목적지가 같습니다.");
+
+        saveBtn.disabled = true;
+        statusEl.textContent = "이동 저장 중...";
+
+        const payload = {
+            cmpyCd: CMPY_CD,
+            agntCd: selectedStock.agntCd,
+            mtrlCd: selectedStock.mtrlCd,
+            fromLocationCd: fromLoc,
+            toLocationCd: toLoc,
+            moveQty: qty,
+            userId: USER_ID,
+            moveType: (moveMode === 'LOC') ? 'NORMAL' : 'ZONE'
+        };
+
+        try {
+            const response = await fetch('/hyapp/api/stock/move', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json().catch(()=> ({}));
+
+            if (result.success) {
+                alert(result.message || "이동이 완료되었습니다.");
+                location.reload();
+            } else {
+                alert("실패: " + (result.message || "알 수 없는 오류"));
+                saveBtn.disabled = false;
+                statusEl.textContent = "이동 실패";
+            }
+        } catch(e) {
+            alert("서버 통신 오류가 발생했습니다.");
+            saveBtn.disabled = false;
+            statusEl.textContent = "이동 실패";
+        }
+    }
+
+    function setStep(n) {
+        document.getElementById("sec2").style.display = n >= 2 ? "block" : "none";
+        document.getElementById("sec3").style.display = n >= 3 ? "block" : "none";
+        document.querySelectorAll('.step').forEach((el, i) => {
+            el.classList.toggle('active', i + 1 === n);
+        });
+    }
+
+    // init
+    loadZones();
+    setMoveMode('LOC'); // 기본 LOC
+</script>
+
+</body>
+</html>

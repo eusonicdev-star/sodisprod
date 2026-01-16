@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>바코드 스캔</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            padding: 12px 16px;
+            background: #222;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+        }
+
+        video {
+            width: 100%;
+            max-width: 420px;
+            border-radius: 10px;
+            background: #000;
+        }
+
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .start-btn { background: #4caf50; color: #fff; }
+        .stop-btn { background: #f44336; color: #fff; }
+
+        .result-box {
+            margin-top: 12px;
+            width: 100%;
+            max-width: 420px;
+            background: #222;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .label {
+            font-size: 12px;
+            color: #aaa;
+        }
+        .value {
+            margin-top: 6px;
+            font-size: 16px;
+            word-break: break-all;
+        }
+
+        .barcode-input {
+            margin-top: 6px;
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #555;
+            background: #111;
+            color: #fff;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<header>바코드 스캔</header>
+
+<div class="content">
+    <video id="preview" autoplay playsinline></video>
+
+    <div class="controls">
+        <button class="start-btn" onclick="startScan()">바코드 스캔</button>
+        <button class="stop-btn" onclick="stopScan()">스캔 중지</button>
+    </div>
+
+    <div class="result-box">
+        <div class="label">스캔 결과</div>
+
+        <!-- ✅ 스캔된 바코드 값이 들어갈 텍스트 박스 -->
+        <input id="barcodeInput" class="barcode-input"
+               type="text"
+               placeholder="스캔된 바코드가 여기에 표시됩니다" readonly />
+
+        <!-- 필요하다면 그대로 유지해도 되는 영역 -->
+        <div id="result" class="value">아직 스캔되지 않았습니다.</div>
+    </div>
+</div>
+
+<script>
+    let stream = null;
+
+    function startScan() {
+        if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+            window.ReactNativeWebView.postMessage(
+                JSON.stringify({ type: "startScan" })
+            );
+        }
+        document.getElementById("result").innerText =
+            "모바일 앱에서 카메라 스캔을 시작합니다...";
+    }
+
+    function stopScan() {
+        if (stream) {
+            const tracks = stream.getTracks();
+            tracks.forEach(t => t.stop());
+            stream = null;
+        }
+        document.getElementById("result").innerText = "스캔이 중지되었습니다.";
+        document.getElementById("preview").srcObject = null;
+
+        if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+            window.ReactNativeWebView.postMessage(
+                JSON.stringify({ type: "stopScan" })
+            );
+        }
+    }
+
+    // ✅ RN에서 바코드 인식 완료 후 호출해 줄 함수
+    function onBarcodeScanned(code) {
+        // 1) 화면에 표시
+        const input = document.getElementById("barcodeInput");
+        const resultDiv = document.getElementById("result");
+
+        if (input) {
+            input.value = code;
+        }
+        if (resultDiv) {
+            resultDiv.innerText = code;
+        }
+
+        // 2) 필요하면 RN 쪽으로도 다시 전달
+        if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+            window.ReactNativeWebView.postMessage(
+                JSON.stringify({ type: "scanned", code })
+            );
+        }
+
+        // 3) ✅ HyappMain.html로 이동하면서 바코드 값 전달
+        //    /hyapp/main 이 Thymeleaf or static 페이지고,
+        //    거기서 ?barcode=... 을 읽어서 텍스트 박스에 표시
+        window.location.href = "/hyapp/main?barcode=" + encodeURIComponent(code);
+    }
+
+    // 개발 테스트용:
+    // 브라우저 콘솔에서 onBarcodeScanned("TEST-123456") 실행해보면 동작 확인 가능
+</script>
+
+</body>
+</html>

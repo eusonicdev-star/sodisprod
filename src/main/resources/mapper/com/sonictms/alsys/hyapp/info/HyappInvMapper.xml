@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.hyapp.info.mapper.HyappInvMapper">
+
+    <!-- =========================================================
+         1) 상품 후보 조회 + 전체수량(totalQty) 포함 (TOP 2)
+         - 상품코드/상품명/바코드 조건으로 1~2건만 조회
+         - totalQty(전체 재고) 포함
+       ========================================================= -->
+    <select id="findProducts"
+            parameterType="map"
+            resultType="com.sonictms.alsys.hyapp.info.service.HyappInvService$ProductRow">
+
+        SELECT TOP (1)
+        m.MTRL_CD  AS mtrlCd,
+        m.MTRL_NM  AS mtrlNm,
+        m.BARCODE  AS barcode,
+        a.AGNT_NM  AS agntNm,
+
+        -- 최근 stock의 WH_CD 표시
+        (
+        SELECT TOP (1) s.WH_CD
+        FROM dbo.TBL_STOCK s
+        WHERE s.CMPY_CD = m.CMPY_CD
+        AND s.AGNT_CD = m.AGNT_CD
+        AND s.MTRL_CD = m.MTRL_CD
+        ORDER BY s.UPDT_TIME DESC
+        ) AS whNm,
+
+        -- 전체 재고 합계(필요시 가용재고로 바꿀 수 있음)
+        (
+        SELECT COALESCE(SUM(CAST(s2.STOCK_QTY AS BIGINT)), 0)
+        FROM dbo.TBL_STOCK s2
+        WHERE s2.CMPY_CD = m.CMPY_CD
+        AND s2.AGNT_CD = m.AGNT_CD
+        AND s2.MTRL_CD = m.MTRL_CD
+        ) AS totalQty
+
+        FROM dbo.TBL_MTRL_M m
+        LEFT JOIN dbo.TBL_AGENCY_M a
+        ON a.CMPY_CD = m.CMPY_CD
+        AND a.AGNT_CD = m.AGNT_CD
+        <where>
+            <if test="mtrlCd != null and mtrlCd != ''">
+                AND m.MTRL_CD LIKE '%' + #{mtrlCd} + '%'
+            </if>
+            <if test="barcode != null and barcode != ''">
+                AND m.BARCODE = #{barcode}
+            </if>
+            <if test="mtrlNm != null and mtrlNm != ''">
+                AND m.MTRL_NM LIKE '%' + #{mtrlNm} + '%'
+            </if>
+            <!-- 필요시 -->
+            <!-- AND m.USE_YN = 'Y' -->
+        </where>
+
+        ORDER BY m.MTRL_CD
+    </select>
+
+
+    <!-- =========================================================
+         2) 로케이션별 재고 (존명 + 로케이션코드 반영)
+         - 존: TBL_WH_ZONE_M (ZONE_CD -> ZONE_NM)
+         - 로케이션: TBL_WH_LOC_M (LOC_CD or LOC_ID로 조인)
+         - 동일 (존/로케이션/로트/유통기한) 단위로 합산
+       ========================================================= -->
+    <select id="selectLocStocks"
+            parameterType="string"
+            resultType="com.sonictms.alsys.hyapp.info.service.HyappInvService$LocationStockRow">
+        SELECT
+        A.AGNT_CD AS agntCd
+        , B.AGNT_NM AS agntNm
+        , A.MTRL_CD AS mtrlCd
+        , C.MTRL_NM AS mtrlNm
+        , A.ZONE_ID AS zoneId
+        , D.ZONE_NM AS zoneNm
+        , A.LOC_ID  AS locId
+        , E.LOC_CD  AS locCd
+        , E.LOC_NM  AS locNm
+        , COALESCE(SUM(CAST(A.STOCK_QTY AS BIGINT)),0) AS qty
+        FROM TBL_STOCK A
+        JOIN TBL_AGENCY_M  B ON A.AGNT_CD = B.AGNT_CD
+        JOIN TBL_MTRL_M    C ON A.MTRL_CD = C.MTRL_CD
+        JOIN TBL_WH_ZONE_M D ON A.ZONE_ID = D.ZONE_ID
+        JOIN TBL_WH_LOC_M  E ON A.LOC_ID  = E.LOC_ID
+        <where>
+            <if test="mtrlCd != null and mtrlCd != ''">
+                AND A.MTRL_CD LIKE '%' + #{mtrlCd} + '%'
+            </if>
+            <if test="barcode != null and barcode != ''">
+                AND C.BARCODE = #{barcode}
+            </if>
+            <if test="mtrlNm != null and mtrlNm != ''">
+                AND C.MTRL_NM LIKE '%' + #{mtrlNm} + '%'
+            </if>
+            <!-- 필요시 -->
+            <!-- AND m.USE_YN = 'Y' -->
+        </where>
+        GROUP BY A.AGNT_CD, B.AGNT_NM
+                 , A.MTRL_CD, C.MTRL_NM
+                 , A.ZONE_ID, D.ZONE_NM
+                 , A.LOC_ID, E.LOC_CD, E.LOC_NM
+
+        ORDER BY A.AGNT_CD, B.AGNT_NM
+                 , A.MTRL_CD, C.MTRL_NM
+                 , A.ZONE_ID, D.ZONE_NM
+                 , A.LOC_ID, E.LOC_CD, E.LOC_NM
+    </select>
+
+
+    <!-- (옵션) 전체수량만 별도로 쓰고 싶으면 유지 -->
+    <select id="selectTotalQty" resultType="long">
+        SELECT COALESCE(SUM(CAST(A.STOCK_QTY AS BIGINT)), 0)
+        FROM TBL_STOCK A
+        JOIN TBL_AGENCY_M B ON A.AGNT_CD = B.AGNT_CD
+        JOIN TBL_MTRL_M   C ON A.MTRL_CD = C.MTRL_CD
+        <where>
+            <if test="mtrlCd != null and mtrlCd != ''">
+                AND A.MTRL_CD LIKE '%' + #{mtrlCd} + '%'
+            </if>
+            <if test="barcode != null and barcode != ''">
+                AND C.BARCODE = #{barcode}
+            </if>
+
+            <if test="mtrlNm != null and mtrlNm != ''">
+                AND C.MTRL_NM LIKE '%' + #{mtrlNm} + '%'
+            </if>
+        </where>
+    </select>
+
+</mapper>
