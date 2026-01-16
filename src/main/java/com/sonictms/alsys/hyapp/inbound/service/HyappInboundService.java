@@ -38,7 +38,10 @@ public class HyappInboundService {
                 forInv.setActualDate(vo.getActualDate());
                 forInv.setActualQuantity(vo.getActualQuantity());
 
-                hyappInboundMapper.updateMultipleInventoryQuantity(List.of(forInv));
+                hyappInboundMapper.updateMultipleInventoryQuantity(
+                        java.util.Collections.singletonList(forInv)
+                );
+
             }
         }
         return updated;
