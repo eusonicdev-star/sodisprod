@@ -22,25 +22,8 @@
 		integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 	<script type="text/javascript" src="/js/commCode.js"></script>
 	<script>
-
 		var myCombo;
 		$(document).ready(function () {
-
-			/* ===============================
-               React-Native 앱 접속 시 Hyapp 로그인으로 이동
-            =============================== */
-			var ua = navigator.userAgent.toLowerCase();
-
-			// ✅ Android WebView (React-Native WebView 포함)
-			var isAndroidWebView =
-					ua.indexOf("wv") > -1 &&
-					ua.indexOf("android") > -1;
-
-			if (isAndroidWebView) {
-				location.replace("/hyapp/login");
-				return;
-			}
-
 			var agent = navigator.userAgent.toLowerCase();
 			if ((navigator.appName == 'Netscape' && navigator.userAgent.search('Trident') != -1) || (agent.indexOf("msie") != -1)) {
 				alert('Internet Explorer는 호환되지 않는 브라우저 입니다.')
