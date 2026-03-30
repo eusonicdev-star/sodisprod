@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html
+  xmlns:sec="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <title>재고 현황 조회 (erp105001)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/skins/web/dhtmlx.css"
+    />
+    <link rel="stylesheet" type="text/css" href="/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="/css/erp-style.css" />
+    <link rel="stylesheet" type="text/css" href="/css/erp105001.css" />
+    <style>
+      /* 출고 대기 주문 그리드 스크롤바 숨기기 */
+      #modalOutboundGrid .objbox {
+        overflow: hidden !important;
+      }
+
+      #modalOutboundGrid .objbox table {
+        width: 100% !important;
+      }
+    </style>
+    <script
+      src="https://cdn.dhtmlx.com/edge/dhtmlx.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+
+    <script th:inline="javascript">
+      var pagePerRow = /*[[${@environment.getProperty('common.html.pagePerRow')}]]*/ 10;
+      var myWins;
+      var myGrid;
+      var myCalendar;
+      var userGrntCd = /*[[${session.userGrntCd}]]*/ ""; // 사용자 권한 코드
+      fnObj = {
+        winOpen: {
+          commSrch: function (title, cmpyCd, srchCtgr, srchInput) {
+            // 화주사 검색인 경우 관리자 권한 체크
+            if (srchCtgr === "AGENCY" && userGrntCd !== "9999") {
+              return; // 권한이 없으면 무반응
+            }
+
+            //공통코드 찾기 팝업
+            windowId = "commSrch";
+            windowText = title + " commSrch";
+            windowUrl = "/commSrch";
+            windowLeft = -14400;
+            windowTop = -14400;
+            windowWidth = 800;
+            windowHeight = 600;
+            windowsModal = true;
+            windowOnClose = function (windowId) {
+              alert("windowId : " + windowId);
+              return true;
+            };
+            windowSendObject = {
+              cmpyCd: cmpyCd,
+              srchCtgr: srchCtgr,
+              srchInput: srchInput,
+              windowId: windowId,
+              srchCd: $("#agntCd").val(),
+              srchNm: $("#agntNm").val(),
+            };
+
+            myWindowsOpen(
+              windowId,
+              windowText,
+              windowUrl,
+              windowLeft,
+              windowTop,
+              windowWidth,
+              windowHeight,
+              windowsModal,
+              windowOnClose,
+              windowSendObject
+            );
+
+            myWins.window(windowId).attachEvent("onClose", function (win) {
+              return true;
+            });
+          }, //END of commSrch : function(){
+
+          prodCommSrch: function (title, cmpyCd, srchCtgr, srchInput) {
+            //상품 찾기 팝업
+            windowId = "prodCommSrch";
+            windowText = title + " prodSrch";
+            windowUrl = "/prodSrchMto";
+            windowLeft = 0;
+            windowTop = 0;
+            windowWidth = 800;
+            windowHeight = 600;
+            windowsModal = true;
+            windowOnClose = function (windowId) {
+              return true;
+            };
+            windowSendObject = {
+              windowId: windowId,
+              cmpyCd: cmpyCd,
+              srchCtgr: srchCtgr,
+              srchInput: srchInput,
+              srchCd: "",
+              srchNm: "",
+              srchArea: $("#agntCd").val(), //화주코드
+              agntCd: $("#agntCd").val(),
+              agntNm: $("#agntNm").val(),
+            };
+
+            var errMsg = "";
+            var rtnVal = true;
+            if (!$("#agntCd").val()) {
+              errMsg = errMsg + "화주코드가 없습니다. 화주를 검색해주세요.\n";
+              rtnVal = false;
+            }
+            if (!$("#agntNm").val()) {
+              errMsg = errMsg + "화주명칭이 없습니다. 화주를 검색해주세요.\n";
+              rtnVal = false;
+            }
+            if (errMsg != "" && rtnVal == false) {
+              alert(errMsg);
+              return;
+            }
+            myWindowsOpen(
+              windowId,
+              windowText,
+              windowUrl,
+              windowLeft,
+              windowTop,
+              windowWidth,
+              windowHeight,
+              windowsModal,
+              windowOnClose,
+              windowSendObject
+            );
+            myWins.window(windowId).attachEvent("onClose", function (win) {
+              return true;
+            });
+          },
+
+          rtnObject: function (windowId, rtnObj, srchInput) {
+            //popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+            if (windowId == "commSrch") {
+              if (rtnObj == null) {
+                myWins.window(windowId).setPosition(0, 0);
+                return;
+              }
+
+              if (srchInput == "text") {
+                // 화주사 필드에 값을 설정하는 경우 관리자 권한 체크
+                if (userGrntCd !== "9999") {
+                  // 일반 사용자는 화주사 변경 불가
+                  myWins.window(windowId).setPosition(0, 0);
+                  return;
+                }
+                $("#agntCd").val(rtnObj[0].commCd);
+                $("#agntNm").val(rtnObj[0].commNm);
+              }
+            }
+            if (windowId == "prodCommSrch") {
+              if (rtnObj == null) {
+                myWins.window(windowId).setPosition(0, 0);
+                return;
+              }
+
+              if (srchInput == "text") {
+                $("#productCd").val(rtnObj[0].commCd);
+                $("#productNm").val(rtnObj[0].commNm);
+              }
+            }
+          }, //END of rtnObject : function(windowId,rtnObj){
+        }, //END of winOpen
+        comboOpen: {
+          comboCmpyCd: function () {
+            //회사콤보목록
+            myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+            comboList(myComboCmpyCd, "A", "COMM", "CMPY_CD", "", "Y", "");
+            myComboCmpyCd.selectOption(
+              myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/)
+            );
+            myComboCmpyCd.setFontSize("12px", "12px");
+            myComboCmpyCd.attachEvent("onChange", function (value, text) {
+              myGrid.clearAll(false);
+            });
+            myComboCmpyCd.disable();
+          },
+        }, //END of comboOpen
+        gridOpen: {
+          grid: function () {
+            myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
+            myGrid.setHeader(
+              "화주사코드,화주사명,상품코드,상품명,재입고대기,가용재고,전체 재고,용인센터,경남센터<br>출고대기,대구센터<br>출고대기,전남센터<br>출고대기,제주센터<br>출고대기"
+            );
+            myGrid.setColumnIds(
+              "agntCd,agntNm,productCd,productNm,yonginReentryQty,availableQty,totalQty,yonginQty,gyeongnamQty,gyeongbukQty,jeonnamQty,jejuQty"
+            );
+            myGrid.setInitWidths(
+              "100,150,150,300,100,100,100,100,100,100,100,100"
+            );
+            myGrid.setColAlign(
+              "center,left,center,left,right,right,right,right,right,right,right,right"
+            );
+            myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+            myGrid.setColSorting(
+              "str,str,str,str,int,int,int,int,int,int,int,int"
+            );
+            myGrid.attachHeader(
+              "#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter"
+            );
+
+            myGrid.setColumnColor(
+              ",,,,,,,#fff0f1,#fff0f1,#fff0f1,#fff0f1,#fff0f1"
+            );
+
+            myGrid.init(); //이걸써야 세팅한 그리드가 표시가 된다
+
+            myGrid.enableSmartRendering(true);
+            myGrid.enablePreRendering(10);
+            fnObj.gridOpen.setWidth();
+            myGrid.addRow(1, "");
+            myGrid.deleteRow(1);
+            myGrid.enableEditEvents(true, false, false);
+            myGrid.enableBlockSelection(true);
+            myGrid.attachEvent("onKeyPress", fnObj.keyOpen.onKeyPressed);
+            myGrid.attachEvent(
+              "onRowDblClicked",
+              fnObj.gridOpen.onRowDblClicked
+            );
+          },
+          setWidth: function () {
+            c_width = top.myLayout.cells("c").getWidth();
+            searchDiv_height = $("#searchDiv").height();
+
+            page_height = $("#page").height();
+            xhdr_height = $(".xhdr").height();
+
+            myGrid.enableAutoWidth(true, c_width - 25, 100);
+            myGrid.enableAutoHeight(
+              true,
+              window.innerHeight -
+                searchDiv_height -
+                page_height -
+                xhdr_height -
+                30
+            );
+
+            $("#searchDiv").width(c_width - 25);
+          },
+          onRowDblClicked: function (rowId) {
+            // 시스템 관리자 권한 체크 (userGrntCd가 "9999"인 경우만 허용)
+            if (userGrntCd !== "9999") {
+              return;
+            }
+
+            var rowData = myGrid.getRowData(rowId);
+
+            $("#modalAgntCd").val(rowData.agntCd);
+            $("#modalAgntNm").val(rowData.agntNm);
+            $("#modalProductCd").val(rowData.productCd);
+            $("#modalProductNm").val(rowData.productNm);
+            $("#modalCurrentQty").val(rowData.yonginQty);
+            $("#modalLocationProductNm").text(rowData.productNm);
+            $("#modalLocationProductCd").text(rowData.productCd);
+
+            // 조정 일자를 오늘 날짜로 설정
+            var today = new Date();
+            var year = today.getFullYear();
+            var month = String(today.getMonth() + 1).padStart(2, "0");
+            var day = String(today.getDate()).padStart(2, "0");
+            $("#modalAdjustmentDate").val(year + "-" + month + "-" + day);
+
+            // 폼 초기화
+            $("#modalAdjustmentType").val("");
+            $("#modalAdjustmentQty").val("");
+            $("#modalAdjustmentQty").prop("disabled", true);
+            $("#modalAfterQty").val("");
+            $("#modalAdjustmentReason").val("");
+
+            // 탭 초기화 (재고 조정 탭 활성화)
+            $(".modal-tab").removeClass("active");
+            $("#tabAdjustment").addClass("active");
+            $(".tab-content").removeClass("active");
+            $("#tabContentAdjustment").addClass("active");
+            $("#modalFooterAdjustment").removeClass("hidden");
+            $("#modalFooterOutbound").addClass("hidden");
+            $("#modalFooterHistory").addClass("hidden");
+
+            // 출고 대기 주문 그리드 초기화
+            fnObj.adjustmentOpen.initOutboundGrid();
+
+            // 재고 변동 이력 그리드 초기화
+            fnObj.adjustmentOpen.initHistoryGrid();
+
+            // 로케이션 그리드 초기화
+            fnObj.adjustmentOpen.initLocationGrid(); // 그리드 미리 생성
+
+            // 출고 대기 주문 정보 표시
+            $("#modalOutboundProductNm").text(rowData.productNm);
+            $("#modalOutboundProductCd").text(rowData.productCd);
+
+            // 재고 변동 이력 정보 표시
+            $("#modalHistoryProductNm").text(rowData.productNm);
+            $("#modalHistoryProductCd").text(rowData.productCd);
+
+            // 출고 대기 주문 조회
+            fnObj.adjustmentOpen.loadOutboundWaitList();
+
+            // 모달창 표시
+            $("#inventoryAdjustmentModal").removeClass("hidden");
+          }, //END of onRowDblClicked
+        }, //END of gridOpen
+        searchOpen: {
+          search: function () {
+            //그리드 목록 조회하기
+
+            myGrid.clearAll(false);
+
+            // 일반 사용자는 본인 화주사로 고정
+            if (userGrntCd !== "9999") {
+              var sessionAgntCd = /*[[${session.agntCd}]]*/ "";
+              var sessionAgntNm = /*[[${session.agntNm}]]*/ "";
+              if (sessionAgntCd) {
+                $("#agntCd").val(sessionAgntCd);
+              }
+              if (sessionAgntNm) {
+                $("#agntNm").val(sessionAgntNm);
+              }
+            }
+
+            if (!fnObj.searchOpen.searchChkVal.chkVal("search")) {
+              alert(chkValMsg);
+              return false;
+            }
+
+            var srchData = new FormData();
+            srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+            srchData.append("agntCd", $("#agntCd").val());
+            srchData.append("productCd", $("#productCd").val());
+            srchData.append("productNm", $("#productNm").val());
+
+            $.ajax({
+              url: "/erp105001List",
+              processData: false,
+              contentType: false,
+              data: srchData,
+              type: "POST",
+              datatype: "json",
+              success: function (res) {
+                if (res && res.length > 0) {
+                  searchRes = res;
+                  searchPaging(1);
+                } else {
+                  alert("조회 수행 결과 없음");
+                  myGrid.clearAll(false);
+                }
+              },
+            });
+          },
+          searchChkVal: {
+            chkVal: function (chkGubn) {
+              chkValMsg = "";
+              var rtnVal = true;
+
+              if (chkGubn == "search") {
+                if (!myComboCmpyCd.getSelectedValue()) {
+                  chkValMsg = chkValMsg + "회사코드가 없습니다\n";
+                  rtnVal = false;
+                }
+              }
+              return rtnVal;
+            },
+          },
+          delAgntCode: function () {
+            if (userGrntCd !== "9999") {
+              return;
+            }
+            $("#agntCd").val("");
+            $("#agntNm").val("");
+          },
+
+          delProductCode: function () {
+            $("#productCd").val("");
+            $("#productNm").val("");
+          },
+        },
+        keyOpen: {
+          enterKey: function (enterType) {
+            if (window.event.keyCode == 13) {
+              if (enterType == "agntNm") {
+                if (userGrntCd !== "9999") {
+                  return;
+                }
+                $("#agntNm").blur();
+                $("#agntCd").blur();
+                $("#agntCd").val("");
+                fnObj.winOpen.commSrch("화주", "A", "AGENCY", "text");
+              }
+              if (enterType == "productNm") {
+                $("#productNm").blur();
+                $("#productCd").blur();
+                $("#productCd").val("");
+                fnObj.winOpen.prodCommSrch("상품", "A", "MTRL_SO", "text");
+              }
+            }
+          },
+          onKeyPressed: function (code, ctrl, shift) {
+            if (code == 67 && ctrl) {
+              myGrid.setCSVDelimiter("\t");
+              myGrid.copyBlockToClipboard();
+            }
+            if (code == 86 && ctrl) {
+              myGrid.pasteBlockFromClipboard();
+            }
+            return true;
+          },
+        },
+        adjustmentOpen: {
+          closeAdjustmentModal: function () {
+            if (
+              window.modalOutboundGrid &&
+              typeof window.modalOutboundGrid.clearAll === "function"
+            ) {
+              window.modalOutboundGrid.clearAll(false);
+            }
+            if (
+              window.modalHistoryGrid &&
+              typeof window.modalHistoryGrid.clearAll === "function"
+            ) {
+              window.modalHistoryGrid.clearAll(false);
+            }
+            $("#inventoryAdjustmentModal").addClass("hidden");
+          },
+
+          loadOutboundWaitList: function (retryCount) {
+            retryCount = retryCount || 0;
+            if (retryCount > 3) {
+              console.error(
+                "출고 대기 주문 그리드 초기화 실패: 최대 재시도 횟수 초과"
+              );
+              return;
+            }
+
+            var agntCd = $("#modalAgntCd").val();
+            var productCd = $("#modalProductCd").val();
+            var cmpyCd = myComboCmpyCd.getSelectedValue();
+
+            if (!agntCd || !productCd) {
+              return;
+            }
+
+            // 그리드가 초기화되지 않았다면 초기화
+            if (
+              !window.modalOutboundGrid ||
+              typeof window.modalOutboundGrid.clearAll !== "function"
+            ) {
+              fnObj.adjustmentOpen.initOutboundGrid();
+              setTimeout(function () {
+                fnObj.adjustmentOpen.loadOutboundWaitList(retryCount + 1);
+              }, 100);
+              return;
+            }
+            var requestData = {
+              cmpyCd: cmpyCd,
+              agntCd: agntCd,
+              productCd: productCd,
+            };
+
+            $.ajax({
+              url: "/erp105001OutboundWaitList",
+              type: "POST",
+              contentType: "application/json",
+              data: JSON.stringify(requestData),
+              success: function (response) {
+                var outboundGrid = window.modalOutboundGrid;
+                if (
+                  !outboundGrid ||
+                  typeof outboundGrid.clearAll !== "function"
+                ) {
+                  console.warn(
+                    "출고 대기 주문 그리드가 초기화되지 않았습니다. 재시도합니다. (시도: " +
+                      (retryCount + 1) +
+                      ")"
+                  );
+                  // 재시도
+                  fnObj.adjustmentOpen.initOutboundGrid();
+                  setTimeout(function () {
+                    fnObj.adjustmentOpen.loadOutboundWaitList(retryCount + 1);
+                  }, 200);
+                  return;
+                }
+
+                // 그리드 초기화
+                outboundGrid.clearAll(false);
+
+                if (response && response.length > 0) {
+                  // 출고 대기 주문 그리드에 데이터 설정
+                  for (var i = 0; i < response.length; i++) {
+                    var rowData = {
+                      soNo: response[i].soNo || "",
+                      refSoNo: response[i].refSoNo || "",
+                      soTypeNm: response[i].soTypeNm || "",
+                      soStatNm: response[i].soStatNm || "",
+                      dlvyCnfmDt: response[i].dlvyCnfmDt || "",
+                      giLiftDt: response[i].giLiftDt || "",
+                      dcNm: response[i].dcNm || "",
+                      acptEr: response[i].acptEr || "",
+                      cqty: response[i].cqty || 0,
+                    };
+                    outboundGrid.addRow(i + 1, "");
+                    outboundGrid.setRowData(i + 1, rowData);
+                  }
+                }
+
+                // 데이터 로드 후 그리드 너비 재조정
+                setTimeout(function () {
+                  if (
+                    outboundGrid &&
+                    typeof outboundGrid.setSizes === "function"
+                  ) {
+                    var modalContentWidth =
+                      $("#inventoryAdjustmentModal .modal-content").width() -
+                      40;
+                    if (modalContentWidth > 0) {
+                      outboundGrid.setSizes();
+                      outboundGrid.enableAutoWidth(true, modalContentWidth, 0);
+                    }
+                  }
+                }, 150);
+              },
+              error: function (xhr, status, error) {
+                console.error("출고 대기 주문 조회 중 오류 발생:", error);
+              },
+            });
+          },
+
+          switchTab: function (tabName) {
+            // 모든 탭 비활성화
+            $(".modal-tab").removeClass("active");
+            $(".tab-content").removeClass("active");
+            $(".modal-footer-section").addClass("hidden");
+
+            // 선택한 탭 활성화
+            if (tabName === "adjustment") {
+              $("#tabAdjustment").addClass("active");
+              $("#tabContentAdjustment").addClass("active");
+              $("#modalFooterAdjustment").removeClass("hidden");
+            } else if (tabName === "outbound") {
+              $("#tabOutbound").addClass("active");
+              $("#tabContentOutbound").addClass("active");
+              $("#modalFooterOutbound").removeClass("hidden");
+              // 그리드가 있다면 너비 재조정
+              if (
+                window.modalOutboundGrid &&
+                typeof window.modalOutboundGrid.setSizes === "function"
+              ) {
+                setTimeout(function () {
+                  var modalContentWidth =
+                    $("#inventoryAdjustmentModal .modal-content").width() - 40;
+                  window.modalOutboundGrid.setSizes();
+                  window.modalOutboundGrid.enableAutoWidth(
+                    true,
+                    modalContentWidth,
+                    0
+                  );
+                }, 50);
+              }
+              // 출고 대기 주문 조회
+              fnObj.adjustmentOpen.loadOutboundWaitList();
+            } else if (tabName === "history") {
+              $("#tabHistory").addClass("active");
+              $("#tabContentHistory").addClass("active");
+              $("#modalFooterHistory").removeClass("hidden");
+              // 그리드가 있다면 너비 재조정
+              if (
+                window.modalHistoryGrid &&
+                typeof window.modalHistoryGrid.setSizes === "function"
+              ) {
+                setTimeout(function () {
+                  var modalContentWidth =
+                    $("#inventoryAdjustmentModal .modal-content").width() - 40;
+                  window.modalHistoryGrid.setSizes();
+                  window.modalHistoryGrid.enableAutoWidth(
+                    true,
+                    modalContentWidth,
+                    0
+                  );
+                }, 50);
+              }
+              // 재고 변동 이력 조회
+              fnObj.adjustmentOpen.loadAdjustmentHistory();
+            }else if (tabName === "location") {
+              $("#tabLocation").addClass("active");
+              $("#tabContentLocation").addClass("active");
+              $("#modalFooterLocation").removeClass("hidden");
+
+              if (window.modalLocationGrid && typeof window.modalLocationGrid.setSizes === "function") {
+                setTimeout(function () {
+                  var modalContentWidth = $("#inventoryAdjustmentModal .modal-content").width() - 40;
+                  window.modalLocationGrid.setSizes();
+                  window.modalLocationGrid.enableAutoWidth(true, modalContentWidth, 0);
+                }, 50);
+              }
+              // 로케이션 재고 조회 함수 호출
+              fnObj.adjustmentOpen.loadLocationStock();
+            }
+          },
+
+          initOutboundGrid: function () {
+            // 그리드가 이미 존재하고 제대로 초기화되어 있다면 리턴
+            if (
+              window.modalOutboundGrid &&
+              typeof window.modalOutboundGrid.clearAll === "function"
+            ) {
+              return;
+            }
+
+            // 기존 그리드가 있지만 초기화가 안 된 경우 제거
+            if (window.modalOutboundGrid) {
+              try {
+                window.modalOutboundGrid.destructor();
+              } catch (e) {
+                console.warn("기존 그리드 제거 중 오류:", e);
+              }
+              window.modalOutboundGrid = null;
+            }
+
+            // DOM 요소가 존재하는지 확인
+            if (!$("#modalOutboundGrid").length) {
+              console.error(
+                "출고 대기 주문 그리드 DOM 요소를 찾을 수 없습니다."
+              );
+              return;
+            }
+
+            window.modalOutboundGrid = new dhtmlXGridObject(
+              "modalOutboundGrid"
+            );
+            window.modalOutboundGrid.setImagePath(
+              "https://cdn.dhtmlx.com/edge/skins/web/imgs/"
+            );
+            window.modalOutboundGrid.setHeader(
+              "주문번호,참조주문번호,주문유형,주문상태,배송확정일,상차일,물류센터,수령인,수량"
+            );
+            window.modalOutboundGrid.setColumnIds(
+              "soNo,refSoNo,soTypeNm,soStatNm,dlvyCnfmDt,giLiftDt,dcNm,acptEr,cqty"
+            );
+            window.modalOutboundGrid.setInitWidths(
+              "150,150,120,120,120,120,120,150,80"
+            );
+            window.modalOutboundGrid.setColAlign(
+              "center,center,center,center,center,center,center,left,right"
+            );
+            window.modalOutboundGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro");
+            window.modalOutboundGrid.setColSorting(
+              "str,str,str,str,str,str,str,str,int"
+            );
+            window.modalOutboundGrid.init();
+            setTimeout(function () {
+              var modalContentWidth =
+                $("#inventoryAdjustmentModal .modal-content").width() - 40;
+              if (modalContentWidth > 0) {
+                window.modalOutboundGrid.setSizes();
+                window.modalOutboundGrid.enableAutoWidth(
+                  true,
+                  modalContentWidth,
+                  0
+                );
+              }
+            }, 100);
+            window.modalOutboundGrid.enableAutoHeight(true, 400, 150);
+            window.modalOutboundGrid.attachEvent(
+              "onKeyPress",
+              function (code, ctrl, shift) {
+                if (code == 67 && ctrl) {
+                  window.modalOutboundGrid.setCSVDelimiter("\t");
+                  window.modalOutboundGrid.copyBlockToClipboard();
+                }
+                return true;
+              }
+            );
+            window.modalOutboundGrid.enableBlockSelection(true);
+          },
+
+          initHistoryGrid: function () {
+            // 그리드가 이미 존재하고 제대로 초기화되어 있다면 리턴
+            if (
+              window.modalHistoryGrid &&
+              typeof window.modalHistoryGrid.clearAll === "function"
+            ) {
+              return;
+            }
+
+            // 기존 그리드가 있지만 초기화가 안 된 경우 제거
+            if (window.modalHistoryGrid) {
+              try {
+                window.modalHistoryGrid.destructor();
+              } catch (e) {
+                console.warn("기존 재고 변동 이력 그리드 제거 중 오류:", e);
+              }
+              window.modalHistoryGrid = null;
+            }
+
+            // DOM 요소가 존재하는지 확인
+            if (!$("#modalHistoryGrid").length) {
+              console.error(
+                "재고 변동 이력 그리드 DOM 요소를 찾을 수 없습니다."
+              );
+              return;
+            }
+
+            window.modalHistoryGrid = new dhtmlXGridObject("modalHistoryGrid");
+            window.modalHistoryGrid.setImagePath(
+              "https://cdn.dhtmlx.com/edge/skins/web/imgs/"
+            );
+            window.modalHistoryGrid.setHeader(
+              "조정일자,조정유형,조정전수량,조정수량,조정후수량,조정사유,등록일시,등록자"
+            );
+            window.modalHistoryGrid.setColumnIds(
+              "adjustmentDate,adjustmentType,beforeQty,adjustmentQty,afterQty,adjustmentReason,saveTime,saveUser"
+            );
+            window.modalHistoryGrid.setInitWidths(
+              "120,100,100,100,100,200,150,100"
+            );
+            window.modalHistoryGrid.setColAlign(
+              "center,center,right,right,right,left,center,center"
+            );
+            window.modalHistoryGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro");
+            window.modalHistoryGrid.setColSorting(
+              "str,str,int,int,int,str,str,str"
+            );
+            window.modalHistoryGrid.init();
+            setTimeout(function () {
+              var modalContentWidth =
+                $("#inventoryAdjustmentModal .modal-content").width() - 40;
+              if (modalContentWidth > 0) {
+                window.modalHistoryGrid.setSizes();
+                window.modalHistoryGrid.enableAutoWidth(
+                  true,
+                  modalContentWidth,
+                  0
+                );
+              }
+            }, 100);
+            window.modalHistoryGrid.enableAutoHeight(true, 400, 150);
+            window.modalHistoryGrid.attachEvent(
+              "onKeyPress",
+              function (code, ctrl, shift) {
+                if (code == 67 && ctrl) {
+                  window.modalHistoryGrid.setCSVDelimiter("\t");
+                  window.modalHistoryGrid.copyBlockToClipboard();
+                }
+                return true;
+              }
+            );
+            window.modalHistoryGrid.enableBlockSelection(true);
+          },
+
+          // 로케이션 그리드 초기화
+          initLocationGrid: function () {
+            if (window.modalLocationGrid && typeof window.modalLocationGrid.clearAll === "function") return;
+
+            window.modalLocationGrid = new dhtmlXGridObject("modalLocationGrid");
+            window.modalLocationGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
+            window.modalLocationGrid.setHeader("구역,로케이션,현재고,가용재고,최종입고일");
+            window.modalLocationGrid.setColumnIds("zoneNm,locNm,stockQty,availQty,lastInDt");
+            window.modalLocationGrid.setInitWidths("100,150,100,100,150");
+            window.modalLocationGrid.setColAlign("center,center,right,right,center");
+            window.modalLocationGrid.setColTypes("ro,ro,ro,ro,ro");
+            window.modalLocationGrid.init();
+            window.modalLocationGrid.enableAutoHeight(true, 400, 150);
+          },
+
+          loadAdjustmentHistory: function (retryCount) {
+            retryCount = retryCount || 0;
+            if (retryCount > 3) {
+              console.error(
+                "재고 변동 이력 그리드 초기화 실패: 최대 재시도 횟수 초과"
+              );
+              return;
+            }
+
+            var agntCd = $("#modalAgntCd").val();
+            var productCd = $("#modalProductCd").val();
+            var cmpyCd = myComboCmpyCd.getSelectedValue();
+
+            if (!agntCd || !productCd) {
+              return;
+            }
+
+            // 그리드가 초기화되지 않았다면 초기화
+            if (
+              !window.modalHistoryGrid ||
+              typeof window.modalHistoryGrid.clearAll !== "function"
+            ) {
+              fnObj.adjustmentOpen.initHistoryGrid();
+              setTimeout(function () {
+                fnObj.adjustmentOpen.loadAdjustmentHistory(retryCount + 1);
+              }, 100);
+              return;
+            }
+
+            var requestData = {
+              cmpyCd: cmpyCd,
+              agntCd: agntCd,
+              productCd: productCd,
+            };
+
+            $.ajax({
+              url: "/erp105001AdjustmentHistory",
+              type: "POST",
+              contentType: "application/json",
+              data: JSON.stringify(requestData),
+              success: function (response) {
+                var historyGrid = window.modalHistoryGrid;
+                if (
+                  !historyGrid ||
+                  typeof historyGrid.clearAll !== "function"
+                ) {
+                  console.warn(
+                    "재고 변동 이력 그리드가 초기화되지 않았습니다. 재시도합니다. (시도: " +
+                      (retryCount + 1) +
+                      ")"
+                  );
+                  // 재시도
+                  fnObj.adjustmentOpen.initHistoryGrid();
+                  setTimeout(function () {
+                    fnObj.adjustmentOpen.loadAdjustmentHistory(retryCount + 1);
+                  }, 200);
+                  return;
+                }
+
+                // 그리드 초기화
+                historyGrid.clearAll(false);
+
+                if (response && response.length > 0) {
+                  // 재고 변동 이력 그리드에 데이터 설정
+                  for (var i = 0; i < response.length; i++) {
+                    var rowData = {
+                      adjustmentDate: response[i].adjustmentDate || "",
+                      adjustmentType:
+                        response[i].adjustmentType === "INCREASE"
+                          ? "증가"
+                          : "감소",
+                      beforeQty: response[i].beforeQty || 0,
+                      adjustmentQty: response[i].adjustmentQty || 0,
+                      afterQty: response[i].afterQty || 0,
+                      adjustmentReason: response[i].adjustmentReason || "",
+                      saveTime: response[i].saveTime
+                        ? response[i].saveTime.substring(0, 19)
+                        : "",
+                      saveUser: response[i].saveUser || "",
+                    };
+                    historyGrid.addRow(i + 1, "");
+                    historyGrid.setRowData(i + 1, rowData);
+                  }
+                }
+
+                // 데이터 로드 후 그리드 너비 재조정
+                setTimeout(function () {
+                  if (
+                    historyGrid &&
+                    typeof historyGrid.setSizes === "function"
+                  ) {
+                    var modalContentWidth =
+                      $("#inventoryAdjustmentModal .modal-content").width() -
+                      40;
+                    if (modalContentWidth > 0) {
+                      historyGrid.setSizes();
+                      historyGrid.enableAutoWidth(true, modalContentWidth, 0);
+                    }
+                  }
+                }, 150);
+              },
+              error: function (xhr, status, error) {
+                console.error("재고 변동 이력 조회 중 오류 발생:", error);
+              },
+            });
+          },
+
+          // 로케이션 데이터 로드
+          loadLocationStock: function () {
+            var agntCd = $("#modalAgntCd").val();
+            var productCd = $("#modalProductCd").val();
+            var cmpyCd = myComboCmpyCd.getSelectedValue();
+
+            if (!window.modalLocationGrid || typeof window.modalLocationGrid.clearAll !== "function") {
+              fnObj.adjustmentOpen.initLocationGrid();
+            }
+
+            $.ajax({
+              url: "/erp105001LocationStock", // 백엔드 API 주소 (별도 구현 필요)
+              type: "POST",
+              contentType: "application/json",
+              data: JSON.stringify({ cmpyCd: cmpyCd, agntCd: agntCd, productCd: productCd }),
+              success: function (response) {
+                window.modalLocationGrid.clearAll(false);
+                if (response && response.length > 0) {
+                  for (var i = 0; i < response.length; i++) {
+                    window.modalLocationGrid.addRow(i + 1, [
+                      response[i].zoneNm,
+                      response[i].locNm,
+                      response[i].stockQty,
+                      response[i].availQty,
+                      response[i].lastInDt
+                    ]);
+                  }
+                }
+              }
+            });
+          },
+
+          registerAdjustment: function () {
+            if (!fnObj.adjustmentOpen.validateAdjustmentForm()) {
+              return;
+            }
+
+            var adjustmentData = {
+              cmpyCd: myComboCmpyCd.getSelectedValue(),
+              agntCd: $("#modalAgntCd").val(),
+              agntNm: $("#modalAgntNm").val(),
+              productCd: $("#modalProductCd").val(),
+              productNm: $("#modalProductNm").val(),
+              currentQty: parseInt($("#modalCurrentQty").val()),
+              totalQty: parseInt($("#modalCurrentQty").val()),
+              adjustmentType: $("#modalAdjustmentType").val(),
+              adjustmentQty: parseInt($("#modalAdjustmentQty").val()),
+              afterQty: parseInt($("#modalAfterQty").val()),
+              adjustmentReason: $("#modalAdjustmentReason").val(),
+              adjustmentDate: $("#modalAdjustmentDate").val(),
+              saveUser: /*[[${session.userId}]]*/ "admin", // 세션에서 사용자 ID 가져오기
+            };
+
+            $.ajax({
+              url: "/erp105001Adjustment",
+              type: "POST",
+              contentType: "application/json",
+              data: JSON.stringify(adjustmentData),
+              success: function (response) {
+                if (response.success) {
+                  alert("재고 조정이 완료되었습니다.");
+                  fnObj.adjustmentOpen.closeAdjustmentModal();
+                  // 그리드 새로고침
+                  fnObj.searchOpen.search();
+                } else {
+                  alert(
+                    "재고 조정 중 오류가 발생했습니다: " + response.message
+                  );
+                }
+              },
+              error: function (xhr, status, error) {
+                alert("재고 조정 중 오류가 발생했습니다: " + error);
+              },
+            });
+          },
+
+          validateAdjustmentForm: function () {
+            var errMsg = "";
+
+            if (!$("#modalAdjustmentType").val()) {
+              errMsg += "조정 유형을 선택해주세요.\n";
+            }
+
+            if (
+              !$("#modalAdjustmentQty").val() ||
+              parseInt($("#modalAdjustmentQty").val()) <= 0
+            ) {
+              errMsg += "조정 수량을 입력해주세요.\n";
+            }
+
+            if (!$("#modalAdjustmentReason").val()) {
+              errMsg += "조정 사유를 입력해주세요.\n";
+            }
+
+            if (!$("#modalAdjustmentDate").val()) {
+              errMsg += "조정 일자를 선택해주세요.\n";
+            }
+
+            // 감소 조정 시 현재 재고보다 많이 조정할 수 없도록 검사
+            if ($("#modalAdjustmentType").val() === "DECREASE") {
+              var currentQty = parseInt($("#modalCurrentQty").val());
+              var adjustmentQty = parseInt($("#modalAdjustmentQty").val());
+              if (adjustmentQty > currentQty) {
+                errMsg += "조정 수량이 현재 재고보다 많을 수 없습니다.\n";
+              }
+            }
+
+            if (errMsg) {
+              alert(errMsg);
+              return false;
+            }
+
+            return true;
+          },
+        },
+        setupModalEventHandlers: function () {
+          $("#modalAdjustmentType").on("change", function () {
+            if ($(this).val()) {
+              $("#modalAdjustmentQty").prop("disabled", false);
+            } else {
+              $("#modalAdjustmentQty").prop("disabled", true);
+              $("#modalAdjustmentQty").val("");
+              $("#modalAfterQty").val("");
+            }
+          });
+
+          // 조정 수량 입력 시 조정 후 수량 자동 계산
+          $("#modalAdjustmentQty").on("input", function () {
+            var currentQty = parseInt($("#modalCurrentQty").val()) || 0;
+            var adjustmentQty = parseInt($(this).val()) || 0;
+            var adjustmentType = $("#modalAdjustmentType").val();
+
+            if (adjustmentType && adjustmentQty > 0) {
+              var afterQty =
+                adjustmentType === "INCREASE"
+                  ? currentQty + adjustmentQty
+                  : currentQty - adjustmentQty;
+              $("#modalAfterQty").val(afterQty);
+            } else {
+              $("#modalAfterQty").val("");
+            }
+          });
+
+          // 모달창 외부 클릭 시 닫기
+          $(document).on("click", function (event) {
+            if ($(event.target).hasClass("modal")) {
+              fnObj.adjustmentOpen.closeAdjustmentModal();
+            }
+          });
+
+          // ESC 키로 모달창 닫기
+          $(document).on("keydown", function (event) {
+            if (
+              event.keyCode === 27 &&
+              $("#inventoryAdjustmentModal").is(":visible")
+            ) {
+              fnObj.adjustmentOpen.closeAdjustmentModal();
+            }
+          });
+        },
+        setupDateValidation: function () {
+          function validateDateRange(startDateId, endDateId) {
+            var startDate = new Date($("#" + startDateId).val());
+            var endDate = new Date($("#" + endDateId).val());
+
+            if (startDate && endDate && startDate > endDate) {
+              alert("시작일은 종료일보다 늦을 수 없습니다.");
+              $("#" + endDateId).val($("#" + startDateId).val());
+            }
+          }
+
+          // 날짜 변경 시 유효성 검증
+          $("#dateFrom").on("change", function () {
+            validateDateRange("dateFrom", "dateTo");
+          });
+
+          $("#dateTo").on("change", function () {
+            validateDateRange("dateFrom", "dateTo");
+          });
+
+          // 모달창의 조정 일자도 오늘 날짜로 설정
+          $("#modalAdjustmentDate").on("focus", function () {
+            if (!$(this).val()) {
+              var today = new Date();
+              var year = today.getFullYear();
+              var month = String(today.getMonth() + 1).padStart(2, "0");
+              var day = String(today.getDate()).padStart(2, "0");
+              $(this).val(year + "-" + month + "-" + day);
+            }
+          });
+        },
+      };
+
+      //엑셀 헨들러
+      var excelHandler = {
+        getExcelFileName: function () {
+          return "재고현황 리스트.xlsx"; //엑셀파일명
+        },
+        getSheetName: function () {
+          return "재고현황 리스트"; //시트명
+        },
+        getExcelData: function () {
+          return get_json_res(myGrid, searchRes); //그리드를 엑셀다운로드dyd json 으로 변경
+        },
+        getWorksheet: function () {
+          return XLSX.utils.json_to_sheet(this.getExcelData());
+        },
+      };
+
+      function searchPaging(page) {
+        if ($("#rowPerPage").val()) {
+          pagePerRow = parseInt($("#rowPerPage").val());
+        }
+
+        var pageRange = 10; //페이지범위를 몇개씩짜를것인가. 예) 23페이지 라면 1 2 3 4 5 6 7 8 9 10  이 한번 나오고 >> 누르면 11 12 13 14 15 16 17 18 19 20 나오고 >> 누르면 21 22 23 나옴
+
+        var totalPageCnt =
+          searchRes.length % pagePerRow == 0
+            ? parseInt(searchRes.length / pagePerRow)
+            : parseInt(searchRes.length / pagePerRow) + 1;
+
+        var a = "<div class='pagination-container'>";
+
+        //패이징 처리
+        var start = page - 1;
+        var end = page - 1 + pageRange;
+
+        if (start % pageRange != 0) {
+          start = parseInt(start / pageRange) * pageRange;
+        }
+
+        if (end % pageRange != 0 || page == 1) {
+          end = parseInt(end / pageRange) * pageRange;
+        }
+
+        if (start >= pageRange) {
+          a +=
+            "<input type='button' onclick='searchPaging(" +
+            1 +
+            ");' value='<<' class='pagination-button'>";
+          a +=
+            "<input type='button' onclick='searchPaging(" +
+            (start - 1) +
+            ");' value='<' class='pagination-button'>";
+        }
+
+        var r = 0;
+
+        for (r = start; r < end; r++) {
+          if (r < totalPageCnt) {
+            if (r + 1 == page) {
+              //현재페이지 강조
+              a +=
+                "<input type='button' onclick='searchPaging(" +
+                (r + 1) +
+                ");' value=" +
+                (r + 1) +
+                " class='pagination-button active'>";
+            } else {
+              a +=
+                "<input type='button' onclick='searchPaging(" +
+                (r + 1) +
+                ");' value=" +
+                (r + 1) +
+                " class='pagination-button'>";
+            }
+          }
+        }
+
+        if (end * pagePerRow < searchRes.length) {
+          a +=
+            "<input type='button' onclick='searchPaging(" +
+            (end + 1) +
+            ");' value='>' class='pagination-button'>";
+          a +=
+            "<input type='button' onclick='searchPaging(" +
+            totalPageCnt +
+            ");' value='>>' class='pagination-button'>";
+        }
+
+        a += "<div class='pagination-info'>";
+        a +=
+          "<input type='number' maxlength=4 id='rowPerPage' value=" +
+          pagePerRow +
+          ">";
+        a +=
+          "<input type='button' value='적용' onclick='searchPaging(" +
+          1 +
+          ");' class='action-button'>";
+        a +=
+          "&nbsp;&nbsp;<i class='fa fa-calculator fa-lg' aria-hidden='true'></i>&nbsp;" +
+          searchRes.length;
+        a += "</div></div>";
+        $("#page").html(a);
+
+        var is = (page - 1) * pagePerRow; //시작점
+        var ie = (page - 1) * pagePerRow + pagePerRow; //종료점
+
+        if (searchRes.length < ie) {
+          ie = searchRes.length;
+        }
+
+        myGrid.clearAll(false);
+
+        var columns = myGrid.getColumnCount();
+        for (var i = is; i < ie; i++) {
+          var jsonData = {};
+          for (var c = 0; c < columns; c++) {
+            var columnId = myGrid.getColumnId(c);
+            var value = searchRes[i][columnId];
+
+            jsonData[columnId] = value;
+          }
+          myGrid.addRow(i + 1, "");
+          myGrid.setRowData(i + 1, jsonData);
+        }
+      }
+
+      $(document).ready(function () {
+        myWins = new dhtmlXWindows();
+
+        myGrid = new dhtmlXGridObject("grid"); //그리드
+
+        myCalendar = new dhtmlXCalendarObject([
+          { input: "dateFrom", button: "dateFromIcon" },
+          {
+            input: "dateTo",
+            button: "dateToIcon",
+          },
+        ]);
+
+        var now = new Date();
+        var year = now.getFullYear() + "";
+        var month = now.getMonth() + 1 + "";
+        var date = now.getDate() + "";
+        if (month.length == 1) {
+          month = "0" + month;
+        }
+        if (date.length == 1) {
+          date = "0" + date;
+        }
+
+        var today = year + "-" + month + "-" + date;
+
+        $("#dateFrom").val(today);
+        $("#dateTo").val(today);
+
+        myCalendar.loadUserLanguage("ko");
+
+        fnObj.comboOpen.comboCmpyCd(); //회사콤보 바인드
+
+        // 화주사 필드 권한별 제어
+        var sessionAgntCd = /*[[${session.agntCd}]]*/ "";
+        var sessionAgntNm = /*[[${session.agntNm}]]*/ "";
+
+        if (userGrntCd !== "9999") {
+          // 일반 사용자는 본인 화주사로 고정
+          if (sessionAgntCd) {
+            $("#agntCd").val(sessionAgntCd);
+          }
+          if (sessionAgntNm) {
+            $("#agntNm").val(sessionAgntNm);
+          }
+          // 화주사 필드를 readonly로 설정
+          $("#agntNm").prop("readonly", true);
+          // 검색 및 삭제 아이콘 숨기기
+          $("#agntSrchIcon").addClass("hidden");
+          $("#agntDelIcon").addClass("hidden");
+        } else {
+          // 관리자는 화주사 검색 가능 (현재 상태 유지)
+        }
+
+        fnObj.gridOpen.grid();
+
+        // 모달창 이벤트 핸들러 설정
+        fnObj.setupModalEventHandlers();
+
+        // 날짜 유효성 검증 및 기본값 설정
+        fnObj.setupDateValidation();
+
+        window.onresize = function (event) {
+          //윈도우의 사이즈가 변경했을떄
+          fnObj.gridOpen.setWidth();
+          fnObj.gridOpen.setWidth();
+        };
+      });
+
+      //20211226 정연호 추가. 키보드에서 F2 누르면 조회하기
+      $(document).keydown(function (event) {
+        if (event.keyCode == 113 || event.which == 113) {
+          fnObj.searchOpen.search();
+        }
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="mainDiv">
+      <div id="searchDiv">
+        <div id="btnDiv1">
+          <span class="title-container">
+            <span class="item-heade title-text">재고 현황 조회</span>
+            <span class="sub-title">erp105001</span>
+          </span>
+          <span class="btn-container">
+            <span class="item-data">
+              <button
+                id="btnSearch"
+                class="action-button primary"
+                onclick="fnObj.searchOpen.search()"
+              >
+                조회(F2)
+              </button>
+            </span>
+            <span class="item-data">
+              <input
+                id="btnReload"
+                type="button"
+                class="action-button secondary"
+                onclick="location.reload(true);"
+                value="초기화"
+              />
+            </span>
+            <span class="item-data">
+              <button
+                id="btnExcel"
+                class="action-button secondary"
+                onclick="excelDownload(excelHandler)"
+              >
+                엑셀다운로드
+              </button>
+            </span>
+          </span>
+        </div>
+        <div id="searchDiv1">
+          <span class="cell hidden-cell">
+            <span class="item-head">회사</span>
+            <span class="item-data">
+              <div id="cmpyCd"></div>
+            </span>
+          </span>
+          <span class="cell">
+            <span class="item-head">화주사</span>
+            <span class="item-data margin-right-5">
+              <input
+                type="text"
+                id="agntNm"
+                onkeyup="fnObj.keyOpen.enterKey('agntNm');"
+              />
+              <i
+                id="agntSrchIcon"
+                class="fa fa-search"
+                aria-hidden="true"
+                onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"
+              ></i>
+            </span>
+            <span class="item-data">
+              <input type="text" id="agntCd" readonly />
+              <i
+                id="agntDelIcon"
+                class="fa fa-minus-circle"
+                aria-hidden="true"
+                onclick="fnObj.searchOpen.delAgntCode()"
+              ></i>
+            </span>
+          </span>
+
+          <span class="cell">
+            <span class="item-head">상품</span>
+            <span class="item-data margin-right-5">
+              <input
+                type="text"
+                id="productNm"
+                onkeyup="fnObj.keyOpen.enterKey('productNm');"
+              />
+              <i
+                id="productSrchIcon"
+                class="fa fa-search"
+                aria-hidden="true"
+                onclick="fnObj.winOpen.prodCommSrch('상품','A','MTRL_SO','text')"
+              ></i>
+            </span>
+            <span class="item-data">
+              <input type="text" id="productCd" readonly />
+              <i
+                id="productDelIcon"
+                class="fa fa-minus-circle"
+                aria-hidden="true"
+                onclick="fnObj.searchOpen.delProductCode()"
+              ></i>
+            </span>
+          </span>
+        </div>
+        <div id="infoDiv">
+          <span class="info-text"
+            >※ <strong>재입고대기:</strong> 조회 시점을 기준으로 반품(정품) /
+            지방 상차 후 취소 주문의 용인센터로의 재입고 수량입니다.</span
+          ><br />
+          <span class="info-text"
+            >※ <strong>가용재고:</strong> 조회 시점을 기준으로 전체 재고에서
+            배송 예정인 물량을 제외한 재고입니다.</span
+          ><br />
+          <span class="info-text"
+            >※ <strong>전체재고:</strong> 조회 시점을 기준으로 실물 전체
+            재고입니다.</span
+          ><br />
+          <span class="info-text"
+            >※ <strong>용인센터:</strong> 조회 시점을 기준으로 현재 용인센터에
+            보관되어 있는 실물 재고입니다.</span
+          ><br />
+          <span class="info-text"
+            >※ <strong>지방센터 출고대기:</strong> 조회 시점을 기준으로
+            전체재고에서 배송 예정인 물량을 제외한 재고입니다.</span
+          ><br />
+        </div>
+      </div>
+
+      <div id="gridDiv">
+        <div id="grid"></div>
+      </div>
+      <div id="page"></div>
+    </div>
+
+    <!-- 재고 조정 모달 -->
+    <div id="inventoryAdjustmentModal" class="modal hidden">
+      <div class="modal-content large-modal">
+        <div class="modal-header">
+          <h4>재고 조정 및 출고 대기 주문</h4>
+          <span
+            class="close"
+            onclick="fnObj.adjustmentOpen.closeAdjustmentModal()"
+            >&times;</span
+          >
+        </div>
+        <div class="modal-body">
+          <!-- 탭 메뉴 -->
+          <div class="modal-tabs">
+            <div
+              id="tabAdjustment"
+              class="modal-tab active"
+              onclick="fnObj.adjustmentOpen.switchTab('adjustment')"
+            >
+              재고 조정
+            </div>
+            <div
+              id="tabOutbound"
+              class="modal-tab"
+              onclick="fnObj.adjustmentOpen.switchTab('outbound')"
+            >
+              출고 대기 주문
+            </div>
+            <div
+              id="tabHistory"
+              class="modal-tab"
+              onclick="fnObj.adjustmentOpen.switchTab('history')"
+            >
+              재고 변동 이력
+            </div>
+            <div
+                    id="tabLocation"
+                    class="modal-tab"
+                    onclick="fnObj.adjustmentOpen.switchTab('location')"
+            >
+              로케이션 재고
+            </div>
+          </div>
+
+          <!-- 재고 조정 탭 -->
+          <div id="tabContentAdjustment" class="tab-content active">
+            <div class="form-section">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>화주사</label>
+                  <input type="text" id="modalAgntNm" readonly />
+                </div>
+                <div class="form-group">
+                  <label>화주사코드</label>
+                  <input type="text" id="modalAgntCd" readonly />
+                </div>
+                <div class="form-group">
+                  <label>상품명</label>
+                  <input type="text" id="modalProductNm" readonly />
+                </div>
+                <div class="form-group">
+                  <label>상품코드</label>
+                  <input type="text" id="modalProductCd" readonly />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>현재 재고</label>
+                  <input type="number" id="modalCurrentQty" readonly />
+                </div>
+                <div class="form-group">
+                  <label>조정 유형</label>
+                  <select id="modalAdjustmentType">
+                    <option value="">선택하세요</option>
+                    <option value="INCREASE">증가</option>
+                    <option value="DECREASE">감소</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>조정 수량</label>
+                  <input
+                    type="number"
+                    id="modalAdjustmentQty"
+                    placeholder="조정 수량"
+                    min="1"
+                    disabled
+                  />
+                </div>
+                <div class="form-group">
+                  <label>조정 후 수량</label>
+                  <input
+                    type="number"
+                    id="modalAfterQty"
+                    placeholder="조정 후 수량"
+                    readonly
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group full-width">
+                  <label>조정 사유</label>
+                  <input
+                    type="text"
+                    id="modalAdjustmentReason"
+                    placeholder="조정 사유를 입력하세요"
+                    maxlength="500"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>조정 일자</label>
+                  <input type="date" id="modalAdjustmentDate" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 출고 대기 주문 탭 -->
+          <div id="tabContentOutbound" class="tab-content">
+            <div class="product-info">
+              <strong>상품:</strong>
+              <span id="modalOutboundProductNm"></span> (<span
+                id="modalOutboundProductCd"
+              ></span
+              >)
+            </div>
+            <div id="modalOutboundGrid"></div>
+          </div>
+
+          <!-- 재고 변동 이력 탭 -->
+          <div id="tabContentHistory" class="tab-content">
+            <div class="product-info">
+              <strong>상품:</strong>
+              <span id="modalHistoryProductNm"></span> (<span
+                id="modalHistoryProductCd"
+              ></span
+              >)
+            </div>
+            <div id="modalHistoryGrid"></div>
+          </div>
+
+          <!-- 로케이션 탭 -->
+          <div id="tabContentLocation" class="tab-content">
+            <div class="product-info">
+              <strong>상품:</strong>
+              <span id="modalLocationProductNm"></span> (<span id="modalLocationProductCd"></span>)
+            </div>
+            <div id="modalLocationGrid"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div id="modalFooterAdjustment" class="modal-footer-section">
+            <button
+              class="btn btn-primary"
+              onclick="fnObj.adjustmentOpen.registerAdjustment()"
+            >
+              재고 조정
+            </button>
+            <button
+              class="btn btn-secondary"
+              onclick="fnObj.adjustmentOpen.closeAdjustmentModal()"
+            >
+              취소
+            </button>
+          </div>
+          <div id="modalFooterOutbound" class="modal-footer-section hidden">
+            <button
+              class="btn btn-secondary"
+              onclick="fnObj.adjustmentOpen.closeAdjustmentModal()"
+            >
+              닫기
+            </button>
+          </div>
+          <div id="modalFooterHistory" class="modal-footer-section hidden">
+            <button
+              class="btn btn-secondary"
+              onclick="fnObj.adjustmentOpen.closeAdjustmentModal()"
+            >
+              닫기
+            </button>
+            <div id="modalFooterLocation" class="modal-footer-section hidden">
+              <button
+                      class="btn btn-secondary"
+                      onclick="fnObj.adjustmentOpen.closeAdjustmentModal()"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>재고 통합 조회</title>
+    <style>
+        :root{
+            --bg:#f5f5f5; --card:#ffffff; --bd:#e0e0e0;
+            --txt:#111; --sub:#666; --primary:#2563eb; --primary-bg:#eff6ff;
+            --dark:#1f2937; --warn:#dc2626;
+        }
+        *{box-sizing:border-box;}
+        body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--txt);padding-bottom:40px;}
+
+        header{
+            position:sticky;top:0;background:var(--card);
+            border-bottom:1px solid var(--bd);padding:14px 16px;z-index:100;
+            display:flex;align-items:center;justify-content:space-between;
+        }
+        h1{margin:0;font-size:18px;font-weight:800;}
+
+        .search-area{padding:16px;background:var(--card);border-bottom:1px solid var(--bd);}
+        .input-group{display:flex;gap:8px;margin-bottom:10px;}
+        .input-wrapper{position:relative;flex:1;}
+
+        .input{
+            width:100%;height:48px;padding:0 12px;padding-right:40px;
+            border:1px solid #ccc;border-radius:8px;font-size:16px;
+            background:#fff;appearance:none;
+        }
+        .input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(37,99,235,.1);}
+
+        .clear-icon{
+            position:absolute;right:0;top:0;height:48px;width:40px;
+            display:flex;align-items:center;justify-content:center;
+            color:#999;cursor:pointer;font-size:18px;
+        }
+
+        .btn{
+            height:48px;padding:0 16px;border-radius:8px;border:none;
+            font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;
+        }
+        .btn.search{background:var(--primary);color:#fff;width:100%;}
+        .btn.scan{background:var(--dark);color:#fff;min-width:50px;font-size:18px;}
+        .btn:active{opacity:.9;transform:scale(.98);}
+        .btn:disabled{opacity:.6;cursor:not-allowed;}
+
+        /* 상단 출력 버튼 스타일 */
+        #printBtn {
+            background: #6c757d;
+            color: #fff;
+            transition: all 0.2s;
+        }
+        #printBtn.active {
+            background: var(--dark);
+            opacity: 1 !important;
+        }
+
+        .status-msg{font-size:13px;color:var(--sub);text-align:center;margin-top:8px;min-height:16px;}
+
+        .main-container{padding:16px;display:flex;flex-direction:column;gap:24px;}
+        .section-header{
+            font-size:14px;font-weight:700;color:var(--sub);margin-bottom:8px;
+            display:flex;justify-content:space-between;align-items:center;
+        }
+
+        .item-card{
+            background:var(--card);border:1px solid var(--bd);border-radius:12px;
+            padding:14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(0,0,0,.03);
+            transition:all .2s ease;
+        }
+
+        .master-item{cursor:pointer;position:relative;}
+        .master-item:active{background:#fafafa;}
+        .master-item.selected{
+            border-color:var(--primary);
+            box-shadow:0 0 0 2px rgba(37,99,235,.15);
+            background-color:var(--primary-bg);
+        }
+        .master-item.selected::after{
+            content:"✓";position:absolute;right:14px;top:14px;
+            color:var(--primary);font-size:18px;font-weight:bold;
+        }
+
+        .detail-item{border-left:4px solid var(--sub);}
+        .detail-item.has-stock{border-left-color:var(--primary);}
+
+        .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+        .row:last-child{margin-bottom:0;}
+
+        .cust-nm{font-size:12px;color:var(--sub);font-weight:600;margin-bottom:2px;}
+        .mtrl-nm{font-size:16px;font-weight:800;color:#111;line-height:1.3; padding-right: 20px;}
+        .mtrl-cd{font-size:13px;color:#666;background:#eee;padding:2px 6px;border-radius:4px;display:inline-block;margin-top:4px;}
+
+        .qty-area{text-align:right;}
+        .qty-val{font-size:16px;font-weight:800;color:var(--primary);}
+        .qty-label{font-size:11px;color:#888;margin-right:2px;}
+
+        .loc-cd{font-size:15px;font-weight:700;color:#333;}
+
+        .empty-state{
+            padding:30px 0;text-align:center;color:#999;font-size:13px;
+            background:rgba(0,0,0,.02);border-radius:8px;border:1px dashed #ccc;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>재고 조회</h1>
+    <div style="font-size:13px;color:#666;" id="topBadge">0건</div>
+</header>
+
+<div class="search-area">
+    <div class="input-group">
+        <div class="input-wrapper">
+            <input id="keyword" class="input" type="text" placeholder="상품코드 / 명 / 바코드" />
+            <div class="clear-icon" id="clearBtn">&times;</div>
+        </div>
+        <button id="scanBtn" class="btn scan" type="button">스캔</button>
+    </div>
+    <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
+        <button id="searchBtn" class="btn search" type="button" style="flex: 2;">조회</button>
+
+        <div style="flex: 1; display: flex; align-items: center; background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 0 8px; height: 48px;">
+            <span style="font-size: 12px; color: #666; margin-right: 4px;">매수</span>
+            <input id="printQty" type="number" value="1" min="1" max="99"
+                   style="width: 100%; border: none; font-size: 16px; font-weight: bold; text-align: center; outline: none;"
+                   onfocus="this.select()">
+        </div>
+
+        <button id="printBtn" class="btn" type="button" style="flex: 1.5; opacity: 0.5;" disabled>
+            🖨️ 출력
+        </button>
+    </div>
+    <div class="status-msg" id="status"></div>
+</div>
+
+<main class="main-container">
+
+    <section>
+        <div class="section-header">
+            <span>📦 검색 상품 목록</span>
+        </div>
+        <div id="masterList">
+            <div class="empty-state">검색어를 입력하고 조회하세요.</div>
+        </div>
+    </section>
+
+    <section id="detailSection">
+        <div class="section-header">
+            <span>📍 로케이션별 재고</span>
+            <span id="selectedMtrlInfo" style="font-weight:400;font-size:12px;color:var(--primary);"></span>
+        </div>
+        <div id="detailList">
+            <div class="empty-state">위 목록에서 상품을 선택하세요.</div>
+        </div>
+    </section>
+
+</main>
+
+<script>
+    // ===============================================
+    // 유틸리티 및 상태 관리
+    // ===============================================
+    const el = (id) => document.getElementById(id);
+    const setStatus = (msg) => { const s = el("status"); if (s) s.textContent = msg || ""; };
+    const fmt = (n) => Number(n || 0).toLocaleString();
+
+    const escape = (s) => String(s ?? "").replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[m]));
+
+    function pick(obj, keys, def = "") {
+        for (const k of keys) {
+            const v = obj?.[k];
+            if (v != null && String(v) !== "") return v;
+        }
+        return def;
+    }
+
+    const API_PRODUCTS = "/hyapp/api/inv/products";
+    const API_LOCS     = "/hyapp/api/inv/locs";
+
+    let state = {
+        products: [],
+        selectedCd: null,
+        selectedNm: null,
+        selectedCust: null,
+        selectedBarcode: null
+    };
+
+    // ===============================================
+    // 로직: 상품 검색
+    // ===============================================
+    async function searchData() {
+        const keyword = el("keyword").value.trim();
+        if (!keyword) {
+            setStatus("검색어를 입력해주세요.");
+            el("keyword").focus();
+            return;
+        }
+
+        // 초기화
+        state.selectedCd = null;
+        updatePrintButton(); // 출력 버튼 비활성화
+
+        setStatus("상품 조회 중...");
+        el("searchBtn").disabled = true;
+
+        try {
+            const params = new URLSearchParams({ keyword });
+            const resProd = await fetch(`${API_PRODUCTS}?${params}`);
+            const dataProd = await resProd.json();
+
+            state.products = Array.isArray(dataProd) ? dataProd : (dataProd.list || dataProd.data || []);
+
+            renderMaster(state.products);
+            renderDetail(null);
+            el("topBadge").textContent = `${state.products.length}건`;
+            setStatus(state.products.length === 0 ? "검색 결과가 없습니다." : "조회 완료");
+
+        } catch (e) {
+            console.error(e);
+            setStatus("서버 통신 오류");
+        } finally {
+            el("searchBtn").disabled = false;
+        }
+    }
+
+    // ===============================================
+    // 렌더링: 상품 목록
+    // ===============================================
+    function renderMaster(list) {
+        const box = el("masterList");
+        if (!list || list.length === 0) {
+            box.innerHTML = `<div class="empty-state">검색 결과가 없습니다.</div>`;
+            return;
+        }
+
+        box.innerHTML = list.map(item => {
+            const mtrlCd = pick(item, ["mtrlCd", "MTRL_CD"]);
+            const mtrlNm = pick(item, ["mtrlNm", "MTRL_NM"]);
+            const custNm = pick(item, ["custNm", "CUST_NM", "partnerNm"]);
+            const qty    = pick(item, ["qty", "QTY", "stockQty"], 0);
+            const barcode = pick(item, ["barcode", "BARCODE"]);
+
+            return `
+                <div class="item-card master-item"
+                     onclick='selectProduct(${JSON.stringify({mtrlCd, mtrlNm, custNm, barcode}).replace(/'/g, "\\'")})'
+                     data-cd="${escape(mtrlCd)}">
+                    <div class="cust-nm">${escape(custNm)}</div>
+                    <div class="row"><div class="mtrl-nm">${escape(mtrlNm)}</div></div>
+                    <div class="row" style="margin-top:6px;">
+                        <span class="mtrl-cd">${escape(mtrlCd)}</span>
+                        <div class="qty-area">
+                            <span class="qty-label">총 재고</span>
+                            <span class="qty-val">${fmt(qty)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    }
+
+    // ===============================================
+    // 선택 처리 (상품 클릭 시)
+    // ===============================================
+    async function selectProduct(item) {
+        // [추가] 바코드 값이 실제 존재하는지 엄격하게 체크
+        // barcode가 null, undefined, 빈값, 또는 상품코드와 동일한 경우(백업 처리된 경우) 체크
+        if (!item.barcode || item.barcode === "" || item.barcode === item.mtrlCd) {
+            setStatus("⚠️ 해당 상품은 등록된 바코드가 없습니다.");
+            alert("바코드 정보가 없는 상품입니다.\n데이터를 먼저 확인해주세요.");
+
+            state.selectedCd = null;
+            updatePrintButton(); // 버튼 비활성화 유지
+            return;
+        }
+
+        state.selectedCd = item.mtrlCd;
+        state.selectedNm = item.mtrlNm;
+        state.selectedCust = item.custNm;
+        state.selectedBarcode = item.barcode;
+
+        // UI 업데이트
+        document.querySelectorAll(".master-item").forEach(div => {
+            div.classList.toggle("selected", div.dataset.cd === item.mtrlCd);
+        });
+        el("selectedMtrlInfo").textContent = `[선택: ${item.mtrlNm}]`;
+
+        updatePrintButton();
+        await loadLocs(item.mtrlCd);
+        setStatus("상품 선택 완료 (출력 가능)");
+    }
+
+    function updatePrintButton() {
+        const btn = el("printBtn");
+        if (state.selectedCd) {
+            btn.disabled = false;
+            btn.classList.add("active");
+        } else {
+            btn.disabled = true;
+            btn.classList.remove("active");
+        }
+    }
+
+    // ===============================================
+    // 로케이션 조회
+    // ===============================================
+    async function loadLocs(mtrlCd) {
+        renderDetail({ loading: true });
+        try {
+            const res = await fetch(`${API_LOCS}?mtrlCd=${mtrlCd}`);
+            const data = await res.json();
+            const list = Array.isArray(data) ? data : (data.list || data.data || []);
+            renderDetail({ list });
+        } catch (e) {
+            renderDetail({ error: e.message });
+        }
+    }
+
+    function renderDetail(arg) {
+        const box = el("detailList");
+        if (!state.selectedCd) { box.innerHTML = `<div class="empty-state">상품을 선택하세요.</div>`; return; }
+        if (arg?.loading) { box.innerHTML = `<div class="empty-state">로딩 중...</div>`; return; }
+
+        const list = arg?.list || [];
+        if (list.length === 0) { box.innerHTML = `<div class="empty-state">재고가 없습니다.</div>`; return; }
+
+        box.innerHTML = list.map(it => `
+            <div class="item-card detail-item ${Number(it.QTY||it.qty||0) > 0 ? 'has-stock' : ''}">
+                <div class="row">
+                    <div class="loc-cd">${escape(it.LOC_CD || it.locCd)}</div>
+                    <div class="qty-val">${fmt(it.QTY || it.qty)}</div>
+                </div>
+            </div>
+        `).join("");
+    }
+
+    // ===============================================
+    // 바코드 출력 (입고 검수 화면 로직)
+    // ===============================================
+    el("printBtn").addEventListener("click", async () => {
+        if (!state.selectedCd) return;
+
+        // 입력된 매수 가져오기 (기본값 1)
+        const qtyInput = el("printQty");
+        let qty = parseInt(qtyInput.value || 1);
+
+        if (qty < 1) {
+            alert("출력 매수는 1매 이상이어야 합니다.");
+            qtyInput.value = 1;
+            return;
+        }
+
+        if (!confirm(`[${state.selectedCust}]\n${state.selectedNm}\n바코드를 ${qty}장 출력하시겠습니까?`)) return;
+
+        try {
+            setStatus("출력 요청 중...");
+            const res = await fetch("/hyapp/api/print/request", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    agntNm: state.selectedCust,
+                    mtrlNm: state.selectedNm,
+                    mtrlCd: state.selectedCd,
+                    barcode: state.selectedBarcode,
+                    qty: qty, // 사용자가 입력한 매수 전달
+                    cmpyCd: 'A'
+                })
+            });
+
+            if (res.ok) {
+                alert(qty + "장 출력 요청 완료!");
+                setStatus("출력 완료 (" + qty + "장)");
+            } else {
+                throw new Error("서버 응답 오류");
+            }
+        } catch (e) {
+            alert("출력 실패: " + e.message);
+            setStatus("출력 실패");
+        }
+    });
+
+    // ===============================================
+    // 기타 이벤트 (스캔, 클리어 등)
+    // ===============================================
+    el("searchBtn").addEventListener("click", searchData);
+    el("keyword").addEventListener("keydown", (e) => { if (e.key === "Enter") searchData(); });
+
+    el("clearBtn").addEventListener("click", () => {
+        el("keyword").value = "";
+        el("printQty").value = 1; // 매수 초기화 추가
+        state.selectedCd = null;
+        updatePrintButton();
+        renderMaster([]);
+        renderDetail(null);
+        el("topBadge").textContent = "0건";
+        el("selectedMtrlInfo").textContent = "";
+    });
+
+    // 앱 통신 로직 (스캔 등)은 기존 파일과 동일하게 유지
+    function requestScan() {
+        if (window.ReactNativeWebView?.postMessage) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: "requestBarcodeScan", target: "KEYWORD" }));
+        } else {
+            alert("모바일 앱 환경이 아닙니다.");
+        }
+    }
+    el("scanBtn").addEventListener("click", requestScan);
+
+    function handleAppMessage(e) {
+        let data = e.data;
+        try { if(typeof data === "string") data = JSON.parse(data); } catch(e){}
+        const code = data?.payload?.code || data?.code || (typeof data === "string" ? data : "");
+        if(code) { el("keyword").value = code; searchData(); }
+    }
+    window.addEventListener("message", handleAppMessage);
+    document.addEventListener("message", handleAppMessage);
+
+</script>
+</body>
+</html>

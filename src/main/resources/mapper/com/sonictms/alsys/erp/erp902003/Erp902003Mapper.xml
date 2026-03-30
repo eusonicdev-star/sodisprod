@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.erp.erp902003.mapper.Erp902003Mapper">
+
+	<!-- 그리드 목록 조회하기 -->
+    <select id="erp902003List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO"
+    															resultType		="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO">
+        {
+	      CALL ${schema}..USP_ZONEPOST_LISTBYALL (
+	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{zoneType	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{zoneCd	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{sidoNm	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{siguNm	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{postCd	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{useYn		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+	<!-- 권역매핑저장하기 -->
+    <select id="erp902003Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO"
+    															resultType		="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO">
+        {
+	      CALL ${schema}..USP_ZONEPOST_SAVE (
+	      	#{tblLgstZonepostMId	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{cmpyCd				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{zoneType				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{zoneCd				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{postCd				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{memo					,mode=IN	,	jdbcType=VARCHAR},
+	      	#{saveUser				,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+    <!-- 권역매핑삭제하기 -->
+    <select id="erp902003Delete"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO"
+    															resultType		="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO">
+        {
+	      CALL ${schema}..USP_ZONEPOST_DELETE (
+	      	#{tblLgstZonepostMId	,mode=IN	,	jdbcType=VARCHAR}
+	      	
+	      )      
+      }
+    </select>
+    
+    
+      <!-- 권역 등록 수정 팝업의 중복확인하기-->
+    <select id="erp902003p1DoubleChk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO"
+																	resultType		="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO">
+        {
+	      CALL ${schema}..USP_COMM_M_DUP_CHK (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{commCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{comdCd		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+    
+    <!-- 권역 등록 수정 팝업의 등록/수정 하기 -->
+	<select id="erp902003p1Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO"
+    															resultType		="com.sonictms.alsys.erp.erp902003.entity.Erp902003VO">
+        {
+	      CALL ${schema}..USP_COMM_M_EASY_SAVE (
+	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{tblCommMId	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{commCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{commNm		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{commDesc		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{comdCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{comdNm		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{comdDesc		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{useYn			,mode=IN	,	jdbcType=VARCHAR},
+	      	#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+
+    </select>
+    
+    
+         
+</mapper>

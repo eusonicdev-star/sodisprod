@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.hyapp.common.mapper.BarcodePrintMapper">
+
+    <insert id="insertPrintQueue" parameterType="map">
+        INSERT INTO TBL_PRINT_QUEUE (MTRL_NM, MTRL_CD, BARCODE, QTY, STATUS, REQ_DT)
+        VALUES (#{mtrlNm}, #{mtrlCd}, #{barcode}, 1, '0', GETDATE())
+    </insert>
+
+    <select id="selectPendingQueue" resultType="map">
+        SELECT TOP 10
+           SEQ, MTRL_NM, MTRL_CD, BARCODE, QTY
+        FROM TBL_PRINT_QUEUE
+        WHERE STATUS = '0'
+        ORDER BY REQ_DT ASC
+    </select>
+
+    <update id="updatePrintStatus">
+        UPDATE TBL_PRINT_QUEUE
+        SET STATUS = #{status},
+            DONE_DT = GETDATE(),
+            ERR_MSG = #{errMsg}
+        WHERE SEQ = #{seq}
+    </update>
+
+</mapper>

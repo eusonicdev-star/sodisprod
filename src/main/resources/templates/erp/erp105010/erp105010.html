@@ -1,0 +1,254 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>택배/직출 출고관리 (erp105010)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/web/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/erp-style.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/erp105005.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/erp105010.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+    <script src=" https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <!-- 엑셀 다운로드 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+
+    <script th:inline="javascript">
+      var environmentPagePerRow = /*[[${@environment.getProperty('common.html.pagePerRow')}]]*/ 15;
+      var cmpyCd = /*[[${session.cmpyCd}]]*/ '';
+      var sessionUserGrntCd = /*[[${session.userGrntCd}]]*/ null;
+      var sessionAgntCd = /*[[${session.agntCd}]]*/ null;
+      var sessionAgntNm = /*[[${session.agntNm}]]*/ null;
+    </script>
+    <script type="text/javascript" src="/js/erp105010.js"></script>
+</head>
+<body>
+<div id="mainDiv">
+    <div id="searchDiv">
+        <div id="btnDiv1">
+            <div class="title-container">
+				<span class="item-head title-text">
+					택배/직출 출고관리
+				</span>
+                <span class="sub-title">erp105010</span>
+            </div>
+            <div class="btn-container">
+                <input id="btnSearch" class="action-button primary" type="button" onclick="fnObj.searchOpen.sTime()"
+                       value="조회(F2)">
+                <input id="btnCourierOutbound" class="action-button" type="button"
+                       onclick="fnObj.outboundOpen.courierOutbound()"
+                       value="택배 출고">
+                <input id="btnDirectOutbound" class="action-button" type="button"
+                       onclick="fnObj.outboundOpen.directOutbound()"
+                       value="업체직출 출고">
+                <input id="btnExcelOutbound" class="action-button" type="button"
+                       onclick="fnObj.excelOutbound.downloadTemplate()"
+                       value="택배출고 엑셀양식 다운로드">
+                <input id="btnExcelUpload" class="action-button" type="button"
+                       onclick="fnObj.excelOutbound.uploadExcelFile()"
+                       value="택배출고 엑셀업로드">
+                <input id="btnExcelDown" class="action-button" type="button" onclick="excelDn();" value="엑셀 다운로드">
+                <input id="btnReload" class="action-button" type="button" onclick="location.reload(true);"
+                       value="초기화">
+            </div>
+        </div>
+        <div id="searchDiv1">
+            <span class="cell" style="width: 220px; display: none;">
+					<span class="item-head">회사</span>
+					<span class="item-data">
+						<div id="cmpyCd"></div>
+					</span>
+				</span>
+            <span class="cell">
+					<span class="item-head" style="width: 80px;">달력유형</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="dtType"></div>
+					</span>
+				</span>
+
+            <span id="fromTo" class="cell" style="width: 360px;">
+					<span class="item-head" style="width: 80px;">달력</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="dateFrom" style="height: 20px; width: 90px;" readonly>
+						<i id="dateFromIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+					</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="dateTo" style="height: 20px; width: 90px;" readonly>
+						<i id="dateToIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+					</span>
+				</span>
+
+            <span class="cell" style="width: 380px;">
+					<span class="item-head" style="width: 80px;">화주사</span>
+					<span class="item-data" style="width: 160px;">
+						<input type="text" id="srchName" style="width: 112px;"
+                               onkeyup="fnObj.keyOpen.enterKey('srchName');"></input>
+						<i id="srchIcon" class="fa fa-search" aria-hidden="true"
+                           onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"></i>
+					</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="srchCode" style="width: 102px;" readonly></input>
+						<i id="delIcon" class="fa fa-minus-circle" aria-hidden="true"
+                           onclick="fnObj.searchOpen.delSrchCode()"></i>
+					</span>
+				</span>
+
+            <span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">물류센터</span>
+					<span class="item-data" style="width: 140px;">
+						<div opt_type="checkbox" id="dcCd"></div>
+					</span>
+				</span>
+
+            <span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">수령인</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="rcptNm" style="height: 20px; width: 132px;">
+					</span>
+				</span>
+
+            <span class="cell h-cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">AL 오더</span>
+					<span class="item-data" style="width: 140px;">
+						<textArea id="soList" style="width: 122px;"
+                                  oninput="this.value = this.value.replace(/[^0-9\n]/g, '').replace(/(\..*)\./g, '$1');"/></textArea>
+					</span>
+			</span>
+
+            <span class="cell" style="width: 240px;">
+					<span class="item-head" style="width: 80px;">주문유형</span>
+					<span class="item-data" style="width: 160px;">
+						<div opt_type="checkbox" id="soType"></div>
+					</span>
+				</span>
+
+            <span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">출고상태</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="outboundStatus"></div>
+					</span>
+				</span>
+
+            <span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">상품코드</span>
+					<span class="item-data" style="width: 140px;">
+						<textArea id="prodList" style="width: 122px;"></textArea>
+					</span>
+				</span>
+
+            <span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">상품명</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="prodNm" style="height: 20px; width: 132px;">
+					</span>
+				</span>
+
+        </div>
+    </div>
+
+    <div id="searchDiv2nd"
+         style="width: 100%; font-size: 12px; padding-bottom: 5px; background-color: papayawhip; display: none;">
+        <div id="btnDiv2nd1" style="width: 100%;">
+            <span class="cell" style="float: right;"> </span>
+        </div>
+        <div id="searchDiv2nd1" style="width: 100%;"></div>
+    </div>
+
+    <div id="gridDiv" style="width: 100%; font-size: 12px; padding-bottom: 5px;">
+        <div id="grid" style="width: 25%; height: 100%;"></div>
+    </div>
+    <div id="page" style="width: 100%; height: 30px;"></div>
+</div>
+
+<!-- 택배 출고 모달 -->
+<div id="courierModal"
+     style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+    <div id="courierModalContent"
+         style="background-color: #fff; position: absolute; top: 10%; left: 50%; transform: translateX(-50%); padding: 0; border: 1px solid #ccc; width: 80%; max-width: 900px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+        <div id="courierModalHeader"
+             style="padding: 12px 15px; background-color: #4a5568; color: white; cursor: move; user-select: none; border-bottom: 1px solid #999;">
+            <h3 style="margin: 0; font-size: 16px; display: inline-block;">택배 출고 처리</h3>
+            <button onclick="fnObj.outboundOpen.closeCourierModal()"
+                    style="float: right; background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; line-height: 1;">
+                &times;
+            </button>
+        </div>
+        <div style="padding: 15px;">
+            <div style="margin-bottom: 15px;">
+                <label style="display: inline-block; width: 60px; font-size: 12px;">출고일:</label>
+                <input type="date" id="courierOutboundDate"
+                       style="padding: 4px 8px; font-size: 12px; border: 1px solid #ccc; width: 140px;">
+            </div>
+            <div id="courierOutboundTable" style="max-height: 400px; overflow-y: auto; margin-bottom: 15px;">
+                <!-- 동적으로 테이블이 생성됩니다 -->
+            </div>
+            <div style="text-align: right; padding-top: 10px; border-top: 1px solid #ddd;">
+                <button onclick="fnObj.outboundOpen.confirmCourierOutbound()" class="action-button primary"
+                        style="margin-right: 5px;">확인
+                </button>
+                <button onclick="fnObj.outboundOpen.closeCourierModal()" class="action-button">취소</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 엑셀 업로드 파일 입력 -->
+<input type="file" id="excelOutboundFileInput" accept=".xlsx,.xls" style="display: none"
+       onchange="fnObj.excelOutbound.handleExcelFileSelect(event)"/>
+
+<!-- 엑셀 데이터 미리보기 모달 -->
+<div id="excelOutboundModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="width: 90%; max-width: 1000px;">
+        <div class="modal-header">
+            <h3>택배 출고 엑셀 데이터 미리보기</h3>
+            <span class="modal-close" onclick="fnObj.excelOutbound.closeExcelPreview()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="preview-info">
+                <p><strong>총 <span id="excelOutboundPreviewCount">0</span>건의 데이터가 처리됩니다.</strong></p>
+                <p>아래 내용을 확인한 후 '처리하기' 버튼을 클릭하세요.</p>
+            </div>
+            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                <table class="outbound-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">번호</th>
+                            <th>AL 오더</th>
+                            <th>상품코드</th>
+                            <th>상품명</th>
+                            <th>운송사</th>
+                            <th>송장번호</th>
+                            <th>출고일</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody id="excelOutboundPreviewTableBody">
+                        <!-- 미리보기 데이터가 여기에 표시됩니다 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="fnObj.excelOutbound.closeExcelPreview()">취소</button>
+            <button type="button" class="btn btn-primary" onclick="fnObj.excelOutbound.confirmExcelUpload()">처리하기</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

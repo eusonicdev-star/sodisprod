@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.menu.mapper.MenuMapper">
+
+
+    <select id="menuList" statementType="CALLABLE" parameterType="com.sonictms.alsys.menu.entity.MenuVO" resultType="com.sonictms.alsys.menu.entity.MenuVO">
+        {
+	      CALL ${schema}..USP_MENU_LIST_BY_GRNT_R (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{sysCd			,mode=IN	,	jdbcType=VARCHAR},
+	      	#{userGrntCd	,mode=IN	,	jdbcType=VARCHAR}
+	      	
+	      )      
+      }
+
+    </select>
+
+</mapper>

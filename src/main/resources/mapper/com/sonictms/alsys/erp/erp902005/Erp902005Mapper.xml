@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.erp.erp902005.mapper.Erp902005Mapper">
+
+	<!-- 그리드 목록 조회하기 -->
+    <select id="erp902005List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902005.entity.Erp902005VO"
+    															resultType		="com.sonictms.alsys.erp.erp902005.entity.Erp902005VO">
+        {
+	      CALL ${schema}..USP_CALENDA_LISTBYALL (
+	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{clndType	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{clndYear	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{dateFrom	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{dateTo	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{weekList	,mode=IN	,	jdbcType=VARCHAR}
+	      <!-- 	#{useYn		,mode=IN	,	jdbcType=VARCHAR} -->
+	      )      
+      }
+    </select>
+
+	<!-- 권역매핑저장하기 -->
+    <select id="erp902005Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902005.entity.Erp902005VO"
+    															resultType		="com.sonictms.alsys.erp.erp902005.entity.Erp902005VO">
+        {
+	      CALL ${schema}..USP_CALENDA_UPDT (
+	      	#{tblCalendaM	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{dlvyWorkYn				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{cdcWorkYn				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{rdcWorkYn				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{memo					,mode=IN	,	jdbcType=VARCHAR},
+	      	#{saveUser				,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+  
+    
+    
+    <!-- 달력일괄생성 팝업창에서 일괄생성 저장하기 -->
+	<select id="erp902005p1Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902005.entity.Erp902005VO"
+    															resultType		="com.sonictms.alsys.erp.erp902005.entity.Erp902005VO">
+        {
+	      CALL ${schema}..USP_CALENDA_CRT (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{clndType		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{clndYear		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{weekList		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+
+    </select>
+    
+    
+         
+</mapper>

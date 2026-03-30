@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.erp.erp104001.mapper.Erp104001Mapper">
+
+	<!-- 그리드 목록 조회하기 -->
+    <select id="erp104001List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO"
+    															resultType		="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO">
+        {
+	      CALL ${schema}..USP_SO_REPORT_SO_LISTBYALL (
+	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
+			#{dtType	,mode=IN	,	jdbcType=VARCHAR},
+			#{fromDt	,mode=IN	,	jdbcType=VARCHAR},
+			#{toDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{agntList	,mode=IN	,	jdbcType=VARCHAR},
+			#{dcList	,mode=IN	,	jdbcType=VARCHAR},
+			#{soList	,mode=IN	,	jdbcType=VARCHAR},
+			#{soTypeList,mode=IN	,	jdbcType=VARCHAR},
+			#{soStatList,mode=IN	,	jdbcType=VARCHAR},
+			#{mallNm	,mode=IN	,	jdbcType=VARCHAR},
+			#{acptNm	,mode=IN	,	jdbcType=VARCHAR},
+			#{acptTel	,mode=IN	,	jdbcType=VARCHAR},
+			#{useYn		,mode=IN	,	jdbcType=VARCHAR},
+			#{refSoList	,mode=IN	,	jdbcType=VARCHAR},
+			#{srchAddr	,mode=IN	,	jdbcType=VARCHAR},
+			<!-- 20220106 정연호 추가. 시공카테고리 -->
+			#{instCtgrList		,mode=IN	,	jdbcType=VARCHAR}
+	      )
+      }
+    </select>
+
+	<!-- 체크수정 하기  -->
+    <select id="erp104001Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO"
+    															resultType		="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO">
+        {
+	      CALL ${schema}..USP_INST_CAPA_SAVE (
+	      	#{saveGubn	,mode=IN	,	jdbcType=VARCHAR},
+			#{capaId	,mode=IN	,	jdbcType=VARCHAR},
+			#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
+			#{capaCtgr	,mode=IN	,	jdbcType=VARCHAR},
+			#{capaType	,mode=IN	,	jdbcType=VARCHAR},
+			#{seatType	,mode=IN	,	jdbcType=VARCHAR},
+			#{zoneType	,mode=IN	,	jdbcType=VARCHAR},
+			#{zoneCd	,mode=IN	,	jdbcType=VARCHAR},
+			#{instDt	,mode=IN	,	jdbcType=VARCHAR},
+			#{weekCd	,mode=IN	,	jdbcType=VARCHAR},
+			#{capaPerDay,mode=IN	,	jdbcType=VARCHAR},
+			#{totCapa	,mode=IN	,	jdbcType=VARCHAR},
+			#{useYn		,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser	,mode=IN	,	jdbcType=VARCHAR}
+	      )
+      }
+    </select>
+
+
+
+
+    <!-- 시공좌석 일괄생성 팝업창에서 일괄생성 저장하기 -->
+	<select id="erp104001p1Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO"
+    															resultType		="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO">
+        {
+	      CALL ${schema}..USP_INST_CAPA_CRT (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{dtType		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{fromDt		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{toDt			,mode=IN	,	jdbcType=VARCHAR},
+	      	#{dtList		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{instCtgr		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{instType		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{seatTypeList	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{instZoneType	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{instZoneList	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{weekList		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{capaCnt		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+
+	      )
+      }
+
+    </select>
+
+
+
+
+    <!-- erp104001p2 좌석 점유 상제 조회 리스트 -->
+    <select id="erp104001p2List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO"
+    															resultType		="com.sonictms.alsys.erp.erp104001.entity.Erp104001VO">
+        {
+	      CALL ${schema}..USP_INST_CAPA_CRT_POPUP_LOAD (
+	      	#{capaId		,mode=IN	,	jdbcType=VARCHAR}
+
+	      )
+      }
+    </select>
+
+
+
+
+
+</mapper>

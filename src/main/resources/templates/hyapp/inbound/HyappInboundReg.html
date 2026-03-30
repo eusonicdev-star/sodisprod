@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>입고 예정 등록</title>
+    <style>
+        :root {
+            --bg: #f5f7fb; --card: #ffffff; --bd: #e0e0e0;
+            --primary: #007bff; --dark: #1f2937; --sub: #666;
+        }
+        body { margin:0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: #333; padding-bottom: 30px; }
+        header { position: sticky; top:0; background:#fff; border-bottom:1px solid #e0e0e0; padding:16px; z-index: 100; display: flex; align-items: center; }
+        .back-btn { background: none; border: none; font-size: 20px; cursor: pointer; margin-right: 10px; }
+        h1 { margin:0; font-size:18px; flex: 1; text-align: center; margin-right: 30px; }
+
+        main { padding:16px; }
+
+        .search-section { background: #fff; padding: 16px; border-radius: 12px; border: 1px solid var(--bd); margin-bottom: 20px; }
+        .section-title { font-size: 14px; font-weight: 700; color: var(--sub); margin-bottom: 10px; display: block; }
+
+        .input-group { display: flex; gap: 8px; margin-bottom: 0; }
+        .input-wrapper { position: relative; flex: 1; }
+
+        input, select {
+            width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px;
+            font-size: 16px; box-sizing: border-box; background: #fff;
+        }
+        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(0,123,255,.1); }
+
+        .btn { height: 48px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .btn-search { background: var(--primary); color: #fff; padding: 0 20px; min-width: 80px; }
+        .btn:active { transform: scale(0.98); opacity: 0.9; }
+
+        #searchResultList {
+            margin-top: 10px; max-height: 250px; overflow-y: auto;
+            border: 1px solid var(--bd); border-radius: 8px; display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .search-item {
+            padding: 12px; border-bottom: 1px solid #eee; background: #fff; cursor: pointer;
+        }
+        .search-item:last-child { border-bottom: none; }
+        .search-item:active { background: #f0f7ff; }
+        .si-cust { font-size: 11px; color: var(--sub); font-weight: 600; }
+        .si-nm { font-size: 14px; font-weight: 700; margin: 2px 0; color: #111; }
+        .si-cd { font-size: 12px; color: #888; background: #f0f0f0; padding: 1px 5px; border-radius: 4px; display: inline-block; }
+
+        .reg-form { background: #fff; padding: 16px; border-radius: 12px; border: 1px solid var(--bd); }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+        .read-only { background-color: #f9f9f9; color: #666; border: 1px solid #eee; }
+
+        .btn-submit {
+            width: 100%; padding: 16px; background: #28a745; color: #fff; border: none;
+            border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+        .btn-submit:active { background: #218838; }
+
+        /* X 버튼 스타일 추가 */
+        .clear-icon {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 50px; /* input 높이와 동일하게 설정 */
+            width: 45px;
+            display: none; /* 초기 상태 숨김 */
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            cursor: pointer;
+            font-size: 22px;
+            z-index: 5;
+        }
+        .clear-icon:active { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<header>
+    <button class="back-btn" onclick="history.back()">←</button>
+    <h1>입고 예정 등록</h1>
+</header>
+
+<main>
+    <section class="search-section">
+        <span class="section-title">Step 1. 상품 검색 (명칭 검색 또는 스캔)</span>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div class="input-wrapper">
+                <input type="text" id="searchKeyword" placeholder="명칭 검색 또는 바코드 스캔" autocomplete="off" style="height: 50px; font-size: 18px; padding-right: 45px;">
+                <div id="clearKeyword" class="clear-icon">&times;</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button id="searchBtn" class="btn btn-search" style="flex: 2; height: 48px;">상품 조회</button>
+                <button class="btn btn-search" style="flex: 1; background:#1f2937; height: 48px;" onclick="requestScan()">📷 스캔</button>
+            </div>
+        </div>
+        <div id="searchResultList"></div>
+    </section>
+
+    <section class="reg-form">
+        <span class="section-title">Step 2. 입고 정보 입력</span>
+        <input type="hidden" id="mtrlMId">
+
+        <div class="form-group">
+            <label>선택된 상품명</label>
+            <input type="text" id="mtrlNm" class="read-only" readonly placeholder="위에서 상품을 검색해 선택하세요">
+        </div>
+
+        <div class="form-group">
+            <label>상품 코드</label>
+            <input type="text" id="mtrlCd" class="read-only" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>고객사 (화주사)</label>
+            <input type="text" id="agntNm" class="read-only" readonly>
+            <input type="hidden" id="agntCd">
+        </div>
+
+        <div class="form-group">
+            <label>입고 예정 수량</label>
+            <input type="number" id="inboundQty" placeholder="0" inputmode="numeric">
+        </div>
+
+        <div class="form-group">
+            <label>입고 예정일</label>
+            <input type="date" id="expectedDate">
+        </div>
+
+        <div class="form-group">
+            <label>비고 (REMARKS)</label>
+            <input type="text" id="remarks" placeholder="특이사항">
+        </div>
+
+        <button class="btn-submit" onclick="submitInboundProduct()">입고 예정 등록 완료</button>
+    </section>
+</main>
+
+<script>
+    const el = (id) => document.getElementById(id);
+    const API_PRODUCTS = "/hyapp/api/inbound/search/products";
+
+    el('expectedDate').value = new Date().toISOString().split('T')[0];
+
+    async function searchProduct() {
+        const keyword = el("searchKeyword").value.trim();
+        if (!keyword) {
+            alert("검색어를 입력해주세요.");
+            el("searchKeyword").focus();
+            return;
+        }
+
+        const listEl = el("searchResultList");
+        listEl.style.display = "block";
+        listEl.innerHTML = "<div class='search-item' style='text-align:center;'>조회 중...</div>";
+
+        try {
+            const params = new URLSearchParams({ keyword: keyword });
+            const res = await fetch(`${API_PRODUCTS}?${params}`);
+
+            if (!res.ok) throw new Error("조회 실패");
+
+            const data = await res.json();
+            const products = Array.isArray(data) ? data : (data.list || data.data || []);
+
+            if (products.length === 0) {
+                listEl.innerHTML = "<div class='search-item' style='text-align:center;'>검색 결과가 없습니다.</div>";
+            }
+            // ★ [핵심 추가] 결과가 딱 하나면 자동으로 선택 실행
+            else if (products.length === 1) {
+                const p = products[0];
+                const cd = p.mtrlCd || p.MTRL_CD;
+                const nm = p.mtrlNm || p.MTRL_NM;
+                const cust = p.agntNm || p.AGNT_NM;
+                const cCd = p.agntCd || p.AGNT_CD;
+                const mId = p.tblMtrlMId || p.TBL_MTRL_M_ID || "";
+
+                console.log("단일 상품 자동 선택 실행:", nm);
+                selectProduct(cd, nm, cust, cCd, mId);
+            } else {
+                listEl.innerHTML = products.map(p => {
+                    const cd = p.mtrlCd || p.MTRL_CD;
+                    const nm = p.mtrlNm || p.MTRL_NM;
+                    const cust = p.agntNm || p.AGNT_NM;
+                    const cCd = p.agntCd || p.AGNT_CD;
+                    const mId = p.tblMtrlMId || p.TBL_MTRL_M_ID || "";
+
+                    // 인자 순서와 따옴표 주의
+                    return `
+                        <div class="search-item" onclick="selectProduct('${cd}', '${nm.replace(/'/g, "\\'")}', '${cust}', '${cCd}', '${mId}')">
+                            <div class="si-cust">${cust}</div>
+                            <div class="si-nm">${nm}</div>
+                            <span class="si-cd">${cd}</span>
+                        </div>
+                    `;
+                }).join("");
+            }
+        } catch (e) {
+            listEl.innerHTML = `<div class="search-item" style="color:red; text-align:center;">오류 발생: ${e.message}</div>`;
+        }
+    }
+
+    // ★ 수정 포인트: 인자 이름을 mId로 명시하고 el("mtrlMId").value에 할당
+    function selectProduct(cd, nm, custNm, custCd, mId) {
+        el("mtrlCd").value = cd;
+        el("mtrlNm").value = nm;
+        el("agntNm").value = custNm;
+        el("agntCd").value = custCd;
+        el("mtrlMId").value = mId; // 기존 파일에서 발생한 오류(mtrlMId = mtrlMId) 수정
+
+        el("searchResultList").style.display = "none";
+
+        // 수량 입력란으로 포커스 이동
+        const qtyInput = el("inboundQty");
+        qtyInput.focus();
+
+        // 모바일 환경에서 폼이 잘 보이도록 자동 스크롤
+        qtyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    async function submitInboundProduct() {
+        const mId = el('mtrlMId').value; // .value로 정확히 값을 가져옴
+        const qty = el('inboundQty').value;
+        const agntCd = el('agntCd').value;
+
+        if (!mId || !agntCd) {
+            alert("상품을 먼저 검색하고 선택해주세요.");
+            return;
+        }
+        if (!qty || parseInt(qty) <= 0) {
+            alert("입고 예정 수량을 입력해주세요.");
+            el('inboundQty').focus();
+            return;
+        }
+
+        const data = {
+            agntCd: agntCd,
+            mtrlCd: el('mtrlCd').value,
+            mtrlNm: el('mtrlNm').value,
+            tblMtrlMId: parseInt(mId), // 숫자로 확실히 변환하여 전송
+            inboundQuantity: parseInt(qty),
+            expectedDate: el('expectedDate').value,
+            remarks: el('remarks').value,
+            inboundStatus: 'PENDING'
+        };
+
+        console.log("전송 데이터 확인:", data);
+
+        try {
+            const res = await fetch("/hyapp/api/inbound/registerProduct", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+
+            const result = await res.json();
+            if (result.success) {
+                alert("성공적으로 등록되었습니다.");
+                location.href = "/hyapp/in";
+            } else {
+                alert("실패: " + result.message);
+            }
+        } catch (e) {
+            alert("서버 통신 중 오류가 발생했습니다.");
+        }
+    }
+
+    el("searchKeyword").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            searchProduct();
+        }
+    });
+
+    el("searchBtn").addEventListener("click", searchProduct);
+
+    /**
+     * 1. 앱(ReactNative)에 카메라 스캔 요청
+     */
+    function requestScan() {
+        if (window.ReactNativeWebView) {
+            // target을 'KEYWORD' 또는 'MTRL' 중 앱 규격에 맞는 것으로 전달
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: "requestBarcodeScan",
+                target: "KEYWORD"
+            }));
+        } else {
+            const bc = prompt("바코드 입력(PC 테스트):");
+            if(bc) onReceiveBarcode(bc);
+        }
+    }
+
+    /**
+     * 2. 앱으로부터 전달받은 메시지 처리
+     */
+    window.addEventListener("message", function(e) {
+        try {
+            let data = e.data;
+            if (typeof data === "string") {
+                try { data = JSON.parse(data); } catch(err) { data = { value: data }; }
+            }
+
+            // 데이터 구조에 상관없이 바코드 값 추출
+            const code = data.value || data.code || data.barcode || "";
+            if (code) {
+                onReceiveBarcode(code); // 바코드 처리 함수 호출
+            }
+        } catch(err) {
+            console.error("Scan Message Error", err);
+        }
+    });
+
+    // 블루투스 리더기용 엔터키 감지 (선택 사항: 검색창이 있을 경우)
+    document.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            // 현재 포커스된 곳이 input이 아닐 때만 전역 스캔 처리
+            if (document.activeElement.tagName !== 'INPUT') {
+                // 별도의 숨겨진 필드에 쌓인 값을 가져오거나 처리 로직 추가 필요
+            }
+        }
+    });
+
+    /**
+     * 3. 수신된 바코드를 입력창에 넣고 검색 실행
+     */
+    function onReceiveBarcode(barcode) {
+        const searchInput = el("searchKeyword");
+        const clearBtn = el("clearKeyword"); // 버튼 가져오기 추가
+        if (searchInput) {
+            searchInput.value = barcode;
+
+            // 값이 들어왔으므로 X 버튼 강제로 표시
+            if (clearBtn) clearBtn.style.display = "flex";
+
+            searchProduct();
+        }
+    }
+
+    function handleAppMessage(e) {
+        try {
+            let data = e.data;
+            if (typeof data === "string") {
+                try { data = JSON.parse(data); } catch(err) { data = { value: data }; }
+            }
+
+            // [핵심] 데이터 추출 경로를 더 다양하게 체크 (OutboundDetail 로직)
+            const code = data.value || data.code || data.barcode || (typeof data === 'string' ? data : '');
+
+            if (code) {
+                console.log("수신된 바코드:", code);
+                onReceiveBarcode(code);
+            }
+        } catch(err) {
+            console.error("Scan Message Error", err);
+        }
+    }
+
+    // document와 window 모두 등록
+    document.addEventListener("message", handleAppMessage);
+    window.addEventListener("message", handleAppMessage);
+
+    // [수정] 자동 포커스 및 키보드 방지 로직 완전 제거
+    window.onload = function() {
+        el('expectedDate').value = new Date().toISOString().split('T')[0];
+        const searchInput = el("searchKeyword");
+        const clearBtn = el("clearKeyword");
+
+        // 1. 입력 시 X 버튼 표시/숨김 제어
+        searchInput.addEventListener("input", function() {
+            clearBtn.style.display = this.value.length > 0 ? "flex" : "none";
+        });
+
+        // 2. X 버튼 클릭 시 초기화 로직
+        clearBtn.addEventListener("click", function() {
+            searchInput.value = ""; // 입력값 삭제
+            this.style.display = "none"; // 버튼 숨김
+            el("searchResultList").style.display = "none"; // 검색 결과 리스트 숨김
+            el("searchResultList").innerHTML = ""; // 결과 내용 삭제
+            searchInput.focus(); // 다시 포커스
+        });
+
+        searchInput.focus();
+    };
+</script>
+</body>
+</html>

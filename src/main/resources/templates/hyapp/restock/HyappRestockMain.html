@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>재입고 작업 선택</title>
+  <style>
+    :root { --bg:#f8fafc; --primary:#2563eb; --success:#10b981; --text:#1e293b; }
+    body {
+      margin: 0; font-family: system-ui, sans-serif; background: var(--bg);
+      display: flex; align-items: center; justify-content: center; height: 100vh; padding: 20px; box-sizing: border-box;
+    }
+
+    .menu-container { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 24px; }
+
+    /* 크고 직관적인 작업 버튼 */
+    .work-btn {
+      height: 180px; border: none; border-radius: 30px; color: #fff;
+      font-size: 28px; font-weight: 900; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15); transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .work-btn:active { transform: scale(0.95); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+    .btn-acc { background: linear-gradient(135deg, #2563eb, #1d4ed8); } /* 검수: 파랑 */
+    .btn-put { background: linear-gradient(135deg, #10b981, #059669); } /* 적치: 초록 */
+
+    .btn-sub { font-size: 16px; font-weight: 400; margin-top: 10px; opacity: 0.9; }
+  </style>
+</head>
+<body>
+
+<div class="menu-container">
+  <button class="work-btn btn-acc" onclick="go('/hyapp/restock/acc')">
+    📦 재입고 검수
+    <span class="btn-sub">바코드 스캔 및 확인</span>
+  </button>
+
+  <button class="work-btn btn-put" onclick="go('/hyapp/restock/put')">
+    🏗️ 재입고 적치
+    <span class="btn-sub">로케이션 이동 및 재고반영</span>
+  </button>
+</div>
+
+<script>
+  /**
+   * 페이지 이동 함수
+   * 검색 조건이 없으므로 각 페이지 window.onload에서 기본값을 세팅하여 조회하게 됩니다.
+   */
+  function go(url) {
+    // 이동 전 세션 초기화 (필요 시)
+    location.href = url;
+  }
+</script>
+
+</body>
+</html>

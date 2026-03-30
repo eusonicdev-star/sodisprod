@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.wh.mapper.WhZoneMapper">
+
+    <select id="selectZoneList" resultType="WhZoneVO">
+        SELECT *
+        FROM TBL_WH_ZONE_M
+        WHERE CMPY_CD = #{cmpyCd}
+          AND WH_CD = #{whCd}
+          AND DELETED_YN = 'N'
+        ORDER BY VIEW_SEQ ASC, ZONE_CD ASC
+    </select>
+
+    <update id="saveZone">
+        MERGE INTO TBL_WH_ZONE_M AS target
+            USING (SELECT #{zoneId} AS ZONE_ID) AS source
+            ON (target.ZONE_ID = source.ZONE_ID)
+            WHEN MATCHED THEN
+                UPDATE SET
+                    ZONE_NM = #{zoneNm},
+                    ZONE_TYPE = #{zoneType},
+                    USE_YN = #{useYn},
+                    VIEW_SEQ = #{viewSeq},
+                    UPDT_TIME = GETDATE(),
+                    UPDT_USER = #{updtUser}
+            WHEN NOT MATCHED THEN
+                INSERT (CMPY_CD, WH_CD, ZONE_CD, ZONE_NM, ZONE_TYPE, USE_YN, SAVE_TIME, SAVE_USER, DELETED_YN, VIEW_SEQ)
+                    VALUES (#{cmpyCd}, #{whCd}, #{zoneCd}, #{zoneNm}, #{zoneType}, 'Y', GETDATE(), #{saveUser}, 'N', #{viewSeq});
+    </update>
+
+</mapper>

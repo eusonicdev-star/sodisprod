@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.erp.erp105013.mapper.Erp105013Mapper">
+
+    <delete id="deleteStockTemp" parameterType="com.sonictms.alsys.erp.erp105013.entity.Erp105013VO">
+        DELETE FROM TBL_STOCK_TEMP
+        WHERE CMPY_CD = #{cmpyCd}
+          AND WH_CD = #{whCd}
+    </delete>
+
+    <insert id="insertStockTemp" parameterType="com.sonictms.alsys.erp.erp105013.entity.Erp105013VO">
+        INSERT INTO TBL_STOCK_TEMP (
+            CMPY_CD, WH_CD, AGNT_NM, MTRL_CD, MTRL_NM, LOC_CD, STOCK_QTY, PALT_TYPE, SAVE_TIME, SAVE_USER
+        ) VALUES (
+                     #{cmpyCd}, #{whCd}, #{agntNm}, #{mtrlCd}, #{mtrlNm}, #{locCd}, #{stockQty}, #{paltType}, GETDATE(), #{saveUser}
+                 )
+    </insert>
+
+    <select id="getTempStockList" parameterType="com.sonictms.alsys.erp.erp105013.entity.Erp105013VO"
+            resultType="com.sonictms.alsys.erp.erp105013.entity.Erp105013VO">
+        SELECT
+            T.SAVE_TIME     AS saveTime,
+            T.AGNT_NM     AS agntNm,
+            T.MTRL_CD     AS mtrlCd,
+            T.MTRL_NM     AS mtrlNm,
+            T.LOC_CD      AS locCd,
+            T.STOCK_QTY   AS stockQty,
+            T.PALT_TYPE   AS paltType,
+            A.AGNT_CD     AS agntCd,
+            L.LOC_ID      AS locId,
+            L.LOC_NM      AS locNm,
+            /* [추가] 상품 마스터에서 실제 상품명을 가져와 매칭 여부 확인 */
+            M.MTRL_NM     AS mtrlNmCheck,
+            CASE WHEN M.MTRL_CD IS NULL THEN 'N' ELSE 'Y' END AS mtrlYn,
+            T.REMARK      AS remark
+        FROM TBL_STOCK_TEMP T WITH(NOLOCK)
+LEFT JOIN TBL_AGENCY_M A ON T.AGNT_NM = A.AGNT_NM AND T.CMPY_CD = A.CMPY_CD
+            LEFT JOIN TBL_WH_LOC_M L ON T.LOC_CD  = L.LOC_CD  AND T.CMPY_CD = L.CMPY_CD
+/* [추가] 상품 코드와 회사 코드로 상품 마스터 조인 */
+            LEFT JOIN TBL_MTRL_M M ON T.MTRL_CD = M.MTRL_CD AND T.CMPY_CD = M.CMPY_CD
+        WHERE T.CMPY_CD = #{cmpyCd}
+          AND T.WH_CD   = #{whCd}
+          AND T.STOCK_QTY > 0
+        ORDER BY T.TEMP_ID ASC
+    </select>
+
+    <insert id="insertMissingLocations" parameterType="com.sonictms.alsys.erp.erp105013.entity.Erp105013VO">
+        INSERT INTO TBL_WH_LOC_M (
+            CMPY_CD, WH_CD, LOC_CD, LOC_NM, ZONE_ID, USE_YN, SAVE_USER, SAVE_TIME, DELETED_YN
+        )
+        SELECT DISTINCT
+            T.CMPY_CD,
+            T.WH_CD,
+            T.LOC_CD,
+            T.LOC_CD AS LOC_NM, -- 초기 명칭은 코드로 설정
+            (SELECT TOP 1 ZONE_ID FROM TBL_WH_ZONE_M
+             WHERE CMPY_CD = T.CMPY_CD AND WH_CD = T.WH_CD AND ZONE_CD = 'STORAGE') AS ZONE_ID,
+            'Y',
+            #{saveUser},
+            GETDATE(),
+            'N'
+        FROM TBL_STOCK_TEMP T
+        WHERE T.CMPY_CD = #{cmpyCd}
+          AND T.WH_CD = #{whCd}
+          AND T.LOC_CD IS NOT NULL
+          AND T.LOC_CD &lt;&gt; ''
+          AND NOT EXISTS (
+            SELECT 1 FROM TBL_WH_LOC_M L
+            WHERE L.CMPY_CD = T.CMPY_CD
+              AND L.WH_CD = T.WH_CD
+              AND L.LOC_CD = T.LOC_CD
+        )
+    </insert>
+
+    <insert id="insertFloorLocations" parameterType="com.sonictms.alsys.erp.erp105013.entity.Erp105013VO">
+        INSERT INTO [dbo].[TBL_WH_LOC_M] (
+            CMPY_CD, WH_CD, ZONE_ID, LOC_CD, LOC_NM,
+            LOC_TYPE, ALLOW_MIX_YN, LOCK_YN, USE_YN,
+            SAVE_TIME, SAVE_USER, DELETED_YN, PICKING_YN
+        )
+        SELECT
+            A.CMPY_CD,
+            #{whCd} AS WH_CD,
+            5 AS ZONE_ID, -- 평치 존 ID
+            'FLOOR_' + A.AGNT_CD AS LOC_CD,
+            N'평치_' + A.AGNT_NM AS LOC_NM,
+            'FLOOR' AS LOC_TYPE,
+            'Y' AS ALLOW_MIX_YN,
+            'N' AS LOCK_YN,
+            'Y' AS USE_YN,
+            GETDATE() AS SAVE_TIME,
+            #{saveUser} AS SAVE_USER,
+            'N' AS DELETED_YN,
+            'Y' AS PICKING_YN
+        FROM (
+                 SELECT DISTINCT
+                     SM.CMPY_CD,
+                     SM.AGNT_CD,
+                     AM.AGNT_NM
+                 FROM TBL_SO_M SM WITH(NOLOCK)
+        INNER JOIN TBL_AGENCY_M AM WITH(NOLOCK)
+                 ON SM.CMPY_CD = AM.CMPY_CD AND SM.AGNT_CD = AM.AGNT_CD
+                 WHERE SM.RCPT_DT >= CONVERT(VARCHAR(10), DATEADD(MONTH, -3, GETDATE()), 112)
+                   AND SM.USE_YN = 'Y'
+                   AND SM.CMPY_CD = #{cmpyCd}
+             ) A
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM TBL_WH_LOC_M L WITH(NOLOCK)
+            WHERE L.CMPY_CD = A.CMPY_CD
+                AND L.WH_CD = #{whCd}
+                AND L.LOC_CD = 'FLOOR_' + A.AGNT_CD
+        )
+    </insert>
+
+    <insert id="insertStockHistory" parameterType="com.sonictms.alsys.erp.erp105013.entity.Erp105013VO">
+        INSERT INTO TBL_STOCK_HISTORY (
+            BACKUP_DT,
+            BACKUP_SEQ,
+            STOCK_ID,
+            CMPY_CD,
+            AGNT_CD,
+            MTRL_CD,
+            ZONE_ID,
+            LOC_ID,
+            STOCK_QTY,
+            ALLOCATED_QTY,
+            UPDT_TIME,
+            UPDT_USER,
+            LOT_NO,
+            WH_CD,
+            EXPIRE_DATE,
+            PLT_SPEC,
+            BACKUP_TIME
+        )
+        SELECT
+            CONVERT(VARCHAR(8), GETDATE(), 112), -- BACKUP_DT (YYYYMMDD)
+            (SELECT ISNULL(MAX(BACKUP_SEQ), 0) + 1
+             FROM TBL_STOCK_HISTORY
+             WHERE BACKUP_DT = CONVERT(VARCHAR(8), GETDATE(), 112)), -- 회차 계산
+            STOCK_ID,
+            CMPY_CD,
+            AGNT_CD,
+            MTRL_CD,
+            ZONE_ID,
+            LOC_ID,
+            STOCK_QTY,
+            ALLOCATED_QTY,
+            UPDT_TIME,
+            UPDT_USER,
+            LOT_NO,
+            WH_CD,
+            EXPIRE_DATE,
+            PLT_SPEC,
+            GETDATE() -- BACKUP_TIME (현재 시간)
+        FROM TBL_STOCK
+        WHERE CMPY_CD = #{cmpyCd}
+          AND WH_CD = #{whCd}
+    </insert>
+
+    <delete id="deleteActualStock" parameterType="com.sonictms.alsys.erp.erp105013.entity.Erp105013VO">
+        DELETE FROM TBL_STOCK
+        WHERE CMPY_CD = #{cmpyCd} AND WH_CD = #{whCd}
+    </delete>
+
+    <insert id="insertFinalStock" parameterType="com.sonictms.alsys.erp.erp105013.entity.Erp105013VO">
+        INSERT INTO TBL_STOCK (
+            CMPY_CD, WH_CD, AGNT_CD, MTRL_CD,
+            ZONE_ID, LOC_ID, STOCK_QTY,
+            UPDT_TIME, UPDT_USER
+        )
+        SELECT
+            DATA.CMPY_CD,
+            DATA.WH_CD,
+            DATA.AGNT_CD,
+            DATA.MTRL_CD,
+            DATA.ZONE_ID,
+            DATA.LOC_ID,
+            SUM(CAST(DATA.STOCK_QTY AS DECIMAL(18,2))) AS STOCK_QTY,
+            GETDATE(),
+            #{saveUser}
+        FROM (
+                 SELECT
+                     T.CMPY_CD,
+                     T.WH_CD,
+                     A.AGNT_CD,
+                     T.MTRL_CD,
+                     /* 1. 실제 로케이션의 ZONE_ID 우선 사용
+                        2. 로케이션이 없으면 해당 화주의 'FLOOR_' 로케이션의 ZONE_ID 조회
+                        3. 그것도 없으면 ZONE_CD가 'FLOOR'인 데이터의 ZONE_ID를 최종적으로 가져옴
+                     */
+                     ISNULL(L.ZONE_ID,
+                            ISNULL(
+                                    (SELECT TOP 1 ZONE_ID FROM TBL_WH_LOC_M
+                                     WHERE CMPY_CD = T.CMPY_CD AND WH_CD = T.WH_CD
+                                       AND LOC_CD = 'FLOOR_' + A.AGNT_CD),
+                                    (SELECT TOP 1 ZONE_ID FROM TBL_WH_ZONE_M
+                                     WHERE CMPY_CD = T.CMPY_CD AND WH_CD = T.WH_CD
+                                       AND ZONE_CD = 'FLOOR')
+                            )
+                     ) AS ZONE_ID,
+
+                     /* 로케이션 ID 결정 (없으면 FLOOR_화주코드 로케이션) */
+                     ISNULL(L.LOC_ID,
+                            (SELECT TOP 1 LOC_ID FROM TBL_WH_LOC_M
+                             WHERE CMPY_CD = T.CMPY_CD AND WH_CD = T.WH_CD
+                               AND LOC_CD = 'FLOOR_' + A.AGNT_CD)
+                     ) AS LOC_ID,
+                     T.STOCK_QTY
+                 FROM TBL_STOCK_TEMP T
+                          INNER JOIN TBL_AGENCY_M A ON T.AGNT_NM = A.AGNT_NM AND T.CMPY_CD = A.CMPY_CD
+                          LEFT JOIN TBL_WH_LOC_M L ON T.LOC_CD = L.LOC_CD AND T.CMPY_CD = L.CMPY_CD AND T.WH_CD = L.WH_CD
+                 WHERE T.CMPY_CD = #{cmpyCd} AND T.WH_CD = #{whCd}
+             ) DATA
+        WHERE DATA.LOC_ID IS NOT NULL /* 최종적으로 LOC_ID가 확인된 건만 삽입 */
+        GROUP BY
+            DATA.CMPY_CD, DATA.WH_CD, DATA.AGNT_CD, DATA.MTRL_CD, DATA.ZONE_ID, DATA.LOC_ID
+    </insert>
+
+    <update id="updateTempStatus" parameterType="com.sonictms.alsys.erp.erp105013.entity.Erp105013VO">
+        UPDATE T
+        SET T.REMARK = '반영완료'
+            FROM TBL_STOCK_TEMP T
+     INNER JOIN TBL_AGENCY_M A ON T.AGNT_NM = A.AGNT_NM AND T.CMPY_CD = A.CMPY_CD
+            INNER JOIN TBL_STOCK S ON S.CMPY_CD = T.CMPY_CD
+            AND S.WH_CD = T.WH_CD
+            AND S.AGNT_CD = A.AGNT_CD
+            AND S.MTRL_CD = T.MTRL_CD
+            /* 로케이션 매핑: 직접 매핑되었거나 평치로 매핑된 건 모두 포함 */
+            AND S.LOC_ID = ISNULL(
+            (SELECT LOC_ID FROM TBL_WH_LOC_M WHERE CMPY_CD = T.CMPY_CD AND WH_CD = T.WH_CD AND LOC_CD = T.LOC_CD),
+            (SELECT TOP 1 LOC_ID FROM TBL_WH_LOC_M WHERE CMPY_CD = T.CMPY_CD AND WH_CD = T.WH_CD AND LOC_CD = 'FLOOR_' + A.AGNT_CD)
+            )
+        WHERE T.CMPY_CD = #{cmpyCd}
+          AND T.WH_CD = #{whCd}
+    </update>
+
+    <update id="updateMtrlMasterQuantity" parameterType="com.sonictms.alsys.erp.erp105013.entity.Erp105013VO">
+        UPDATE MM
+        SET
+            MM.CURRENT_QUANTITY = ST.total_qty,
+            MM.YONGIN_CURRENT_QUANTITY = ST.total_qty,
+            MM.UPDT_USER = #{saveUser},
+            MM.UPDT_TIME = GETDATE()
+            FROM TBL_MTRL_M MM
+    INNER JOIN (
+        SELECT
+            CMPY_CD,
+            AGNT_CD,
+            MTRL_CD,
+            SUM(ISNULL(STOCK_QTY, 0)) as total_qty
+        FROM TBL_STOCK
+        WHERE CMPY_CD = #{cmpyCd}
+            AND WH_CD = #{whCd} -- 현재 작업 중인 창고 기준
+            GROUP BY CMPY_CD, AGNT_CD, MTRL_CD
+            ) ST ON MM.CMPY_CD = ST.CMPY_CD
+            AND MM.AGNT_CD = ST.AGNT_CD
+            AND MM.MTRL_CD = ST.MTRL_CD
+        WHERE MM.CMPY_CD = #{cmpyCd}
+    </update>
+
+</mapper>

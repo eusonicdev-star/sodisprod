@@ -1,0 +1,325 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" style="height:100%;">
+
+<head>
+	<link rel="icon" href="/css/favicon.ico" type="image/x-icon" sizes="16x16">
+	<title>얼라이언스</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/login.css}" />
+	<link rel="stylesheet" type="text/css"
+		href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+		integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+	<link rel="stylesheet" type="text/css"
+		href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+
+	<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+		integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+	<script type="text/javascript" src="/js/commCode.js"></script>
+
+
+	<style>
+		html,
+		body {
+			width: 100%;
+			height: 100%;
+			margin: 0px;
+			overflow: auto;
+		}
+	</style>
+	<script type="text/javascript">
+		var alertText = "";
+
+		var myCombo;
+
+		//인증번호 전송하기
+		function sendReqNo() {
+
+
+
+			if (!$("#reqNo").val()) {
+				alert("인증번호를 입력해주세요");
+				return false;
+			}
+
+			var formReqNo = new FormData();
+			formReqNo.append("cmpyCd", $("#cmpyCd").val());
+			formReqNo.append("loginId", $("#loginId").val());
+			formReqNo.append("phoneNo", $("#phoneNo").val());
+			formReqNo.append("reqNo", $("#reqNo").val());
+
+			$.ajax({
+				url: "/repwSendReqNo",
+				processData: false,
+				contentType: false,
+				data: formReqNo,
+				type: "POST",
+				datatype: "json",
+				success: function (res) {
+					if (res)	//인증번호 비교 로직을 수행했는데
+					{
+						if (res.rtnYn == 'Y')	//성공
+						{
+							$("#cmpyCd").removeAttr("disabled");
+							$("#loginId").removeAttr("disabled");
+							$("#phoneNo").removeAttr("disabled");
+
+							$("#sms_form").attr("action", "/changePw").submit();
+
+						}
+						else	//실패
+						{
+							alert(res.rtnMsg);
+
+						}
+					}
+					/* else	//인증번호발급 로직 수행을 실패
+					{
+						alert("인증번호비교 로직 수행 실패");
+						
+					} */
+				}
+			});
+
+		}
+
+		//인증문자를 요청하기
+		function reqSms() {
+
+			$("#cmpyCd").val(myCombo.getSelectedValue());
+
+			if (chkVal()) {
+
+				//모든입력값이 통과되었으면
+				//인증번호 생성 후 그것을 sms로 발송하는 SP 수행
+
+				var formData = new FormData();
+				formData.append("cmpyCd", $("#cmpyCd").val());
+				formData.append("loginId", $("#loginId").val());
+				formData.append("phoneNo", $("#phoneNo").val());
+
+
+				$.ajax({
+					url: "/repwReqSmsByPhoneNo",
+					processData: false,
+					contentType: false,
+					data: formData,
+					type: "POST",
+					datatype: "json",
+					success: function (res) {
+						if (res)	//인증서 발급 로직을 수행했는데
+						{
+							if (res.rtnYn == 'Y')	//성공
+							{
+								console.log(res);
+
+								//인증문자전송 버튼을 눌러서 성공했으면
+								//인증문자버튼을 비활성화- 또 못누르게
+								//회사,아이디, 전화번호 모두 비 활성화
+								$("#reqSms").hide();
+								$("#reqNo").show();
+								$("#sendReqNo").show();
+								myCombo.disable();
+								$("#cmpyCd").attr("disabled", "disabled");
+								$("#loginId").attr("disabled", "disabled");
+								$("#phoneNo").attr("disabled", "disabled");
+
+
+							}
+							else	//실패
+							{
+								alert(res.rtnMsg);
+								$("#reqSms").show();
+								$("#reqNo").hide();
+								$("#sendReqNo").hide();
+								myCombo.enable();
+								$("#cmpyCd").removeAttr("disabled");
+								$("#loginId").removeAttr("disabled");
+								$("#phoneNo").removeAttr("disabled");
+							}
+						}
+						else	//인증번호발급 로직 수행을 실패
+						{
+							alert("인증번호발급 로직 수행 실패");
+							$("#reqSms").show();
+							$("#reqNo").hide();
+							$("#sendReqNo").hide();
+							myCombo.enable();
+							$("#cmpyCd").removeAttr("disabled");
+							$("#loginId").removeAttr("disabled");
+							$("#phoneNo").removeAttr("disabled");
+						}
+					}
+				});
+
+			}
+			else {
+				alert(alertText);
+
+			}
+
+		}
+
+		function chkVal() {
+
+			alertText = "";
+			resultRtn = true;
+
+			if (!$("input:checkbox[id=chkOk]").is(":checked"))		//정보수집동의
+			{
+				alertText = alertText + '정보수집동의에 체크하시기 바랍니다\n';
+				resultRtn = false;
+			}
+
+			if (!$("#cmpyCd").val())		//선택한 회사코드가 없다면
+			{
+				alertText = alertText + '회사코드를 선택해주세요\n';
+				resultRtn = false;
+			}
+			if (!$("#loginId").val())		//아이디가 없다면
+			{
+				alertText = alertText + '아이디를 입력해주세요\n';
+				resultRtn = false;
+			}
+			if (!$("#phoneNo").val())		//아이디가 없다면
+			{
+				alertText = alertText + '핸드폰번호를 입력해주세요';
+				resultRtn = false;
+			}
+
+			return resultRtn;
+
+		}
+
+
+		$(document).ready(function () {
+
+
+
+			myCombo = new dhtmlXCombo("company");
+
+			comboList(myCombo, 'A', 'COMM', 'CMPY_CD', '', 'Y', 'req');
+			myCombo.selectOption(myCombo.getIndexByValue("A"));
+
+			/* myCombo.attachEvent("onChange", function(value, text){
+				$("#cmpyCd").val(myCombo.getSelectedValue());
+			}); */
+
+		});
+	</script>
+
+<body>
+
+	<br><br>
+	<div class="form-signin" style="background-color:white;border: 2px solid black;">
+		<form method="POST" tbLobject="${smsForm}" id="sms_form" name="sms_form">
+
+			<h3 class="form-signin-heading">인증문자 발급</h3>
+
+			<table width="100%" border=0>
+
+				<tr>
+
+					<td>
+
+					</td>
+					<td>
+						<span>회사</span>
+					</td>
+				</tr>
+				<tr>
+					<td valign="middle" align="center">
+
+						<input type="hidden" id="cmpyCd" name="cmpyCd" />
+					</td>
+					<td>
+						<span class="form-control">
+							<div id="company" name="company"></div>
+						</span>
+
+					</td>
+
+				</tr>
+				<tr>
+					<td>
+						<br>
+					</td>
+					<td>
+					</td>
+				</tr>
+				<tr>
+
+					<td>
+
+					</td>
+					<td>
+						<span>아이디</span>
+					</td>
+				</tr>
+				<tr>
+					<td valign="middle" align="center">
+
+					</td>
+					<td>
+						<input type="text" id="loginId" name="loginId" placeholder="사용자 아이디" class="form-control" />
+					</td>
+
+				</tr>
+				<tr>
+					<td>
+						<br>
+					</td>
+					<td>
+					</td>
+				</tr>
+				<tr>
+
+					<td>
+
+					</td>
+					<td>
+						<span>전화번호</span>
+					</td>
+				</tr>
+				<tr>
+					<td valign="middle" align="center">
+
+					</td>
+					<td>
+						<input type="text" placeholder="전화번호" id="phoneNo" name="phoneNo" class="form-control"
+							oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');" />
+					</td>
+
+				</tr>
+				<tr>
+					<td>
+					</td>
+					<td>
+
+						<input type="checkbox" id="chkOk" name="chkOk">정보수집 동의</input>
+					</td>
+				</tr>
+			</table>
+
+
+
+
+			<input id="reqNo" name="reqNo" placeholder="인증번호를 입력해주세요" class="form-control" style="display:none;"></input>
+
+		</form>
+		<br>
+		<input id="reqSms" type="button" class="btn btn-lg btn-primary btn-block" name="sms" value="인증문자 요청"
+			onclick="reqSms();"></input>
+		<input id="sendReqNo" type="button" class="btn btn-lg btn-primary btn-block" name="sendReqNo" value="인증문자 전송"
+			onclick="sendReqNo();" style="display:none;"></input>
+		<button type="button" class="btn btn-lg btn-outline-primary btn-block mt-3" onclick="location.href='/login'">로그인으로 돌아가기</button>
+	</div>
+</body>
+
+</html>

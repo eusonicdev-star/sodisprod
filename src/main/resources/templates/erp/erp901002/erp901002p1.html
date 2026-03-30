@@ -1,0 +1,1089 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <title>등록/수정(erp901002p1)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/popup.css"/>
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+
+    <script th:inline="javascript">
+        var srchInput;
+        var myWins;
+        var myCalendarInptdt;
+        var myCalendarOutdt;
+        var sendObject;
+        fnObj = {
+            winOpen: {
+                commSrch: function (title, cmpyCd, srchCtgr, srchInput) {		//공통코드 찾기 팝업
+                    windowId = "commSrch";
+                    windowText = title + " commSrch";
+                    windowUrl = "/commSrch"
+                    windowLeft = -14400;
+                    windowTop = -144000;
+                    windowWidth = 800;
+                    windowHeight = 400;
+                    windowsModal = false;
+                    windowOnClose = function (windowId) {
+
+                        return true;
+                    };
+                    windowSendObject = {
+                        cmpyCd: cmpyCd,
+                        srchCtgr: srchCtgr,
+                        srchInput: srchInput,
+                        windowId: windowId,
+                        srchCd: $("#agencyCd").val(),
+                        srchNm: $("#agencyNm").val(),
+                    };
+
+
+                    myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+
+                    myWins.window(windowId).attachEvent("onClose", function (win) {
+
+                        return true;
+                    });
+                },	//END of commSrch : function(){
+                rtnObject: function (windowId, rtnObj, srchInput) {
+                    if (windowId == "commSrch") {
+                        if (rtnObj == null) {
+                            myWins.window(windowId).setPosition(0, 0);
+                            return;
+                        }
+
+                        if (srchInput == "text") {
+                            // 기존 화주사(AGENCY) 검색 결과 처리 로직
+                            if (sendObject.srchCtgr == "AGENCY") {
+                                $("#agencyCd").val(rtnObj[0].commCd);
+                                $("#agencyNm").val(rtnObj[0].commNm);
+                            }
+                            /* 여기에 로케이션 처리 로직을 추가하시면 됩니다 */
+                            else if (sendObject.srchCtgr == "LOCATION") {
+                                $("#fixedLocNm").val(rtnObj[0].commCd);
+                            }
+                        }
+                    }
+                },	//END of rtnObject : function(windowId,rtnObj){
+                // 고정 로케이션 조회 팝업 추가
+                locSrch: function () {
+                    windowId = "commLocSrch"; // 팝업창 고유 ID
+                    windowText = "로케이션 검색";
+                    windowUrl = "/commLocSrch"; // 서버에 구현된 로케이션 검색 페이지 경로
+                    windowLeft = 100;
+                    windowTop = 100;
+                    windowWidth = 600;
+                    windowHeight = 600;
+                    windowsModal = true;
+
+                    // 부모창의 정보를 전달해야 할 경우 여기에 담습니다.
+                    windowSendObject = {
+                        windowId: windowId,
+                        cmpyCd: $("#cmpyCd").val(),
+                        // 화주사명을 기본 검색어로 사용 (필요 시 agencyCd로 변경 가능)
+                        srchKeyword: $("#agencyNm").val()
+                    };
+
+                    myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, null, windowSendObject);
+                },
+                // [추가 2] 팝업에서 보낸 데이터를 받아 필드에 채우는 함수
+                rtnLocObject: function (windowId, rtnObj) {
+                    if (windowId == "commLocSrch") {
+                        if (rtnObj == null) return;
+
+                        // 팝업에서 선택한 로케이션 코드(LOC_CD)를 인풋박스에 입력
+                        // (참고: 팝업 그리드의 column ID가 locCd라고 가정)
+                        $("#fixedLoc").val(rtnObj[0].locCd);    // Hidden 필드에 코드 저장
+                        $("#fixedLocNm").val(rtnObj[0].locNm);  // Text 필드에 명칭 표시
+
+                        // 데이터 입력 후 팝업창 닫기
+                        myWins.window(windowId).close();
+                    }
+                },
+            },	//END of winOpen:{
+            comboOpen: {
+
+                comboCmpyCd: function () {
+                    myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+                    comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+                    myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/));
+                    myComboCmpyCd.setFontSize("12px", "12px");
+
+                    myComboCmpyCd.disable();
+                },
+                comboMtrlCtgr1: function () {
+                    myComboMtrlCtgr1 = new dhtmlXCombo("mtrlCtgr1");
+                    comboList(myComboMtrlCtgr1, 'A', 'COMM', 'MTRL_CTGR_1', '', 'Y', 'all');
+                    myComboMtrlCtgr1.selectOption(0);
+                    myComboMtrlCtgr1.setFontSize("12px", "12px");
+                    myComboMtrlCtgr1.readonly(true);
+                },
+                comboMtrlCtgr2: function () {
+                    myComboMtrlCtgr2 = new dhtmlXCombo("mtrlCtgr2");
+                    comboList(myComboMtrlCtgr2, 'A', 'COMM', 'MTRL_CTGR_2', '', 'Y', 'all');
+                    myComboMtrlCtgr2.selectOption(0);
+                    myComboMtrlCtgr2.setFontSize("12px", "12px");
+                    myComboMtrlCtgr2.readonly(true);
+                },
+                comboMtrlCtgr3: function () {
+                    myComboMtrlCtgr3 = new dhtmlXCombo("mtrlCtgr3");
+                    comboList(myComboMtrlCtgr3, 'A', 'COMM', 'MTRL_CTGR_3', '', 'Y', 'all');
+                    myComboMtrlCtgr3.selectOption(0);
+                    myComboMtrlCtgr3.setFontSize("12px", "12px");
+                    myComboMtrlCtgr3.readonly(true);
+
+                },
+                comboSetYn: function () {
+                    myComboSetYn = new dhtmlXCombo("setYn");
+
+                    comboList(myComboSetYn, 'A', 'COMM', 'COM_YN', '', 'Y', 'req');
+                    myComboSetYn.selectOption(0);
+                    myComboSetYn.selectOption(0);
+                    myComboSetYn.setFontSize("12px", "12px");
+                    myComboSetYn.readonly(true);
+
+                },
+                comboBomYn: function () {
+                    myComboBomYn = new dhtmlXCombo("bomYn");
+                    myComboBomYn.addOption([{value: "", text: "선택해주세요"}]);
+                    myComboBomYn.addOption([{value: "Y", text: "Y"}]);
+                    myComboBomYn.addOption([{value: "N", text: "N"}]);
+                    myComboBomYn.selectOption(0);
+                    myComboBomYn.setFontSize("12px", "12px");
+                    myComboBomYn.readonly(true);
+                },
+                comboMtrlStatCd: function () {
+                    myComboMtrlStatCd = new dhtmlXCombo("mtrlStatCd");
+                    comboList(myComboMtrlStatCd, 'A', 'COMM', 'MTRL_STAT_CD', '', 'Y', 'all');
+                    myComboMtrlStatCd.selectOption(0);
+
+                    myComboMtrlStatCd.setFontSize("12px", "12px");
+                    myComboMtrlStatCd.readonly(true);
+                },
+
+                comboMtrlType: function () {
+                    myComboMtrlType = new dhtmlXCombo("mtrlType");
+                    comboList(myComboMtrlType, 'A', 'COMM', 'MTRL_TYPE', '', 'Y', 'all');
+                    myComboMtrlType.selectOption(0);
+
+                    myComboMtrlType.setFontSize("12px", "12px");
+                    myComboMtrlType.readonly(true);
+                },
+
+                comboUseYn: function () {
+                    myComboUseYn = new dhtmlXCombo("useYn");
+                    myComboUseYn.addOption([{value: "Y", text: "Y"}]);
+                    myComboUseYn.addOption([{value: "N", text: "N"}]);
+                    myComboUseYn.selectOption(0);
+                    myComboUseYn.setFontSize("12px", "12px");
+                    myComboUseYn.readonly(true);
+
+                },
+
+                comboMtoYn: function () {
+                    myComboMtoYn = new dhtmlXCombo("mtoYn");
+                    comboList(myComboMtoYn, 'A', 'COMM', 'COM_YN', '', 'Y', 'all');
+                    // 기본값을 'N'으로 설정
+                    setTimeout(function () {
+                        var index = myComboMtoYn.getIndexByValue("N");
+                        if (index >= 0) {
+                            myComboMtoYn.selectOption(index);
+                        } else {
+                            myComboMtoYn.selectOption(0);
+                        }
+                    }, 100);
+
+                    myComboMtoYn.setFontSize("12px", "12px");
+                    myComboMtoYn.readonly(true);
+                },
+
+                comboStdYn: function () {
+                    myComboStdYn = new dhtmlXCombo("stdYn");
+                    comboList(myComboStdYn, 'A', 'COMM', 'COM_YN', '', 'Y', 'all');
+                    myComboStdYn.selectOption(0);
+
+                    myComboStdYn.setFontSize("12px", "12px");
+                    myComboStdYn.readonly(true);
+                },
+
+                comboInstYn: function () {
+                    myComboInstYn = new dhtmlXCombo("instYn");
+                    comboList(myComboInstYn, 'A', 'COMM', 'COM_YN', '', 'Y', 'all');
+                    myComboInstYn.selectOption(0);
+                    myComboInstYn.setFontSize("12px", "12px");
+                    myComboInstYn.readonly(true);
+                },
+                comboInstCtgr: function () {
+                    myComboInstCtgr = new dhtmlXCombo("instCtgr");
+                    comboList(myComboInstCtgr, 'A', 'COMM', 'INST_CAPA_CTGR', '', 'Y', 'all');
+                    myComboInstCtgr.selectOption(0);
+                    myComboInstCtgr.setFontSize("12px", "12px");
+                    myComboInstCtgr.readonly(true);
+                },
+                comboInstType: function () {
+                    myComboInstType = new dhtmlXCombo("instType");
+                    comboList(myComboInstType, 'A', 'COMM', 'INST_CAPA_TYPE', '', 'Y', 'all');
+                    myComboInstType.selectOption(0);
+                    myComboInstType.setFontSize("12px", "12px");
+                    myComboInstType.readonly(true);
+                },
+                comboInstSeatType: function () {
+                    myComboInstSeatType = new dhtmlXCombo("instSeatType");
+                    comboList(myComboInstSeatType, 'A', 'COMM', 'INST_SEAT_TYPE', '', 'Y', 'all');
+                    myComboInstSeatType.selectOption(0);
+                    myComboInstSeatType.setFontSize("12px", "12px");
+                    myComboInstSeatType.readonly(true);
+                },
+
+
+                comboDlvyYn: function () {	//배송여부
+                    myComboDlvyYn = new dhtmlXCombo("dlvyYn");
+                    comboList(myComboDlvyYn, 'A', 'COMM', 'COM_YN', '', 'Y', 'all');
+                    myComboDlvyYn.selectOption(0);
+                    myComboDlvyYn.setFontSize("12px", "12px");
+                    myComboDlvyYn.readonly(true);
+                },
+
+
+                comboDlvyType: function () {	//배송유형
+                    myComboDlvyType = new dhtmlXCombo("dlvyType");
+                    comboList(myComboDlvyType, 'A', 'COMM', 'DLVY_TYPE', '', 'Y', 'all');
+                    myComboDlvyType.selectOption(0);
+                    myComboDlvyType.setFontSize("12px", "12px");
+                    myComboDlvyType.readonly(true);
+                },
+
+
+                comboThrDlvyYn: function () {	//3자배송유무
+                    myComboThrDlvyYn = new dhtmlXCombo("thrDlvyYn");
+                    comboList(myComboThrDlvyYn, 'A', 'COMM', 'COM_YN', '', 'Y', 'all');
+                    myComboThrDlvyYn.selectOption(0);
+                    myComboThrDlvyYn.setFontSize("12px", "12px");
+                    myComboThrDlvyYn.readonly(true);
+                },
+                comboExchangeReturnExcludeYn: function () {	//교환/반품 제외여부
+                    myComboExchangeReturnExcludeYn = new dhtmlXCombo("exchangeReturnExcludeYn");
+                    myComboExchangeReturnExcludeYn.addOption([{value: "N", text: "N (포함)"}]);
+                    myComboExchangeReturnExcludeYn.addOption([{value: "Y", text: "Y (제외)"}]);
+                    myComboExchangeReturnExcludeYn.selectOption(0);
+                    myComboExchangeReturnExcludeYn.setFontSize("12px", "12px");
+                    myComboExchangeReturnExcludeYn.readonly(true);
+                },
+            },	//END of comboOpen : {
+            gridOpen: {},		//ENd of gridOpen : {
+            searchOpen: {
+
+                mtrlSrch: function () {		//부모창에서 받은 고유ID 로 정보 찾는것
+
+                    var dcData = new FormData();
+
+                    dcData.append("tblMtrlMId",	/*[[${sendObject.tblMtrlMId}]]*/);
+
+
+                    $.ajax({
+                        url: "/erp901002p1mtrlSrch",
+                        processData: false,
+                        contentType: false,
+                        data: dcData,
+                        type: "POST",
+                        datatype: "json",
+                        async: false,
+                        success: function (res) {
+                            if (res) {
+
+                                $("#tblMtrlMId").val(res.tblMtrlMId);
+                                $("#cmpyCd").val(res.cmpyCd);
+                                $("#agencyCd").val(res.agntCd);
+                                $("#agencyNm").val(res.agntNm);
+                                myComboMtrlType.selectOption(myComboMtrlType.getIndexByValue(res.mtrlType));
+                                $("#mtrlCd").val(res.mtrlCd);
+                                $("#mtrlNm").val(res.mtrlNm);
+                                $("#mtrlDesc").val(res.mtrlDesc);
+                                myComboMtrlStatCd.selectOption(myComboMtrlStatCd.getIndexByValue(res.statCd));
+                                //$("#statNm").val(res.statNm);
+                                $("#smplCd").val(res.smplCd);
+
+                                //$("#custPrc").val(	res.custPrc%1 == 0 ? parseInt(res.custPrc) : res.custPrc	);
+                                $("#custPrc").val(res.custPrc);
+
+                                //$("#salePrc").val(res.salePrc%1 == 0 ? parseInt(res.salePrc) : res.salePrc);
+                                $("#salePrc").val(res.salePrc);
+
+                                //$("#factPrc").val(res.factPrc%1 == 0 ? parseInt(res.factPrc) : res.factPrc);
+                                $("#factPrc").val(res.factPrc);
+
+                                //$("#purcPrc").val(res.purcPrc%1 == 0 ? parseInt(res.purcPrc) : res.purcPrc);
+                                $("#purcPrc").val(res.purcPrc);
+
+                                $("#sizeNm").val(res.sizeNm);
+                                $("#lnth").val(res.lnth);
+                                $("#dpth").val(res.dpth);
+                                $("#hght").val(res.hght);
+                                //$("#hght2").val(res.hght2);
+
+                                //$("#cbm").val(res.cbm%1 == 0 ? parseInt(res.cbm) : res.cbm);
+                                $("#cbm").val(res.cbm);
+
+                                $("#wght").val(res.wght);
+                                myComboMtrlCtgr1.selectOption(myComboMtrlCtgr1.getIndexByValue(res.mtrlCtgr1));
+                                myComboMtrlCtgr2.selectOption(myComboMtrlCtgr2.getIndexByValue(res.mtrlCtgr2));
+                                myComboMtrlCtgr3.selectOption(myComboMtrlCtgr3.getIndexByValue(res.statCd));
+                                myComboSetYn.selectOption(myComboSetYn.getIndexByValue(res.setYn));
+                                myComboBomYn.selectOption(myComboBomYn.getIndexByValue(res.bomYn));
+                                myComboMtoYn.selectOption(myComboMtoYn.getIndexByValue(res.mtoYn));
+                                myComboStdYn.selectOption(myComboStdYn.getIndexByValue(res.stdYn));
+                                myComboInstYn.selectOption(myComboInstYn.getIndexByValue(res.instYn));
+                                myComboInstCtgr.selectOption(myComboInstCtgr.getIndexByValue(res.instCtgr));
+                                //$("#instCtgrNm").val(res.instCtgrNm);
+                                myComboInstType.selectOption(myComboInstType.getIndexByValue(res.instType));
+                                //$("#instTypeNm").val(res.instTypeNm);
+                                myComboInstSeatType.selectOption(myComboInstSeatType.getIndexByValue(res.instSeatType));
+                                //$("#instSeatTypeNm").val(res.instSeatTypeNm);
+
+                                //$("#instCost").val(res.instCost%1 == 0 ? parseInt(res.instCost) : res.instCost);
+                                $("#instCost").val(res.instCost);
+
+                                $("#instUrl").val(res.instUrl);
+                                $("#instImgPath").val(res.instImgPath);
+                                $("#pstnNm").val(res.pstnNm);
+                                myComboDlvyYn.selectOption(myComboDlvyYn.getIndexByValue(res.dlvyYn));
+                                myComboDlvyType.selectOption(myComboDlvyType.getIndexByValue(res.dlvyType));
+                                $("#dlvyCost").val(res.dlvyCost);
+                                myComboThrDlvyYn.selectOption(myComboThrDlvyYn.getIndexByValue(res.thrDlvyYn));
+                                $("#cnvtMtrlCd").val(res.cnvtMtrlCd);
+                                $("#cnvtMtrlNm").val(res.cnvtMtrlNm);
+                                $("#memo").val(res.memo);
+                                myComboUseYn.selectOption(myComboUseYn.getIndexByValue(res.useYn));
+
+                                //20211204 피킹존 추가
+                                $("#zone").val(res.pickZone);
+
+                                // 20260219 고정 로케이션 추가
+                                $("#fixedLoc").val(res.fixedLoc);
+                                $("#fixedLocNm").val(res.fixedLocNm);
+                                
+                                //교환/반품 제외여부 설정
+                                myComboExchangeReturnExcludeYn.selectOption(myComboExchangeReturnExcludeYn.getIndexByValue(res.exchangeReturnExcludeYn || 'N'));
+                            } else {
+                                alert("상품내용 조회 수행 결과 없음")
+                            }
+                        },
+                    });
+                },	//END of mtrlSrch : function() {
+                comdSave: function () {
+
+                    if (!fnObj.searchOpen.searchChkVal.chkVal("commSave")) {
+                        alert(chkValMsg);
+                        return false;
+                    }
+
+
+                    if (!confirm((sendObject.saveGubn == "INS" ? "등록" : "수정") + "하시겠습니까?")) {
+                        alert("취소하였습니다.");
+                        return;
+                    }
+
+
+                    //저장할 값 폼 형식으로 생성하기
+                    var saveData = new FormData();
+
+                    saveData.append("saveGubn",	/*[[${sendObject.saveGubn}]]*/);
+                    saveData.append("tblMtrlMId",	/*[[${sendObject.tblMtrlMId}]]*/);
+                    saveData.append("cmpyCd", $("#cmpyCd").val());
+                    saveData.append("agntCd", $("#agencyCd").val());
+                    saveData.append("mtrlType", myComboMtrlType.getSelectedValue());
+                    saveData.append("mtrlCd", $("#mtrlCd").val());
+                    saveData.append("mtrlNm", $("#mtrlNm").val());
+                    saveData.append("mtrlDesc", $("#mtrlDesc").val());
+                    saveData.append("statCd", myComboMtrlStatCd.getSelectedValue());
+                    saveData.append("smplCd", $("#smplCd").val());
+                    saveData.append("custPrc", $("#custPrc").val());
+                    saveData.append("salePrc", $("#salePrc").val());
+                    saveData.append("factPrc", $("#factPrc").val());
+                    saveData.append("purcPrc", $("#purcPrc").val());
+                    saveData.append("sizeNm", $("#sizeNm").val());
+                    saveData.append("lnth", $("#lnth").val());
+                    saveData.append("dpth", $("#dpth").val());
+                    saveData.append("hght", $("#hght").val());
+                    saveData.append("hght2", "");
+                    saveData.append("cbm", $("#cbm").val());
+                    saveData.append("wght", $("#wght").val());
+                    saveData.append("mtrlCtgr1", myComboMtrlCtgr1.getSelectedValue());
+                    saveData.append("mtrlCtgr2", myComboMtrlCtgr2.getSelectedValue());
+                    saveData.append("mtrlCtgr3", myComboMtrlCtgr3.getSelectedValue());
+                    saveData.append("setYn", myComboSetYn.getSelectedValue());
+                    saveData.append("bomYn", myComboBomYn.getSelectedValue());
+                    saveData.append("mtoYn", myComboMtoYn.getSelectedValue());
+                    saveData.append("stdYn", myComboStdYn.getSelectedValue());
+                    saveData.append("instYn", myComboInstYn.getSelectedValue());
+                    saveData.append("instCtgr", myComboInstCtgr.getSelectedValue());
+                    saveData.append("instType", myComboInstType.getSelectedValue());
+                    saveData.append("instSeatType", myComboInstSeatType.getSelectedValue());
+                    saveData.append("instCost", $("#instCost").val());
+                    saveData.append("instUrl", $("#instUrl").val());
+                    saveData.append("instImgPath", $("#instImgPath").val());
+                    saveData.append("pstnNm", $("#pstnNm").val());
+                    saveData.append("dlvyYn", myComboDlvyYn.getSelectedValue());
+                    saveData.append("dlvyType", myComboDlvyType.getSelectedValue());
+                    saveData.append("dlvyCost", $("#dlvyCost").val());
+                    saveData.append("ndlvyYn", "");
+                    saveData.append("thrDlvyYn", myComboThrDlvyYn.getSelectedValue());
+                    saveData.append("dlvyLt", "");
+                    saveData.append("cnvtMtrlCd", $("#cnvtMtrlCd").val());
+                    saveData.append("cnvtMtrlNm", $("#cnvtMtrlNm").val());
+                    saveData.append("cnvtQty", "");
+                    saveData.append("cnvtUnit", "");
+                    saveData.append("memo", $("#memo").val());
+                    saveData.append("useYn", myComboUseYn.getSelectedValue());
+                    saveData.append("saveUser",	/*[[${session.tblUserMId}]]*/);
+
+                    //20211204 피킹존 추가
+                    saveData.append("pickZone", $("#zone").val());
+                    saveData.append("fixedLoc", $("#fixedLoc").val()); // 20260219 고정 로케이션 추가 전송
+                    
+                    //교환/반품 제외여부 추가
+                    saveData.append("exchangeReturnExcludeYn", myComboExchangeReturnExcludeYn.getSelectedValue());
+
+                    $.ajax({
+                        url: "/erp901002p1ComdSave",
+                        processData: false,
+                        contentType: false,
+                        data: saveData,
+                        type: "POST",
+                        datatype: "json",
+                        async: false,
+                        success: function (res) {
+                            if (res) {
+                                if (res.rtnYn == "Y") {
+                                    alert("성공 : " + res.rtnMsg);
+                                    parent.fnObj.searchOpen.search();
+                                    parent.myWins.window(sendObject.windowId).close();
+                                } else {
+                                    alert("실패 : " + res.rtnMsg);
+                                }
+                            } else {
+                                alert("등록/수정 수행 결과 없음")
+                            }
+                        },
+                    });
+
+
+                },	//END of comdSave : function() {
+                commDupl: function () {		//지점(물류센터)코드 중복확인 하기
+                    if (!fnObj.searchOpen.searchChkVal.chkVal("commDupl")) {
+                        alert(chkValMsg);
+                        return false;
+                    }
+                    //저장할 값 폼 형식으로 생성하기
+                    var duplData = new FormData();
+
+                    duplData.append("cmpyCd",	/*[[${sendObject.cmpyCd}]]*/);
+                    duplData.append("dcCd", $("#dcCd").val());
+
+
+                    $.ajax({
+                        url: "/erp901002p1CommDupl",
+                        processData: false,
+                        contentType: false,
+                        data: duplData,
+                        type: "POST",
+                        datatype: "json",
+                        async: false,
+                        success: function (res) {
+                            if (res) {
+                                if (res.rtnYn == "Y") {
+                                    alert("성공 : " + res.rtnMsg);
+                                } else {
+                                    alert("실패 : " + res.rtnMsg);
+                                }
+                                $("#rtnYn").val(res.rtnYn);
+                            } else {
+                                alert("지점(물류센터)코드 중복조회 수행 결과 없음")
+                            }
+                        },
+                    });
+                },	//END of commDupl : function() {
+                delSrchCode: function (delGubn) {
+                    if (delGubn == "agency") {
+                        $("#agencyCd").val("");
+                        $("#agencyNm").val("");
+                    }
+                    // [추가] 로케이션 삭제 처리
+                    if (delGubn == "fixedLoc") {
+                        $("#fixedLoc").val("");
+                        $("#fixedLocNm").val("");
+                    }
+                },	//END of delSrchCode : function(){
+
+                searchChkVal: {
+                    chkVal: function (chkGubn) {
+                        chkValMsg = "";	//메세지 초기화
+                        var rtnVal = true;
+                        if (chkGubn == "commSave") {
+                            if (!$("#cmpyCd").val()) {
+                                chkValMsg = chkValMsg + "회사코드가 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#agencyCd").val()) {
+                                chkValMsg = chkValMsg + "화주코드가 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#agencyNm").val()) {
+                                chkValMsg = chkValMsg + "화주명칭이 없습니다\n";
+                                rtnVal = false;
+                            }
+                            /* 				if(	!myComboMtrlCtgr1.getSelectedValue()){
+                                                chkValMsg = chkValMsg + "제품분류(대)를 선택해주세요\n";
+                                                rtnVal = false;
+                                            }
+                                            if(	!myComboMtrlCtgr2.getSelectedValue()){
+                                                chkValMsg = chkValMsg + "제품분류(중)을 선택해주세요\n";
+                                                rtnVal = false;
+                                            }
+                                            if(	!myComboMtrlCtgr3.getSelectedValue()){
+                                                chkValMsg = chkValMsg + "제품분류(소)를 선택해주세요\n";
+                                                rtnVal = false;
+                                            }
+                                            if(	!myComboSetYn.getSelectedValue()){
+                                                chkValMsg = chkValMsg + "세트여부를 선택해주세요\n";
+                                                rtnVal = false;
+                                            }
+                                            if(	!myComboBomYn.getSelectedValue()){
+                                                chkValMsg = chkValMsg + "BOM여부를 선택해주세요\n";
+                                                rtnVal = false;
+                                            } */
+
+                            if (!$("#mtrlCd").val()) {
+                                chkValMsg = chkValMsg + "상품-상품코드가 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#mtrlNm").val()) {
+                                chkValMsg = chkValMsg + "상품-상품명칭이 없습니다\n";
+                                rtnVal = false;
+                            }
+                            /* if(!$("#mtrlDesc").val()){
+                                chkValMsg = chkValMsg + "상품-상품비고가 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            if (!myComboMtrlStatCd.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "제품상태를 선택해주세요\n";
+                                rtnVal = false;
+                            }
+                            if (!myComboMtrlType.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "자재유형를 선택해주세요\n";
+                                rtnVal = false;
+                            }
+                            /* if(!$("#smplCd").val()){
+                                chkValMsg = chkValMsg + "심플코드가 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(parseInt($("#smplCd").val()) == 0){
+                                chkValMsg = chkValMsg + "심플코드 0은 입력할수 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(!$("#sizeNm").val()){
+                                chkValMsg = chkValMsg + "규격이 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(!$("#lnth").val()){
+                                chkValMsg = chkValMsg + "사이즈 길이[가로]가 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(parseInt($("#lnth").val()) == 0){
+                                chkValMsg = chkValMsg + "사이즈 길이[가로] 0은 입력할수 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(!$("#dpth").val()){
+                                chkValMsg = chkValMsg + "사이즈 깊이가 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(parseInt($("#dpth").val()) == 0){
+                                chkValMsg = chkValMsg + "사이즈 깊이 0은 입력할수 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(!$("#hght").val()){
+                                chkValMsg = chkValMsg + "사이즈 높이[세로]가 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(parseInt($("#hght").val()) == 0){
+                                chkValMsg = chkValMsg + "사이즈 높이[세로] 0은 입력할수 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(!$("#custPrc").val()){
+                                chkValMsg = chkValMsg + "소비자가가 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(parseInt($("#custPrc").val()) == 0){
+                                chkValMsg = chkValMsg + "소비자 0은 입력할수 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(!$("#salePrc").val()){
+                                chkValMsg = chkValMsg + "판매가가 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(parseInt($("#salePrc").val()) == 0){
+                                chkValMsg = chkValMsg + "판매가 0은 입력할수 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(!$("#factPrc").val()){
+                                chkValMsg = chkValMsg + "공가가 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(parseInt($("#factPrc").val()) == 0){
+                                chkValMsg = chkValMsg + "공가 0은 입력할수 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(!$("#purcPrc").val()){
+                                chkValMsg = chkValMsg + "매입가가 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(parseInt($("#purcPrc").val()) == 0){
+                                chkValMsg = chkValMsg + "매입가 0은 입력할수 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            if (!$("#cbm").val()) {
+                                chkValMsg = chkValMsg + "CBM이 없습니다\n";
+                                rtnVal = false;
+                            }
+                            /* if(parseInt($("#cbm").val()) == 0){
+                            chkValMsg = chkValMsg + "CBM 0은 입력할수 없습니다\n";
+                            rtnVal = false;
+                            } */
+                            /* if(!$("#wght").val()){
+                                chkValMsg = chkValMsg + "무게가 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(parseInt($("#wght").val()) == 0){
+                                chkValMsg = chkValMsg + "무게 0은 입력할수 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(!$("#cnvtMtrlCd").val()){
+                                chkValMsg = chkValMsg + "변환상품코드가 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(!$("#cnvtMtrlNm").val()){
+                                chkValMsg = chkValMsg + "변환상품명칭이 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            /* if(	!myComboMtoYn.getSelectedValue()){
+                                chkValMsg = chkValMsg + "MTO여부를 선택해주세요\n";
+                                rtnVal = false;
+                            } */
+                            /* if(	!myComboStdYn.getSelectedValue()){
+                                chkValMsg = chkValMsg + "정규격여부를 선택해주세요\n";
+                                rtnVal = false;
+                            } */
+                            /* if(!$("#pstnNm").val()){
+                                chkValMsg = chkValMsg + "위치를 입력해주세요\n";
+                                rtnVal = false;
+                            } */
+
+                            /* if(	!myComboInstYn.getSelectedValue()){
+                                chkValMsg = chkValMsg + "시공여부를 선택해주세요\n";
+                                rtnVal = false;
+                            } */
+                            if (!myComboInstCtgr.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "시공카테고리를 선택해주세요\n";
+                                rtnVal = false;
+                            }
+                            if (!myComboInstType.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "시공유형를 선택해주세요\n";
+                                rtnVal = false;
+                            }
+                            if (!myComboInstSeatType.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "좌석유형를 선택해주세요\n";
+                                rtnVal = false;
+                            }
+                            /* if(!$("#instCost").val()){
+                                chkValMsg = chkValMsg + "시공비를 입력해주세요\n";
+                                rtnVal = false;
+                            } */
+                            /* if(!$("#instUrl").val()){
+                                chkValMsg = chkValMsg + "시공URL를 입력해주세요\n";
+                                rtnVal = false;
+                            }
+                            if(!$("#instImgPath").val()){
+                                chkValMsg = chkValMsg + "시공이미지경로를 입력해주세요\n";
+                                rtnVal = false;
+                            } */
+                            /* if(	!myComboDlvyYn.getSelectedValue()){
+                                chkValMsg = chkValMsg + "배송여부를 선택해주세요\n";
+                                rtnVal = false;
+                            } */
+                            /* if(	!myComboDlvyType.getSelectedValue()){
+                                chkValMsg = chkValMsg + "배송유형을 선택해주세요\n";
+                                rtnVal = false;
+                            } */
+                            /* if(	!myComboThrDlvyYn.getSelectedValue()){
+                                chkValMsg = chkValMsg + "3자배송유무를 선택해주세요\n";
+                                rtnVal = false;
+                            } */
+                            /* if(!$("#dlvyCost").val()){
+                                chkValMsg = chkValMsg + "배송비를 입력해주세요\n";
+                                rtnVal = false;
+                            } */
+                        }
+                        return rtnVal;
+                    },	//END of chkVal : function(){
+                },	//END of searchChkVal
+            },		//ENd of searchOpen : {
+            keyOpen: {
+                enterKey: function (enterType) {
+                    if (enterType == "agency") {
+                        if (window.event.keyCode == 13) {
+
+                            $("#agencyNm").blur();
+                            $("#agencyCd").blur();
+
+                            $("#agencyCd").val("");
+                            fnObj.winOpen.commSrch('화주', 'A', 'AGENCY', 'text');
+
+                        }
+                    }
+                },
+            },
+
+        }	//END of fnObj
+
+        $(document).ready(function () {
+
+            //windowOpen 정의
+            myWins = new dhtmlXWindows();
+
+            fnObj.comboOpen.comboCmpyCd();
+            fnObj.comboOpen.comboMtrlCtgr1();
+            fnObj.comboOpen.comboMtrlCtgr2();
+            fnObj.comboOpen.comboMtrlCtgr3();
+            fnObj.comboOpen.comboSetYn();
+            fnObj.comboOpen.comboBomYn();
+            fnObj.comboOpen.comboMtrlStatCd();
+            fnObj.comboOpen.comboMtrlType();
+
+            fnObj.comboOpen.comboMtoYn();
+            fnObj.comboOpen.comboStdYn();
+            fnObj.comboOpen.comboUseYn();
+            fnObj.comboOpen.comboInstYn();
+            fnObj.comboOpen.comboInstCtgr();
+            fnObj.comboOpen.comboInstType();
+            fnObj.comboOpen.comboInstSeatType();
+            fnObj.comboOpen.comboDlvyYn();
+            fnObj.comboOpen.comboDlvyType();
+            fnObj.comboOpen.comboThrDlvyYn();
+            fnObj.comboOpen.comboExchangeReturnExcludeYn();
+
+            sendObject = /*[[${sendObject}]]*/;
+
+            $("#cmpyCd").val(/*[[${sendObject.cmpyCd}]]*/);
+            $("#tblMtrlMId").val(/*[[${sendObject.tblMtrlMId}]]*/);
+
+            //사용자 정보 조회 - 수정일 경우
+
+            if (sendObject.saveGubn == "UPDT") {
+                //조회하기
+                fnObj.searchOpen.mtrlSrch();
+                $("#commSave").val("수정");
+                $("#changeTitle").html("&nbsp;수정&nbsp;");
+
+            } else if (sendObject.saveGubn == "INS") {
+                $("#commSave").val("등록");
+                $("#changeTitle").html("&nbsp;등록&nbsp;");
+
+            }
+
+        });
+
+    </script>
+</head>
+<body>
+<div id="mainDiv">
+    <div class="popup-header-container">
+        <div class="popup-header-text">
+            화주 상품 정보<span id="changeTitle"></span>
+        </div>
+        <div class="button-container">
+            <input id="commSave" class="action-button primary" name="commSave"
+                   type="button"
+                   onclick="fnObj.searchOpen.comdSave()"
+                   value="등록">
+        </div>
+    </div>
+
+    <div class="search-container">
+		<span class="cell" style="display: none">
+			<span class="item-head">회사</span>
+			<span class="item-data" disabled>
+				<div id="cmpyCd"></div>
+			</span>
+		</span>
+
+        <div class="search-item">
+            <span class="search-label">화주사 <span class="stress">*</span></span>
+            <input class="search-input" type="text" id="agencyNm" onkeyup="fnObj.keyOpen.enterKey('agency');"/>
+            <i id="srchIcon" class="fa fa-search search-icon" aria-hidden="true"
+               onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text');"></i>
+
+            <input class="search-input" type="text" id="agencyCd" readonly/>
+            <i id="delIcon" class="fa fa-minus-circle" aria-hidden="true" readonly></i>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">제품 분류</span>
+            <div id="mtrlCtgr1"></div>
+            <div id="mtrlCtgr2"></div>
+            <div id="mtrlCtgr3"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">세트 여부</span>
+            <div id="setYn"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">BOM 여부</span>
+            <div id="bomYn"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">
+				상품 <span class="stress">*</span>
+			</span>
+            <input class="search-input" type="text" maxlength=80 id="mtrlCd"
+                   name="mtrlCd" th:placeholder="상품코드"/>
+
+            <input class="search-input" type="text" maxlength=100 id="mtrlNm"
+                   name="mtrlNm" th:placeholder="상품명칭"/>
+
+            <input class="search-input" type="text" maxlength=250 id="mtrlDesc"
+                   name="mtrlDesc" th:placeholder="상품비고"/>
+        </div>
+
+        <div class="search-item">
+			<span class="search-label">
+				제품상태 <span class="stress">*</span>
+			</span>
+            <div id="mtrlStatCd"></div>
+        </div>
+
+        <div class="search-item">
+			<span class="search-label">
+				자재유형<span class="stress">*</span>
+			</span>
+            <div id="mtrlType"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">심플코드</span>
+            <input type="text" class="search-input" maxlength=25 id="smplCd" name="smplCd"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">사용여부</span>
+            <div id="useYn"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">
+                규격
+            </span>
+            <input class="search-input" type="text" maxlength=50 id="sizeNm"
+                   name="sizeNm"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">사이즈</span>
+            <input class="search-input" type="text" maxlength=20 id="lnth" name="lnth"
+                   th:placeholder="'길이[가로]'"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/></input></span>
+            <input class="search-input" type="text" maxlength=20 id="dpth" name="dpth"
+                   th:placeholder="'깊이'"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/></input></span>
+            <input class="search-input" type="text" maxlength=20 id="hght" name="hght"
+                   th:placeholder="'높이[세로]'"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/></input></span>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">소비자가</span>
+            <input class="search-input" type="text" maxlength=50 id="custPrc" name="custPrc"
+                   oninput="this.value = this.value.replace(/[^0-9-.]/g, '').replace(/(\..*)\./g, '$1');"/></input></span>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">판매가</span>
+            <input class="search-input" type="text" maxlength=50 id="salePrc"
+                   name="salePrc"
+                   oninput="this.value = this.value.replace(/[^0-9-.]/g, '').replace(/(\..*)\./g, '$1');"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">공가</span>
+            <input class="search-input" type="text" maxlength=50 id="factPrc"
+                   name="factPrc"
+                   oninput="this.value = this.value.replace(/[^0-9-.]/g, '').replace(/(\..*)\./g, '$1');"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">매입가</span>
+            <input class="search-input" type="text" maxlength=50 id="purcPrc"
+                   name="purcPrc"
+                   oninput="this.value = this.value.replace(/[^0-9-.]/g, '').replace(/(\..*)\./g, '$1');"/>
+        </div>
+
+        <div class="search-item">
+			<span class="search-label">
+				CBM <span class="stress">*</span>
+			</span>
+            <input type="text" class="search-input" maxlength=50 id="cbm" name="cbm"
+                   oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">매입가</span>
+            <input class="search-input" type="text" maxlength=50 id="wght"
+                   name="wght"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">변환상품</span>
+            <input class="search-input" type="text" maxlength=50 id="cnvtMtrlCd"
+                   name="cnvtMtrlCd" th:placeholder="변환상품코드"
+                   oninput="this.value = this.value.replace(/[^0-9^a-z^A-Z]/g, '').replace(/(\..*)\./g, '$1');"/>
+            <input class="search-input" type="text" maxlength=100 id="cnvtMtrlNm" name="cnvtMtrlNm"
+                   th:placeholder="변환상품명칭"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">MTO</span>
+            <div id="mtoYn"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">정규격</span>
+            <div id="stdYn"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">비고</span>
+            <input class="search-input" type="text" maxlength=50 id="memo" name="memo"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">피킹 ZONE</span>
+            <input class="search-input" type="text" maxlength=25 id="zone" name="zone"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">고정 로케이션</span>
+            <input class="search-input" type="text" id="fixedLocNm" name="fixedLocNm" readonly />
+            <input type="hidden" id="fixedLoc" name="fixedLoc"></input>
+            <i class="fa fa-search search-icon" aria-hidden="true" onclick="fnObj.winOpen.locSrch();"></i>
+            <i class="fa fa-minus-circle" aria-hidden="true" onclick="$('#fixedLoc').val('');"></i>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">위치</span>
+            <input class="search-input" type="text" maxlength=25 id="pstnNm" name="pstnNm"/>
+        </div>
+    </div>
+
+    <div class="popup-header-container">
+        <div class="popup-header-text sub">
+            시공/배송정보
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-item">
+            <span class="search-label">시공여부</span>
+            <div id="instYn"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">
+                시공카테고리<span class="stress">*</span>
+            </span>
+            <div id="instCtgr"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">시공유형<span class="stress">*</span></span>
+            <div id="instType"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">좌석유형<span class="stress">*</span></span>
+            <div id="instSeatType"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">시공비</span>
+            <input class="search-input" type="text" maxlength=50 id="instCost"
+                   name="instCost"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">시공URL</span>
+            <input type="text" class="search-input" id="instUrl" name="instUrl">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">시공이미지경로</span>
+            <input type="text" class="search-input" id="instImgPath" name="instImgPath">
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">배송여부</span>
+            <div id="dlvyYn"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">배송유형</span>
+            <div id="dlvyType"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">3자배송유무</span>
+            <div id="thrDlvyYn"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">배송비</span>
+            <input type="text" class="search-input" maxlength=50 id="dlvyCost"
+                   name="dlvyCost"
+                   oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"/></input></span>
+        </div>
+    </div>
+
+    <div class="popup-header-container">
+        <div class="popup-header-text sub">
+            교환/반품 설정
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-item">
+            <span class="search-label">교환/반품 제외여부</span>
+            <div id="exchangeReturnExcludeYn"></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

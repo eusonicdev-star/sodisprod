@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html
+  xmlns:sec="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <link rel="icon" href="/css/favicon2.ico" type="image/x-icon" />
+    <title>유진소닉 TMS</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <!-- External CSS -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/skins/material/dhtmlx.css"
+    />
+
+    <!-- Internal CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="/css/layout.css" />
+    <link rel="stylesheet" type="text/css" href="/css/layout-custom.css" />
+
+    <!-- External JS -->
+    <script
+      src="https://cdn.dhtmlx.com/edge/dhtmlx.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Internal JS -->
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/layout.js"></script>
+
+    <script th:inline="javascript">
+      window.sessionData = {
+        userId: /*[[${session.userId}]]*/ "",
+        userNm: /*[[${session.userNm}]]*/ "",
+        cmpyCd: /*[[${session.cmpyCd}]]*/ "",
+        cmpyNm: /*[[${session.cmpyNm}]]*/ "",
+        userGrdCd: /*[[${session.userGrdCd}]]*/ "",
+        userGrdNm: /*[[${session.userGrdNm}]]*/ "",
+        userGrntCd: /*[[${session.userGrntCd}]]*/ "",
+        userGrntNm: /*[[${session.userGrntNm}]]*/ "",
+        dcCd: /*[[${session.dcCd}]]*/ "",
+        dcNm: /*[[${session.dcNm}]]*/ "",
+        agntCd: /*[[${session.agntCd}]]*/ "",
+        agntNm: /*[[${session.agntNm}]]*/ "",
+        userIp: /*[[${session.userIp}]]*/ "",
+        tblUserMId: /*[[${session.tblUserMId}]]*/ "",
+      };
+    </script>
+  </head>
+
+  <body>
+    <div class="loader" id="loader"></div>
+    <div id="profileDisplay" style="display: none">
+      <span
+        class="profile-badge"
+        th:classappend="${activeProfile == '운영' ? 'prod' : 'dev'}"
+        th:text="${activeProfile}"
+      ></span>
+    </div>
+  </body>
+</html>

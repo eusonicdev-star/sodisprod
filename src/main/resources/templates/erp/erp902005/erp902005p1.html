@@ -1,0 +1,260 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <title>달력 일괄생성 (erp902005p1)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/popup.css">
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+
+    <script th:inline="javascript">
+        fnObj = {
+            winOpen: {},	//END of winOpen
+            comboOpen: {
+                comboCmpyCd: function () {		//회사콤보목록
+                    myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+                    comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+                    myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/));
+                    myComboCmpyCd.setFontSize("12px", "12px");
+                    myComboCmpyCd.attachEvent("onChange", function (value, text) {
+                        myGrid.clearAll(false);
+                    });
+                    myComboCmpyCd.disable();
+
+                },
+                comboClndType: function () {		//달력유형 콤보
+                    myComboClndType = new dhtmlXCombo("clndType");
+                    comboList(myComboClndType, 'A', 'COMM', 'CLND_TYPE', '', 'Y', '');
+                    //myComboClndType.selectOption(myComboClndType.getIndexByValue(/*[[${session.cmpyCd}]]*/));
+                    myComboClndType.selectOption(0);
+                    myComboClndType.setFontSize("12px", "12px");
+                    myComboClndType.attachEvent("onChange", function (value, text) {
+                        myGrid.clearAll(false);
+                    });
+                    //myComboClndType.disable();
+                },
+                comboDlvyWorkYn: function () {
+                    myComboDlvyWorkYn = new dhtmlXCombo("dlvyWorkYn");
+                    myComboDlvyWorkYn.addOption([{value: "Y", text: "사용"}]);
+                    myComboDlvyWorkYn.addOption([{value: "N", text: "미사용"}]);
+                    myComboDlvyWorkYn.selectOption(0);
+                    myComboDlvyWorkYn.setFontSize("12px", "12px");
+                    myComboDlvyWorkYn.attachEvent("onChange", function (value, text) {
+                        //myGrid.clearAll(false);
+                    });
+
+                    myComboDlvyWorkYn.disable();
+                },
+                comboCdcWorkYn: function () {
+                    myComboCdcWorkYn = new dhtmlXCombo("cdcWorkYn");
+                    myComboCdcWorkYn.addOption([{value: "Y", text: "사용"}]);
+                    myComboCdcWorkYn.addOption([{value: "N", text: "미사용"}]);
+                    myComboCdcWorkYn.selectOption(0);
+                    myComboCdcWorkYn.setFontSize("12px", "12px");
+                    myComboCdcWorkYn.attachEvent("onChange", function (value, text) {
+                        //myGrid.clearAll(false);
+                    });
+                    myComboCdcWorkYn.disable();
+                },
+                comboRdcWorkYn: function () {
+                    myComboRdcWorkYn = new dhtmlXCombo("rdcWorkYn");
+                    myComboRdcWorkYn.addOption([{value: "Y", text: "사용"}]);
+                    myComboRdcWorkYn.addOption([{value: "N", text: "미사용"}]);
+                    myComboRdcWorkYn.selectOption(0);
+                    myComboRdcWorkYn.setFontSize("12px", "12px");
+                    myComboRdcWorkYn.attachEvent("onChange", function (value, text) {
+                        //myGrid.clearAll(false);
+                    });
+                    myComboRdcWorkYn.disable();
+                },
+            },	//END of comboOpen
+            gridOpen: {},	//END of gridOpen
+            btnOpen: {
+
+
+                clndSave: function () {
+
+
+                    var weekDay = "";
+                    $('input:checkbox[name="week"]').each(function () {
+
+                        if (this.checked) {
+                            weekDay = weekDay + "," + $(this).val();
+                        }
+
+                    });
+
+                    if (!$("#clndYear").val()) {
+                        alert("년도를 입력해주세요");
+                        return false;
+                    }
+                    if ($("#clndYear").val().length != 4) {
+                        alert("숫자 4자리를 입력해주세요");
+                        return false;
+                    }
+                    if (!weekDay) {
+                        alert("요일이 어떤것도 체크되지 않았습니다.");
+                        return false;
+                    }
+
+
+                    if (!confirm($("#clndYear").val() + "년도 달력을 일괄생성합니다.\n기존데이터는 삭제 후 재생성 됩니다.\n진행하시겠습니까?")) {
+
+                        alert("취소하였습니다.");
+                        return;
+                    }
+
+
+                    var save = new FormData();
+
+                    save.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+                    save.append("clndType", myComboClndType.getSelectedValue());
+                    save.append("clndYear", $("#clndYear").val());
+                    save.append("dlvyWorkYn", myComboDlvyWorkYn.getSelectedValue());
+                    save.append("cdcWorkYn", myComboCdcWorkYn.getSelectedValue());
+                    save.append("rdcWorkYn", myComboRdcWorkYn.getSelectedValue());
+                    save.append("weekList", weekDay);
+
+
+                    save.append("saveUser",	/*[[${session.tblUserMId}]]*/);
+
+                    for (var pair of save.entries()) {
+                        console.log(pair[0] + ' ==> ' + pair[1]);
+                    }
+
+                    $.ajax({
+                        url: "/erp902005p1Save",
+                        processData: false,
+                        contentType: false,
+                        data: save,
+                        type: "POST",
+                        datatype: "json",
+                        success: function (res) {
+                            if (res) {
+                                console.log(res);
+                                if (res.rtnYn == "Y")	//신규등록
+                                {
+                                    parent.myGrid.clearAll(false);
+                                    parent.$("#clndYear").val("");
+                                    parent.$("#dateFrom").val("");
+                                    parent.$("#dateTo").val("");
+                                    alert("완료하였습니다.")
+
+                                    parent.myWins.window(/*[[${sendObject.windowId}]]*/).close();
+                                } else		//결과 리턴값이 없으면 오류다
+                                {
+                                    alert("실패하였습니다.\n" + res.rtnMsg);
+                                }
+                            } else {
+                                alert("달력 일괄생성 수행 실패.")
+                            }
+                        },
+                    });
+
+                },		//END of clndSave : function(){
+
+                clndClose: function () {
+                    parent.myWins.window(/*[[${sendObject.windowId}]]*/).close();
+                },
+            }
+
+        };//END of fnObj
+
+
+        $(document).ready(function () {
+            console.log(pageUrl());
+
+
+            var sendObj = /*[[${sendObject}]]*/
+                console.log(sendObj)
+
+            fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+            fnObj.comboOpen.comboClndType();	//달력유형콤보 바인드
+
+
+            fnObj.comboOpen.comboDlvyWorkYn();	//배송콤보 바인드
+            fnObj.comboOpen.comboCdcWorkYn();	//CDC콤보 바인드
+            fnObj.comboOpen.comboRdcWorkYn();	//RDC콤보 바인드
+
+        });
+
+
+    </script>
+
+</head>
+<body>
+<div id="mainDiv">
+    <div class="popup-header-container">
+        <div class="popup-header-text">
+            달력 일괄 생성
+        </div>
+        <div class="button-container">
+            <span class="cell" id="spanclndSave">
+			    <input id="btnclndSave" class="action-button primary" type="button"
+                       onclick="fnObj.btnOpen.clndSave()" value="등록">
+		    </span>
+
+            <span class="cell" id="spanGrntUpdt">
+			    <input id="btnGrntUpdt" class="action-button danger" type="button"
+                       onclick="fnObj.btnOpen.clndClose();" value="닫기">
+		    </span>
+        </div>
+    </div>
+    <div class="search-container">
+        <div class="search-item">
+            <span class="search-label">회사</span>
+            <div id="cmpyCd"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">달력유형</span>
+            <div id="clndType"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">연도</span>
+            <input type="text" id="clndYear" class="search-input" name="clndYear" minlength='4' maxlength='4'
+                   onKeyup="this.value=this.value.replace(/[^0-9]/g,'');"/>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">배송</span>
+            <div id="dlvyWorkYn"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">CDC</span>
+            <div id="cdcWorkYn"></div>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">RDC</span>
+            <div id="rdcWorkYn"></div>
+        </div>
+
+        <div class="search-item">
+            <input type="checkBox" id="mon" name="week" value="MON">월</input>&nbsp;&nbsp;
+            <input type="checkBox" id="tue" name="week" value="TUE">화</input>&nbsp;&nbsp;
+            <input type="checkBox" id="wed" name="week" value="WED">수</input>&nbsp;&nbsp;
+            <input type="checkBox" id="thu" name="week" value="THU">목</input>&nbsp;&nbsp;
+            <input type="checkBox" id="fri" name="week" value="FRI">금</input>&nbsp;&nbsp;
+            <input type="checkBox" id="sat" name="week" value="SAT"><font color="blue">토</font></input>&nbsp;&nbsp;
+            <input type="checkBox" id="sun" name="week" value="SUN"><font color="red">일</font></input>
+        </div>
+    </div>
+</div>
+</body>
+</html>

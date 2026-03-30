@@ -1,0 +1,24 @@
+spring:
+  devtools:
+    livereload:
+      enabled: true
+  freemarker:
+    cache: false
+  thymeleaf:
+    cache: false
+    check-template-location: true
+  profiles:
+    active: dev
+common:
+  html:
+    pagePerRow: 500
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.sonictms
+
+server:
+  shutdown: graceful

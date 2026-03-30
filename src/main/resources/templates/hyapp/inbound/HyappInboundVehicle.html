@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>입차 차량 관리</title>
+  <style>
+    :root { --bg: #f5f7fb; --card: #ffffff; --bd: #e0e0e0; --primary: #007bff; }
+    body { margin:0; font-family: system-ui, sans-serif; background: var(--bg); padding-bottom: 30px; }
+    header { position: sticky; top:0; background:#fff; border-bottom:1px solid #e0e0e0; padding:16px; display: flex; align-items: center; z-index:100; }
+    .back-btn { background: none; border: none; font-size: 20px; cursor: pointer; }
+    h1 { margin:0; font-size:17px; flex: 1; text-align: center; }
+    main { padding:16px; }
+
+    .section-card { background: #fff; padding: 16px; border-radius: 12px; border: 1px solid var(--bd); margin-bottom: 20px; }
+    .section-title { font-size: 14px; font-weight: 700; color: #666; margin-bottom: 12px; display: block; }
+
+    .row { margin-bottom: 12px; }
+    .input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
+    .btn-reg { width: 100%; padding: 14px; background: #343a40; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+    .v-card { background: #fff; border: 1px solid var(--bd); border-radius: 12px; padding: 15px; margin-bottom: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .v-info b { font-size: 16px; display: block; margin-bottom: 4px; }
+    .v-info span { font-size: 13px; color: #888; }
+    .v-badge { background: var(--primary); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+  </style>
+</head>
+<body>
+<header>
+  <button class="back-btn" onclick="location.href='/hyapp/in_main'">←</button>
+  <h1 id="headerTitle">차량 입차 등록</h1>
+</header>
+<main>
+  <span class="section-title">신규 차량 입차 정보</span>
+  <section class="section-card">
+    <div class="row">
+      <select id="vehicleTon" class="input">
+        <option value="">차량톤수 선택</option>
+        <option value="1T">1톤</option>
+        <option value="3.5T">3.5톤</option>
+        <option value="5T">5톤</option>
+        <option value="11T">11톤</option>
+        <option value="20FT">컨테이너 20FT</option>
+        <option value="40FT">컨테이너 40FT</option>
+      </select>
+    </div>
+    <div class="row">
+      <select id="inboundMethod" class="input" onchange="togglePallet()">
+        <option value="">입고 방법 선택</option>
+        <option value="BULK">벌크</option>
+        <option value="PALLET">파렛트</option>
+      </select>
+    </div>
+    <div id="palletQtyWrap" style="display:none;" class="row">
+      <input id="palletQty" class="input" type="number" placeholder="파렛트 수량 (N개)">
+    </div>
+    <button class="btn-reg" onclick="saveVehicle()">입차 차량 등록</button>
+  </section>
+
+  <span class="section-title">오늘 입차된 차량 목록 (선택 시 검수 이동)</span>
+  <div id="vehicleList">
+  </div>
+</main>
+
+<script>
+  let currentAgntCd = "";
+
+  window.onload = function() {
+    const selected = JSON.parse(sessionStorage.getItem("SELECTED_CUSTOMER"));
+    if (!selected) { location.href = "/hyapp/in_main"; return; }
+    currentAgntCd = selected.cd;
+    document.getElementById("headerTitle").textContent = selected.nm + " - 차량 목록";
+    loadVehicles();
+  };
+
+  function togglePallet() {
+    const isPallet = document.getElementById("inboundMethod").value === "PALLET";
+    document.getElementById("palletQtyWrap").style.display = isPallet ? "block" : "none";
+  }
+
+  async function saveVehicle() {
+    const ton = document.getElementById("vehicleTon").value;
+    const method = document.getElementById("inboundMethod").value;
+    const pQty = document.getElementById("palletQty").value;
+
+    if (!ton || !method) return alert("정보를 입력해주세요.");
+
+    const data = {
+      cmpyCd: "A",
+      agntCd: currentAgntCd,
+      vhclTonType: ton,
+      inMethod: method,
+      palletQty: parseInt(pQty || 0),
+      inboundStatus: "READY"
+    };
+
+    try {
+      const res = await fetch("/hyapp/api/inbound/master/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert("차량이 등록되었습니다.");
+        // 등록 성공 시 다시 검수 화면(Acc)으로 돌아감
+        location.href = "/hyapp/in_ass";
+      }
+    } catch (e) { alert("등록 실패"); }
+  }
+
+  async function loadVehicles() {
+    // 오늘 해당 고객사로 입차된 마스터 리스트 조회 API 호출 필요
+    // 임시 렌더링 로직
+    const listEl = document.getElementById("vehicleList");
+    listEl.innerHTML = `
+            <div class="v-card" onclick="goAcc(101)">
+                <div class="v-info">
+                    <b>1톤 / 파렛트(5개)</b>
+                    <span>등록시간: 14:20</span>
+                </div>
+                <div class="v-badge">검수하기</div>
+            </div>
+        `;
+  }
+
+  function goAcc(masterId) {
+    location.href = `/hyapp/in_ass?masterId=${masterId}`;
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+package com.sonictms.alsys.erp.erp902004.entity;
+
+import com.sonictms.alsys.common.entity.CommonVO;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+
+
+@Getter
+@Setter
+//@ToString
+@ToString(callSuper=true)
+public class Erp902004VO extends CommonVO {
+		
+	private static final long serialVersionUID = 1L;
+
+		private	String	chkYn			;		//매핑여부
+
+		private	String	tblPostMId		;
+		private	String	postCd		;
+		private	String	sidoNm		;
+		private	String	siguNm		;
+		private	String	dngNm		;
+		private	String	riNm		;
+		private	String	bunji		;
+		private	String	ho		;
+		private	String	roadNm		;
+		private	String	tblLgstDcpostMId		;
+		private	String	cmpyCd		;
+		private	String	dcCd		;		;
+		private	String	dcNm		;
+		private	String	memo;
+	
+}

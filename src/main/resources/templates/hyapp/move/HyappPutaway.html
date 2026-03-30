@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>WMS 적치 등록</title>
+    <style>
+        :root { --bg:#f1f5f9; --primary:#0066ff; --dark:#1e293b; --border:#cbd5e1; --card:#ffffff; }
+        body { margin:0; font-family: system-ui, sans-serif; background:var(--bg); color:#0f172a; padding-bottom:30px; }
+        header { background:#fff; border-bottom:1px solid var(--border); padding:16px; text-align: center; position: sticky; top:0; z-index:10; }
+        h1 { margin:0; font-size:18px; font-weight:800; }
+        main { padding:16px; display: flex; flex-direction: column; gap: 15px; }
+
+        .card { background:var(--card); border-radius:16px; padding:16px; border:1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .label { font-size:16px; font-weight:800; margin-bottom:10px; display:block; color:var(--dark); }
+
+        .input-group { display: flex; gap: 8px; }
+        .input { flex:1; height:50px; border:2px solid var(--border); border-radius:10px; font-size:18px; text-align:center; font-weight:700; }
+        .input:focus { border-color: var(--primary); outline: none; }
+
+        .btn { height:50px; padding:0 15px; border-radius:10px; border:none; font-weight:800; font-size:16px; cursor:pointer; }
+        .btn-dark { background:var(--dark); color:#fff; }
+        .btn-primary { background:var(--primary); color:#fff; width:100%; height:60px; font-size:20px; }
+        .btn:disabled { opacity: 0.5; }
+
+        .pallet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .plt-btn { height:55px; background:#fff; border:2px solid var(--border); border-radius:10px; font-weight:700; }
+        .plt-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+
+        .info-box { background:#f8fafc; border:1px dashed var(--primary); padding:12px; border-radius:10px; font-size:14px; margin-top:10px; display:none; }
+        .info-row { display:flex; justify-content:space-between; margin-bottom:4px; }
+        .info-row span { color:#64748b; }
+        .info-row b { color:var(--dark); }
+        .status-msg{font-size:13px;color:#666;text-align:center;margin-top:8px;min-height:16px;}
+
+        /* [추가] 입력창 래퍼 및 X 버튼 스타일 */
+        .input-wrapper { position: relative; flex: 1; display: flex; align-items: center; }
+        .btn-clear {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            border: none; background: #cbd5e1; color: #fff; border-radius: 50%;
+            width: 24px; height: 24px; font-size: 14px; cursor: pointer;
+            display: none; align-items: center; justify-content: center; z-index: 5;
+        }
+        /* 입력값이 있을 때만 X 버튼 표시 */
+        .input:not(:placeholder-shown) + .btn-clear { display: flex; }
+
+        /* [추가] 토스트 메시지 스타일 */
+        .toast-msg {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(30, 41, 59, 0.9); color: #fff; padding: 15px 25px;
+            border-radius: 30px; z-index: 9999; font-size: 15px; font-weight: 800;
+            display: none; text-align: center; white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+<header style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px;">
+    <div style="width: 24px;"></div> <h1>적치 등록</h1>
+    <button type="button" onclick="openPendingPopup()" style="background:none; border:none; padding:5px; cursor:pointer;">
+        <span style="font-size: 24px;">📋</span>
+    </button>
+</header>
+
+<div id="pendingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+    <div style="position:absolute; bottom:0; width:100%; background:#fff; border-radius:20px 20px 0 0; max-height:80%; overflow-y:auto; padding:20px; box-sizing:border-box;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:2px solid #f1f5f9; padding-bottom:10px;">
+            <b style="font-size:18px;">적치 대기 목록</b>
+            <button onclick="closePendingPopup()" style="border:none; background:none; font-size:20px;">✕</button>
+        </div>
+        <div id="pendingList" style="display:flex; flex-direction:column; gap:10px;">
+        </div>
+    </div>
+</div>
+
+<main>
+    <div id="toast" class="toast-msg"></div>
+
+    <div class="card">
+        <label class="label">1. 상품 바코드 스캔</label>
+        <div class="input-group">
+            <div class="input-wrapper">
+                <input type="text" id="mtrlBarcode" class="input" placeholder="상품 바코드 입력/스캔"
+                       onkeypress="if(event.keyCode==13) findInboundItem()">
+                <button type="button" class="btn-clear" onclick="clearInput('mtrlBarcode')">✕</button>
+            </div>
+            <button class="btn btn-dark" type="button" onclick="requestScan('MTRL')">스캔</button>
+        </div>
+        <div id="itemInfo" class="info-box" style="display:none; background:#ffffff; border:2px solid #0066ff; padding:20px;">
+            <div style="margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
+                <span style="font-size: 16px; color: #64748b; font-weight: 700;">상품명</span>
+                <div id="v_mtrlNm" style="font-size: 28px; font-weight: 900; color: #1e293b; margin-top: 5px; word-break: break-all;">-</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div style="background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center;">
+                    <span style="font-size: 15px; color: #64748b; font-weight: 700;">검수 완료</span>
+                    <div id="v_qcQty" style="font-size: 32px; font-weight: 1000; color: #475569;">0</div>
+                </div>
+                <div style="background: #eff6ff; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #bfdbfe;">
+                    <span style="font-size: 15px; color: #0066ff; font-weight: 700;">적치 가능</span>
+                    <div id="v_availQty" style="font-size: 32px; font-weight: 1000; color: #0066ff;">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" id="locSection" style="opacity: 0.5; pointer-events: none;">
+        <label class="label">2. 로케이션 스캔</label>
+        <div class="input-group">
+            <div class="input-wrapper">
+                <input type="text" id="locBarcode" class="input" placeholder="로케이션 바코드"
+                       onkeypress="if(event.keyCode==13) checkLocation()">
+                <button type="button" class="btn-clear" onclick="clearInput('locBarcode')">✕</button>
+            </div>
+            <button class="btn btn-dark" type="button" onclick="requestScan('LOC')">스캔</button>
+        </div>
+    </div>
+
+    <div class="card" id="qtySection" style="opacity: 0.5; pointer-events: none;">
+        <label class="label">3. 적치 수량 입력</label>
+        <input type="number" id="putQty" class="input" style="width:100%;"
+               inputmode="numeric"
+               oninput="this.value = this.value ? Number(this.value) : ''; validateQty();"
+               onfocus="this.select()">
+        <label class="label" style="margin-top:15px;">4. 팔렛트 규격 선택</label>
+        <div class="pallet-grid">
+            <button class="plt-btn" onclick="selectPallet(this, 'PLT_11')">표준(1100)</button>
+            <button class="plt-btn" onclick="selectPallet(this, 'PLT_12')">대형(1200)</button>
+            <button class="plt-btn" onclick="selectPallet(this, 'PLT_EURO')">유로(EURO)</button>
+            <button class="plt-btn" onclick="selectPallet(this, 'PLT_BOX')">박스(BOX)</button>
+        </div>
+    </div>
+
+    <div class="status-msg" id="status"></div>
+    <button id="saveBtn" class="btn btn-primary" disabled onclick="savePutaway()">적치 완료 저장</button>
+</main>
+
+<script>
+    // [수정] 페이지 로드 시 초기 포커스 설정
+    window.onload = function() {
+        const mtrlInput = document.getElementById("mtrlBarcode");
+        if (mtrlInput) {
+            // 가상 키보드 방지를 위해 잠시 readOnly 사용
+            mtrlInput.readOnly = true;
+            mtrlInput.focus();
+            setTimeout(() => {
+                mtrlInput.readOnly = false;
+                setStatus("상품 바코드를 스캔하세요.");
+            }, 200);
+        }
+    };
+
+    // [추가] 화면 빈 곳 클릭 시 포커스 복구
+    document.addEventListener('click', function(e) {
+        const skipTags = ['INPUT', 'BUTTON', 'SELECT'];
+        // 현재 포커스가 다른 입력창(로케이션 등)에 있는 게 아니라면 상품창으로 복구
+        if (!skipTags.includes(e.target.tagName)) {
+            // 단, 로케이션 섹션이 활성화된 상태라면 로케이션 창으로, 아니면 상품창으로 포커스
+            const locSection = document.getElementById("locSection");
+            if (locSection.style.opacity === "1") {
+                document.getElementById("locBarcode").focus();
+            } else {
+                document.getElementById("mtrlBarcode").focus();
+            }
+        }
+    });
+
+    let selectedItem = null;
+    let isLocValid = false;
+    let selectedPlt = "";
+    let scanTarget = null;
+
+    const setStatus = (msg) => { document.getElementById("status").textContent = msg || ""; };
+
+    // 세션에서 cmpyCd 가져오기
+    function getCmpyCd() {
+        const raw = sessionStorage.getItem("SELECTED_CUSTOMER");
+        if (raw) {
+            const customer = JSON.parse(raw);
+            return customer.cmpyCd || 'A';
+        }
+        return "A";
+    }
+
+    // 스캔 브릿지 연동
+    function requestScan(target) {
+        scanTarget = target;
+        if (window.ReactNativeWebView) {
+            setStatus("스캔 화면 요청...");
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: "requestBarcodeScan", target: "KEYWORD" }));
+        } else {
+            alert("모바일 앱 환경에서만 카메라 스캔이 가능합니다.");
+        }
+    }
+
+    function handleAppMessage(e) {
+        try {
+            let data = e.data;
+            if (typeof data === "string") {
+                try { data = JSON.parse(data); } catch(ex) { data = { value: data }; }
+            }
+            const code = String(data.value || data.code || data.barcode || (typeof data === 'string' ? data : '')).trim();
+            if (code) {
+                if (scanTarget === "MTRL") {
+                    document.getElementById("mtrlBarcode").value = code;
+                    findInboundItem();
+                } else if (scanTarget === "LOC") {
+                    document.getElementById("locBarcode").value = code;
+                    checkLocation();
+                }
+            }
+        } catch (err) { console.error("Scan Error", err); }
+    }
+
+    document.addEventListener("message", handleAppMessage);
+    window.addEventListener("message", handleAppMessage);
+
+    // 1단계: 상품 조회
+    async function findInboundItem() {
+        const barcode = document.getElementById("mtrlBarcode").value.trim();
+        if(!barcode) return;
+
+        try {
+            setStatus("입고 내역 조회 중...");
+            // 조회 시에도 cmpyCd를 명시적으로 보내는 것이 안전합니다.
+            const res = await fetch(`/hyapp/api/wh/put/check-item?barcode=${encodeURIComponent(barcode)}&cmpyCd=${getCmpyCd()}`);
+            const data = await res.json();
+
+            if (data.success && data.item) {
+                selectedItem = data.item;
+
+                const qcQty = Number(selectedItem.actualQuantity || selectedItem.ACTUAL_QUANTITY || 0);
+                const availQty = Number(selectedItem.remainingQty || selectedItem.availQty || selectedItem.AVAILQTY || 0);
+
+                // 디버깅용 로그 (브라우저 F12 콘솔에서 확인 가능)
+                console.log("체크된 데이터:", selectedItem); // 브라우저 콘솔에서 어떤 필드로 값이 오는지 확인용
+                console.log("최종 가용수량:", availQty);
+
+                // [체크] 수량이 실제로 0 이하인지 숫자형으로 명확히 비교
+                if (availQty <= 0) {
+                    alert("적치 가능한 수량이 없습니다 (현재 잔량: " + availQty + ")");
+                    resetForm();
+                    return;
+                }
+
+                // 데이터가 정상(10개)이라면 아래 화면 표시 로직 실행
+                document.getElementById("v_mtrlNm").textContent = selectedItem.mtrlNm || selectedItem.MTRL_NM;
+                document.getElementById("v_qcQty").textContent = qcQty;
+                document.getElementById("v_availQty").textContent = availQty;
+
+                document.getElementById("putQty").value = availQty;
+                document.getElementById("itemInfo").style.display = "block";
+
+                // 다음 단계 활성화
+                document.getElementById("locSection").style.opacity = "1";
+                document.getElementById("locSection").style.pointerEvents = "auto";
+                moveFocusWithoutKeyboard("locBarcode");
+            } else {
+                alert("입고 내역을 찾을 수 없습니다.");
+                resetForm();
+            }
+        } catch (e) { setStatus("조회 오류 발생"); }
+    }
+
+    // 2단계: 로케이션 확인 (수정본)
+    async function checkLocation() {
+        const locInput = document.getElementById("locBarcode");
+        const locCode = locInput.value.trim();
+        if(!locCode) return;
+
+        try {
+            setStatus("로케이션 유효성 확인 중...");
+            const res = await fetch(`/hyapp/api/wh/loc/check?locBarcode=${encodeURIComponent(locCode)}&cmpyCd=${getCmpyCd()}`);
+            const data = await res.json();
+
+            if (data && data.locId) {
+                isLocValid = true;
+                document.getElementById("qtySection").style.opacity = "1";
+                document.getElementById("qtySection").style.pointerEvents = "auto";
+                document.getElementById("putQty").focus();
+                showToast("✅ 로케이션 확인 완료"); // 알림 대신 토스트
+                checkSaveReady();
+            } else {
+                // ★ [수정] 존재하지 않는 로케이션 처리 (토스트 교체)
+                showToast("❌ 존재하지 않는 로케이션입니다.");
+
+                locInput.value = ""; // 입력값 삭제
+                isLocValid = false;
+                document.getElementById("saveBtn").disabled = true;
+
+                // 즉시 재스캔 가능하도록 포커스
+                setTimeout(() => { locInput.focus(); }, 100);
+            }
+        } catch (e) {
+            showToast("⚠️ 통신 오류가 발생했습니다.");
+        }
+    }
+
+    function validateQty() {
+        const inputQty = parseInt(document.getElementById("putQty").value || 0);
+        // selectedItem 내의 가용수량 참조 (필드명 주의)
+        const availQty = selectedItem ? (selectedItem.remainingQty || selectedItem.availQty || 0) : 0;
+
+        if (inputQty > availQty) {
+            alert(`적치 가능 수량(${availQty})을 초과할 수 없습니다.`);
+            document.getElementById("putQty").value = availQty;
+        }
+        checkSaveReady();
+    }
+
+    function selectPallet(btn, type) {
+        document.querySelectorAll('.plt-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedPlt = type;
+        checkSaveReady();
+    }
+
+    function checkSaveReady() {
+        const qty = parseInt(document.getElementById("putQty").value || 0);
+        const availQty = selectedItem ? (selectedItem.remainingQty || selectedItem.availQty || 0) : 0;
+        // 수량이 가용수량 내에 있고, 로케이션이 유효하며, 팔렛트가 선택된 경우 활성화
+        document.getElementById("saveBtn").disabled = !(selectedItem && isLocValid && qty > 0 && qty <= availQty && selectedPlt);
+    }
+
+    // 3단계: 적치 저장
+    async function savePutaway() {
+        const putQtyInput = document.getElementById("putQty");
+        const putQty = parseInt(putQtyInput.value || 0);
+        const availQty = selectedItem ? (selectedItem.remainingQty || selectedItem.availQty || 0) : 0;
+
+        if (putQty > availQty) {
+            alert(`적치 가능 수량(${availQty}개)을 초과할 수 없습니다.`);
+            return;
+        }
+        if (putQty <= 0) return alert("수량을 입력하세요.");
+        if (!isLocValid || !selectedPlt) return alert("로케이션과 팔렛트를 확인해주세요.");
+
+        const payload = {
+            tblInboundProductId: selectedItem.tblInboundProductId,
+            cmpyCd: getCmpyCd(), // 회사코드 명시적 전달
+            agntCd: selectedItem.agntCd,
+            mtrlCd: selectedItem.mtrlCd,
+            mtrlNm: selectedItem.mtrlNm,
+            locBarcode: document.getElementById("locBarcode").value.trim(),
+            lines: [{ qty: putQty, lotNo: "", expireDate: null }],
+            remarks: selectedPlt
+        };
+
+        try {
+            document.getElementById("saveBtn").disabled = true;
+            const res = await fetch("/hyapp/api/wh/put/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const resultText = await res.text();
+            if (res.status === 401 || resultText === "SESSION_EXPIRED") {
+                alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+                location.href = "/hyapp/login";
+                return;
+            }
+
+            if (res.ok && resultText === "SUCCESS") {
+                alert("적치 완료!");
+                location.reload();
+            } else {
+                alert("저장 실패: " + resultText);
+                document.getElementById("saveBtn").disabled = false;
+            }
+        } catch (e) {
+            alert("서버 통신 오류");
+            document.getElementById("saveBtn").disabled = false;
+        }
+    }
+
+    function resetForm() {
+        selectedItem = null;
+        isLocValid = false;
+        document.getElementById("itemInfo").style.display = "none";
+        document.getElementById("locSection").style.opacity = "0.5";
+        document.getElementById("qtySection").style.opacity = "0.5";
+        document.getElementById("mtrlBarcode").value = "";
+        document.getElementById("locBarcode").value = "";
+        document.getElementById("saveBtn").disabled = true;
+        setStatus("초기화됨");
+    }
+
+    /**
+     * [추가] 입력창 내용 삭제 및 포커스 복구
+     */
+    function clearInput(id) {
+        const inp = document.getElementById(id);
+        if (!inp) return;
+
+        inp.value = "";
+
+        moveFocusWithoutKeyboard(id);
+
+        // 1. 상품 바코드를 지울 경우 전체 폼 초기화
+        if (id === 'mtrlBarcode') {
+            resetForm();
+        }
+        // 2. 로케이션 바코드를 지울 경우 유효성 상태 초기화
+        else if (id === 'locBarcode') {
+            isLocValid = false;
+            document.getElementById("qtySection").style.opacity = "0.5";
+            document.getElementById("qtySection").style.pointerEvents = "none";
+            document.getElementById("saveBtn").disabled = true;
+            setStatus("로케이션을 다시 스캔하세요.");
+        }
+
+        // 3. 가상 키보드 방지 로직과 함께 포커스 복구
+        inp.readOnly = true;
+        inp.focus();
+        setTimeout(() => {
+            inp.readOnly = false;
+        }, 100);
+    }
+
+    /**
+     * [추가] 토스트 메시지 표시 함수
+     */
+    function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 2000);
+    }
+
+    /**
+     * [수정] 적치 대기 목록 팝업 열기 (실제 API 경로 반영)
+     */
+    /**
+     * [수정] 적치 대기 목록 팝업 열기 (키보드 방지 로직 추가)
+     */
+    async function openPendingPopup() {
+        // [추가] 현재 포커스된 요소가 있다면 강제로 해제하여 키보드를 내립니다.
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
+
+        const mtrlInput = document.getElementById("mtrlBarcode");
+        const locInput = document.getElementById("locBarcode");
+
+        // [추가] 팝업이 떠 있는 동안 키보드가 올라오지 않도록 입력창을 잠시 잠급니다.
+        if (mtrlInput) mtrlInput.readOnly = true;
+        if (locInput) locInput.readOnly = true;
+
+        const modal = document.getElementById("pendingModal");
+        const listCont = document.getElementById("pendingList");
+
+        modal.style.display = "block";
+        listCont.innerHTML = "<div style='text-align:center; padding:20px;'>조회 중...</div>";
+
+        try {
+            const res = await fetch(`/hyapp/api/inbound/qc/complete`, {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' }
+            });
+
+            const data = await res.json();
+            const list = Array.isArray(data) ? data : [];
+
+            if (list.length === 0) {
+                listCont.innerHTML = "<div style='text-align:center; padding:20px; color:#94a3b8;'>대기 중인 적치 내역이 없습니다.</div>";
+                return;
+            }
+
+            listCont.innerHTML = list.map(item => {
+                // [수정] 바코드 필드를 가장 먼저 체크하도록 순서 변경
+                const barcode = item.barcode || item.BARCODE || item.mtrlBarcode || item.MTRL_BARCODE || item.mtrlCd || "";
+                const mtrlNm = item.mtrlNm || item.MTRL_NM || "상품명 없음";
+                const qty = item.availQty || item.AVAILQTY || item.remainingQty || 0;
+                const agntNm = item.agntNm || item.AGNT_NM || "";
+
+                return `
+            <div onclick="selectFromPending('${barcode}')"
+                 style="padding:15px; border:1px solid #e2e8f0; border-radius:12px; background:#f8fafc; margin-bottom:8px; cursor:pointer;">
+                <div style="font-size:11px; color:var(--primary); font-weight:700;">${agntNm}</div>
+                <div style="font-weight:800; font-size:15px; margin-bottom:4px; color:#1e293b;">${mtrlNm}</div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; color:#64748b;">
+                    <span>바코드: ${barcode}</span> <b style="color:var(--primary);">가용: ${qty}개</b>
+                </div>
+            </div>
+            `;
+            }).join("");
+        } catch (e) {
+            console.error("목록 조회 에러:", e);
+            listCont.innerHTML = "<div style='text-align:center; padding:20px; color:red;'>조회 중 오류가 발생했습니다.</div>";
+        }
+    }
+
+    /**
+     * [수정] 팝업 닫기 시 입력창 잠금 해제
+     */
+    function closePendingPopup() {
+        document.getElementById("pendingModal").style.display = "none";
+
+        // [추가] 닫을 때 다시 스캔할 수 있도록 readOnly 해제
+        const mtrlInput = document.getElementById("mtrlBarcode");
+        const locInput = document.getElementById("locBarcode");
+
+        if (mtrlInput) mtrlInput.readOnly = false;
+        if (locInput) locInput.readOnly = false;
+    }
+
+    /**
+     * [추가] 목록에서 선택 시 스캔한 것처럼 동작
+     */
+    function selectFromPending(barcode) {
+        if (!barcode) return;
+
+        const mtrlInput = document.getElementById("mtrlBarcode");
+
+        // 1. 값을 먼저 채워넣음
+        mtrlInput.value = barcode;
+
+        // 2. 팝업 닫기
+        closePendingPopup();
+
+        // 3. [핵심] 키보드 방지용 포커스 이동
+        // 잠시 읽기 전용으로 만들어 키보드가 올라오는 것을 막고 포커스만 보냄
+        mtrlInput.readOnly = true;
+        mtrlInput.focus();
+
+        setTimeout(() => {
+            mtrlInput.readOnly = false; // 0.2초 후 스캔 가능한 상태로 복구
+            findInboundItem(); // 상품 정보 조회 실행
+        }, 200);
+    }
+
+    /**
+     * [추가] 이벤트 전용 포커스 이동 함수 (키보드 방지)
+     */
+    function moveFocusWithoutKeyboard(elementId) {
+        const target = document.getElementById(elementId);
+        if (!target) return;
+
+        // 1. 잠시 읽기 전용으로 만들어 키보드 팝업을 차단
+        target.readOnly = true;
+        target.focus();
+
+        // 2. 아주 짧은 지연 시간(스캐너 입력에는 영향 없는 수준) 후 해제
+        setTimeout(() => {
+            target.readOnly = false;
+            console.log(`${elementId}로 이벤트 포커스 이동 (키보드 차단)`);
+        }, 200);
+    }
+
+</script>
+</body>
+</html>

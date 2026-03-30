@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>HyApp 설치 센터</title>
+    <style>
+        :root { --bg:#f5f7fb; --card:#fff; --border:#e2e8f0; --text:#1e293b; --sub:#64748b; }
+        body { margin:0; font-family: system-ui, -apple-system, sans-serif; background:var(--bg); color:var(--text); padding: 20px; }
+
+        header { text-align: center; margin-bottom: 30px; padding-top: 20px; }
+        header h1 { font-size: 24px; font-weight: 800; margin: 0; color: #0f172a; }
+        header p { font-size: 14px; color: var(--sub); margin: 8px 0 0; }
+
+        .download-container { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+        /* 버전별 카드 스타일 */
+        .ver-card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+            padding: 20px; display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); text-decoration: none; color: inherit;
+            transition: transform 0.1s, background 0.1s;
+        }
+        .ver-card:active { transform: scale(0.97); background: #f8fafc; }
+
+        .ver-info { display: flex; flex-direction: column; gap: 4px; }
+        .ver-name { font-size: 18px; font-weight: 700; }
+        .ver-tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 6px; width: fit-content; }
+
+        /* 태그 색상 구분 */
+        .tag-test { background: #fee2e2; color: #b91c1c; } /* 개발 테스트 */
+        .tag-dev  { background: #e0f2fe; color: #0369a1; } /* 개발 */
+        .tag-prod { background: #dcfce7; color: #15803d; } /* 운영 */
+
+        .btn-download {
+            background: #0f172a; color: #fff; padding: 10px 16px;
+            border-radius: 12px; font-size: 14px; font-weight: 600;
+        }
+
+        .footer-info { text-align: center; margin-top: 40px; font-size: 12px; color: var(--sub); line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>HyApp 설치 센터</h1>
+    <p>업무에 맞는 버전을 선택하여 다운로드하세요</p>
+</header>
+
+<main class="download-container">
+    <a href="https://drive.google.com/file/d/1LXhQpuUzcD2m-GXsgkmgAJB2ekiomIWN/view?usp=drive_link" class="ver-card" download="sodisW_test.apk" onclick="trackDownload('TEST')">
+    <div class="ver-info">
+            <span class="ver-tag tag-test">TEST</span>
+            <span class="ver-name">1. 개발 테스트 버전</span>
+            <div style="font-size:12px; color:var(--sub);">신규 기능 사전 검증용</div>
+        </div>
+        <div class="btn-download">다운로드</div>
+    </a>
+
+    <a href="https://drive.google.com/file/d/1sx_-AFrX6ZEoadvl0U_mrHLTjjrArbtL/view?usp=drive_link" class="ver-card" download="sodisW_dev.apk" onclick="trackDownload('개발')">
+        <div class="ver-info">
+            <span class="ver-tag tag-dev">DEV</span>
+            <span class="ver-name">2. 개발 버전</span>
+            <div style="font-size:12px; color:var(--sub);">개발 환경 동기화 버전</div>
+        </div>
+        <div class="btn-download">다운로드</div>
+    </a>
+
+    <a href="https://drive.google.com/file/d/1_sbH0W4D5s6eEzzg263rr7u-HbTH5UXE/view?usp=drive_link" class="ver-card" download="sodisW.apk" onclick="trackDownload('운영')">
+        <div class="ver-info">
+            <span class="ver-tag tag-prod">PROD</span>
+            <span class="ver-name">3. 운영 버전</span>
+            <div style="font-size:12px; color:var(--sub);">실무 업무용 (안정화)</div>
+        </div>
+        <div class="btn-download">다운로드</div>
+    </a>
+</main>
+
+<div class="footer-info">
+    안드로이드 설정에서 '출처를 알 수 없는 앱 설치' 허용이 필요합니다.<br>
+    다운로드 후 알림바를 내려 설치를 진행해 주세요.
+</div>
+
+<script>
+    /**
+     * [수정] 페이지 진입 시 초기화 로직
+     * URL을 강제로 변경하는 pushState 로직을 제거했습니다.
+     */
+    window.addEventListener('pageshow', function(event) {
+        // 1. 세션 및 작업 기록 초기화
+        localStorage.clear();
+        console.log("설치 센터 진입: 세션 정보 초기화 완료");
+
+        /* [삭제됨] window.history.pushState('forward', null, './download');
+           이 부분이 주소를 /download로 바꾸던 원인이므로 제거했습니다.
+        */
+    });
+
+    function trackDownload(ver) {
+        console.log(ver + " 버전 다운로드 시작");
+    }
+</script>
+
+</body>
+</html>

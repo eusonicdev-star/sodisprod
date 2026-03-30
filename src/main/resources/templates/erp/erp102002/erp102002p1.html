@@ -1,0 +1,520 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <title>알림톡 발송 스케줄 등록/수정 (erp102002p1)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/popup.css"/>
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+
+    <script th:inline="javascript">
+        var srchInput;
+        var myWins;
+        var myCalendarInptdt;
+        var myCalendarOutdt;
+        var sendObject;
+        fnObj = {
+            winOpen: {
+                commSrch: function (title, cmpyCd, srchCtgr, srchInput) {		//공통코드 찾기 팝업
+                    windowId = "commSrch";
+                    windowText = title + " commSrch";
+                    windowUrl = "/commSrch"
+                    windowLeft = -14400;
+                    windowTop = -14400;
+                    windowWidth = 800;
+                    windowHeight = 400;
+                    windowsModal = false;
+                    windowOnClose = function (windowId) {
+                        //alert("windowId : " + windowId);
+                        return true;
+                    };
+                    windowSendObject = {
+                        cmpyCd: cmpyCd,
+                        srchCtgr: srchCtgr,
+                        srchInput: srchInput,
+                        windowId: windowId,
+                        srchCd: $("#srchCode").val(),
+                        srchNm: $("#srchName").val(),
+                    };
+
+
+                    myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+
+                    myWins.window(windowId).attachEvent("onClose", function (win) {
+
+                        return true;
+                    });
+                },	//END of commSrch : function(){
+
+                rtnObject: function (windowId, rtnObj, srchInput) {	//popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+                    if (windowId == "commSrch") {
+
+                        if (rtnObj == null) {
+                            myWins.window(windowId).setPosition(0, 0);
+                            return;
+                        }
+                        if (srchInput == "text") {
+                            $("#srchCode").val(rtnObj[0].commCd);
+                            $("#srchName").val(rtnObj[0].commNm);
+                        } else if (srchInput == "textArea") {
+                            var areaContent = "";
+                            for (var i = 0; i < rtnObj.length; i++) {
+                                areaContent = areaContent + rtnObj[i].commCd;
+
+                                if (i < rtnObj.length - 1) {
+                                    areaContent = areaContent + "\n";
+                                }
+                            }
+                            $("#srchArea").val(areaContent);
+                        }
+                    }
+
+                },	//END of rtnObject : function(windowId,rtnObj){
+            },	//END of winOpen:{
+            comboOpen: {
+
+                comboCmpyCd: function () {
+                    myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+                    comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+                    myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${sendObject.cmpyCd}]]*/));
+                    myComboCmpyCd.setFontSize("12px", "12px");
+                    myComboCmpyCd.attachEvent("onChange", function (value, text) {
+                        //myGrid.clearAll(false);
+                    });
+                    myComboCmpyCd.disable();
+                },
+
+                //20211103 정연호 메세지 타입 콤보
+
+                comboTmpType: function () {
+                    myComboTmpType = new dhtmlXCombo("tmpType");
+                    comboList(myComboTmpType, 'A', 'ALRM_TMPLET', '', '', 'Y', 'req');
+                    myComboTmpType.selectOption(0);
+                    myComboTmpType.setFontSize("12px", "12px");
+                    myComboTmpType.attachEvent("onChange", function (value, text) {
+
+                    });
+                },
+
+
+                comboDtCalType: function () {
+                    myComboDtCalType = new dhtmlXCombo("dtCalType");
+                    comboList(myComboDtCalType, 'A', 'COMM', 'DT_CAL_TYPE', '', 'Y', 'req');
+                    myComboDtCalType.selectOption(0);
+                    myComboDtCalType.setFontSize("12px", "12px");
+                    myComboDtCalType.attachEvent("onChange", function (value, text) {
+
+                    });
+                },
+                comboUseYn: function () {
+                    myComboUseYn = new dhtmlXCombo("useYn");
+                    myComboUseYn.addOption([{value: "Y", text: "사용"}]);
+                    myComboUseYn.addOption([{value: "N", text: "미사용"}]);
+
+                    myComboUseYn.selectOption(0);
+                    myComboUseYn.setFontSize("12px", "12px");
+
+                },
+            },	//END of comboOpen : {
+            gridOpen: {},		//ENd of gridOpen : {
+            searchOpen: {
+
+                alrmSrch: function () {		//부모창에서 받은 고유ID 로 정보 찾는것
+
+                    var alrmData = new FormData();
+
+                    alrmData.append("tblAlrmScdlId",	/*[[${sendObject.tblAlrmScdlId}]]*/);
+
+
+                    $.ajax({
+                        url: "/erp102002p1AlrmSrch",
+                        processData: false,
+                        contentType: false,
+                        data: alrmData,
+                        type: "POST",
+                        datatype: "json",
+                        async: false,
+                        success: function (res) {
+                            if (res) {
+                                //console.log(res)
+
+                                myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(res.cmpyCd));
+                                $("#srchCode").val(res.agntCd);
+                                $("#srchName").val(res.agntNm);
+                                $("#alrmMsgType").val(res.alrmMsgType);
+
+                                myComboDtCalType.selectOption(myComboDtCalType.getIndexByValue(res.dtCalType));
+                                $("#dtCalDay").val(res.dtCalDay);
+                                $("#sendTime").val(res.sendTime);
+
+                                myComboUseYn.selectOption(myComboUseYn.getIndexByValue(res.useYn));
+
+
+                                $("#memo").val(res.memo);
+
+
+                            } else {
+                                alert("화주사내용 조회 수행 결과 없음")
+                            }
+                        },
+                    });
+                },	//END of alrmSrch : function() {
+                comdSave: function () {
+
+
+                    //console.log("전송시간 : " + 		parseInt($("#sendTime").val())		)	;
+                    if (((parseInt($("#sendTime").val()) >= 0 &&
+                                parseInt($("#sendTime").val()) < 8) 		//0시부터 7시까지
+                            ||
+                            (parseInt($("#sendTime").val()) > 20 &&
+                                parseInt($("#sendTime").val()) <= 23) 			//21시(오후9시) 부터 23시까지
+                            //를 입력하면 정말 이시간에 보낼꺼냐고 경고메시지를 보냄
+                        )
+                        &&
+                        !confirm((parseInt($("#sendTime").val()) < 12 ? "오전" + $("#sendTime").val() : "오후" + (parseInt($("#sendTime").val()) - 12)) + "시에 정말 메세지를 보내시겠습니까?")
+                    ) {
+                        alert("취소하였습니다.");
+                        return;
+
+                    }
+
+                    if (!fnObj.searchOpen.searchChkVal.chkVal("commSave")) {
+                        alert(chkValMsg);
+                        return false;
+                    }
+
+
+                    if (!confirm((sendObject.saveGubn == "INS" ? "등록" : "수정") + "하시겠습니까?")) {
+                        alert("취소하였습니다.");
+                        return;
+                    }
+
+
+                    //저장할 값 폼 형식으로 생성하기
+                    var saveData = new FormData();
+
+                    saveData.append("saveGubn",	/*[[${sendObject.saveGubn}]]*/);
+                    saveData.append("tblAlrmScdlId",	/*[[${sendObject.tblAlrmScdlId}]]*/);
+                    saveData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+                    saveData.append("agntCd", $("#srchCode").val());	//화주사코드
+                    saveData.append("alrmMsgType", myComboTmpType.getSelectedValue());//$("#alrmMsgType").val()	);	//메세지 타입 --> 탬플릿 코드
+                    saveData.append("dtCalType", myComboDtCalType.getSelectedValue());
+                    saveData.append("dtCalDay", $("#dtCalDay").val());
+                    saveData.append("sendTime", $("#sendTime").val());
+
+                    saveData.append("useYn", myComboUseYn.getSelectedValue());
+                    saveData.append("memo", $("#memo").val());
+                    saveData.append("saveUser",	/*[[${session.tblUserMId}]]*/);
+
+                    /* for(var pair of saveData.entries()) {
+                           console.log(pair[0]+ ' : '+ pair[1]);
+                        } */
+
+
+                    $.ajax({
+                        url: "/erp102002p1ComdSave",
+                        processData: false,
+                        contentType: false,
+                        data: saveData,
+                        type: "POST",
+                        datatype: "json",
+                        async: false,
+                        success: function (res) {
+                            if (res) {
+                                if (res.rtnYn == "Y") {
+                                    alert("성공 : " + res.rtnMsg);
+                                    parent.fnObj.searchOpen.search();
+                                    parent.myWins.window(sendObject.windowId).close();
+                                } else {
+                                    alert("실패 : " + res.rtnMsg);
+                                }
+                            } else {
+                                alert("등록/수정 수행 결과 없음")
+                            }
+                        },
+                    });
+
+
+                },	//END of comdSave : function() {
+
+                prDcDel: function () {
+                    $("#prDcCd").val("");
+                    $("#prDcNm").val("");
+                },	//END of prDcDel : function() {
+                delSrchCode: function (delGubn) {
+                    if (delGubn == "srch") {
+                        $("#srchCode").val("");
+                        $("#srchName").val("");
+                    }
+                    if (delGubn == "srch2") {
+                        $("#srchCode2").val("");
+                        $("#srchName2").val("");
+                    }
+                },	//END of delSrchCode : function(){
+
+                searchChkVal: {
+                    chkVal: function (chkGubn) {
+                        chkValMsg = "";	//메세지 초기화
+                        var rtnVal = true;
+                        if (chkGubn == "commSave") {
+                            if (!myComboCmpyCd.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "회사코드를 선택해주세요\n";
+                                rtnVal = false;
+                            }
+                            if (!myComboTmpType.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "탬플릿 코드를 선택해주세요\n";
+                                rtnVal = false;
+                            }
+
+
+                            if (!$("#srchCode").val()) {
+                                chkValMsg = chkValMsg + "화주코드가 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#srchName").val()) {
+                                chkValMsg = chkValMsg + "화주명칭이 없습니다\n";
+                                rtnVal = false;
+                            }
+                            /* if(!$("#alrmMsgType").val()){
+                                chkValMsg = chkValMsg + "메시지 타입이 없습니다\n";
+                                rtnVal = false;
+                            } */
+                            if (!myComboDtCalType.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "날짜계산을 선택해주세요\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#dtCalDay").val()) {
+                                chkValMsg = chkValMsg + "날짜계산일이 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#sendTime").val()) {
+                                chkValMsg = chkValMsg + "전송시간이 없습니다\n";
+                                rtnVal = false;
+                            }
+
+                            if ($("#sendTime").val().trim().length != 2) {
+                                chkValMsg = chkValMsg + "전송시간 2자리를 입력해주세요\n";
+                                rtnVal = false;
+                            }
+
+                            if (parseInt($("#sendTime").val()) == 24) {
+                                chkValMsg = chkValMsg + "전송시간을 00시로 입력해주세요\n";
+                                rtnVal = false;
+                            }
+                        }
+                        return rtnVal;
+                    },	//END of chkVal : function(){
+                },	//END of searchChkVal
+
+
+            },		//ENd of searchOpen : {
+            keyOpen: {
+                enterKey: function (keyGubn) {
+
+
+                    if (keyGubn == "srch") {
+                        if (window.event.keyCode == 13) {
+
+                            $("#srchName").blur();
+                            $("#srchCode").blur();
+
+
+                            $("#srchCode").val("");
+                            fnObj.winOpen.commSrch('화주', 'A', 'AGENCY', 'text');
+                        }
+                    }
+                    if (keyGubn == "srch2") {
+                        if (window.event.keyCode == 13) {
+                            $("#srchName2").blur();
+                            $("#srchCode2").blur();
+
+
+                            $("#srchCode2").val("");
+                            fnObj.winOpen.commSrch2('상품', 'A', 'MTRL', 'text');
+                        }
+                    }
+                },
+                onKeyPressed: function (code, ctrl, shift) {
+                    if (code == 67 && ctrl) {
+                        myGrid.setCSVDelimiter("\t");
+                        myGrid.copyBlockToClipboard()
+                    }
+                    if (code == 86 && ctrl) {
+                        myGrid.pasteBlockFromClipboard()
+                    }
+                    return true;
+                },
+            },
+
+        }	//END of fnObj
+
+        $(document).ready(function () {
+            //console.log(pageUrl());
+
+            //windowOpen 정의
+            myWins = new dhtmlXWindows();
+
+            fnObj.comboOpen.comboCmpyCd();
+            fnObj.comboOpen.comboTmpType();
+
+            fnObj.comboOpen.comboDtCalType();
+            fnObj.comboOpen.comboUseYn();
+
+
+            sendObject = /*[[${sendObject}]]*/;
+
+
+            $("#tblAlrmScdlId").val(/*[[${sendObject.tblAlrmScdlId}]]*/);
+
+
+            //사용자 정보 조회 - 수정일 경우
+
+            if (sendObject.saveGubn == "UPDT") {
+                //조회하기
+                fnObj.searchOpen.alrmSrch();
+                $("#commSave").val("수정");
+            } else if (sendObject.saveGubn == "INS") {
+                $("#commSave").val("등록");
+
+
+            }
+
+        });
+    </script>
+</head>
+<body>
+<div id="mainDiv">
+    <div id="searchDiv">
+        <div class="popup-header-container">
+            <div class="popup-header-text">
+                <span>알림톡 발송 스케줄 관리</span>
+            </div>
+
+            <span class="item-data">
+					<input id="commSave"
+                           class="action-button primary"
+                           name="commSave" type="button" onclick="fnObj.searchOpen.comdSave()"
+                           value="등록">
+            </span>
+        </div>
+
+        <div id="inputDiv0">
+				<span class="cell" style="display:none;">
+					<span class="item-head">
+						회사 코드
+					</span>
+					<span class="item-data">
+						<div id="cmpyCd"></div>
+					</span>
+				</span>
+        </div>
+
+        <div class="search-container">
+            <div class="search-item">
+                <span class="search-label">
+                    화주사
+                </span>
+                <input type="text" id="srchName" class="search-input" onkeyup="fnObj.keyOpen.enterKey('srch');"/>
+                <i id="srchIcon" class="fa fa-search search-icon" aria-hidden="true"
+                   onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')">
+                </i>
+                <input type="text" id="srchCode" class="search-input" readonly>
+                <i id="delIcon" class="fa fa-minus-circle search-icon" aria-hidden="true"
+                   onclick="fnObj.searchOpen.delSrchCode('srch')">
+                </i>
+            </div>
+
+            <div class="search-item">
+                <span class="search-label">
+                    템플릿 코드
+                </span>
+                <div id="tmpType" class="search-input" style="width:120px">
+
+                </div>
+            </div>
+
+            <div class="search-item">
+                <span class="search-label">
+                    메모
+                </span>
+                <input type="text" id="memo" class="search-input" maxlength=100 name="memo">
+            </div>
+
+            <div class="search-item">
+                <span class="search-label">
+                    날짜 계산
+                </span>
+                <div id="dtCalType">
+                </div>
+            </div>
+
+            <div class="search-item">
+                <span class="search-label">
+                    날짜 계산일
+                </span>
+                <input type="text" maxlength=4 id="dtCalDay"
+                       class="search-input"
+                       name="dtCalDay"
+                       style="width: 10px"
+                       oninput="this.value = this.value.replace(/[^0-9-+]/g, '').replace(/(\..*)\./g, '$1');"/>
+                <div class="tooltip-container">
+                    <i class="fa fa-question-circle search-icon"></i>
+                    <div class="tooltip">
+                        +1 : [날짜계산]의 다음날 알림톡 발송
+                        0 : [날짜계산] 당일 알림톡 발송
+                        -3 : [날짜계산]의 3일 전 날짜에 알림톡발송
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-item">
+                <span class="search-label">전송 시간</span>
+                <input type="text" maxlength=2 id="sendTime"
+                       class="search-input"
+                       name="sendTime"
+                       style="width:10px;"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/>
+                <div class="tooltip-container">
+                    <i class="fa fa-question-circle search-icon"></i>
+                    <div class="tooltip">
+                        예) 오후3시 : 15, 오전9시 : 09
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-item">
+                <span class="search-label">사용 여부</span>
+                <div id="useYn"></div>
+            </div>
+
+            <span class="cell" style="display:none;">
+					<span class="item-head">
+                        tblAlrmScdlId
+                    </span>
+					<span class="item-data">
+                        <input type="text" id="tblAlrmScdlId"
+                               name="tblAlrmScdlId"
+                               disabled/>
+                        </input>
+                    </span>
+				</span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

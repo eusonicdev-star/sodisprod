@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>로케이션 검색(commLocSrch)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/web/dhtmlx.css">
+  <link rel="stylesheet" type="text/css" href="/css/erp-style.css">
+  <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div style="padding: 10px;">
+  <div id="searchDiv" class="input-group">
+    <input type="text" id="srchKeyword" class="input" placeholder="로케이션 코드 또는 명칭"
+           style="width:200px; height:30px;" onkeyup="if(event.keyCode==13) fnSearch();">
+    <button onclick="fnSearch()" class="btn-dark">조회</button>
+  </div>
+  <div id="gridBox" style="width:100%; height:350px; margin-top:10px;"></div>
+  <div style="text-align: center; margin-top: 10px;">
+    <button onclick="fnSelect()" class="btn-primary" style="width:100px;">선택</button>
+    <button onclick="fnClose()" class="btn-secondary" style="width:100px;">닫기</button>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  var myGrid;
+
+  $(document).ready(function () {
+    myGrid = new dhtmlXGridObject('gridBox');
+    myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
+    myGrid.setHeader("존,로케이션 코드,로케이션 명칭,유형");
+    myGrid.setColumnIds("zoneNm,locCd,locNm,locType");
+    myGrid.setInitWidths("120,150,150,80");
+    myGrid.setColAlign("left,center,left,center");
+    myGrid.setColTypes("ro,ro,ro,ro");
+    myGrid.init();
+
+    // [추가] 부모창에서 보낸 검색 데이터 확인
+    if (parent.windowSendObject && parent.windowSendObject.srchKeyword) {
+      $("#srchKeyword").val(parent.windowSendObject.srchKeyword);
+    }
+
+    myGrid.attachEvent("onRowDblClicked", function(rId) {
+      fnSelect();
+    });
+
+    fnSearch(); // 초기 조회
+  });
+
+  function fnSearch() {
+    var keyword = $("#srchKeyword").val();
+    $.ajax({
+      url: "/common/api/loc/search",
+      data: { keyword: keyword },
+      success: function (res) {
+        myGrid.clearAll();
+        myGrid.parse(res, "js");
+
+        // [추가] 결과가 1개이면 자동으로 첫 번째 행 선택
+        if (myGrid.getRowsNum() === 1) {
+          var firstId = myGrid.getRowId(0);
+          myGrid.selectRowById(firstId);
+        }
+      }
+    });
+  }
+
+  // commLocSrch.html 스크립트 수정
+
+  // 선택 버튼 클릭 시 호출
+  function fnSelect() {
+    var rId = myGrid.getSelectedRowId();
+    if (!rId) return alert("로케이션을 선택해주세요.");
+
+    var rowData = [myGrid.getRowData(rId)];
+
+    // 부모창의 rtnLocObject 함수 호출 (데이터 전달)
+    parent.fnObj.winOpen.rtnLocObject("commLocSrch", rowData);
+
+    // 데이터 전달 후 창 닫기 실행
+    fnClose();
+  }
+
+  // 닫기 버튼 클릭 시 호출 (신규 추가 또는 수정)
+  function fnClose() {
+    // dhtmlXWindows(레이어 팝업)를 사용하는 경우 부모창의 myWins 객체 이용
+    if (parent && parent.myWins && parent.myWins.window("commLocSrch")) {
+      parent.myWins.window("commLocSrch").close();
+    } else {
+      // 일반 브라우저 팝업인 경우
+      window.close();
+    }
+  }
+</script>
+</body>
+</html>

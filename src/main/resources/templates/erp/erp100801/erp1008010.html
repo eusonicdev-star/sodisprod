@@ -1,0 +1,502 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>타업체 주문 가져오기 (erp100801)</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+
+
+<link rel="stylesheet" type="text/css" href="/css/common.css">
+
+
+<link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css" />
+<link rel="stylesheet" href="https://uicdn.toast.com/tui-grid/latest/tui-grid.css" />
+
+<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/js/commCode.js"></script>
+
+
+<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.js"></script>
+<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+<!-- 엑셀 다운로드 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+
+<script th:inline="javascript">
+	var pagePerRow	=	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/
+	var myGrid;
+
+	var myCalendar;
+
+	fnObj={
+			winOpen:{
+				
+			
+			},	//END of winOpen
+			comboOpen : {
+				comboCmpyCd : function(){		//회사콤보목록
+					myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+			    	comboList(myComboCmpyCd,'A','COMM','CMPY_CD','','Y','');		     
+			    	myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/));
+			    	myComboCmpyCd.setFontSize("12px","12px");
+			    	myComboCmpyCd.attachEvent("onChange", function(value, text){
+			    		//myGrid.clearAll(false);
+			    	});
+			    	myComboCmpyCd.disable();
+			    	
+				},	
+				
+				comboAlrmSrchDtType : function(){	//타업체 정보 가져오달력유형구분 콤보
+					myComboAlrmSrchDtType = new dhtmlXCombo("alrmSrchDtType");
+					comboList(myComboAlrmSrchDtType,'A','COMM','ALRM_SRCH_DT_TYPE','','Y','');		     
+					myComboAlrmSrchDtType.selectOption(0);
+					myComboAlrmSrchDtType.readonly(true);
+					myComboAlrmSrchDtType.disable()
+					myComboAlrmSrchDtType.setFontSize("12px","12px");
+					myComboAlrmSrchDtType.attachEvent("onChange", function(value, text){
+			    		//myGrid.clearAll(false);
+			    	});
+				},
+				
+				comboOutCmpyCd : function(){		//회사콤보목록
+					myComboOutCmpyCd = new dhtmlXCombo("outCmpyCd");
+			    	comboList(myComboOutCmpyCd,'A','COMM','OUT_CMPY_CD','','Y','');		     
+			    	myComboOutCmpyCd.selectOption(0);
+			    	myComboOutCmpyCd.readonly(true);
+			    	myComboOutCmpyCd.disable()
+			    	myComboOutCmpyCd.setFontSize("12px","12px");
+			    	myComboOutCmpyCd.attachEvent("onChange", function(value, text){
+			    		//myGrid.clearAll(false);
+			    	});
+				},	
+			
+				
+				
+				
+				
+				
+				
+			},	//END of comboOpen
+			gridOpen : {
+				grid : function()
+				{
+					
+			
+					c_height =  top.myLayout.cells("c").getHeight();
+					searchDiv_height =  $("#searchDiv").height();
+					searchDiv2nd_height =  $("#searchDiv2nd").height();
+					//xhdr_height =  $(".xhdr").height(); 	
+					resultGridHeight = c_height-searchDiv_height-searchDiv2nd_height-160;  
+					//console.log("c_height : " + c_height);
+					//console.log("searchDiv_height : " + searchDiv_height);
+					//console.log("searchDiv2nd_height : " + searchDiv2nd_height); 
+					console.log("resultGridHeight : " + resultGridHeight);  
+					myGrid = new tui.Grid({
+					      el: document.getElementById('grid'), 
+					
+					      scrollX: true,
+					      scrollY: true,
+					      minBodyHeight: 30,
+					      bodyHeight: resultGridHeight,  
+					      rowHeaders: ['rowNum'],
+					    
+					      pageOptions: {
+					          useClient: true,
+					          perPage: 10000   
+					          //type: "scroll",
+					        },
+					    
+					      columns: [
+					        {header:'화주코드',	name:'trustCustCd', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'수취인명',name:'dlvCustomerNm', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'등록구분',name:'trnDlvOrdType', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'발주일(주문)',name:'buyedDt', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'입고예정일',name:'dlvInReqDt', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'지정일',name:'dlvSetDt', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'판매처',name:'salesCompanyNm', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'주문자',name:'buyCustNm', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'우편번호',name:'dlvZip', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'주소',name:'dlvAddr', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'지역',name:'dlvCityNm', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'고객전화번호1',name:'dlvPhone1', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'고객전화번호2',name:'dlvPhone2', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'상품명',name:'dlvProductNm', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'상품코드',name:'dlvProductCd', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'제품설명',name:'tempDlvProductNm', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'상품수량',name:'dlvQty', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'고객주문번호',name:'orgOrdId', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'순번',name:'dlvOrdSeq', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'기타메모',name:'etc1', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'취소사유',name:'etc2', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'거래배송사',name:'dlvCompNm', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'배송센터',name:'reqDlvJoinNm', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'메시지전송여부',name:'msgSndYn', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'메시지전송일',name:'msgSndDt', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'설치유형(완료)',name:'dlvSetTypeNm', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'센터연락처',name:'reqDlvJoinTel', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'배송주문번호(WINUS)',name:'dlvOrdId', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'저장자',name:'saveUser', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'저장시간',name:'saveTime', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'전송유무',name:'soTransYn', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'전송사유',name:'soTransResn', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'전송시간',name:'soTransTime', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'등록일(FROM)',name:'dlvDtFrom', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        {header:'등록일(TO)',name:'dlvDtTo', sortingType: 'desc',sortable: true,filter: 'text',width : 80},
+					        
+					        
+					        
+					      ],
+					     
+					      columnOptions: {
+					          resizable: true
+					        }
+					    });
+				
+					
+				
+					
+				},//grid
+			},	//END of gridOpen
+			searchOpen : {
+				
+				
+				search : function() {	//그리드 목록 조회하기
+					//myGrid.clearAll(false);
+	
+					if(!fnObj.searchOpen.searchChkVal.chkVal("search"))
+					{
+						alert(chkValMsg);
+						return false;
+					}
+
+					var ajaxUrl;
+					var srchData = {};
+					if(myComboOutCmpyCd.getSelectedValue() == "KPP")
+					{
+						ajaxUrl = "/kppSearch";
+						srchData.outCmpyCd	=	myComboOutCmpyCd.getSelectedValue()		;
+						srchData.dlvDtFrom	=	$("#dateFrom").val().replace(/-/g,"")	;
+						srchData.dlvDtTo	=	$("#dateTo").val().replace(/-/g,"")		;
+					}
+					srchData.cmpyCd		=	myComboCmpyCd.getSelectedValue();
+					srchData.dtType		=	myComboAlrmSrchDtType.getSelectedValue();
+					srchData.refSoNoList	=	"";//$("#refSoNoList").val().replace(/\n/g,",")	;
+					srchData.outSoNoList	=	"";//$("#outSoNoList").val().replace(/\n/g,",")	;
+					srchData.saveUser	=	/*[[${session.tblUserMId}]]*/;
+				
+					
+					$.ajax({
+				        url: ajaxUrl,
+				        processData : false,
+						contentType : "application/json",
+				        data: JSON.stringify(srchData),
+				        type:"POST",
+				        datatype:"json", 
+				    				       
+				        success : function(res){
+				      
+				     
+				        	if(res){
+				        							        	
+				        		searchRes = res.results;
+				        		//searchPaging(1);
+				        		myGrid.resetData(searchRes);
+				        		//myGrid.setLanguage('ko'); // set Korean
+
+				        	}
+				        	else{
+				       			alert("조회 수행 결과 없음");
+				        	}
+				        },
+				       
+					});
+					
+			
+				},	//END of search : function() {
+				
+				
+				searchChkVal : {
+					chkVal : function(chkGubn){
+						chkValMsg="";	//메세지 초기화
+						var rtnVal = true;
+						
+						if(chkGubn == "search")
+						{
+							if(!myComboCmpyCd.getSelectedValue()){
+								chkValMsg = chkValMsg + "회사코드가 없습니다\n";
+								rtnVal = false;
+							}
+							
+							if(!myComboAlrmSrchDtType.getSelectedValue()){
+								chkValMsg = chkValMsg + "달력유형을 선택해주세요\n";
+								rtnVal = false;
+							}
+							if(!$("#dateFrom").val()){
+								chkValMsg = chkValMsg + "검색시작일을 입력해주세요\n";
+								rtnVal = false;
+							}
+							if(!$("#dateTo").val()){
+								chkValMsg = chkValMsg + "검색종료일을 입력해주세요\n";
+								rtnVal = false;
+							}
+				
+							if($("#dateFrom").val() && $("#dateTo").val())
+							{
+								var date1 = new Date($("#dateFrom").val());
+								var date2 = new Date($("#dateTo").val());
+								if(date1 > date2)	//시작날짜가 크고 종료날짜가 작을떄
+								{
+									chkValMsg = chkValMsg + "검색시작일이 검색종료일보다 작습니다.\n";
+									rtnVal = false;
+								}
+							}
+						
+							if($("#dateFrom").val() && $("#dateTo").val())
+							{
+								var date1 = new Date($("#dateFrom").val());
+								var date2 = new Date($("#dateTo").val());
+								var gapDate = (date2.getTime() - date1.getTime()) / (1000*60*60*24);
+								if(gapDate > 31)	//시작날짜가 크고 종료날짜가 작을떄
+								{
+									chkValMsg = chkValMsg + "검색일은 최대 31일입니다.\n";
+									rtnVal = false;
+								}
+							}
+						}
+						return rtnVal;
+					},	//END of chkVal : function(){
+				},	//END of searchChkVal
+			
+		},	//END of searchOpen
+		keyOpen : {
+			enterKey : function(enterType){
+				 if (window.event.keyCode == 13) {
+					 
+					 
+		        }
+			},
+			
+		}
+	}
+
+
+	//엑셀 헨들러
+	var excelHandler = {
+	    getExcelFileName : function(){
+	        return '주문등록.xlsx';		//엑셀파일명
+	    },
+	    getSheetName : function(){
+	        return '주문등록';		//시트명
+	    },
+	    getExcelData : function(){
+	        return	get_json_res(myGrid,searchRes);		//그리드를 엑셀다운로드dyd json 으로 변경
+	    },
+	    getWorksheet : function(){
+	        return XLSX.utils.json_to_sheet(this.getExcelData());
+	    }
+	}
+
+	
+	
+	
+	
+	
+	
+			
+$(document).ready(function() {
+
+	myCalendar = new dhtmlXCalendarObject([{input:"dateFrom",button:"dateFromIcon"},{input:"dateTo",button:"dateToIcon"}]);
+
+	var now = new Date()
+	var year = now.getFullYear()+"";
+	var month = (now.getMonth()+1)+"";
+	var date = now.getDate()+"";
+	if(month.length == 1 )
+	{
+		month = "0"+month;
+	}
+	if(date.length == 1 )
+	{
+		date = "0"+date;
+	}
+	
+	var today =  year+"-" + month + "-" + date;
+	
+	$("#dateFrom").val(today);
+	$("#dateTo").val(today);
+	
+	myCalendar.loadUserLanguage("ko");
+	
+	fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+	fnObj.comboOpen.comboAlrmSrchDtType();	//달력유형콤보 바인드
+	fnObj.comboOpen.comboOutCmpyCd();	//외부업체콤보 바인드
+	
+		
+	
+	fnObj.gridOpen.grid();
+	
+	
+	window.onresize = function(event) {		//윈도우의 사이즈가 변경했을때
+		
+		c_height =  top.myLayout.cells("c").getHeight();
+		searchDiv_height =  $("#searchDiv").height();
+		searchDiv2nd_height =  $("#searchDiv2nd").height();
+		//xhdr_height =  $(".xhdr").height(); 	
+		resultGridHeight = c_height-searchDiv_height-searchDiv2nd_height-160;   
+		//console.log("c_height : " + c_height);
+		//console.log("searchDiv_height : " + searchDiv_height);
+		//console.log("searchDiv2nd_height : " + searchDiv2nd_height); 
+		console.log("onresize_resultGridHeight : " + resultGridHeight);  
+		myGrid.setBodyHeight(resultGridHeight);
+	};
+
+	sessionUserGrntCd =  /*[[${session.userGrntCd}]]*/
+	sessionAgntCd = /*[[${session.agntCd}]]*/
+	sessionAgntNm = /*[[${session.agntNm}]]*/
+	
+	
+	$("#btnExcelDown" ).mouseover(function() {
+		$("#btnExcelDown").val("화면에 조회된 내용을 엑셀 다운로드");
+	});	
+	$("#btnExcelDown" ).mouseout(function() {
+		$("#btnExcelDown").val("엑셀다운로드");
+	});
+		
+
+});
+function myCallback(res){
+    data= JSON.stringify(res)
+    // alert(data) // 디버깅용 alert 제거
+}
+
+//20211226 정연호 추가. 키보드에서 F2 누르면 조회하기
+$(document).keydown(function(event) {
+    if ( event.keyCode == 113 || event.which == 113 ) {
+    	fnObj.searchOpen.search()
+    }
+});
+
+
+</script>
+</head>
+<!-- top , left, bottom , right,  -->
+<body class="jui">
+	<div id="mainDiv" style="padding: 10px 10px 0 10px;">
+		<div id="searchDiv" style="width: 100%; font-size: 12px; padding-bottom: 5px;">
+			<div id="btnDiv1" style="width: 100%;">
+				<span class="cell" style="float: right;">
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<input id="btnSearch" type="button" onclick="fnObj.searchOpen.search()" value="외부주문정보 조회(F2)">
+					</span>
+					
+			
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<input id="btnSearch" type="button" onclick="fnObj.winOpen.soTypePopup()" value="데이터체크">
+					</span>
+
+
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<input id="btnDelete" type="button" onclick="fnObj.searchOpen.deleteRows()" value="주문일괄확정">
+					</span>
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<input id="btnDelete" type="button" onclick="fnObj.searchOpen.deleteRows()" value="저장정보 조회">
+					</span>
+
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<input id="btnExcelDown" type="button" onclick="excelDn();" value="엑셀다운로드">
+					</span>
+					<span class="item-data" style="padding: 0 20px 0 20px;"><input id="btnReload" type="button" onclick="location.reload(true);" value="초기화"></span>
+				</span>
+			</div>
+			<div id="searchDiv1" style="width: 100%;">
+				<span class="cell" style="width: 320px;">
+					<span class="item-head" style="font-size: 14px; font-weight: bold; color: darkblue; text-align: left; padding: 0 0 10px 0;">
+						타업체 주문 가져오기 <font size=2 color=black>erp100801</font>
+					</span>
+				</span>
+				<br>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">회사</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="cmpyCd"></div>
+					</span>
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">달력유형</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="alrmSrchDtType"></div>
+					</span>
+				</span>
+
+
+				<span id="fromTo" class="cell" style="width: 360px;">
+					<span class="item-head" style="width: 80px;">달력</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="dateFrom" style="height: 20px; width: 90px;" readonly>
+						<i id="dateFromIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+					</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="dateTo" style="height: 20px; width: 90px;" readonly>
+						<i id="dateToIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+					</span>
+				</span>
+			
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">외부업체</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="outCmpyCd"></div>
+					</span>
+				</span>
+
+				
+
+
+				<span class="cell" style="width: 260px;">
+					<span class="item-head" style="width: 120px;">고객사 주문번호</span>
+					<span class="item-data" style="width: 140px;">
+						<textArea id="refSoNoList" style="width: 122px;" /></textArea>
+					</span>
+
+				</span>
+				
+				
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">KPP 주문번호</span>
+					<span class="item-data" style="width: 140px;">
+						<textArea id="outSoNoList" style="width: 122px;" oninput="this.value = this.value.replace(/[^0-9\n]/g, '').replace(/(\..*)\./g, '$1');" /></textArea>
+					</span>
+
+				</span>
+
+			</div>
+
+
+		</div>
+
+		<div id="searchDiv2nd" style="width: 100%; font-size: 12px; padding-bottom: 5px; background-color: papayawhip; display: none;">
+			<div id="btnDiv2nd1" style="width: 100%;">
+				<span class="cell" style="float: right;"> </span>
+			</div>
+			<div id="searchDiv2nd1" style="width: 100%;"></div>
+		</div>
+
+		
+	
+		<div id="gridDiv" style="width: 100%;height :60%; font-size: 12px; padding-bottom: 5px;">
+			
+			<div id="grid"></div>
+		</div>
+		
+	</div>
+</body>
+</html>

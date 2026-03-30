@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.mobile.mYesCmpl.mapper.MobileYesCmplMapper">
+
+	<!-- 모바일 배송완료 onCreate 조회 -->
+    <select id="mYesCmplOnCreate"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO"
+    															resultType		="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
+        {
+	      CALL ${schema}..USP_MOBILE_DELIVERY_COMPLETE_LOAD (
+	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+    
+    <!-- 모바일 배송완료 처리 저장 SAVE   -->
+    <select id="mYesCmplSaveStat"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO"
+    															resultType		="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
+        {
+	      CALL ${schema}..USP_MOBILE_DELIVERY_COMPLETE_SAVE_STAT (
+	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyCostClct		,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyCostTxt		,mode=IN	,	jdbcType=VARCHAR},
+			#{liftCostYn		,mode=IN	,	jdbcType=VARCHAR},
+			#{listCostTxt		,mode=IN	,	jdbcType=VARCHAR},
+			#{downSrvcYn		,mode=IN	,	jdbcType=VARCHAR},
+			#{downSrvcTxt		,mode=IN	,	jdbcType=VARCHAR},
+			#{wallFstnYn		,mode=IN	,	jdbcType=VARCHAR},
+			#{wallFstnTxt		,mode=IN	,	jdbcType=VARCHAR},
+			#{memo				,mode=IN	,	jdbcType=VARCHAR},
+			#{signImg			,mode=IN	,	jdbcType=VARCHAR},
+			#{img1				,mode=IN	,	jdbcType=VARCHAR},
+			#{img2				,mode=IN	,	jdbcType=VARCHAR},
+			#{img3				,mode=IN	,	jdbcType=VARCHAR},
+			#{img4				,mode=IN	,	jdbcType=VARCHAR},
+			#{img5				,mode=IN	,	jdbcType=VARCHAR},
+			#{img6				,mode=IN	,	jdbcType=VARCHAR},
+			#{img7				,mode=IN	,	jdbcType=VARCHAR},
+			#{img8				,mode=IN	,	jdbcType=VARCHAR},
+			#{img9				,mode=IN	,	jdbcType=VARCHAR},
+			#{img10				,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser			,mode=IN	,	jdbcType=VARCHAR}
+			
+	      )      
+      }
+    </select>
+    
+    <!-- 모바일 배송완료 취소 처리 저장 DEL  -->
+    <select id="mYesCmplDel"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO"
+    															resultType		="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
+        {
+	      CALL ${schema}..USP_MOBILE_DELIVERY_COMPLETE_DEL (
+	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{saveUser			,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+    
+   
+     <!-- 모바일 배송완료 알림톡 결과 저장   -->
+    <select id="mYesCmplSaveTalk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO"
+    															resultType		="com.sonictms.alsys.mobile.mYesCmpl.entity.MobileYesCmplVO">
+        {
+	      CALL ${schema}..USP_MOBILE_DELIVERY_COMPLETE_SAVE_TALK (
+	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
+			#{sendComplete		,mode=IN	,	jdbcType=VARCHAR},
+			#{cmplUserid		,mode=IN	,	jdbcType=VARCHAR},
+			#{messageType		,mode=IN	,	jdbcType=VARCHAR},
+			#{phn				,mode=IN	,	jdbcType=VARCHAR},
+			#{profile			,mode=IN	,	jdbcType=VARCHAR},
+			#{reserveDt			,mode=IN	,	jdbcType=VARCHAR},
+			#{alrmTlkMsg		,mode=IN	,	jdbcType=VARCHAR},
+			#{title				,mode=IN	,	jdbcType=VARCHAR},
+			#{tmplid			,mode=IN	,	jdbcType=VARCHAR},
+			#{message			,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser			,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+</mapper>

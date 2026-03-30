@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.erp.erp105011.mapper.Erp105011Mapper">
+
+    <select id="selectLocationStockList" parameterType="com.sonictms.alsys.erp.erp105011.entity.Erp105011VO"
+            resultType="com.sonictms.alsys.erp.erp105011.entity.Erp105011VO">
+        SELECT
+        Z.ZONE_NM           AS zoneNm,
+        L.LOC_NM            AS locNm,
+        A.AGNT_NM           AS agntNm,
+        A.AGNT_CD           AS agntCd,
+        M.MTRL_CD           AS mtrlCd,
+        M.MTRL_NM           AS mtrlNm,
+        S.STOCK_QTY         AS stockQty,
+        (ISNULL(S.STOCK_QTY, 0) - ISNULL(S.ALLOCATED_QTY, 0)) AS availQty,
+        CONVERT(VARCHAR(19), S.UPDT_TIME, 120) AS lastInDt,
+        S.LOC_ID            AS locId,
+        S.WH_CD             AS whCd,
+        S.AGNT_CD           AS agntCd,
+        S.ZONE_ID           AS zoneId,
+        S.CMPY_CD           AS cmpyCd
+        FROM TBL_STOCK S WITH(NOLOCK)
+        INNER JOIN TBL_WH_LOC_M L WITH(NOLOCK) ON S.LOC_ID = L.LOC_ID AND S.CMPY_CD = L.CMPY_CD
+        INNER JOIN TBL_WH_ZONE_M Z WITH(NOLOCK) ON S.ZONE_ID = Z.ZONE_ID AND S.CMPY_CD = Z.CMPY_CD
+        INNER JOIN TBL_MTRL_M M WITH(NOLOCK) ON S.MTRL_CD = M.MTRL_CD AND S.AGNT_CD = M.AGNT_CD AND S.CMPY_CD = M.CMPY_CD
+        INNER JOIN TBL_AGENCY_M A WITH(NOLOCK) ON S.AGNT_CD = A.AGNT_CD AND S.CMPY_CD = A.CMPY_CD
+        WHERE S.CMPY_CD = ISNULL(NULLIF(#{cmpyCd}, ''), 'A')
+        <if test="agntCd != null and agntCd != ''">
+            AND S.AGNT_CD = #{agntCd}
+        </if>
+        <if test="locNm != null and locNm != ''">
+            AND L.LOC_NM LIKE '%' + #{locNm} + '%'
+        </if>
+        <if test="mtrlNm != null and mtrlNm != ''">
+            AND M.MTRL_NM LIKE '%' + #{mtrlNm} + '%'
+        </if>
+        ORDER BY Z.VIEW_SEQ, Z.ZONE_NM, L.LOC_NM
+    </select>
+
+    <select id="selectLocationInfoByNm" parameterType="com.sonictms.alsys.erp.erp105011.entity.Erp105011VO"
+            resultType="com.sonictms.alsys.erp.erp105011.entity.Erp105011VO">
+        SELECT
+            LOC_ID  AS locId,
+            ZONE_ID AS zoneId,
+            WH_CD   AS whCd,
+            LOC_NM  AS locNm
+        FROM TBL_WH_LOC_M WITH(NOLOCK)
+        WHERE CMPY_CD = #{cmpyCd}
+          AND LOC_NM = #{toLocNm}
+          AND USE_YN = 'Y'
+          AND DELETED_YN = 'N'
+    </select>
+
+    <update id="updateDecreaseStock" parameterType="com.sonictms.alsys.erp.erp105011.entity.Erp105011VO">
+        UPDATE TBL_STOCK
+        SET STOCK_QTY = STOCK_QTY - #{transferQty},
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{processUser}
+        WHERE CMPY_CD = #{cmpyCd}
+          AND AGNT_CD = #{agntCd}
+          AND MTRL_CD = #{mtrlCd}
+          AND LOC_ID  = #{fromLocId}
+          AND (STOCK_QTY - ISNULL(ALLOCATED_QTY, 0)) >= #{transferQty}
+    </update>
+
+    <update id="upsertIncreaseStock" parameterType="com.sonictms.alsys.erp.erp105011.entity.Erp105011VO">
+        MERGE INTO TBL_STOCK AS TARGET
+            USING (
+                SELECT #{cmpyCd} AS CMPY_CD, #{agntCd} AS AGNT_CD, #{mtrlCd} AS MTRL_CD, #{toLocId} AS LOC_ID
+            ) AS SOURCE
+            ON (TARGET.CMPY_CD = SOURCE.CMPY_CD AND TARGET.AGNT_CD = SOURCE.AGNT_CD
+                AND TARGET.MTRL_CD = SOURCE.MTRL_CD AND TARGET.LOC_ID = SOURCE.LOC_ID)
+            WHEN MATCHED THEN
+                UPDATE SET
+                    STOCK_QTY = STOCK_QTY + #{transferQty},
+                    UPDT_TIME = GETDATE(),
+                    UPDT_USER = #{processUser}
+            WHEN NOT MATCHED THEN
+                INSERT (CMPY_CD, AGNT_CD, MTRL_CD, ZONE_ID, LOC_ID, STOCK_QTY, ALLOCATED_QTY, WH_CD, UPDT_TIME, UPDT_USER)
+                    VALUES (
+                               #{cmpyCd}, #{agntCd}, #{mtrlCd}, #{zoneId}, #{toLocId},
+                               #{transferQty}, 0, #{whCd}, GETDATE(), #{processUser}
+                           );
+    </update>
+
+    <insert id="insertTransferHistory" parameterType="com.sonictms.alsys.erp.erp105011.entity.Erp105011VO">
+        INSERT INTO TBL_STOCK_HISTORY (
+            CMPY_CD, AGNT_CD, MTRL_CD, FROM_LOC_ID, TO_LOC_ID,
+            TRANSFER_QTY, REASON, SAVE_TIME, SAVE_USER
+        ) VALUES (
+                     #{cmpyCd}, #{agntCd}, #{mtrlCd}, #{fromLocId}, #{toLocId},
+                     #{transferQty}, #{transferReason}, GETDATE(), #{processUser}
+                 )
+    </insert>
+
+</mapper>

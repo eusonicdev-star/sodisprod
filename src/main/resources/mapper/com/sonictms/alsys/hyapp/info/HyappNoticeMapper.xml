@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.hyapp.info.mapper.HyappNoticeMapper">
+
+    <select id="selectNoticeList" resultType="com.sonictms.alsys.hyapp.info.entity.HyappNoticeVO">
+        SELECT TOP 10
+            NOTICE_ID AS noticeId,
+            TITLE,
+               CONTENT,
+               CONFIRM_YN AS confirmYn,
+               FORMAT(SAVE_TIME, 'yyyy-MM-dd HH:mm') AS saveTime
+        FROM TBL_NOTICE
+        WHERE CMPY_CD = #{cmpyCd}
+        ORDER BY CONFIRM_YN ASC, SAVE_TIME DESC
+    </select>
+
+    <select id="selectUnreadCount" resultType="int">
+        SELECT COUNT(*)
+        FROM TBL_NOTICE
+        WHERE CMPY_CD = #{cmpyCd}
+          AND CONFIRM_YN = 'N'
+    </select>
+
+    <insert id="insertNotice" parameterType="com.sonictms.alsys.hyapp.info.entity.HyappNoticeVO">
+        INSERT INTO TBL_NOTICE (
+            CMPY_CD, NOTICE_TYPE, TITLE, CONTENT,
+            CONFIRM_YN, SAVE_TIME, SAVE_USER
+        ) VALUES (
+                     #{cmpyCd}, #{noticeType}, #{title}, #{content},
+                     'N', GETDATE(), #{saveUser}
+                 )
+    </insert>
+
+    <update id="updateNoticeConfirm">
+        UPDATE TBL_NOTICE
+        SET CONFIRM_YN = 'Y',
+            CONFIRM_TIME = GETDATE(),
+            CONFIRM_USER = #{confirmUser}  WHERE NOTICE_ID = #{noticeId}
+    </update>
+</mapper>

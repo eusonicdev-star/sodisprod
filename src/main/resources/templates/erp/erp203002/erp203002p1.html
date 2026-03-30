@@ -1,0 +1,453 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head> 
+	<title>모바일 확정 일괄(확정/취소) 팝업 (erp203002p1)</title>
+	<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	
+	<style type="text/css">
+	
+		
+	    html, body {
+	        width: 100%;
+	        height: 100%;
+	        margin: 0px;
+	        overflow: auto;
+	    }
+	    
+	
+	
+	</style>
+	
+		<link rel="stylesheet" type="text/css" href="/css/common.css"> 
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css"> 
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css"> 
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css"> 
+
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>	
+	
+	<script th:inline="javascript" >
+	
+	var myCalendar;
+	var myWins;
+	
+	var pagePerRow	=	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/	//페이지당 몇줄을 보여줄것인가
+	var srchInput;
+	fnObj	=	{
+			winOpen : {
+				commSrch : function(title,cmpyCd,srchCtgr,srchInput){		//공통코드 찾기 팝업
+					windowId	=	"commSrch";
+					windowText	=	title + " commSrch";
+					windowUrl	=	"/commSrch"
+					windowLeft	=	-14400;
+					windowTop	=	-14400;
+					windowWidth	=	800;
+					windowHeight	=	600;
+					windowsModal	=	true;
+					windowOnClose	=	 function(windowId){
+					  		     
+					  		      return true;
+					  		  };
+					windowSendObject = {
+							cmpyCd : 	cmpyCd,
+							srchCtgr : 	srchCtgr,
+							srchInput : srchInput,
+							windowId : windowId,
+							srchCd : $("#srchCode").val(),
+							srchNm : $("#srchName").val()
+					};
+					
+
+					myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+					
+					myWins.window(windowId).attachEvent("onClose", function(win){
+						
+						return true;
+					});
+				},	//END of commSrch : function(){
+				rtnObject : function(windowId,rtnObj,srchInput){	//popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+					if(windowId == "commSrch")
+					{
+						
+						if(rtnObj == null)
+						{
+							myWins.window(windowId).setPosition(0, 0);
+							return;
+						}
+						if(srchInput == "text"){
+							$("#srchCode").val(rtnObj[0].commCd);
+							$("#srchName").val(rtnObj[0].commNm);
+						}
+						else if (srchInput == "textArea"){
+							var areaContent="";
+								for(var i=0;i<rtnObj.length;i++){
+								areaContent = areaContent + rtnObj[i].commCd;
+								
+								if(i < rtnObj.length-1){
+									areaContent = areaContent + "\n";
+								}
+							}
+							$("#srchTextArea").val(areaContent);
+						}
+					}					
+				},	//END of rtnObject : function(windowId,rtnObj){
+			},	//END of winOpen:{
+			comboOpen : {
+				
+				comboCmpyCd : function(){		//회사콤보목록
+					myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+			    	comboList(myComboCmpyCd,'A','COMM','CMPY_CD','','Y','');		     
+			    	myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${sendObject.cmpyCd}]]*/));
+
+			    	myComboCmpyCd.setFontSize("12px","12px");
+			    	myComboCmpyCd.attachEvent("onChange", function(value, text){
+			    	});
+			    	myComboCmpyCd.disable();
+			    	
+				},	
+				comboDcCd : function(){		//물류센터 콤보
+					myComboDcCd = new dhtmlXComboFromSelect("dcCd");
+					comboList(myComboDcCd,'A','DC_CD','','','Y','chk');		     
+
+					myComboDcCd.selectOption(0);
+					myComboDcCd.setFontSize("12px","12px");
+					myComboDcCd.attachEvent("onChange", function(value, text){
+					    if(this.getIndexByValue(value) != 0)
+					    {
+					    	this.setChecked(this.getIndexByValue(value),true);
+					    	var c=0;
+					    	for(var i=1;i<this.getOptionsCount();i++)
+					    	{
+					    		if(this.isChecked(i))
+					    		{    
+					    			c++;
+					    		}
+					    	}
+					    	this.updateOption("","",c+"개 선택","");
+					    	this.selectOption(0);
+					    	this.openSelect();
+					    }
+
+			    	});
+					myComboDcCd.attachEvent("onCheck", function(value, text){
+
+						if(!value)		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
+						{
+							if(myComboDcCd.isChecked(0))
+							{
+							
+				    			var c=0;
+				    			for(var i=1;i<myComboDcCd.getOptionsCount();i++)
+					    		{
+				    				myComboDcCd.setChecked(i,true);
+				    				c++;
+					    		}
+				    			myComboDcCd.updateOption("","",c+"개 선택","");
+				    			//myComboDcCd.selectOption(0);
+				    			myComboDcCd.openSelect();
+							}
+							if(!myComboDcCd.isChecked(0))		//전체에 체크를 안했을때
+				    		{
+			    			
+			    				var c=0;
+				    			for(var i=1;i<myComboDcCd.getOptionsCount();i++)
+					    		{
+				    				myComboDcCd.setChecked(i,false);
+					    		}
+				    			myComboDcCd.updateOption("","",c+"개 선택","");
+				    			//myComboDcCd.selectOption(0);
+				    			myComboDcCd.openSelect();
+				    			return;
+			    			}
+							
+						}
+						else
+						{
+							var cnt=0;
+							
+				    		for(var i=1;i<myComboDcCd.getOptionsCount();i++)
+				    		{
+				    			if(myComboDcCd.isChecked(i))
+				    			{
+				    				cnt++;
+				    			}
+				    		}
+				    		
+				    		
+				    		
+				    		if((myComboDcCd.getOptionsCount()-1) == cnt)
+				    		{
+				    			myComboDcCd.setChecked(0,true);
+				    		}
+				    		else
+				    		{
+				    			myComboDcCd.setChecked(0,false);
+				    		}
+				    		
+				    		myComboDcCd.updateOption("","",cnt+"개 선택","");
+				    		//myComboDcCd.selectOption(0);
+				    		myComboDcCd.openSelect();
+	
+							
+			    			return;
+						}
+			    		
+			    	});
+				},	
+			},	//END of comboOpen : {
+			gridOpen : {
+			
+			},		//ENd of gridOpen : {
+			searchOpen : {
+				allCnfmCnsl : function(saveGubn){
+					if(!fnObj.searchOpen.searchChkVal.chkVal("allCnfmCnsl"))
+					{
+						alert(chkValMsg);
+						return false;
+					}
+					
+					var allData = new FormData();
+					allData.append("saveGubn",				saveGubn			);
+					allData.append("cmpyCd",				myComboCmpyCd.getSelectedValue()			);
+					allData.append("instDt",				$("#instDt").val().replace(/-/g,"")		);
+					allData.append("agntList",				$("#srchCode").val().replace(/\n/g,",")							);	//화주사
+					allData.append("dcList",				myComboDcCd.getChecked()					);		//물류센터
+					allData.append("saveUser",				/*[[${session.tblUserMId}]]*/			);
+											
+				/* 
+					for (var pair of allData.entries())
+					{ 
+						console.log(pair[0]+ ' :  ' + pair[1]);
+					} */
+					
+					
+					
+					$.ajax({
+				        url: "/erp203002allCnfmCnsl",
+				        processData : false,
+						contentType : false,
+				        data: allData,
+				        type:"POST",
+				        datatype:"json",
+				        //async:false,
+				        success : function(res){
+				        
+				        	var gubnNm = "";
+					     	if(saveGubn == "CNFM")
+					     	{
+					     		gubnNm = "일괄확정"
+					     	}
+					     	else
+					     	{
+					     		gubnNm = "일괄취소"
+					     	}
+
+				        	if(res){
+				        		if(res.rtnYn == "Y")
+				        		{
+				        			alert(gubnNm+" 성공\n       ▶"+res.rtnMsg);
+				        			parent.fnObj.searchOpen.search();
+				        			parent.myWins.window('erp203002p1').close()
+				        		}
+				        		else
+				        		{
+				        			alert(gubnNm+" 실패\n       ▶"+res.rtnMsg);
+
+				        		}
+				        		
+				        	}
+				        	else{
+				       			alert("조회 수행 결과 없음");
+				        	}
+				        },
+					});
+					
+				},	//END of allCnfmCnsl : function(){
+					
+				delSrchCode : function(){
+					$("#srchCode").val("");
+					$("#srchName").val("");
+				},	//END of delSrchCode : function(){
+					
+				searchChkVal : {
+					chkVal : function(chkGubn){
+						chkValMsg="";	//메세지 초기화
+						var rtnVal = true;
+						
+						if(chkGubn == "allCnfmCnsl")
+						{
+							if(!myComboCmpyCd.getSelectedValue()){
+								chkValMsg = chkValMsg + "회사코드가 없습니다\n";
+								rtnVal = false;
+							}
+							/* if(!$("#srchCode").val()){
+								chkValMsg = chkValMsg + "화주사코드가 없습니다. 화주사를 검색해주세요\n";
+								rtnVal = false;
+							}
+							if(!$("#srchName").val()){
+								chkValMsg = chkValMsg + "화주사명칭이 없습니다. 화주사를 검색해주세요\n";
+								rtnVal = false;
+							} */
+							if(!$("#instDt").val()){
+								chkValMsg = chkValMsg + "시공일자를 입력해주세요\n";
+								rtnVal = false;
+							}
+						
+							/* if(!myComboDcCd.getChecked().length){
+								chkValMsg = chkValMsg + "물류센터를 체크해주세요\n";
+								rtnVal = false;
+							} */
+						}
+						
+						
+					
+						return rtnVal;
+					},	//END of chkVal : function(){
+				},	//END of searchChkVal
+				
+			},		//ENd of searchOpen : {
+			keyOpen : {
+				enterKey : function(enterType){
+					 if (window.event.keyCode == 13) {
+						 
+						 if(enterType == 'srch')
+						 {
+							$("#srchName").blur();
+						 	$("#srchCode").blur();
+							$("#srchCode").val(""); 
+			            	fnObj.winOpen.commSrch('화주','A','AGENCY','text');
+						 }
+			        }
+				},
+				onKeyPressed : function (code,ctrl,shift){
+				    if(code==67&&ctrl){
+				        myGrid.setCSVDelimiter("\t");
+				        myGrid.copyBlockToClipboard()
+				    }
+				    if(code==86&&ctrl){
+				        myGrid.pasteBlockFromClipboard()
+				    }
+				    return true;
+				},
+			}
+	}	//END of fnObj
+
+
+$(document).ready(function() {
+	console.log(pageUrl());
+	
+	myWins = new dhtmlXWindows();
+	
+	
+	sendObj = /*[[${sendObject}]]*/
+	fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+	fnObj.comboOpen.comboDcCd();	//물류센터 콤보
+	
+	
+	
+	
+	
+	myCalendar = new dhtmlXCalendarObject([		{input:"instDt",button:"instDtIcon"}
+	
+		
+		]);
+	
+	var now = new Date()
+	var year = now.getFullYear()+"";
+	var month = (now.getMonth()+1)+"";
+	var date = now.getDate()+"";
+	if(month.length == 1 )
+	{
+	month = "0"+month;
+	}
+	if(date.length == 1 )
+	{
+	date = "0"+date;
+	}
+	
+	var today =  year+"-" + month + "-" + date;
+	
+	$("#instDt").val(today);
+	if(sendObj.instDt)
+	{
+		$("#instDt").val(sendObj.instDt);
+	}
+		
+	
+	
+	myCalendar.loadUserLanguage("ko");
+	
+
+	//console.log(sendObj);
+
+
+
+
+});
+</script>
+</head>
+<body>
+	<div id="mainDiv"  style="padding:10px 10px 10px 10px;border:1px solid black;" >
+		<div id="searchDiv" style="width:100%;font-size:12px;"><!-- 검색조건영역 -->
+			<div id="inputDiv1" style="width:100%;font-size:12px;"> 
+				<span class="cell" style="width:220px;">
+					<span class="item-head" style="font-size:16px;font-weight:bold;color:darkred;text-align: left;">조회결과와 관련 없음</span>
+				</span>
+				<!-- 버튼 -->
+				<span class="cell" style="float:right;">
+					<span class="item-data" style="padding: 0 0 0 20px;"><input id="btnSearch" type="button" onclick="parent.myWins.window('erp203002p1').close()" value="닫기"></span>
+				</span>
+				<br>
+				
+				<span id="fromTo" class="cell" style="width:220px;padding: 10px 0 10px 0;">
+					<span class="item-head" style="width:80px;">시공일자</span>
+					<span class="item-data" style="width:140px;"><input type="text" id="instDt"  style="height:20px;width:90px;"><i id="instDtIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i></span>
+				
+				</span>
+				<span class="cell" style="width:220px;display:none;">
+					<span class="item-head" style="width:80px;">회사</span>
+					<span class="item-data" style="width:140px;"><div id="cmpyCd" ></div></span>
+				</span>
+				
+			<span class="cell" style="width:380px;">
+					<span class="item-head" style="width:80px;">화주사</span>
+					<span class="item-data" style="width:160px;">
+						<input type="text" id="srchName" style="width:112px;" onkeyup="fnObj.keyOpen.enterKey('srch');"></input>
+						<i id="srchIcon" class="fa fa-search" aria-hidden="true" onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"></i>
+					</span>
+					<span class="item-data" style="width:140px;">
+						<input type="text" id="srchCode" style="width:102px;" readonly></input>
+						<i id="delIcon" class="fa fa-minus-circle" aria-hidden="true" onclick="fnObj.searchOpen.delSrchCode()"></i>
+					</span>
+				</span>
+			
+				<span class="cell" style="width:220px;">
+					<span class="item-head" style="width:80px;">물류센터</span>
+					<span class="item-data" style="width:140px;"><div opt_type="checkbox" id="dcCd"></div></span>
+				</span>
+				
+				
+		
+			</div>	
+			
+		</div>
+		<hr style="width:100%;border: solid 1px lightgray;">
+		<div>
+			<center>
+				<input type="button" onclick="fnObj.searchOpen.allCnfmCnsl('CNFM')" value="모바일 일괄 확정"></input>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" onclick="fnObj.searchOpen.allCnfmCnsl('CNSL')" value="모바일 일괄 취소"></input>
+			</center>
+		</div>
+	</div>
+	
+</body>
+</html>

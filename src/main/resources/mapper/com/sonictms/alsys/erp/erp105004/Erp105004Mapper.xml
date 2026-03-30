@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.erp.erp105004.mapper.Erp105004Mapper">
+
+    <!-- 현재 재고 조회 (TBL_MTRL_M 기반) -->
+    <select id="getCurrentInventory" 
+        parameterType="com.sonictms.alsys.erp.erp105004.entity.Erp105004InventoryVO"
+        resultType="com.sonictms.alsys.erp.erp105004.entity.Erp105004InventoryVO">
+        SELECT 
+            MM.TBL_MTRL_M_ID as tblMtrlMId,
+            MM.CMPY_CD as cmpyCd,
+            MM.AGNT_CD as agntCd,
+            (SELECT AGNT_NM FROM TBL_AGENCY_M WHERE AGNT_CD = MM.AGNT_CD AND CMPY_CD = MM.CMPY_CD) as agntNm,
+            MM.MTRL_CD as mtrlCd,
+            MM.MTRL_NM as mtrlNm,
+            ISNULL(MM.CURRENT_QUANTITY, 0) as currentQty,
+            MM.SAVE_TIME as saveTime,
+            MM.SAVE_USER as saveUser,
+            MM.UPDT_TIME as updtTime,
+            MM.UPDT_USER as updtUser
+        FROM TBL_MTRL_M MM
+        WHERE MM.CMPY_CD = #{cmpyCd}
+        AND MM.AGNT_CD = #{agntCd}
+        AND MM.MTRL_CD = #{mtrlCd}
+        AND MM.MTO_YN = 'N'  -- MTO가 아닌 상품만 재고 관리
+    </select>
+
+    <!-- 재고 조정 등록 -->
+    <insert id="insertAdjustment" 
+        parameterType="com.sonictms.alsys.erp.erp105004.entity.Erp105004AdjustmentVO">
+        INSERT INTO TBL_INV_ADJUSTMENT (
+            CMPY_CD, AGNT_CD, AGNT_NM, TBL_MTRL_M_ID, MTRL_CD, MTRL_NM,
+            ADJUSTMENT_TYPE, BEFORE_QTY, ADJUSTMENT_QTY, AFTER_QTY, ADJUSTMENT_REASON, ADJUSTMENT_DATE,
+            SAVE_TIME, SAVE_USER, UPDT_TIME, UPDT_USER, DELETED_YN
+        ) VALUES (
+            #{cmpyCd}, #{agntCd}, #{agntNm}, #{tblMtrlMId}, #{mtrlCd}, #{mtrlNm},
+            #{adjustmentType}, #{beforeQty}, #{adjustmentQty}, #{afterQty}, #{adjustmentReason}, #{adjustmentDate},
+            GETDATE(), #{saveUser}, GETDATE(), #{updtUser}, 'N'
+        )
+    </insert>
+
+    <!-- 조정 내역 목록 조회 (페이징) -->
+    <select id="getAdjustmentList"
+        parameterType="com.sonictms.alsys.erp.erp105004.entity.Erp105004AdjustmentVO"
+        resultType="com.sonictms.alsys.erp.erp105004.entity.Erp105004AdjustmentVO">
+        SELECT
+            ia.TBL_INV_ADJUSTMENT_ID as tblInvAdjustmentId,
+            ia.CMPY_CD as cmpyCd,
+            ia.AGNT_CD as agntCd,
+            ia.AGNT_NM as agntNm,
+            ia.TBL_MTRL_M_ID as tblMtrlMId,
+            ia.MTRL_CD as mtrlCd,
+            ia.MTRL_NM as mtrlNm,
+            ia.ADJUSTMENT_TYPE as adjustmentType,
+            ia.BEFORE_QTY as beforeQty,
+            ia.ADJUSTMENT_QTY as adjustmentQty,
+            ia.AFTER_QTY as afterQty,
+            ia.ADJUSTMENT_REASON as adjustmentReason,
+            ia.ADJUSTMENT_DATE as adjustmentDate,
+            ia.SAVE_TIME as saveTime,
+            ia.SAVE_USER as saveUser,
+            ia.UPDT_TIME as updtTime,
+            ia.UPDT_USER as updtUser,
+            ia.DELETED_YN as deletedYn
+        FROM TBL_INV_ADJUSTMENT ia
+        WHERE (ia.DELETED_YN IS NULL OR ia.DELETED_YN = 'N')
+        <if test="cmpyCd != null and cmpyCd != ''">
+            AND ia.CMPY_CD = #{cmpyCd}
+        </if>
+        <if test="agntCd != null and agntCd != ''">
+            AND ia.AGNT_CD = #{agntCd}
+        </if>
+        <if test="mtrlCd != null and mtrlCd != ''">
+            AND ia.MTRL_CD LIKE '%' + #{mtrlCd} + '%'
+        </if>
+        <if test="mtrlNm != null and mtrlNm != ''">
+            AND ia.MTRL_NM LIKE '%' + #{mtrlNm} + '%'
+        </if>
+        <if test="adjustmentType != null and adjustmentType != ''">
+            AND ia.ADJUSTMENT_TYPE = #{adjustmentType}
+        </if>
+        <if test="dateFrom != null and dateFrom != ''">
+            AND CONVERT(DATE, ia.ADJUSTMENT_DATE) &gt;= #{dateFrom}
+        </if>
+        <if test="dateTo != null and dateTo != ''">
+            AND CONVERT(DATE, ia.ADJUSTMENT_DATE) &lt;= #{dateTo}
+        </if>
+        ORDER BY ia.ADJUSTMENT_DATE DESC, ia.SAVE_TIME DESC
+        OFFSET (#{pageNum} - 1) * #{pageSize} ROWS
+        FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
+    <!-- 조정 내역 총 개수 조회 (페이징용) -->
+    <select id="getAdjustmentListCount"
+        parameterType="com.sonictms.alsys.erp.erp105004.entity.Erp105004AdjustmentVO"
+        resultType="int">
+        SELECT COUNT(*)
+        FROM TBL_INV_ADJUSTMENT ia
+        WHERE (ia.DELETED_YN IS NULL OR ia.DELETED_YN = 'N')
+        <if test="cmpyCd != null and cmpyCd != ''">
+            AND ia.CMPY_CD = #{cmpyCd}
+        </if>
+        <if test="agntCd != null and agntCd != ''">
+            AND ia.AGNT_CD = #{agntCd}
+        </if>
+        <if test="mtrlCd != null and mtrlCd != ''">
+            AND ia.MTRL_CD LIKE '%' + #{mtrlCd} + '%'
+        </if>
+        <if test="mtrlNm != null and mtrlNm != ''">
+            AND ia.MTRL_NM LIKE '%' + #{mtrlNm} + '%'
+        </if>
+        <if test="adjustmentType != null and adjustmentType != ''">
+            AND ia.ADJUSTMENT_TYPE = #{adjustmentType}
+        </if>
+        <if test="dateFrom != null and dateFrom != ''">
+            AND CONVERT(DATE, ia.ADJUSTMENT_DATE) &gt;= #{dateFrom}
+        </if>
+        <if test="dateTo != null and dateTo != ''">
+            AND CONVERT(DATE, ia.ADJUSTMENT_DATE) &lt;= #{dateTo}
+        </if>
+    </select>
+
+    <!-- 재고 현황 목록 조회 (페이징) - TBL_MTRL_M 기반 -->
+    <select id="getInventoryList"
+        parameterType="com.sonictms.alsys.erp.erp105004.entity.Erp105004InventoryVO"
+        resultType="com.sonictms.alsys.erp.erp105004.entity.Erp105004InventoryVO">
+        SELECT
+            MM.TBL_MTRL_M_ID as tblMtrlMId,
+            MM.CMPY_CD as cmpyCd,
+            MM.AGNT_CD as agntCd,
+            (SELECT AGNT_NM FROM TBL_AGENCY_M WHERE AGNT_CD = MM.AGNT_CD AND CMPY_CD = MM.CMPY_CD) as agntNm,
+            MM.MTRL_CD as mtrlCd,
+            MM.MTRL_NM as mtrlNm,
+            ISNULL(MM.CURRENT_QUANTITY, 0) as currentQty,
+            MM.SAVE_TIME as saveTime,
+            MM.SAVE_USER as saveUser,
+            MM.UPDT_TIME as updtTime,
+            MM.UPDT_USER as updtUser
+        FROM TBL_MTRL_M MM
+        WHERE 1=1
+        AND MM.MTO_YN = 'N'  -- MTO가 아닌 상품만 재고 관리
+        <if test="cmpyCd != null and cmpyCd != ''">
+            AND MM.CMPY_CD = #{cmpyCd}
+        </if>
+        <if test="agntCd != null and agntCd != ''">
+            AND MM.AGNT_CD = #{agntCd}
+        </if>
+        <if test="mtrlCd != null and mtrlCd != ''">
+            AND MM.MTRL_CD LIKE '%' + #{mtrlCd} + '%'
+        </if>
+        <if test="mtrlNm != null and mtrlNm != ''">
+            AND MM.MTRL_NM LIKE '%' + #{mtrlNm} + '%'
+        </if>
+        ORDER BY MM.UPDT_TIME DESC, MM.SAVE_TIME DESC
+        OFFSET (#{pageNum} - 1) * #{pageSize} ROWS
+        FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
+    <!-- 재고 현황 총 개수 조회 (페이징용) - TBL_MTRL_M 기반 -->
+    <select id="getInventoryListCount"
+        parameterType="com.sonictms.alsys.erp.erp105004.entity.Erp105004InventoryVO"
+        resultType="int">
+        SELECT COUNT(*)
+        FROM TBL_MTRL_M MM
+        WHERE 1=1
+        AND MM.MTO_YN = 'N'  -- MTO가 아닌 상품만 재고 관리
+        <if test="cmpyCd != null and cmpyCd != ''">
+            AND MM.CMPY_CD = #{cmpyCd}
+        </if>
+        <if test="agntCd != null and agntCd != ''">
+            AND MM.AGNT_CD = #{agntCd}
+        </if>
+        <if test="mtrlCd != null and mtrlCd != ''">
+            AND MM.MTRL_CD LIKE '%' + #{mtrlCd} + '%'
+        </if>
+        <if test="mtrlNm != null and mtrlNm != ''">
+            AND MM.MTRL_NM LIKE '%' + #{mtrlNm} + '%'
+        </if>
+    </select>
+
+    <!-- 조정 내역 수정 -->
+    <update id="updateAdjustment" 
+        parameterType="com.sonictms.alsys.erp.erp105004.entity.Erp105004AdjustmentVO">
+        UPDATE TBL_INV_ADJUSTMENT SET
+            ADJUSTMENT_REASON = #{adjustmentReason},
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{updtUser}
+        WHERE TBL_INV_ADJUSTMENT_ID = #{tblInvAdjustmentId}
+    </update>
+
+    <!-- 조정 내역 삭제 (Soft Delete) -->
+    <update id="deleteAdjustment" 
+        parameterType="com.sonictms.alsys.erp.erp105004.entity.Erp105004AdjustmentVO">
+        UPDATE TBL_INV_ADJUSTMENT SET
+            DELETED_YN = 'Y',
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{updtUser}
+        WHERE TBL_INV_ADJUSTMENT_ID = #{tblInvAdjustmentId}
+    </update>
+
+    <!-- 재고 현황 등록 (TBL_MTRL_M 기반) -->
+    <insert id="insertInventory" 
+        parameterType="com.sonictms.alsys.erp.erp105004.entity.Erp105004InventoryVO">
+        INSERT INTO TBL_MTRL_M (
+            CMPY_CD, AGNT_CD, MTRL_CD, MTRL_NM, CURRENT_QUANTITY, MTO_YN,
+            SAVE_TIME, SAVE_USER, UPDT_TIME, UPDT_USER
+        ) VALUES (
+            #{cmpyCd}, #{agntCd}, #{mtrlCd}, #{mtrlNm}, #{currentQty}, 'N',
+            GETDATE(), #{saveUser}, GETDATE(), #{updtUser}
+        )
+    </insert>
+
+    <!-- 재고 현황 업데이트 (TBL_MTRL_M 기반) -->
+    <update id="updateInventory" 
+        parameterType="com.sonictms.alsys.erp.erp105004.entity.Erp105004InventoryVO">
+        UPDATE TBL_MTRL_M SET
+            CURRENT_QUANTITY = #{currentQty},
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{updtUser}
+        WHERE TBL_MTRL_M_ID = #{tblMtrlMId}
+        AND MTO_YN = 'N'
+    </update>
+
+    <!-- 재고 변동 이력 조회 -->
+    <select id="getInventoryHistory"
+        parameterType="com.sonictms.alsys.erp.erp105004.entity.Erp105004InventoryVO"
+        resultType="com.sonictms.alsys.erp.erp105004.entity.Erp105004AdjustmentVO">
+        SELECT
+            ia.TBL_INV_ADJUSTMENT_ID as tblInvAdjustmentId,
+            ia.CMPY_CD as cmpyCd,
+            ia.AGNT_CD as agntCd,
+            ia.AGNT_NM as agntNm,
+            ia.TBL_MTRL_M_ID as tblMtrlMId,
+            ia.MTRL_CD as mtrlCd,
+            ia.MTRL_NM as mtrlNm,
+            ia.ADJUSTMENT_TYPE as adjustmentType,
+            ia.BEFORE_QTY as beforeQty,
+            ia.ADJUSTMENT_QTY as adjustmentQty,
+            ia.AFTER_QTY as afterQty,
+            ia.ADJUSTMENT_REASON as adjustmentReason,
+            ia.ADJUSTMENT_DATE as adjustmentDate,
+            ia.SAVE_TIME as saveTime,
+            ia.SAVE_USER as saveUser,
+            ia.UPDT_TIME as updtTime,
+            ia.UPDT_USER as updtUser,
+            ia.DELETED_YN as deletedYn
+        FROM TBL_INV_ADJUSTMENT ia
+        WHERE (ia.DELETED_YN IS NULL OR ia.DELETED_YN = 'N')
+        AND ia.CMPY_CD = #{cmpyCd}
+        AND ia.AGNT_CD = #{agntCd}
+        AND ia.MTRL_CD = #{mtrlCd}
+        ORDER BY ia.ADJUSTMENT_DATE DESC, ia.SAVE_TIME DESC
+    </select>
+
+</mapper>

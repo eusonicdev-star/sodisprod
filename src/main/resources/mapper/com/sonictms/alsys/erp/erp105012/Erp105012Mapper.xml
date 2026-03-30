@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.erp.erp105012.mapper.Erp105012Mapper">
+
+    <select id="getProductPickingRackList" parameterType="com.sonictms.alsys.erp.erp105012.entity.Erp105012VO" resultType="com.sonictms.alsys.erp.erp105012.entity.Erp105012VO">
+        SELECT
+        A.AGNT_NM,
+        S.AGNT_CD,
+        S.MTRL_CD,
+        M.MTRL_NM,
+        L.LOC_CD,    /* TBL_MTRL_M.PICKING_LOC_ID와 매핑된 코드 */
+        L.LOC_ID,
+        M.FIXED_LOC_CD,
+        CASE WHEN L.LOC_ID IS NULL THEN 'N' ELSE 'Y' END AS ASSIGNED_YN
+        FROM (
+        /* 재고가 있는 모든 상품 (누락 방지) */
+        SELECT DISTINCT CMPY_CD, WH_CD, AGNT_CD, MTRL_CD
+        FROM TBL_STOCK WITH(NOLOCK)
+        WHERE STOCK_QTY > 0
+        AND CMPY_CD = #{cmpyCd}
+        AND WH_CD = #{whCd}
+        ) S
+        INNER JOIN TBL_MTRL_M M WITH(NOLOCK)
+        ON S.CMPY_CD = M.CMPY_CD
+        AND S.AGNT_CD = M.AGNT_CD
+        AND S.MTRL_CD = M.MTRL_CD
+        INNER JOIN TBL_AGENCY_M A WITH(NOLOCK)
+        ON S.CMPY_CD = A.CMPY_CD
+        AND S.AGNT_CD = A.AGNT_CD
+        /* 상품 마스터에 새로 만든 PICKING_LOC_ID로 피킹랙 조인 */
+        LEFT JOIN TBL_WH_LOC_M L WITH(NOLOCK)
+        ON M.CMPY_CD = L.CMPY_CD
+        AND M.PICKING_LOC_ID = L.LOC_ID
+        AND L.WH_CD = #{whCd}
+        AND L.PICKING_YN = 'Y'
+        WHERE 1=1
+        <if test="mtrlNm != null and mtrlNm != ''">
+            AND (M.MTRL_CD LIKE '%' + #{mtrlNm} + '%' OR M.MTRL_NM LIKE '%' + #{mtrlNm} + '%')
+        </if>
+        ORDER BY ASSIGNED_YN ASC, S.MTRL_CD ASC
+    </select>
+
+    <select id="getStockLocationList" parameterType="com.sonictms.alsys.erp.erp105012.entity.Erp105012VO" resultType="map">
+        SELECT
+            L.LOC_ID,
+            L.LOC_CD,
+            L.LOC_NM,
+            S.STOCK_QTY,
+            L.PICKING_YN
+        FROM TBL_STOCK S WITH(NOLOCK)
+    INNER JOIN TBL_WH_LOC_M L WITH(NOLOCK)
+        ON S.CMPY_CD = L.CMPY_CD
+            AND S.WH_CD = L.WH_CD
+            AND S.LOC_ID = L.LOC_ID
+        WHERE S.CMPY_CD = #{cmpyCd}
+          AND S.WH_CD = #{whCd}
+          AND S.MTRL_CD = #{mtrlCd}
+          AND S.AGNT_CD = #{agntCd}
+        ORDER BY L.PICKING_YN DESC, S.STOCK_QTY DESC
+    </select>
+
+    <select id="getAvailablePickingRackList" parameterType="com.sonictms.alsys.erp.erp105012.entity.Erp105012VO" resultType="map">
+        SELECT
+            LOC_ID,
+            LOC_CD,
+            LOC_NM,
+            ZONE_ID
+        FROM TBL_WH_LOC_M WITH(NOLOCK)
+        WHERE CMPY_CD = #{cmpyCd}
+          AND WH_CD = #{whCd}
+          AND PICKING_YN = 'Y'
+          AND USE_YN = 'Y'
+          AND DELETED_YN = 'N'
+        ORDER BY LOC_CD
+    </select>
+
+    <update id="updateProductPickingRack" parameterType="com.sonictms.alsys.erp.erp105012.entity.Erp105012VO">
+        UPDATE TBL_MTRL_M
+        SET PICKING_LOC_ID = #{pickingLocId},
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{updtUser}
+        WHERE CMPY_CD = #{cmpyCd}
+          AND MTRL_CD = #{mtrlCd}
+    </update>
+
+    <update id="autoAssignPickingRack" parameterType="com.sonictms.alsys.erp.erp105012.entity.Erp105012VO">
+        /* 1. 상품별 최적 로케이션(재고 有, BIN_NO 최소값)을 임시 테이블에 선정 */
+        IF OBJECT_ID('tempdb..#BEST_LOC') IS NOT NULL DROP TABLE #BEST_LOC;
+
+        SELECT
+            S.CMPY_CD, S.AGNT_CD, S.MTRL_CD,
+            L.LOC_ID,
+            L.WH_CD
+        INTO #BEST_LOC
+        FROM TBL_STOCK S WITH(NOLOCK)
+    INNER JOIN TBL_WH_LOC_M L WITH(NOLOCK)
+        ON S.CMPY_CD = L.CMPY_CD AND S.WH_CD = L.WH_CD AND S.LOC_ID = L.LOC_ID
+        WHERE S.STOCK_QTY > 0
+          AND S.CMPY_CD = #{cmpyCd}
+          AND S.WH_CD = #{whCd}
+          AND L.LOC_ID IN (
+            SELECT TOP 1 T.LOC_ID
+            FROM TBL_WH_LOC_M T
+            INNER JOIN TBL_STOCK ST ON T.CMPY_CD = ST.CMPY_CD AND T.WH_CD = ST.WH_CD AND T.LOC_ID = ST.LOC_ID
+            WHERE ST.MTRL_CD = S.MTRL_CD AND ST.AGNT_CD = S.AGNT_CD AND ST.STOCK_QTY > 0
+            ORDER BY ISNULL(T.BIN_NO, 999) ASC, T.LEVEL_NO ASC, T.LOC_ID ASC
+            );
+
+        /* 2. 선정된 로케이션의 PICKING_YN을 'Y'로 승격 */
+        UPDATE L
+        SET L.PICKING_YN = 'Y',
+            L.UPDT_TIME = GETDATE(),
+            L.UPDT_USER = #{updtUser}
+            FROM TBL_WH_LOC_M L
+    INNER JOIN #BEST_LOC B ON L.CMPY_CD = B.CMPY_CD AND L.WH_CD = B.WH_CD AND L.LOC_ID = B.LOC_ID;
+
+        /* 3. 승격된 로케이션을 상품 마스터에 최종 지정 (1:1 매칭) */
+        UPDATE M
+        SET
+            M.PICKING_LOC_ID = B.LOC_ID,
+            M.UPDT_TIME = GETDATE(),
+            M.UPDT_USER = #{updtUser}
+            FROM TBL_MTRL_M M
+    INNER JOIN #BEST_LOC B ON M.CMPY_CD = B.CMPY_CD AND M.AGNT_CD = B.AGNT_CD AND M.MTRL_CD = B.MTRL_CD;
+
+        DROP TABLE #BEST_LOC;
+    </update>
+
+    <select id="getLocIdByCode" parameterType="com.sonictms.alsys.erp.erp105012.entity.Erp105012VO" resultType="string">
+        SELECT TOP 1 LOC_ID
+        FROM TBL_WH_LOC_M WITH(NOLOCK)
+        WHERE CMPY_CD = #{cmpyCd}
+          AND WH_CD = #{whCd}
+          AND LOC_CD = #{locCd}
+          AND USE_YN = 'Y'
+          AND DELETED_YN = 'N'
+    </select>
+
+    <update id="updatePickingRackByCode" parameterType="com.sonictms.alsys.erp.erp105012.entity.Erp105012VO">
+        /* 먼저 해당 로케이션을 피킹 가능 상태('Y')로 변경 */
+        UPDATE TBL_WH_LOC_M
+        SET PICKING_YN = 'Y',
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{updtUser}
+        WHERE CMPY_CD = #{cmpyCd}
+          AND WH_CD = #{whCd}
+          AND LOC_CD = #{locCd};
+
+        /* 상품 마스터에 해당 로케이션 ID 반영 */
+        UPDATE M
+        SET M.PICKING_LOC_ID = L.LOC_ID,
+            M.UPDT_TIME = GETDATE(),
+            M.UPDT_USER = #{updtUser}
+            FROM TBL_MTRL_M M
+    INNER JOIN TBL_WH_LOC_M L
+        ON M.CMPY_CD = L.CMPY_CD AND L.WH_CD = #{whCd} AND L.LOC_CD = #{locCd}
+        WHERE M.CMPY_CD = #{cmpyCd}
+          AND M.AGNT_CD = #{agntCd}
+          AND M.MTRL_CD = #{mtrlCd};
+    </update>
+
+    <update id="updateFixedLocFromFloor" parameterType="com.sonictms.alsys.erp.erp105012.entity.Erp105012VO">
+        /* 재고가 있는 평치 로케이션 중 가장 빠른 코드를 고정 적치지로 지정 */
+        WITH FLOOR_STOCK AS (
+            SELECT
+                S.CMPY_CD, S.AGNT_CD, S.MTRL_CD, L.LOC_CD,
+                ROW_NUMBER() OVER (
+                PARTITION BY S.CMPY_CD, S.AGNT_CD, S.MTRL_CD
+                ORDER BY L.LOC_CD ASC
+            ) AS RN
+            FROM TBL_STOCK S WITH(NOLOCK)
+            INNER JOIN TBL_WH_LOC_M L WITH(NOLOCK)
+        ON S.CMPY_CD = L.CMPY_CD AND S.WH_CD = L.WH_CD AND S.LOC_ID = L.LOC_ID
+        WHERE L.LOC_CD = 'FLOOR_' + S.AGNT_CD
+          AND S.STOCK_QTY > 0
+          AND S.CMPY_CD = #{cmpyCd}
+          AND S.WH_CD = #{whCd}
+            )
+        UPDATE M
+        SET M.FIXED_LOC_CD = F.LOC_CD,
+            M.UPDT_TIME = GETDATE(),
+            M.UPDT_USER = #{updtUser}
+            FROM TBL_MTRL_M M
+    INNER JOIN FLOOR_STOCK F
+        ON M.CMPY_CD = F.CMPY_CD AND M.AGNT_CD = F.AGNT_CD AND M.MTRL_CD = F.MTRL_CD
+        WHERE F.RN = 1;
+    </update>
+
+</mapper>

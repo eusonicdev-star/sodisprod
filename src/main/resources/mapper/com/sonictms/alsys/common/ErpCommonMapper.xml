@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper	namespace="com.sonictms.alsys.common.mapper.ErpCommonMapper">
+
+	<!-- 20220517 정연호 kpp에서 불러온 데이터를 얼라이언스 테이블에 저장한것을 불러오는 부분 -->
+	<select id="erpCommoSendValueSearch" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.common.entity.ErpCommonVO"
+		resultType="com.sonictms.alsys.common.entity.ErpCommonVO">
+		{
+			CALL ${schema}..USP_SO_OUT_CMPY_IF_SO_STAT_UPDT_LISTBYALL (
+				#{soNoList 		,mode=IN , jdbcType=VARCHAR},
+				#{soStatCd		,mode=IN , jdbcType=VARCHAR},
+				#{delResn	 	,mode=IN , jdbcType=VARCHAR}
+			)
+		}
+	</select>	
+	
+	<!-- 20220517 정연호 모바일 수행시 kpp에서 불러온 데이터를 얼라이언스 테이블에 저장한것을 불러오는 부분 -->
+	<select id="erpCommoSendValueSearchForMobile" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.common.entity.ErpCommonVO"
+		resultType="com.sonictms.alsys.common.entity.ErpCommonVO">
+		{
+			CALL ${schema}..USP_SO_OUT_CMPY_IF_SO_STAT_UPDT_LISTBYALL_FOR_MOBILE (
+				#{instMobileMId	,mode=IN , jdbcType=VARCHAR},
+				#{soStatCd		,mode=IN , jdbcType=VARCHAR},
+				#{delResn	 	,mode=IN , jdbcType=VARCHAR}
+			)
+		}
+	</select>	
+</mapper>

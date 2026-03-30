@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+
+	<Properties>
+		<Property name="logFileName">logFile</Property>
+		<Property name="consoleLayout">	%d %-5level %-25t %X %F(%M:%L) - %m%n</Property>
+		<Property name="fileLayout">	%d %-5level %-25t %X %F(%M:%L) - %m%n</Property>
+	</Properties>
+
+	<Appenders>
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="${consoleLayout}" />
+		</Console>
+		<RollingFile name="file" fileName="${catalina.home}/logs/${logFileName}.log"	filePattern="${sys:catalina.base}/logs/${logFileName}.%d{yyyy-MM-dd}.log.zip">
+			<PatternLayout pattern="${fileLayout}" />
+			<Policies>
+				<TimeBasedTriggeringPolicy modulate="true"	interval="1" />
+			</Policies>
+		</RollingFile>
+	</Appenders>
+
+	<Loggers>
+		
+		<!-- 기본 레벨은 info로 설정하여 스프링부트 기본 로그 유지 -->
+		<Root level="info" additivity="false" >
+			<AppenderRef ref="console" />
+			<AppenderRef ref="file" />
+		</Root>
+		
+		<!-- 스프링 프레임워크에서 찍는건 level을 info로 설정 -->
+		<logger name="org.springframework.*" level="error"	additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="file" />
+		</logger>
+		
+		<!-- 애플리케이션 로그는 error로 설정 -->
+		<logger name="com.sonictms.*" level="error" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="file" />
+		</logger>
+
+		<!-- SQL Logger - DEV 환경에서는 비활성화 -->
+		<logger name="jdbc.sqlonly" level="debug" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="file" />
+		</logger>
+
+		<logger name="jdbc.sqltiming" level="error" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="file" />
+		</logger>
+
+		<logger name="jdbc.resultsettable" level="error" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="file" />
+		</logger>
+
+		<logger name="jdbc.audit" level="error" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="file" />
+		</logger>
+		
+		<logger name="jdbc.resultset" level="error" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="file" />
+		</logger>
+
+		<logger name="jdbc.connection" level="error" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="file" />
+		</logger>
+	</Loggers>
+</Configuration> 

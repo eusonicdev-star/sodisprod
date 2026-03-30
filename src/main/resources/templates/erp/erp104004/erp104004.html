@@ -1,0 +1,693 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>픽패킹 출력 (erp104004)</title>
+	<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+	<link rel="stylesheet" type="text/css"
+		href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/web/dhtmlx.css">
+	<link rel="stylesheet" type="text/css" href="/css/common.css">
+	<link rel="stylesheet" type="text/css" href="/css/erp-style.css">
+	<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+		integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="/js/common.js"></script>
+	<script type="text/javascript" src="/js/commCode.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+
+	<script th:inline="javascript">
+		var pagePerRow =	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/
+        var myWins;
+		var myGrid;
+		var myCalendar;
+
+        fnObj = {
+			winOpen: {
+				report: function (report, title) {
+					if (myGrid.getRowsNum() == 0) {
+						alert("조회결과가 없습니다");
+						return;
+					}
+
+                    // 01: 팀별, 02: 기사별, 03: 권역별, 04:지역별, 05: 그룹별
+                    var reportNm = ["erp104004_01", "erp104004_02", "erp104004_03", "erp104004_04", "erp104004_05"];
+
+					if (reportNm.includes(report)) {
+						window.open("/", "").location.href = "/report?report=" + report
+                            + "&p1=" + /*[[${session.cmpyCd}]]*/
+                            +"&p2=" + myComboDtType2.getSelectedValue()
+							+ "&p3=" + $("#dateFrom").val().replace(/-/g, "")
+							+ "&p4=" + $("#dateTo").val().replace(/-/g, "")
+							+ "&p5=" + myComboDcCd.getSelectedValue()
+							+ "&p6=" + myComboTeam.getSelectedValue()
+							+ "&p7=" + myComboZone.getSelectedValue()
+							+ "&p8=" + myComboGrpArea.getSelectedValue()
+                            + "&p9=" + /*[[${session.tblUserMId}]]*/
+                            +"&p10=" + myComboInstCapaCtgr.getChecked();
+					}
+					return;
+				},
+			},	//END of winOpen
+			comboOpen: {
+                comboCmpyCd: function () {
+					myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+					comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+					myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/));
+					myComboCmpyCd.setFontSize("12px", "12px");
+					myComboCmpyCd.attachEvent("onChange", function (value, text) {
+						myGrid.clearAll(false);
+					});
+					myComboCmpyCd.disable();
+				},
+                comboDtType2: function () {
+					myComboDtType2 = new dhtmlXCombo("dtType2");
+					comboList(myComboDtType2, 'A', 'COMM', 'SO_SRCH_DT_TYPE2', '', 'Y', '');
+                    myComboDtType2.selectOption(myComboDtType2.getIndexByValue("3"));
+					myComboDtType2.readonly(true);
+					myComboDtType2.setFontSize("12px", "12px");
+					myComboDtType2.attachEvent("onChange", function (value, text) {
+						myGrid.clearAll(false);
+					});
+				},
+
+                comboDcCd: function () {
+					myComboDcCd = new dhtmlXCombo("dcCd");
+					comboList(myComboDcCd, 'A', 'DC_CD', '', '', 'Y', 'all');
+					myComboDcCd.selectOption(0);
+					myComboDcCd.readonly(true);
+					myComboDcCd.setFontSize("12px", "12px");
+					myComboDcCd.attachEvent("onChange", function (value, text) {
+						myGrid.clearAll(false);
+					});
+				},
+                comboInstCapaCtgr: function () {
+					myComboInstCapaCtgr = new dhtmlXComboFromSelect("instCapaCtgr");
+					comboList(myComboInstCapaCtgr, 'A', 'COMM', 'INST_CAPA_CTGR', '', 'Y', 'all');
+
+					myComboInstCapaCtgr.selectOption(0);
+					myComboInstCapaCtgr.setFontSize("12px", "12px");
+					myComboInstCapaCtgr.attachEvent("onChange", function (value, text) {
+						myGrid.clearAll(false);
+
+						if (this.getIndexByValue(value) != 0) {
+							this.setChecked(this.getIndexByValue(value), true);
+							var c = 0;
+							for (var i = 1; i < this.getOptionsCount(); i++) {
+								if (this.isChecked(i)) {
+									c++;
+								}
+							}
+							this.updateOption("", "", c + "개 선택", "");
+							this.selectOption(0);
+							this.openSelect();
+						}
+					});
+					myComboInstCapaCtgr.attachEvent("onCheck", function (value, text) {
+                        if (!value) {
+							if (myComboInstCapaCtgr.isChecked(0)) {
+								var c = 0;
+								for (var i = 1; i < myComboInstCapaCtgr.getOptionsCount(); i++) {
+									myComboInstCapaCtgr.setChecked(i, true);
+									c++;
+								}
+								myComboInstCapaCtgr.updateOption("", "", c + "개 선택", "");
+								myComboInstCapaCtgr.openSelect();
+							}
+                            if (!myComboInstCapaCtgr.isChecked(0)) {
+								var c = 0;
+								for (var i = 1; i < myComboInstCapaCtgr.getOptionsCount(); i++) {
+									myComboInstCapaCtgr.setChecked(i, false);
+								}
+								myComboInstCapaCtgr.updateOption("", "", c + "개 선택", "");
+								myComboInstCapaCtgr.openSelect();
+								return;
+							}
+                        } else {
+							var cnt = 0;
+							for (var i = 1; i < myComboInstCapaCtgr.getOptionsCount(); i++) {
+								if (myComboInstCapaCtgr.isChecked(i)) {
+									cnt++;
+								}
+							}
+							if ((myComboInstCapaCtgr.getOptionsCount() - 1) == cnt) {
+								myComboInstCapaCtgr.setChecked(0, true);
+                            } else {
+								myComboInstCapaCtgr.setChecked(0, false);
+							}
+							myComboInstCapaCtgr.updateOption("", "", cnt + "개 선택", "");
+							myComboInstCapaCtgr.openSelect();
+							return;
+						}
+					});
+					myComboInstCapaCtgr.readonly(true);
+				},
+                comboTeam: function () {
+					myComboTeam = new dhtmlXCombo("team");
+					comboList(myComboTeam, 'A', 'TEAM', 'TEAM', '', 'Y', 'all');
+					myComboTeam.selectOption(0);
+					myComboTeam.readonly(true);
+					myComboTeam.setFontSize("12px", "12px");
+					myComboTeam.attachEvent("onChange", function (value, text) {
+						myGrid.clearAll(false);
+					});
+				},
+                comboZone: function () {
+					myComboZone = new dhtmlXCombo("zone");
+					comboList(myComboZone, 'A', 'COMM', 'PICK_ZONE', '', 'Y', 'all');
+					myComboZone.selectOption(0);
+					myComboZone.readonly(true);
+					myComboZone.setFontSize("12px", "12px");
+					myComboZone.attachEvent("onChange", function (value, text) {
+						myGrid.clearAll(false);
+					});
+				},
+                comboGrpArea: function () {
+					myComboGrpArea = new dhtmlXCombo("grpArea");
+					comboList(myComboGrpArea, 'A', 'COMM', 'PICK_GRP_AREA', '', 'Y', 'all');
+					myComboGrpArea.selectOption(0);
+					myComboGrpArea.readonly(true);
+					myComboGrpArea.setFontSize("12px", "12px");
+					myComboGrpArea.attachEvent("onChange", function (value, text) {
+						myGrid.clearAll(false);
+					});
+				},
+			},	//END of comboOpen
+			gridOpen: {
+				grid: function () {
+					myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
+					myGrid.setHeader(
+						"물류센터코드" +
+						",물류센터" +
+						",시공카테고리코드" +
+						",시공카테고리" +
+						",배송팀" +
+						",배송기사" +
+						",팔렛트번호" +
+						",팔렛트순번" +
+						",zone" +
+						",권역" +
+                        ",고객명" +
+						",심플코드" +
+						",품목코드" +
+						",품목명칭" +
+						",수량" +
+						",CBM"
+					);
+
+					myGrid.setColumnIds(
+						"dcCd" +
+						",dcNm" +
+						",instCtgr" +
+						",instCtgrNm" +
+						",team" +
+						",userNm" +
+						",paltNoxx" +
+						",seq" +
+						",pickZone" +
+						",pickGrpArea" +
+                        ",acptEr" +
+						",smplCd" +
+						",prodCd" +
+						",prodNm" +
+						",qty" +
+						",cbm"
+					);
+					myGrid.setInitWidths(
+						"100" +
+						",100" +
+						",100" +
+						",120" +
+						",120" +
+						",120" +
+						",120" +
+						",100" +
+						",80" +
+						",100" +
+                        ",100" +
+						",100" +
+						",120" +
+						",280" +
+						",60" +
+						",80"
+					);
+					myGrid.setColAlign(
+						"center" +
+						",center" +
+						",center" +
+						",center" +
+						",center" +
+						",center" +
+						",center" +
+						",right" +
+						",center" +
+						",center" +
+                        ",center" +
+						",center" +
+						",center" +
+						",left" +
+						",right" +
+						",right"
+					);
+					myGrid.setColTypes(
+						"ro" +
+						",ro" +
+						",ro" +
+						",ro" +
+						",ro" +
+						",ro" +
+						",ro" +
+						",ro" +
+						",ro" +
+						",ro" +
+                        ",ro" +
+						",ro" +
+						",ro" +
+						",ro" +
+						",ro" +
+						",ro"
+					);
+					myGrid.setColSorting(
+						"str" +
+						",str" +
+						",str" +
+						",str" +
+						",str" +
+						",str" +
+						",str" +
+						",str" +
+						",str" +
+						",str" +
+                        ",str" +
+						",str" +
+						",str" +
+						",str" +
+						",str" +
+						",str"
+					);
+					myGrid.attachHeader(
+						"#text_filter" +
+						",#text_filter" +
+						",#text_filter" +
+						",#text_filter" +
+						",#text_filter" +
+						",#text_filter" +
+						",#text_filter" +
+						",#text_filter" +
+						",#text_filter" +
+						",#text_filter" +
+                        ",#text_filter" +
+						",#text_filter" +
+						",#numeric_filter" +
+						",#text_filter" +
+						",#text_filter" +
+						",#text_filter"
+					);
+
+                    myGrid.setColumnHidden(myGrid.getColIndexById("dcCd"), true);
+                    myGrid.setColumnHidden(myGrid.getColIndexById("instCtgr"), true);
+					myGrid.setColumnHidden(myGrid.getColIndexById("instCtgr"), true);
+                    myGrid.init();
+                    myGrid.enableSmartRendering(true);
+                    myGrid.enablePreRendering(10);
+					fnObj.gridOpen.setWidth();
+                    myGrid.addRow(1, "");
+					myGrid.deleteRow(1);
+                    myGrid.enableEditEvents(true, false, false);
+					myGrid.enableBlockSelection(true);
+					myGrid.attachEvent("onKeyPress", fnObj.keyOpen.onKeyPressed);
+                },
+				setWidth: function () {
+					c_width = top.myLayout.cells("c").getWidth();
+					searchDiv_height = $("#searchDiv").height();
+					searchDiv2nd_height = $("#searchDiv2nd").height();
+					page_height = $("#page").height();
+					xhdr_height = $(".xhdr").height();
+					myGrid.enableAutoWidth(true, c_width - 25, 100);
+					myGrid.enableAutoHeight(true, window.innerHeight - searchDiv_height - searchDiv2nd_height - page_height - xhdr_height - 30);	//그리드 자동높이
+					$("#searchDiv").width(c_width - 25);
+					$("#searchDiv2nd").width(c_width - 25);
+				},	//END of setWidth
+			},	//END of gridOpen
+			searchOpen: {
+                search: function (dtType) {
+					myGrid.clearAll(false);
+					if (!fnObj.searchOpen.searchChkVal.chkVal("search")) {
+						alert(chkValMsg);
+						return false;
+					}
+
+					var srchData = new FormData();
+					srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+					srchData.append("dtType", myComboDtType2.getSelectedValue());
+					srchData.append("fromDt", $("#dateFrom").val().replace(/-/g, ""));
+					srchData.append("toDt", $("#dateTo").val().replace(/-/g, ""));
+					srchData.append("dcList", myComboDcCd.getSelectedValue());
+					srchData.append("instCtgr", myComboInstCapaCtgr.getChecked());
+					srchData.append("teamList", myComboTeam.getSelectedValue());
+					srchData.append("zoneList", myComboZone.getSelectedValue());
+					srchData.append("pickGrpArea", myComboGrpArea.getSelectedValue());
+					$.ajax({
+						url: "/erp104004List",
+						processData: false,
+						contentType: false,
+						data: srchData,
+						type: "POST",
+						datatype: "json",
+						success: function (res) {
+							if (res) {
+								searchRes = res;
+								searchPaging(1);
+                            } else {
+								alert("조회 수행 결과 없음");
+							}
+						},
+					});
+                },
+				searchChkVal: {
+					chkVal: function (chkGubn) {
+                        chkValMsg = "";
+						var rtnVal = true;
+						if (chkGubn == "search") {
+							if (!myComboCmpyCd.getSelectedValue()) {
+								chkValMsg = chkValMsg + "회사코드가 없습니다\n";
+								rtnVal = false;
+							}
+							if (!myComboDtType2.getSelectedValue()) {
+								chkValMsg = chkValMsg + "달력유형을 선택해주세요\n";
+								rtnVal = false;
+							}
+							if (!$("#dateFrom").val()) {
+								chkValMsg = chkValMsg + "검색시작일을 입력해주세요\n";
+								rtnVal = false;
+							}
+							if (!$("#dateTo").val()) {
+								chkValMsg = chkValMsg + "검색종료일을 입력해주세요\n";
+								rtnVal = false;
+							}
+							if ($("#dateFrom").val() && $("#dateTo").val()) {
+								var date1 = new Date($("#dateFrom").val());
+								var date2 = new Date($("#dateTo").val());
+                                if (date1 > date2) {
+									chkValMsg = chkValMsg + "검색시작일이 검색종료일보다 작습니다.\n";
+									rtnVal = false;
+								}
+							}
+
+							if ($("#dateFrom").val() && $("#dateTo").val()) {
+								var date1 = new Date($("#dateFrom").val());
+								var date2 = new Date($("#dateTo").val());
+								var gapDate = (date2.getTime() - date1.getTime()) / (1000 * 60 * 60 * 24);
+                                if (gapDate > 31) {
+									chkValMsg = chkValMsg + "검색일은 최대 31일입니다.\n";
+									rtnVal = false;
+								}
+							}
+							console.log("myComboInstCapaCtgr.getChecked()\n" + myComboInstCapaCtgr.getChecked())
+                            if (myComboInstCapaCtgr.getChecked() == "") {
+								chkValMsg = chkValMsg + "시공카테고리를 체크해주세요.\n";
+								rtnVal = false;
+							}
+						}
+						return rtnVal;
+					},	//END of chkVal : function(){
+				},	//END of searchChkVal
+			},	//END of searchOpen
+			keyOpen: {
+				enterKey: function () {
+					if (window.event.keyCode == 13) {
+						fnObj.winOpen.commSrch('화주', 'A', 'AGENCY', 'text');
+					}
+				},
+				onKeyPressed: function (code, ctrl, shift) {
+					if (code == 67 && ctrl) {
+						myGrid.setCSVDelimiter("\t");
+						myGrid.copyBlockToClipboard()
+					}
+					if (code == 86 && ctrl) {
+						myGrid.pasteBlockFromClipboard()
+					}
+					return true;
+				},
+			}
+		}
+
+		var excelHandler = {
+			getExcelFileName: function () {
+                return '주문현황 리스트.xlsx';
+            },
+			getSheetName: function () {
+                return '주문현황 리스트';
+			},
+			getExcelData: function () {
+                return get_json_res(myGrid, searchRes);
+			},
+			getWorksheet: function () {
+				return XLSX.utils.json_to_sheet(this.getExcelData());
+			}
+		}
+
+        function searchPaging(page) {
+			if ($("#rowPerPage").val()) {
+				pagePerRow = parseInt($("#rowPerPage").val());
+			}
+            var pageRange = 10;
+			var totalPageCnt = searchRes.length % pagePerRow == 0 ? parseInt(searchRes.length / pagePerRow) : parseInt(searchRes.length / pagePerRow) + 1
+			var a = "<div class='pagination-container'>";
+			var start = (page - 1);
+			var end = (page - 1) + pageRange;
+			if (start % pageRange != 0) {
+				start = parseInt(start / pageRange) * pageRange;
+			}
+			if (end % pageRange != 0 || page == 1) {
+				end = parseInt(end / pageRange) * pageRange;
+			}
+			if (start >= pageRange) {
+				a += "<input type='button' onclick='searchPaging(" + 1 + ");' value='<<' class='pagination-button'>";
+				a += "<input type='button' onclick='searchPaging(" + (start - 1) + ");' value='<' class='pagination-button'>";
+			}
+			var r = 0;
+			for (r = start; r < end; r++) {
+				if (r < totalPageCnt) {
+                    if (r + 1 == page) {
+						a += "<input type='button' onclick='searchPaging(" + (r + 1) + ");' value=" + (r + 1) + " class='pagination-button active'>";
+					} else {
+						a += "<input type='button' onclick='searchPaging(" + (r + 1) + ");' value=" + (r + 1) + " class='pagination-button'>";
+					}
+				}
+			}
+
+			if (end * pagePerRow < searchRes.length) {
+				a += "<input type='button' onclick='searchPaging(" + (end + 1) + ");' value='>' class='pagination-button'>";
+				a += "<input type='button' onclick='searchPaging(" + totalPageCnt + ");' value='>>' class='pagination-button'>";
+			}
+
+			a += "<div class='pagination-info'>";
+			a += "<input type='number' maxlength=4 id='rowPerPage' value=" + pagePerRow + ">";
+			a += "<input type='button' value='적용' onclick='searchPaging(" + 1 + ");' class='action-button'>";
+			a += "&nbsp;&nbsp;<i class='fa fa-calculator fa-lg' aria-hidden='true'></i>&nbsp;" + searchRes.length;
+			a += "</div></div>";
+			$("#page").html(a);
+
+			var is = (page - 1) * pagePerRow;	//시작점
+			var ie = (page - 1) * pagePerRow + pagePerRow;	//종료점
+
+			if (searchRes.length < ie) {
+				ie = searchRes.length;
+			}
+
+			myGrid.clearAll(false);
+
+			var columns = myGrid.getColumnCount()
+			for (var i = is; i < ie; i++) {
+
+				var jsonData = {};
+				for (var c = 0; c < columns; c++) {
+					jsonData[myGrid.getColumnId(c)] = searchRes[i][myGrid.getColumnId(c)];
+				}
+
+				myGrid.addRow(i + 1, "");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+				myGrid.setRowData(i + 1, jsonData);
+			}
+		}
+
+		$(document).ready(function () {
+
+			myWins = new dhtmlXWindows();
+
+			myGrid = new dhtmlXGridObject('grid');	//그리드
+
+			myCalendar = new dhtmlXCalendarObject([{ input: "dateFrom", button: "dateFromIcon" }, { input: "dateTo", button: "dateToIcon" }]);
+
+			var now = new Date()
+			var year = now.getFullYear() + "";
+			var month = (now.getMonth() + 1) + "";
+			var date = now.getDate() + "";
+			if (month.length == 1) {
+				month = "0" + month;
+			}
+			if (date.length == 1) {
+				date = "0" + date;
+			}
+
+			var today = year + "-" + month + "-" + date;
+
+			$("#dateFrom").val(today);
+			$("#dateTo").val(today);
+
+			myCalendar.loadUserLanguage("ko");
+
+            fnObj.comboOpen.comboCmpyCd();
+            fnObj.comboOpen.comboDtType2();
+            fnObj.comboOpen.comboTeam();
+            fnObj.comboOpen.comboDcCd();
+            fnObj.comboOpen.comboInstCapaCtgr();
+            fnObj.comboOpen.comboZone();
+            fnObj.comboOpen.comboGrpArea();
+			fnObj.gridOpen.grid()
+            window.onresize = function (event) {
+				fnObj.gridOpen.setWidth();
+				fnObj.gridOpen.setWidth();
+			};
+			sessionUserGrntCd =  /*[[${session.userGrntCd}]]*/
+				sessionUserGrdCd = /*[[${session.userGrdCd}]]*/
+				sessionDcCd = /*[[${session.dcCd}]]*/
+				sessionDcNm = /*[[${session.dcNm}]]*/
+
+            if (sessionUserGrdCd == "2000" || sessionUserGrntCd == "6000") {
+				myComboDcCd.setChecked(myComboDcCd.getIndexByValue(sessionDcCd), true);
+				myComboDcCd.updateOption("", "", sessionDcNm, "");
+				myComboDcCd.disable();
+			}
+		});
+
+		$(document).keydown(function (event) {
+			if (event.keyCode == 113 || event.which == 113) {
+				fnObj.searchOpen.search(3)
+			}
+		});
+	</script>
+</head>
+
+<body>
+	<div id="mainDiv">
+		<div id="searchDiv">
+			<div id="btnDiv1">
+				<span class="title-container">
+					<span class="item-head title-text">픽패킹 출력</span>
+					<span class="sub-title">erp104004</span>
+				</span>
+				<span class="btn-container">
+					<span class="item-data">
+						<button id="btnSearch" class="action-button primary"
+							onclick="fnObj.searchOpen.search(3)">조회(F2)</button>
+					</span>
+					<span class="item-data"><button id="btnLocalSearch" class="action-button primary"
+							onclick="fnObj.searchOpen.search(4)">지방조회</button></span>
+					<span class="item-data">
+						<button id="btnExcelDown" class="action-button success" onclick="exportExcel()">엑셀 다운로드</button>
+					</span>
+					<span class="item-data">
+						<button id="btnTeamReport" class="action-button secondary"
+							onclick="fnObj.winOpen.report('erp104004_01','팀별 피킹레포트')">팀별</button>
+					</span>
+					<span class="item-data">
+						<button id="btnInstErReport" class="action-button secondary"
+							onclick="fnObj.winOpen.report('erp104004_02','기사별 피킹레포트')">기사별</button>
+					</span>
+					<span class="item-data">
+						<button id="btnZoneReport" class="action-button secondary"
+							onclick="fnObj.winOpen.report('erp104004_03','권역별 피킹레포트')">권역별</button>
+					</span>
+					<span class="item-data">
+						<button id="btnLocalReport" class="action-button secondary"
+							onclick="fnObj.winOpen.report('erp104004_04','지역별 피킹레포트')">지역별</button>
+					</span>
+					<span class="item-data">
+						<button id="btnGroupReport" class="action-button"
+							onclick="fnObj.winOpen.report('erp104004_05','그룹별 피킹레포트')">그룹별</button>
+					</span>
+					<span class="item-data"><input id="btnReload" type="button" class="action-button"
+							onclick="location.reload(true);" value="초기화">
+					</span>
+				</span>
+			</div>
+			<div id="searchDiv1">
+				<span class="cell" style="display:none;">
+					<span class="item-head">회사</span>
+					<span class="item-data">
+						<div id="cmpyCd"></div>
+					</span>
+				</span>
+				<span class="cell">
+					<span class="item-head">날짜유형</span>
+					<span class="item-data">
+						<div id="dtType2"></div>
+					</span>
+				</span>
+				<span id="fromTo" class="cell">
+					<span class="item-head">달력</span>
+					<span class="item-data icon-cell">
+						<input type="text" id="dateFrom" readonly><i id="dateFromIcon" class="fa fa-calendar fa-lg"
+							aria-hidden="true"></i>
+					</span>
+					<span class="item-data">
+						<input type="text" id="dateTo" readonly><i id="dateToIcon" class="fa fa-calendar fa-lg"
+							aria-hidden="true"></i>
+					</span>
+				</span>
+				<span class="cell">
+					<span class="item-head">물류센터</span>
+					<span class="item-data">
+						<div id="dcCd"></div>
+					</span>
+				</span>
+				<!-- 20220106 정연호 추가. 시공카테고리 -->
+				<span class="cell">
+					<span class="item-head">시공카테고리</span>
+					<span class="item-data">
+						<div opt_type="checkbox" id="instCapaCtgr"></div>
+					</span>
+				</span>
+				<!-- 20220106 정연호 추가. 시공카테고리.끝 -->
+				<span class="cell">
+					<span class="item-head">팀명</span>
+					<span class="item-data">
+						<div id="team"></div>
+					</span>
+				</span>
+				<span class="cell">
+					<span class="item-head">ZONE</span>
+					<span class="item-data">
+						<div id="zone"></div>
+					</span>
+				</span>
+				<span class="cell">
+					<span class="item-head">권역</span>
+					<span class="item-data">
+						<div id="grpArea"></div>
+					</span>
+				</span>
+			</div>
+		</div>
+		<div id="searchDiv2nd" style="display:none;">
+			<div id="btnDiv2nd1">
+				<span class="cell">
+				</span>
+			</div>
+			<div id="searchDiv2nd1">
+			</div>
+		</div>
+		<div id="gridDiv">
+			<div id="grid"></div>
+		</div>
+		<div id="page"></div>
+	</div>
+</body>
+</html>

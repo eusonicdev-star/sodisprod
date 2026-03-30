@@ -1,0 +1,425 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>로케이션별 재고 현황 (erp105011)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/web/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/erp-style.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <!-- 엑셀 다운로드 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+
+    <style>
+        /* 재고 이동 모달 스타일 (erp105008 스타일 계승) */
+        .modal-overlay { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
+        .modal-content { background: #fff; position: absolute; top: 15%; left: 50%; transform: translateX(-50%); width: 500px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border-radius: 4px; }
+        .modal-header { padding: 12px 15px; background: #4a5568; color: white; display: flex; justify-content: space-between; align-items: center; cursor: move; }
+        .modal-body { padding: 20px; }
+        .form-group { margin-bottom: 12px; display: flex; align-items: center; }
+        .form-group label { width: 120px; font-weight: bold; font-size: 12px; }
+        .form-group input { flex: 1; padding: 6px; border: 1px solid #ccc; font-size: 12px; }
+        .readonly-inp { background: #f7fafc; cursor: not-allowed; }
+        #gridDiv {
+            position: relative;
+            z-index: 1; /* 그리드 영역이 클릭 이벤트를 받을 수 있도록 설정 */
+        }
+    </style>
+
+    <script th:inline="javascript">
+        var sessionUserGrntCd = /*[[${session.userGrntCd}]]*/ null;
+        var sessionAgntCd = /*[[${session.agntCd}]]*/ null;
+        var sessionAgntNm = /*[[${session.agntNm}]]*/ null;
+        var pagePerRow = /*[[${@environment.getProperty('common.html.pagePerRow')}]]*/ 15; // 페이징 설정값
+        var myWins;
+        var myGrid;
+        var myComboCmpyCd;
+        var searchRes = []; // 서버에서 받은 전체 데이터를 담을 배열
+
+        fnObj = {
+            winOpen: {
+                commSrch: function (title, cmpyCd, srchCtgr, srchInput) {
+                    windowId = "commSrch";
+                    windowText = title + " commSrch";
+                    windowUrl = "/commSrch"
+                    windowLeft = -14400;
+                    windowTop = -14400;
+                    windowWidth = 800;
+                    windowHeight = 600;
+                    windowsModal = true;
+                    windowOnClose = function (windowId) {
+                        return true;
+                    };
+                    windowSendObject = {
+                        cmpyCd: cmpyCd,
+                        srchCtgr: srchCtgr,
+                        srchInput: srchInput,
+                        windowId: windowId,
+                        srchCd: $("#srchCode").val(),
+                        srchNm: $("#srchName").val()
+                    };
+
+                    myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+
+                    myWins.window(windowId).attachEvent("onClose", function (win) {
+                        return true;
+                    });
+                },
+                rtnObject: function (windowId, rtnObj, srchInput) {
+                    if (rtnObj == null) {
+                        myWins.window(windowId).setPosition(0, 0);
+                        return;
+                    }
+                    if (windowId == "commSrch") {
+                        if (srchInput == "text") {
+                            $("#srchCode").val(rtnObj[0].commCd);
+                            $("#srchName").val(rtnObj[0].commNm);
+                        }
+                    }
+                },
+            },
+            gridOpen: {
+                init: function () {
+                    myGrid = new dhtmlXGridObject('grid');
+                    myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
+
+                    // 헤더와 ID에 실제 데이터 필드 매칭 (agntCd, locId 노출)
+                    myGrid.setHeader("구역,로케이션,고객사,상품코드,상품명,수량,최종입고일,고객사코드,로케이션ID");
+                    myGrid.setColumnIds("zoneNm,locNm,agntNm,mtrlCd,mtrlNm,stockQty,lastInDt,agntCd,locId");
+
+                    // 너비를 설정하여 화면에 표시 (0이었던 부분을 100 등으로 변경)
+                    myGrid.setInitWidths("80,120,130,120,*,80,140,100,100");
+
+                    myGrid.setColAlign("center,center,left,center,left,right,center,center,center");
+                    myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro");
+                    myGrid.setColSorting("str,str,str,str,str,int,str,str,int");
+                    myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#numeric_filter,#text_filter");
+
+                    myGrid.init();
+                    //myGrid.setSelectionMode("row"); // 행 단위 선택 모드 명시
+                    //myGrid.enableRowsHover(true, "grid_hover"); // 마우스 오버 효과로 인식 확인
+
+                    myGrid.enableSmartRendering(true);
+                    fnObj.gridOpen.setWidth();
+
+                    // 더블 클릭 시 재고 이동 모달 오픈
+                    myGrid.attachEvent("onRowDblClicked", function(rId) {
+                        fnObj.transferOpen.open(rId);
+                    });
+                },
+                setWidth: function () {
+                    var searchH = $("#searchDiv").height();
+                    myGrid.enableAutoWidth(true);
+                    // 높이 여유값을 -100에서 -130 이상으로 늘려 상단 헤더와의 간섭을 방지합니다.
+                    myGrid.enableAutoHeight(true, window.innerHeight - searchH - 130);
+                    myGrid.setSizes(); // 레이아웃 재계산 호출
+                }
+            },
+            searchOpen: {
+                doSearch: function () {
+                    toastr.info('조회 중입니다...');
+                    var params = {
+                        cmpyCd: myComboCmpyCd ? myComboCmpyCd.getSelectedValue() : "A",
+                        agntCd: $("#srchCode").val(),
+                        locNm: $("#srchLocNm").val(),
+                        mtrlNm: $("#srchMtrlNm").val()
+                    };
+                    $.post("/erp105011List", params, function (res) {
+                        searchRes = res || []; // 데이터를 전역 배열에 저장
+                        searchPaging(1); // 1페이지부터 페이징 처리 시작
+                        toastr.clear();
+                    });
+                }
+            },
+            transferOpen: {
+                open: function (rId) {
+                    // 1. 만약 rId가 넘어오지 않았다면 현재 선택된 행의 ID를 가져옴
+                    if (!rId) rId = myGrid.getSelectedRowId();
+                    if (!rId) return alert("이동할 항목을 선택해주세요.");
+
+                    // 2. 그리드에서 해당 행의 전체 데이터를 객체로 가져옴
+                    var data = myGrid.getRowData(rId);
+
+                    // 3. 생성하신 input 태그에 값 할당 (이때 데이터가 들어갑니다)
+                    $("#fromLocNm").val(data.locNm);
+                    $("#mtrlCd_m").val(data.mtrlCd);
+                    $("#mtrlNm_m").val(data.mtrlNm);
+                    $("#stockQty_m").val(data.stockQty);
+
+                    // [중요] 여기에 값이 들어가는 코드가 있어야 합니다.
+                    $("#agntCd_m").val(data.agntCd);     // 그리드의 agntCd 값을 input에 넣음
+                    $("#fromLocId_m").val(data.locId);   // 그리드의 locId 값을 input에 넣음
+
+                    $("#transferQty").val(data.stockQty);
+                    $("#transferModal").show();
+                },
+                close: function() { $("#transferModal").hide(); },
+                execute: function() {
+                    var rId = myGrid.getSelectedRowId();
+                    if(!rId) return alert("이동할 항목을 선택해주세요.");
+
+                    var data = myGrid.getRowData(rId);
+
+                    // 로그를 찍어 브라우저 콘솔(F12)에서 값이 나오는지 확인하세요.
+                    console.log("선택 행 데이터:", data);
+
+                    var toLocNm = $("#toLocNm").val();
+                    var transferQty = $("#transferQty").val();
+
+                    if(!toLocNm) return alert("목적지 로케이션을 입력하세요.");
+                    if(!transferQty || parseInt(transferQty) <= 0) return alert("수량을 입력하세요.");
+
+                    if(!confirm("재고 이동을 처리하시겠습니까?")) return;
+
+                    var params = {
+                        cmpyCd: myComboCmpyCd.getSelectedValue() || "A",
+                        agntCd: data.agntCd,       // 이제 그리드 컬럼이 활성화되어 값이 잘 들어옵니다.
+                        fromLocId: data.locId,     // 이 값이 Mapper의 #{fromLocId}로 전달됩니다.
+                        mtrlCd: data.mtrlCd,
+                        toLocNm: toLocNm,
+                        transferQty: parseInt(transferQty),
+                        transferReason: "로케이션 이동"
+                    };
+
+                    $.ajax({
+                        url: "/erp105011/transfer",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify(params),
+                        success: function(res) {
+                            if(res.rtnYn === 'Y') {
+                                alert(res.rtnMsg);
+                                fnObj.transferOpen.close();
+                                fnObj.searchOpen.doSearch();
+                            } else {
+                                alert("실패: " + res.rtnMsg);
+                            }
+                        }
+                    });
+                }
+            }
+        };
+
+        function searchPaging(page) {
+            if ($("#rowPerPage").val()) {
+                pagePerRow = parseInt($("#rowPerPage").val());
+            }
+
+            var pageRange = 10;
+            var totalPageCnt = searchRes.length % pagePerRow == 0 ? parseInt(searchRes.length / pagePerRow) : parseInt(searchRes.length / pagePerRow) + 1;
+
+            var a = "<div class='pagination-container'>";
+            var start = (page - 1);
+            var end = (page - 1) + pageRange;
+
+            if (start % pageRange != 0) start = parseInt(start / pageRange) * pageRange;
+            if (end % pageRange != 0 || page == 1) end = parseInt(end / pageRange) * pageRange;
+
+            if (start >= pageRange) {
+                a += "<input type='button' onclick='searchPaging(" + 1 + ");' value='<<' class='pagination-button'>";
+                a += "<input type='button' onclick='searchPaging(" + (start - 1) + ");' value='<' class='pagination-button'>";
+            }
+
+            for (var r = start; r < end; r++) {
+                if (r < totalPageCnt) {
+                    var active = (r + 1 == page) ? "active" : "";
+                    a += "<input type='button' onclick='searchPaging(" + (r + 1) + ");' value=" + (r + 1) + " class='pagination-button " + active + "'>";
+                }
+            }
+
+            if (end * pagePerRow < searchRes.length) {
+                a += "<input type='button' onclick='searchPaging(" + (end + 1) + ");' value='>' class='pagination-button'>";
+                a += "<input type='button' onclick='searchPaging(" + totalPageCnt + ");' value='>>' class='pagination-button'>";
+            }
+
+            a += "<div class='pagination-info'>";
+            a += "<input type='number' maxlength=4 id='rowPerPage' value=" + pagePerRow + ">";
+            a += "<input type='button' value='적용' onclick='searchPaging(" + 1 + ");' class='action-button'>";
+            a += "&nbsp;&nbsp;<i class='fa fa-calculator fa-lg'></i>&nbsp;" + searchRes.length;
+            a += "</div></div>";
+            $("#page").html(a); // 하단 페이지 영역에 HTML 삽입
+
+            // 해당 페이지에 맞는 데이터만 그리드에 추가
+            var is = (page - 1) * pagePerRow;
+            var ie = is + pagePerRow;
+            if (searchRes.length < ie) ie = searchRes.length;
+
+            myGrid.clearAll(false);
+            for (var i = is; i < ie; i++) {
+                myGrid.addRow(i + 1, [
+                    searchRes[i].zoneNm,
+                    searchRes[i].locNm,
+                    searchRes[i].agntNm,
+                    searchRes[i].mtrlCd,
+                    searchRes[i].mtrlNm,
+                    searchRes[i].stockQty,
+                    searchRes[i].lastInDt,
+                    searchRes[i].agntCd,
+                    searchRes[i].locId
+                ]);
+            }
+        }
+
+        function excelDn() {
+            // 1. 데이터 존재 여부 확인 (그리드가 아닌 원본 배열 searchRes 확인)
+            if (!searchRes || searchRes.length === 0) {
+                alert("엑셀 다운로드 대상이 없습니다.\n먼저 조회를 해주세요.");
+                return;
+            }
+
+            var excelData = [];
+
+            // 2. 제목 및 헤더 설정
+            excelData.push(["로케이션별 재고 현황 (전체)"]);
+            excelData.push(["조회 건수 : " + searchRes.length + "건"]);
+            excelData.push([""]);
+
+            var headers = [
+                "구역", "로케이션", "고객사", "상품코드", "상품명",
+                "수량", "최종입고일", "고객사코드", "로케이션ID"
+            ];
+            excelData.push(headers);
+
+            // 3. [핵심 수정] 그리드가 아닌 전체 데이터 배열(searchRes)을 직접 순회
+            for (var i = 0; i < searchRes.length; i++) {
+                var item = searchRes[i];
+                var rowData = [
+                    item.zoneNm || "",
+                    item.locNm || "",
+                    item.agntNm || "",
+                    item.mtrlCd || "",
+                    item.mtrlNm || "",
+                    item.stockQty || "0",
+                    item.lastInDt || "",
+                    item.agntCd || "",
+                    item.locId || ""
+                ];
+                excelData.push(rowData);
+            }
+
+            // 4. 엑셀 파일 생성 및 다운로드
+            var wb = XLSX.utils.book_new();
+            var ws = XLSX.utils.aoa_to_sheet(excelData);
+
+            // 컬럼 너비 설정
+            ws["!cols"] = [
+                {wch: 10}, {wch: 15}, {wch: 20}, {wch: 15}, {wch: 30},
+                {wch: 10}, {wch: 20}, {wch: 12}, {wch: 12}
+            ];
+
+            XLSX.utils.book_append_sheet(wb, ws, "전체재고현황");
+
+            var fileName = "로케이션별재고현황_전체_" + new Date().toISOString().split("T")[0] + ".xlsx";
+            XLSX.writeFile(wb, fileName);
+        }
+
+        $(document).ready(function () {
+            myWins = new dhtmlXWindows();
+
+            // 회사 콤보 초기화
+            myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+            comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+            myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/));
+            myComboCmpyCd.disable();
+
+            fnObj.gridOpen.init();
+
+            // 화주사 권한 제어
+            if (sessionUserGrntCd == "4100" || sessionUserGrntCd == "4200" || sessionUserGrntCd == "7788") {
+                $("#srchName").val(sessionAgntNm).attr("readonly", true).css("color", "gray");
+                $("#srchCode").val(sessionAgntCd).attr("readonly", true).css("color", "gray");
+                $("#srchIcon, #delIcon").hide();
+            }
+
+            window.onresize = function() { fnObj.gridOpen.setWidth(); };
+        });
+
+        $(document).keydown(function (e) {
+            if (e.keyCode == 113) fnObj.searchOpen.doSearch(); // F2
+        });
+    </script>
+</head>
+<body>
+<div id="mainDiv">
+    <div id="searchDiv">
+        <div id="btnDiv1">
+            <div class="title-container">
+                <span class="item-head title-text">로케이션별 재고 현황</span>
+                <span class="sub-title">erp105011</span>
+            </div>
+            <div class="btn-container">
+                <input type="button" class="action-button primary" value="조회(F2)" onclick="fnObj.searchOpen.doSearch()">
+                <input type="button" class="action-button" value="재고 이동" onclick="fnObj.transferOpen.open()">
+                <input id="btnExcelDown" class="action-button" type="button" onclick="excelDn();" value="엑셀 다운로드">
+                <input type="button" class="action-button" value="초기화" onclick="location.reload(true);">
+            </div>
+        </div>
+        <div id="searchDiv1">
+            <span class="cell" style="display: none;"><div id="cmpyCd"></div></span>
+            <span class="cell" style="width: 380px;">
+                <span class="item-head" style="width: 80px;">화주사</span>
+                <span class="item-data" style="width: 160px;">
+                    <input type="text" id="srchName" style="width: 112px;" onkeyup="if(event.keyCode==13) fnObj.winOpen.commSrch('화주','A','AGENCY','text')">
+                    <i id="srchIcon" class="fa fa-search" onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"></i>
+                </span>
+                <span class="item-data" style="width: 140px;">
+                    <input type="text" id="srchCode" style="width: 102px;" readonly>
+                    <i id="delIcon" class="fa fa-minus-circle" onclick="$('#srchCode,#srchName').val('')"></i>
+                </span>
+            </span>
+            <span class="cell">
+                <span class="item-head" style="width: 80px;">로케이션</span>
+                <span class="item-data"><input type="text" id="srchLocNm" style="width: 130px;"></span>
+            </span>
+            <span class="cell">
+                <span class="item-head" style="width: 80px;">상품명</span>
+                <span class="item-data"><input type="text" id="srchMtrlNm" style="width: 130px;" onkeyup="if(event.keyCode==13) fnObj.searchOpen.doSearch()"></span>
+            </span>
+
+            <input type="hidden" id="agntCd_m">
+            <input type="hidden" id="fromLocId_m">
+        </div>
+    </div>
+
+    <div id="gridDiv" style="width: 100%; padding: 10px;">
+        <div id="grid" style="width: 100%; background: white;"></div>
+    </div>
+    <div id="page" style="width: 100%; height: 30px; margin-top: 5px;"></div>
+</div>
+
+<div id="transferModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header" id="modalHeader">
+            <h3 style="margin: 0; font-size: 14px;">재고 이동 처리</h3>
+            <span style="cursor: pointer;" onclick="fnObj.transferOpen.close()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group"><label>출발지(From)</label><input type="text" id="fromLocNm" class="readonly-inp" readonly></div>
+            <div class="form-group"><label>이동 상품</label><input type="hidden" id="mtrlCd_m"><input type="text" id="mtrlNm_m" class="readonly-inp" readonly></div>
+            <div class="form-group"><label>현재고</label><input type="text" id="stockQty_m" class="readonly-inp" readonly></div>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+            <div class="form-group"><label>목적지(To)</label><input type="text" id="toLocNm" placeholder="이동할 로케이션 입력/스캔"></div>
+            <div class="form-group"><label>이동 수량</label><input type="number" id="transferQty"></div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="action-button primary" onclick="fnObj.transferOpen.execute()">이동 확정</button>
+                <button class="action-button" onclick="fnObj.transferOpen.close()">취소</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

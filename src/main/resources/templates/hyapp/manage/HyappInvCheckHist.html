@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>실사 이력 조회</title>
+    <style>
+        :root { --bg:#f5f7fb; --card:#ffffff; --blue:#2563eb; --txt:#1f2937; --bd:#e5e7eb; --primary:#0d9488; }
+        body { margin:0; font-family:-apple-system, sans-serif; background:var(--bg); color:var(--txt); padding-bottom:30px; }
+
+        header {
+            position:sticky; top:0; z-index:100; padding:14px 16px; background:#fff;
+            border-bottom:1px solid var(--bd); font-weight:700; font-size:18px;
+            display:flex; justify-content:space-between; align-items:center;
+        }
+
+        .container { padding:16px; display:flex; flex-direction:column; gap:20px; }
+
+        .section-title { font-size:14px; font-weight:700; color:#6b7280; margin-bottom:8px; display:flex; justify-content:space-between; }
+
+        /* === 1. 상단: 날짜별 요약 리스트 === */
+        .summary-box {
+            display:flex; gap:10px; overflow-x:auto; padding-bottom:4px;
+            scroll-behavior: smooth;
+        }
+        .summary-box::-webkit-scrollbar { display:none; }
+
+        .date-card {
+            min-width:100px; background:#fff; border:1px solid var(--bd); border-radius:12px;
+            padding:12px; text-align:center; cursor:pointer; flex-shrink:0; transition:0.2s;
+        }
+        .date-card.active {
+            border-color:var(--blue); background:#eff6ff; box-shadow:0 0 0 2px rgba(37,99,235,0.2);
+        }
+        .date-txt { font-size:14px; font-weight:700; color:#333; margin-bottom:4px; letter-spacing:-0.5px; }
+        .cnt-txt { font-size:12px; color:#666; }
+        .cnt-num { color:var(--blue); font-weight:800; font-size:14px; }
+
+
+        /* === 2. 하단: 상세 리스트 === */
+        .detail-area { min-height:200px; }
+
+        .card-item { background:#fff; border:1px solid var(--bd); border-radius:8px; padding:14px; margin-bottom:10px; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
+        .card-row { display:flex; justify-content:space-between; align-items:center; }
+
+        .nm { font-weight:700; font-size:15px; color:#111; margin-bottom:4px; }
+        .cd { font-size:12px; color:#888; }
+        .badge { background:#f3f4f6; padding:2px 6px; border-radius:4px; font-weight:600; font-size:11px; color:#555; margin-right:4px; }
+        .qty { font-size:18px; font-weight:800; color:var(--primary); }
+        .time { font-size:11px; color:#999; margin-top:8px; text-align:right; }
+
+        .empty-msg { text-align:center; color:#999; font-size:13px; padding:30px; border:1px dashed #ccc; border-radius:8px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <button onclick="history.back()" style="border:none; background:none; font-size:18px;">←</button>
+    <span>실사 이력 조회</span>
+    <div style="width:20px;"></div>
+</header>
+
+<div class="container">
+
+    <div>
+        <div class="section-title">
+            <span>📅 최근 실사 이력 (3개월)</span>
+        </div>
+        <div id="summaryList" class="summary-box">
+            <div class="empty-msg" style="width:100%">조회 중...</div>
+        </div>
+    </div>
+
+    <div id="detailSection" style="display:none;">
+        <div class="section-title">
+            <span id="detailTitle">상세 내역</span>
+            <span id="detailCount" style="color:var(--primary)">0건</span>
+        </div>
+        <div id="detailList" class="detail-area"></div>
+    </div>
+
+</div>
+
+<script>
+    const el = (id) => document.getElementById(id);
+    const API = {
+        SUMMARY: "/hyapp/api/check/history/summary",
+        DETAIL:  "/hyapp/api/check/history"
+    };
+
+    window.onload = loadSummary;
+
+    // 1. 요약 리스트 조회
+    async function loadSummary() {
+        const box = el("summaryList");
+        try {
+            const res = await fetch(API.SUMMARY);
+            const list = await res.json();
+
+            if (!list || list.length === 0) {
+                box.innerHTML = `<div class="empty-msg" style="width:100%">최근 3개월간 이력이 없습니다.</div>`;
+                return;
+            }
+
+            box.innerHTML = list.map((item, idx) => {
+                const dateRaw = item.TAKE_DATE; // YYYYMMDD (예: 20260121)
+
+                // [수정] 날짜 포맷 변경: YY/MM/DD
+                const dateFmt = `${dateRaw.substring(2,4)}/${dateRaw.substring(4,6)}/${dateRaw.substring(6,8)}`;
+
+                return `
+                <div class="date-card" onclick="loadDetail(this, '${dateRaw}')">
+                    <div class="date-txt">${dateFmt}</div>
+                    <div class="cnt-txt"><span class="cnt-num">${item.CNT}</span> 건</div>
+                </div>
+                `;
+            }).join("");
+
+            if(box.firstElementChild) {
+                box.firstElementChild.click();
+            }
+
+        } catch(e) {
+            box.innerHTML = `<div class="empty-msg" style="width:100%">오류 발생</div>`;
+        }
+    }
+
+    // 2. 상세 내역 조회
+    async function loadDetail(cardEl, date) {
+        document.querySelectorAll('.date-card').forEach(c => c.classList.remove('active'));
+        if(cardEl) cardEl.classList.add('active');
+
+        el("detailSection").style.display = "block";
+
+        // 상세 타이틀 포맷도 변경 (2026-01-21)
+        const fmtDate = `${date.substring(0,4)}-${date.substring(4,6)}-${date.substring(6,8)}`;
+        el("detailTitle").innerText = `${fmtDate} 내역`;
+
+        const box = el("detailList");
+        box.innerHTML = `<div class="empty-msg">내역 조회 중...</div>`;
+
+        try {
+            const res = await fetch(`${API.DETAIL}?date=${date}`);
+            const list = await res.json();
+
+            el("detailCount").innerText = `${list.length}건`;
+
+            if(!list.length) {
+                box.innerHTML = `<div class="empty-msg">상세 내역이 없습니다.</div>`;
+                return;
+            }
+
+            box.innerHTML = list.map(item => `
+                <div class="card-item">
+                    <div class="card-row">
+                        <div>
+                            <div class="nm">${item.MTRL_NM || item.MTRL_CD}</div>
+                            <div class="cd">
+                                <span class="badge">${item.LOC_CD}</span>
+                                <span class="badge">${item.PLT_SIZE}</span>
+                                <span style="color:#999;">${item.MTRL_CD}</span>
+                            </div>
+                        </div>
+                        <div class="qty">${item.QTY}</div>
+                    </div>
+                    <div class="time">${item.REG_TIME ? item.REG_TIME.substring(11, 16) : ''} 저장됨</div>
+                </div>
+            `).join("");
+
+        } catch(e) {
+            box.innerHTML = `<div class="empty-msg">상세 조회 실패</div>`;
+        }
+    }
+</script>
+</body>
+</html>

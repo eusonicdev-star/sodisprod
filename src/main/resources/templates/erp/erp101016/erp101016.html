@@ -1,0 +1,1704 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>미마감 조회 및 관리 (erp101016)</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+<link rel="stylesheet" type="text/css" href="/css/common.css">
+<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/js/commCode.js"></script>
+
+
+<!-- 엑셀 다운로드 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+
+<script th:inline="javascript">
+	var pagePerRow	=	/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/
+	var myWins;
+	var myGrid;
+
+	var myCalendar;
+	var rtnSoType="";
+	
+	fnObj={
+			winOpen:{
+				//as요청 버튼 누르면 이 팝업이 오픈됨
+				/*
+				popup001 : function(tblSoMId){	
+					windowId	=	"erp101016p1";
+					windowText	=	"AS요청 팝업 erp101016p1";
+					windowUrl	=	"/erp101016p1"
+					windowLeft	=	0;
+					windowTop	=	0;
+					windowWidth	=	800;
+					windowHeight	=	600;
+					windowsModal	=	true;
+					windowOnClose	=	 function(windowId){return true;};
+					windowSendObject = {
+							cmpyCd : 	myComboCmpyCd.getSelectedValue(),
+							windowId : windowId,
+							tblSoMId : tblSoMId
+					};
+					myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+					myWins.window(windowId).attachEvent("onClose", function(win){
+						return true;
+					});
+				},	//END of popup001 : function(){
+				*/	
+					
+				//반품오더 버튼 누르면 이 팝업이 오픈됨
+				/*
+				popup002 : function(){	
+					windowId	=	"erp101016p2";
+					windowText	=	"판품오더 팝업 erp101016p2";
+					windowUrl	=	"/erp101016p2"
+					windowLeft	=	0;
+					windowTop	=	0;
+					windowWidth	=	800;
+					windowHeight	=	600;
+					windowsModal	=	true;
+					windowOnClose	=	 function(windowId){return true;};
+					windowSendObject = {
+							cmpyCd : 	myComboCmpyCd.getSelectedValue(),
+							windowId : windowId
+					};
+					myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+					myWins.window(windowId).attachEvent("onClose", function(win){
+						return true;
+					});
+				},	//END of popup002 : function(){
+				*/	
+					
+				//20220605 정연호 조치이력 상세보기 팝업
+				missDetailPopup : function(tblSoMId){		//공통코드 찾기 팝업
+					windowId		=	"erp101016p3";
+					windowText		=	"조치이력 상세보기 팝업 erp101016p3";
+					windowUrl		=	"/erp101016p3"
+					windowLeft		=	0;
+					windowTop		=	0;
+					windowWidth		=	800;
+					windowHeight	=	600;
+					windowsModal	=	true;
+					windowOnClose	=	 function(windowId){
+						  		      return true;
+					  		  };
+					windowSendObject = {
+							windowId : windowId,
+							tblSoMId : tblSoMId
+					};
+					
+
+					myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+					
+					myWins.window(windowId).attachEvent("onClose", function(win){
+						return true;
+					});
+				},	//END of missDetailPopup : function(){
+				
+				//교환오더 버튼 누르면 이 팝업이 오픈됨
+				/*
+				popup004 : function(){	
+					windowId	=	"erp101016p4";
+					windowText	=	"교환오더 팝업 erp101016p4";
+					windowUrl	=	"/erp101016p4"
+					windowLeft	=	0;
+					windowTop	=	0;
+					windowWidth	=	800;
+					windowHeight	=	600;
+					windowsModal	=	true;
+					windowOnClose	=	 function(windowId){return true;};
+					windowSendObject = {
+							cmpyCd : 	myComboCmpyCd.getSelectedValue(),
+							windowId : windowId
+					};
+					myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+					myWins.window(windowId).attachEvent("onClose", function(win){
+						return true;
+					});
+				},	//END of popup004 : function(){
+				*/		
+				//오출고 처리 버튼 누르면 이 팝업이 오픈됨
+				/*
+				popup005 : function(){	
+					windowId	=	"erp101016p5";
+					windowText	=	"오출고 처리 팝업 erp101016p5";
+					windowUrl	=	"/erp101016p5"
+					windowLeft	=	0;
+					windowTop	=	0;
+					windowWidth	=	800;
+					windowHeight	=	600;
+					windowsModal	=	true;
+					windowOnClose	=	 function(windowId){return true;};
+					windowSendObject = {
+							cmpyCd : 	myComboCmpyCd.getSelectedValue(),
+							windowId : windowId
+					};
+					myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+					myWins.window(windowId).attachEvent("onClose", function(win){
+						return true;
+					});
+				},	//END of popup005 : function(){	
+				*/	
+					
+				//취할 조치 없음 버튼 누르면 이 팝업이 오픈됨
+				popup006 : function(){	
+					//20220605 정연호 체크한 것이 없으면 오류 메세지
+					if(myGrid.getCheckedRows(myGrid.getColIndexById("chk")) == 0)
+					{
+						alert("체크한 값이 없습니다.");
+						return;
+					}
+					
+					var midValueArray=[];
+					myGrid.forEachRow(function(rId){
+						if(myGrid.cellById(rId,myGrid.getColIndexById("chk")).getValue() == "1"){
+							midValueArray.push(myGrid.cellById(rId,myGrid.getColIndexById("tblSoMId")).getValue());
+						}
+					});
+
+					windowId	=	"erp101016p6";
+					windowText	=	"취할 조치 없음 팝업 erp101016p6";
+					windowUrl	=	"/erp101016p6"
+					windowLeft	=	0;
+					windowTop	=	0;
+					windowWidth	=	800;
+					windowHeight	=	600;
+					windowsModal	=	true;
+					windowOnClose	=	 function(windowId){return true;};
+					windowSendObject = {
+							cmpyCd : 	myComboCmpyCd.getSelectedValue(),
+							windowId : windowId,
+							midValueArray : midValueArray
+					};
+					myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+					myWins.window(windowId).attachEvent("onClose", function(win){
+						return true;
+					});
+				},	//END of popup005 : function(){	
+					
+					
+					
+				//20220604 정연호 원오더찾기팝업 열기(미마감 전용 원오더 찾기 팝업)
+				//원오더 찾기 팝업
+				soOriOrdrSrchPopup : function(rtnBtnType){	
+					windowId	=	"erp101016p0";
+					var rtnName = ""
+					if(rtnBtnType == "2000")
+					{
+						rtnName = "반품오더";
+					}
+					if(rtnBtnType == "3100")
+					{
+						rtnName = "교환오더";
+					}
+					
+					if(rtnBtnType == "6000")
+					{
+						rtnName = "AS요청";
+					}
+					if(rtnBtnType == "9904")
+					{
+						rtnName = "오출고 처리";
+					}
+					windowText	=	rtnName + "의 원오더 찾기 팝업 (미마감) erp101016p0";
+					windowUrl	=	"/erp101016p0"
+					windowLeft	=	0;
+					windowTop	=	0;
+					windowWidth	=	1400;
+					windowHeight	=	800;
+					windowsModal	=	true;
+					windowOnClose	=	 function(windowId){
+					  		    
+					  		      return true;
+					  		  };
+					windowSendObject = {
+							cmpyCd		:	myComboCmpyCd.getSelectedValue(),
+							windowId	:	windowId,
+							soType		:	rtnBtnType,
+							rtnBtnType	:	rtnBtnType
+					};
+					
+
+					myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+					
+					myWins.window(windowId).attachEvent("onClose", function(win){
+				
+						return true;
+					});
+				},	//END of soOriOrdrSrchPopup : function(){	
+					
+				//실제 미마감 주문 입력하는 팝업창을 여는 부분
+				//2000 반품오더, 3100 교환오더(일반), 3200 교환오더(반품), 	6000 A/S오더 수정등록 팝업
+				soOrdrEditPopup : function(rtnBtnType, rtnSoType,rtnTblSoMId, rtnMissCloseStep){		//공통코드 찾기 팝업
+					console.log("soOrdrEditPopup rtnBtnType : " + rtnBtnType + ", rtnSoType : " + rtnSoType + ", rtnTblSoMId : " + rtnTblSoMId);
+						windowId	=	"erp101016p1";
+						var rtnName = "", rtnSoStatCd = "";
+						
+						//A/S요청 버튼 수행
+						if(rtnBtnType == "6000" && rtnSoType == "6000" && rtnMissCloseStep == "1")
+						{
+							rtnBtnName = "";rtnName = "A/S오더";rtnSoStatCd = "1000";missCloseType = "AS";missCloseStep = "1"; endCloseStep = "1";
+						}
+						
+						
+						//반품오더 버튼 수행
+						if(rtnBtnType == "2000" && rtnSoType == "2000" && rtnMissCloseStep == "1")
+						{
+							rtnBtnName = "";rtnName = "반품오더";rtnSoStatCd = "1000";missCloseType = "RETURN";missCloseStep = "1"; endCloseStep = "1";
+						}
+						
+						
+						//교환오더 버튼 수행
+						if(rtnBtnType == "3100" && rtnSoType == "3100" && rtnMissCloseStep == "1")
+						{
+							rtnBtnName = "반품오더의 ";rtnName = "교환오더(일반)";rtnSoStatCd = "1200";missCloseType = "EXCH";missCloseStep = "1"; endCloseStep = "2";
+						}
+						if(rtnBtnType == "3100" && rtnSoType == "3200" && rtnMissCloseStep == "2")
+						{
+							rtnBtnName = "반품오더의 ";rtnName = "교환오더(반품)";rtnSoStatCd = "1200";missCloseType = "EXCH";missCloseStep = "2"; endCloseStep = "2";
+						}
+						
+						
+						//오출고 처리 버튼 수행
+						if(rtnBtnType == "9904" && rtnSoType == "9904"  && rtnMissCloseStep == "1")	{
+							rtnBtnName = "오출고 처리의 ";rtnName = "반품(정품)";rtnSoStatCd = "9999";;missCloseType = "MISSGI";missCloseStep = "1"; endCloseStep = "4";
+						}
+						if(rtnBtnType == "9904" && rtnSoType == "1000" && rtnMissCloseStep == "2") {
+							rtnBtnName = "오출고 처리의 ";rtnName = "일반오더";rtnSoStatCd = "1200";;missCloseType = "MISSGI";missCloseStep = "2"; endCloseStep = "4";
+						}
+						if(rtnBtnType == "9904" && rtnSoType == "2000" && rtnMissCloseStep == "3")	{
+							rtnBtnName = "오출고 처리의 ";rtnName = "반품오더";rtnSoStatCd = "1200";;missCloseType = "MISSGI";missCloseStep = "3"; endCloseStep = "4";
+						}
+						if(rtnBtnType == "9904" && rtnMissCloseStep == "4")	{
+							rtnBtnName = "오출고 처리의 ";rtnName = rtnSoTypeNm_9904_4 ;rtnSoStatCd = "1000";;missCloseType = "MISSGI";missCloseStep = "4"; endCloseStep = "4";
+						}
+						
+						
+						windowText	=	rtnBtnName + rtnName + " 등록하기 팝업 erp101016p1 (" + endCloseStep + "단계 중 " + missCloseStep + "단계)";
+						windowUrl	=	"/erp101016p1"
+						windowLeft	=	0;
+						windowTop	=	0;
+						windowWidth	=	1500;
+						windowHeight	=	800;
+						windowsModal	=	true;
+						windowOnClose	=	 function(windowId){
+						  		  
+						  		      return true;
+						  		  };
+						windowSendObject = {
+								cmpyCd			:	myComboCmpyCd.getSelectedValue(),
+								windowId		:	windowId,
+								tblSoMId		:	rtnTblSoMId,
+								rtnBtnType		:	rtnBtnType,
+								rtnSoType		:	rtnSoType,
+								rtnName			:	rtnName,
+								rtnSoStatCd		:	rtnSoStatCd,
+								missCloseType	:	missCloseType,		//미마감 상태등록때 넣어야 할 코드 (알파벳)
+								missCloseStep	:	missCloseStep,		//미마감 현재 진행중인 단계 숫자
+								endCloseStep	:	endCloseStep		//미마감 총 몇단계 짜리 인가 숫자
+						};
+
+						myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+						myWins.window(windowId).attachEvent("onClose", function(win){
+							return true;
+						});
+				},	//END of soOrdrEditPopup : function(){
+					
+				//미마감 주문유형 선택 팝업 erp101016p7 열기
+				soTypePopup : function(){		//공통코드 찾기 팝업
+					windowId	=	"erp101016p7";
+					windowText	=	" 오출고 처리의 미마감 주문유형 선택 팝업 erp101016p7";
+					windowUrl	=	"/erp101016p7"
+					windowLeft	=	0;
+					windowTop	=	0;
+					windowWidth	=	800;
+					windowHeight	=	600;
+					windowsModal	=	true;
+					windowOnClose	=	 function(windowId){
+					  		      return true;
+					  		  };
+					windowSendObject = {
+							cmpyCd : 	myComboCmpyCd.getSelectedValue(),
+							windowId : windowId,
+							tblSoMId		:	rtnTblSoMId
+					};					
+					myWindowsOpen(windowId,windowText,windowUrl,windowLeft,windowTop,windowWidth,windowHeight,windowsModal,windowOnClose,windowSendObject);
+					myWins.window(windowId).attachEvent("onClose", function(win){
+						return true;
+					});
+				},	//END of soTypePopup : function(){
+
+				rtnObject : function(windowId,rtnObj,srchInput){	//popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+					if(rtnObj == null)	{
+						myWins.window(windowId).setPosition(0, 0);
+						return;
+					}
+					if(windowId == "erp101016p6"){
+						fnObj.searchOpen.search();
+					}
+					//미마감 주문 팝업 닫을때 여기에서 리턴을 처리
+					if(windowId == "erp101016p1"){
+						myWins.window("erp101016p1").close();	//팝업창 닫기
+						
+						//교환오더 버튼의 1단계 3100 교환오더(일반) 이 끝나면 2단계 수행
+						if(rtnObj[0].rtnBtnType == "3100" && rtnObj[0].rtnSoType == "3100" )	{
+							fnObj.winOpen.soOrdrEditPopup("3100", "3200",rtnObj[0].tblSoMId,"2");	//2단계 팝업 열기 - 교환오더(반품)
+							//0505//fnObj.winOpen.soOrdrEditPopup("3100", "3200","282864","2");	//2단계 팝업 열기
+						}
+						
+						//오출고 처리 버튼의 1단계 9904 반품(정품) 이 끝나면 2단계 수행 1000 일반오더 등록
+						if(rtnObj[0].rtnBtnType == "9904" && rtnObj[0].rtnSoType == "9904")	{
+							fnObj.winOpen.soOrdrEditPopup("9904","1000",rtnObj[0].tblSoMId,"2");	//2단계 팝업 열기 - 일반오더
+							//0505//fnObj.winOpen.soOrdrEditPopup("9904","1000","282864","2");	//2단계 팝업 열기
+						}						
+						//오출고 처리 버튼의 2단계 1000 일반오더 가 끝나면 3단계 수행 2000 반품오더 등록
+						if(rtnObj[0].rtnBtnType == "9904" && rtnObj[0].rtnSoType == "1000" )	{
+							fnObj.winOpen.soOrdrEditPopup("9904","2000",rtnObj[0].tblSoMId,"3");	//3단계 팝업 열기 - 반품오더
+							//0505//fnObj.winOpen.soOrdrEditPopup("9904","2000","282864","3");	//3단계 팝업 열기
+						}
+						//오출고 처리 버튼의 3단계 2000 반품오더 가 끝나면 4단계 수행을 위한 3.5단계 미마감 주문유형 선택 팝업을 연다
+						if(rtnObj[0].rtnBtnType == "9904" && rtnObj[0].rtnSoType == "2000" )	{
+							fnObj.winOpen.soTypePopup();	//3.5단계 팝업 열기
+						}	
+					}
+					
+					if(windowId == "erp101016p7"){
+						rtnSoType = rtnObj[0].soType;
+						rtnSoTypeNm_9904_4 = rtnObj[0].soTypeNm;
+				
+						fnObj.winOpen.soOrdrEditPopup("9904",rtnSoType,rtnObj[0].tblSoMId,"4");	//4단계 팝업 열기
+						//0505//fnObj.winOpen.soOrdrEditPopup("9904",rtnSoType,"282864","4");	//4단계 팝업 열기
+					}
+					
+					//20220604 정연호 
+					if(windowId == "erp101016p0"){
+						if(rtnObj != null){
+							rtnBtnType = rtnObj[0].rtnBtnType;
+							rtnSoType = rtnObj[0].rtnSoType;
+							rtnTblSoMId = rtnObj[0].tblSoMId;
+	
+							fnObj.winOpen.soOrdrEditPopup(rtnBtnType,rtnSoType,rtnTblSoMId,"1");	//erp101001p5 팝업열기 주문 수정등록 화면
+						}
+					}
+				},	//END of rtnObject : function(windowId,rtnObj){
+			},	//END of winOpen
+			comboOpen : {
+				comboCmpyCd : function(){		//회사콤보목록
+					myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+			    	comboList(myComboCmpyCd,'A','COMM','CMPY_CD','','Y','');		     
+			    	myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/));
+			    	myComboCmpyCd.setFontSize("12px","12px");
+			    	myComboCmpyCd.attachEvent("onChange", function(value, text){
+			    		myGrid.clearAll(false);
+			    	});
+			    	myComboCmpyCd.disable();
+				},	
+				
+				comboDtType : function(){	//달력유형구분 콤보
+					myComboDtType = new dhtmlXCombo("dtType");
+					comboList(myComboDtType,'A','COMM','SO_SRCH_DT_TYPE','','Y','');		     
+					myComboDtType.selectOption(0);
+					myComboDtType.readonly(true);
+					myComboDtType.setFontSize("12px","12px");
+					myComboDtType.attachEvent("onChange", function(value, text){
+			    		myGrid.clearAll(false);
+			    	});
+				},			
+				
+				comboDcCd : function(){		//물류센터 콤보
+					myComboDcCd = new dhtmlXComboFromSelect("dcCd");
+					comboList(myComboDcCd,'A','DC_CD','','','Y','req');		     
+					myComboDcCd.readonly(true);
+					myComboDcCd.selectOption(0);
+					
+					//20220605 정연호 추가. 전체를 체크하려고 추가함
+					var c=0;
+	    			for(var i=0;i<myComboDcCd.getOptionsCount();i++) {
+	    				myComboDcCd.setChecked(i,true);
+	    				c++;
+		    		}
+	    			myComboDcCd.updateOption("","",(c-1)+"개 선택","");
+	    			//20220605 정연호 추가. 전체를 체크하려고 추가함.끝
+										
+					myComboDcCd.setFontSize("12px","12px");
+					myComboDcCd.attachEvent("onChange", function(value, text){
+			    		myGrid.clearAll(false);
+			    		if(this.getIndexByValue(value) != 0){
+			    			this.setChecked(this.getIndexByValue(value),true);
+			    			var c=0;
+			    			for(var i=1;i<this.getOptionsCount();i++){
+			    				if(this.isChecked(i)){    
+			    					c++;
+			    				}
+			    			}
+			    			this.updateOption("","",c+"개 선택","");
+			    			this.selectOption(0);
+			    			this.openSelect();
+			    		}
+			    	});
+					
+					myComboDcCd.attachEvent("onCheck", function(value, text){
+						//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
+						if(!value){
+							if(myComboDcCd.isChecked(0)){
+				    			var c=0;
+				    			for(var i=1;i<myComboDcCd.getOptionsCount();i++){
+				    				myComboDcCd.setChecked(i,true);
+				    				c++;
+					    		}
+				    			myComboDcCd.updateOption("","",c+"개 선택","");
+				    			myComboDcCd.openSelect();
+							}
+							
+							//전체에 체크를 안했을때
+							if(!myComboDcCd.isChecked(0)){
+			    				var c=0;
+				    			for(var i=1;i<myComboDcCd.getOptionsCount();i++){
+				    				myComboDcCd.setChecked(i,false);
+					    		}
+				    			myComboDcCd.updateOption("","",c+"개 선택","");
+				    			myComboDcCd.openSelect();
+				    			return;
+			    			}
+						}
+						else{
+							var cnt=0;
+							
+				    		for(var i=1;i<myComboDcCd.getOptionsCount();i++){
+				    			if(myComboDcCd.isChecked(i)){
+				    				cnt++;
+				    			}
+				    		}
+				    		
+				    		if((myComboDcCd.getOptionsCount()-1) == cnt){
+				    			myComboDcCd.setChecked(0,true);
+				    		}
+				    		else{
+				    			myComboDcCd.setChecked(0,false);
+				    		}				    		
+				    		myComboDcCd.updateOption("","",cnt+"개 선택","");
+				    		myComboDcCd.openSelect();
+			    			return;
+						}
+			    	});
+				},	
+				
+				comboSoType : function(){		//주문유형
+					myComboSoType = new dhtmlXComboFromSelect("soType");
+			    	comboList(myComboSoType,'A','COMM','SO_ORDR_TYPE','','Y','req');		     
+			    	myComboSoType.selectOption(0);
+			    	myComboSoType.readonly(true);
+			    	myComboSoType.setFontSize("12px","12px");
+			    	myComboSoType.attachEvent("onChange", function(value, text){
+				    	if(this.getIndexByValue(value) != 0){
+				    		this.setChecked(this.getIndexByValue(value),true);
+				    		var c=0;
+				    		for(var i=1;i<this.getOptionsCount();i++){
+				    			if(this.isChecked(i)){    
+				    				c++;
+				    			}
+				    		}
+				    		this.updateOption("","",c+"개 선택","");
+				    		this.selectOption(0);
+				    		this.openSelect();
+				    	}
+			    	});
+			    	myComboSoType.attachEvent("onCheck", function(value, text){
+			    		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
+						if(!value){
+							if(myComboSoType.isChecked(0)){
+				    			var c=0;
+				    			for(var i=1;i<myComboSoType.getOptionsCount();i++){
+				    				myComboSoType.setChecked(i,true);
+				    				c++;
+					    		}
+				    			myComboSoType.updateOption("","",c+"개 선택","");
+				    			myComboSoType.openSelect();
+							}
+							
+							//전체에 체크를 안했을때
+							if(!myComboSoType.isChecked(0)){
+			    				var c=0;
+				    			for(var i=1;i<myComboSoType.getOptionsCount();i++){
+				    				myComboSoType.setChecked(i,false);
+					    		}
+				    			myComboSoType.updateOption("","",c+"개 선택","");
+				    			myComboSoType.openSelect();
+				    			return;
+			    			}
+						}
+						else{
+							var cnt=0;
+				    		for(var i=1;i<myComboSoType.getOptionsCount();i++){
+				    			if(myComboSoType.isChecked(i)){
+				    				cnt++;
+				    			}
+				    		}
+				    		
+				    		if((myComboSoType.getOptionsCount()-1) == cnt){
+				    			myComboSoType.setChecked(0,true);
+				    		}
+				    		else{
+				    			myComboSoType.setChecked(0,false);
+				    		}
+				    		
+				    		myComboSoType.updateOption("","",cnt+"개 선택","");
+				    		myComboSoType.openSelect();
+			    			return;
+						}
+			    	});
+				},
+				
+				comboSoStat : function(){		//주문상태
+					myComboSoStat = new dhtmlXComboFromSelect("soStat");
+			    	comboList(myComboSoStat,'A','COMM','SO_STAT_CD','','Y','req');		     
+			    	myComboSoStat.selectOption(0);
+			    	myComboSoStat.readonly(true);
+			    	myComboSoStat.setFontSize("12px","12px");
+			    	myComboSoStat.attachEvent("onChange", function(value, text){
+				    	if(this.getIndexByValue(value) != 0){
+				    		this.setChecked(this.getIndexByValue(value),true);
+				    		var c=0;
+				    		for(var i=1;i<this.getOptionsCount();i++){
+				    			if(this.isChecked(i)){    
+				    				c++;
+				    			}
+				    		}
+				    		this.updateOption("","",c+"개 선택","");
+				    		this.selectOption(0);
+				    		this.openSelect();
+				    	}
+			    	});
+			    	myComboSoStat.attachEvent("onCheck", function(value, text){
+			    		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
+						if(!value){
+							if(myComboSoStat.isChecked(0)){
+				    			var c=0;
+				    			for(var i=1;i<myComboSoStat.getOptionsCount();i++){
+				    				myComboSoStat.setChecked(i,true);
+				    				c++;
+					    		}
+				    			myComboSoStat.updateOption("","",c+"개 선택","");
+				    			myComboSoStat.openSelect();
+							}
+							//전체에 체크를 안했을때
+							if(!myComboSoStat.isChecked(0)){
+			    				var c=0;
+				    			for(var i=1;i<myComboSoStat.getOptionsCount();i++){
+				    				myComboSoStat.setChecked(i,false);
+					    		}
+				    			myComboSoStat.updateOption("","",c+"개 선택","");
+				    			myComboSoStat.openSelect();
+				    			return;
+			    			}
+						}
+						else{
+							var cnt=0;
+				    		for(var i=1;i<myComboSoStat.getOptionsCount();i++){
+				    			if(myComboSoStat.isChecked(i)){
+				    				cnt++;
+				    			}
+				    		}				    		
+				    		if((myComboSoStat.getOptionsCount()-1) == cnt){
+				    			myComboSoStat.setChecked(0,true);
+				    		}
+				    		else{
+				    			myComboSoStat.setChecked(0,false);
+				    		}
+				    		myComboSoStat.updateOption("","",cnt+"개 선택","");
+				    		myComboSoStat.openSelect();
+			    			return;
+						}
+			    	});
+				},
+				
+				//시공카테고리 체크박스 콤보
+				comboInstCapaCtgr : function(){		//시공카테고리 콤보
+					myComboInstCapaCtgr = new dhtmlXComboFromSelect("instCapaCtgr");
+			    	comboList(myComboInstCapaCtgr,'A','COMM','INST_CAPA_CTGR','','Y','req');		     
+			    	myComboInstCapaCtgr.readonly(true);
+			    	myComboInstCapaCtgr.selectOption(0);
+
+			    	var c=0;
+	    			for(var i=0;i<myComboInstCapaCtgr.getOptionsCount();i++){
+	    				myComboInstCapaCtgr.setChecked(i,true);
+	    				c++;
+		    		}
+	    			myComboInstCapaCtgr.updateOption("","",(c-1)+"개 선택","");
+			    	myComboInstCapaCtgr.setFontSize("12px","12px");
+			    	myComboInstCapaCtgr.attachEvent("onChange", function(value, text){
+			    		myGrid.clearAll(false);
+			    		if(this.getIndexByValue(value) != 0){
+			    			this.setChecked(this.getIndexByValue(value),true);
+			    			var c=0;
+			    			for(var i=1;i<this.getOptionsCount();i++){
+			    				if(this.isChecked(i)){    
+			    					c++;
+			    				}
+			    			}
+			    			this.updateOption("","",c+"개 선택","");
+			    			this.selectOption(0);
+			    			this.openSelect();
+			    		}
+			    	});
+			    	myComboInstCapaCtgr.attachEvent("onCheck", function(value, text){
+			    		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
+						if(!value){
+							if(myComboInstCapaCtgr.isChecked(0)){
+				    			var c=0;
+				    			for(var i=1;i<myComboInstCapaCtgr.getOptionsCount();i++){
+				    				myComboInstCapaCtgr.setChecked(i,true);
+				    				c++;
+					    		}
+				    			myComboInstCapaCtgr.updateOption("","",c+"개 선택","");
+				    			myComboInstCapaCtgr.openSelect();
+							}
+							//전체에 체크를 안했을때
+							if(!myComboInstCapaCtgr.isChecked(0)){
+			    				var c=0;
+				    			for(var i=1;i<myComboInstCapaCtgr.getOptionsCount();i++){
+				    				myComboInstCapaCtgr.setChecked(i,false);
+					    		}
+				    			myComboInstCapaCtgr.updateOption("","",c+"개 선택","");
+				    			myComboInstCapaCtgr.openSelect();
+				    			return;
+			    			}
+						}
+						else{
+							var cnt=0;
+				    		for(var i=1;i<myComboInstCapaCtgr.getOptionsCount();i++){
+				    			if(myComboInstCapaCtgr.isChecked(i)){
+				    				cnt++;
+				    			}
+				    		}
+				    		if((myComboInstCapaCtgr.getOptionsCount()-1) == cnt){
+				    			myComboInstCapaCtgr.setChecked(0,true);
+				    		}
+				    		else{
+				    			myComboInstCapaCtgr.setChecked(0,false);
+				    		}
+				    		myComboInstCapaCtgr.updateOption("","",cnt+"개 선택","");
+				    		myComboInstCapaCtgr.openSelect();
+			    			return;
+						}
+			    	});
+				},
+				
+				
+				//조치유형 체크콤보 목록 missCloseType
+				comboMissCloseType : function(){		
+					myComboMissCloseType = new dhtmlXComboFromSelect("missCloseType");
+			    	comboList(myComboMissCloseType,'A','COMM','MISS_CLOSE_TYPE','','Y','req');		     
+			    	myComboMissCloseType.readonly(true);
+			    	myComboMissCloseType.selectOption(0);
+			
+			    	var c=0;
+	    			for(var i=0;i<myComboMissCloseType.getOptionsCount();i++){
+	    				myComboMissCloseType.setChecked(i,true);
+	    				c++;
+		    		}
+	    			myComboMissCloseType.updateOption("","",(c-1)+"개 선택","");
+	    			
+	    			myComboMissCloseType.setFontSize("12px","12px");
+	    			myComboMissCloseType.attachEvent("onChange", function(value, text){
+			    		myGrid.clearAll(false);
+			    		if(this.getIndexByValue(value) != 0){
+			    			this.setChecked(this.getIndexByValue(value),true);
+			    			var c=0;
+			    			for(var i=1;i<this.getOptionsCount();i++){
+			    				if(this.isChecked(i)){    
+			    					c++;
+			    				}
+			    			}
+			    			this.updateOption("","",c+"개 선택","");
+			    			this.selectOption(0);
+			    			this.openSelect();
+			    		}
+			    	});
+	    			
+	    			myComboMissCloseType.attachEvent("onCheck", function(value, text){
+						if(!value){		//체크를 한것의 값이 없을때. 즉 제일위에 전체, 또는 선택해주세요 를 체크한 것이다
+							if(myComboMissCloseType.isChecked(0)){
+				    			var c=0;
+				    			for(var i=1;i<myComboMissCloseType.getOptionsCount();i++){
+				    				myComboMissCloseType.setChecked(i,true);
+				    				c++;
+					    		}
+				    			myComboMissCloseType.updateOption("","",c+"개 선택","");
+				    			myComboMissCloseType.openSelect();
+							}
+							if(!myComboMissCloseType.isChecked(0)){		//전체에 체크를 안했을때
+			    				var c=0;
+				    			for(var i=1;i<myComboMissCloseType.getOptionsCount();i++){
+				    				myComboMissCloseType.setChecked(i,false);
+					    		}
+				    			myComboMissCloseType.updateOption("","",c+"개 선택","");
+				    			myComboMissCloseType.openSelect();
+				    			return;
+			    			}
+						}
+						else{
+							var cnt=0;
+				    		for(var i=1;i<myComboMissCloseType.getOptionsCount();i++){
+				    			if(myComboMissCloseType.isChecked(i)){
+				    				cnt++;
+				    			}
+				    		}
+				
+				    		if((myComboMissCloseType.getOptionsCount()-1) == cnt){
+				    			myComboMissCloseType.setChecked(0,true);
+				    		}
+				    		else{
+				    			myComboMissCloseType.setChecked(0,false);
+				    		}
+				    		
+				    		myComboMissCloseType.updateOption("","",cnt+"개 선택","");
+				    		myComboMissCloseType.openSelect();
+	
+			    			return;
+						}
+			    	});
+				},
+
+				comboUseYn : function(){
+					myComboUseYn = new dhtmlXCombo("useYn");
+					myComboUseYn.addOption([{value:"", text:"전체"}]);
+					myComboUseYn.addOption([{value:"Y", text:"Y"}]);
+					myComboUseYn.addOption([{value:"N", text:"N"}]);
+					myComboUseYn.selectOption(0);
+					myComboUseYn.readonly(true);
+					myComboUseYn.setFontSize("12px","12px");
+					myComboUseYn.attachEvent("onChange", function(value, text){
+			    		myGrid.clearAll(false);
+			    	});
+				},
+			},	//END of comboOpen
+			gridOpen : {
+				grid : function()
+				{
+					myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/terrace/imgs/");
+					myGrid.setHeader(		
+										 "#master_checkbox"		+
+										",CUD"					+
+										",회사코드"+   
+										",타업체"+
+										",화주코드"+
+										",화주"+
+										",주문유형코드"+
+										",주문유형"+
+										",주문상태코드"+
+										",주문상태"+
+										",물류센터코드"+
+										",물류센터"+
+										",시공카테고리코드"+
+										",시공<br>카테고리"+
+										",시스템등록일"+
+										",고객접수일"+
+										",고객배송<br>요청일"+
+										",배송확정일"+
+										",공장출고일"+
+										",쇼핑몰"+
+										",브랜드"+
+										",AL오더번호"+
+										",고객사<br>주문번호"+
+										",수취인"+
+										",수취인<br>휴대번호"+
+										",수취인일반번호"+
+										",우편번호"+
+										",주소"+
+										",상세주소"+
+										",배송메세지"+
+										",고객사<br>특이사항"+
+										",운임구분코드"+
+										",운임구분"+
+										",착불비"+
+										",통행료"+
+										",시공일"+
+										",팔렛트번호"+
+										",시공기사"+
+										",팀"+
+										",기사메모"+
+										",시공비"+
+										",물류비"+
+										",AL오더고유ID"+
+										",미마감조치<br>유무"+
+										",미마감조치유형코드"+
+										",미마감조치<br>유형",
+										null, 
+										[	 ""		
+											,
+											,
+											,
+											,
+											,
+											,
+											,
+											,
+											,	//10
+											,
+											,
+											,
+											,
+											,
+											,
+											,
+											,
+											,
+											,	//20
+											,
+											,
+											,
+											,
+											,
+											,
+											,
+											,
+											,
+											,	//30
+											,
+											,
+											,
+											,
+											,
+											,
+											,
+											,
+											,
+											,	//40
+											,
+											,
+											,
+											,
+											,
+											,"background-color : yellow"
+											] 
+					);
+					myGrid.setColumnIds(	
+										"chk"+				// "#master_checkbox"	
+										",cud"+             //",CUD"				
+										",cmpyCd"+          //",회사코드"+           
+										",outCmpyCd"+       //",타업체"+            
+										",agntCd"+          //",화주코드"+           
+										",agntNm"+          //",화주명칭"+           
+										",soType"+          //",오더유형코드"+         
+										",soTypeNm"+        //",오더유형명칭"+         
+										",soStatCd"+        //",오더상태코드"+         
+										",soStatNm"+        //",오더상태명칭"+         
+										",dcCd"+            //",물류센터코드"+         
+										",dcNm"+            //",물류센터코드"+         
+										",instCtgr"+        //",시공카테고리코드"+       
+										",instCtgrNm"+      //",시공카테고리명칭"+       
+										",ordrInptDt"+      //",시스템등록일"+         
+										",rcptDt"+          //",고객접수일"+          
+										",rqstDt"+          //",고객배숑요청일"+        
+										",dlvyCnfmDt"+      //",배송확정일"+          
+										",giLiftDt"+        //",공장출고일"+          
+										",mallCd"+          //",쇼핑몰"+            
+										",brand"+           //",브랜드"+            
+										",soNo"+            //",AL오더번호"+         
+										",refSoNo"+         //",고객사주문번호"+        
+										",acptEr"+          //",수취인"+            
+										",acptTel1"+        //",수취인휴대번호"+        
+										",acptTel2"+        //",수취인일반번호"+        
+										",postCd"+          //",우편번호"+           
+										",addr1"+           //",주소"+             
+										",addr2"+           //",상세주소"+           
+										",dlvyRqstMsg"+     //",배송메세지"+          
+										",custSpclTxt"+     //",고객사특이사항"+        
+										",dlvyCostType"+    //",운임구분코드"+         
+										",dlvyCostTypeNm"+  //",운임구분명칭"+         
+										",rcptCost"+        //",착불비"+            
+										",passCost"+        //",통행료"+            
+										",instDt"+          //",시공일"+            
+										",paltNoxx"+        //",팔렛트번호"+          
+										",instEr"+          //",시공기사"+           
+										",team"+            //",시공기사(팀)"+        
+										",instMemo"+        //",기사메모"+           
+										",instCost"+        //",시공비"+            
+										",dlvyCost"+        //",물류비"+            
+										",tblSoMId"+        //",AL오더고유ID"+       
+										",missCloseYn"+     //",미마감조치유무"+        
+										",missCloseType"+   //",미마감조치유형코드"+      
+										",missCloseTypeNm"  //",미마감조치유형명칭"       
+					);
+					myGrid.setInitWidths(	
+										"40"+				// "#master_checkbox	
+										",40"+              //",CUD"			
+										",40"+             //",회사코드"+          
+										",80"+             //",타업체"+           
+										",40"+             //",화주코드"+          
+										",100"+             //",화주명칭"+          
+										",80"+             //",주문유형코드"+        
+										",120"+             //",주문유형명칭"+        
+										",100"+             //",주문상태코드"+        
+										",120"+             //",주문상태명칭"+        
+										",100"+             //",물류센터코드"+        
+										",100"+             //",물류센터명칭"+        
+										",100"+             //",시공카테고리코드"+      
+										",80"+             //",시공카테고리명칭"+      
+										",100"+             //",시스템등록일"+        
+										",100"+             //",고객접수일"+         
+										",100"+             //",고객배숑요청일"+       
+										",100"+             //",배송확정일"+         
+										",100"+             //",공장출고일"+         
+										",140"+             //",쇼핑몰"+           
+										",100"+             //",브랜드"+           
+										",120"+             //",AL오더번호"+        
+										",180"+             //",고객사주문번호"+       
+										",100"+             //",수취인"+           
+										",100"+             //",수취인휴대번호"+       
+										",100"+             //",수취인일반번호"+       
+										",80"+             //",우편번호"+          
+										",280"+             //",주소"+            
+										",280"+             //",상세주소"+          
+										",200"+             //",배송메세지"+         
+										",200"+             //",고객사특이사항"+       
+										",100"+             //",운임구분코드"+        
+										",80"+             //",운임구분명칭"+        
+										",80"+             //",착불비"+           
+										",80"+             //",통행료"+           
+										",100"+             //",시공일"+           
+										",100"+             //",팔렛트번호"+         
+										",100"+             //",시공기사"+          
+										",100"+             //",시공기사(팀)"+       
+										",200"+             //",기사메모"+          
+										",80"+             //",시공비"+           
+										",80"+             //",물류비"+           
+										",100"+             //",AL오더고유ID"+      
+										",90"+             //",미마감조치유무"+       
+										",100"+             //",미마감조치유형코드"+     
+										",160"              //",미마감조치유형명칭"      
+								);
+					myGrid.setColAlign(		
+								"center"+                    // "#master_checkbox
+								",center"+                   //",CUD"			
+								",center"+                   //",회사코드"+          
+								",center"+                   //",타업체"+           
+								",center"+                   //",화주코드"+          
+								",center"+                   //",화주명칭"+          
+								",center"+                   //",오더유형코드"+        
+								",center"+                   //",오더유형명칭"+        
+								",center"+                   //",오더상태코드"+        
+								",center"+                   //",오더상태명칭"+        
+								",center"+                   //",물류센터코드"+        
+								",center"+                   //",물류센터코드"+        
+								",center"+                   //",시공카테고리코드"+      
+								",center"+                   //",시공카테고리명칭"+      
+								",center"+                   //",시스템등록일"+        
+								",center"+                   //",고객접수일"+         
+								",center"+                   //",고객배숑요청일"+       
+								",center"+                   //",배송확정일"+         
+								",center"+                   //",공장출고일"+         
+								",left"+                   //",쇼핑몰"+           
+								",center"+                   //",브랜드"+           
+								",center"+                   //",AL오더번호"+        
+								",left"+                   //",고객사주문번호"+       
+								",left"+                   //",수취인"+           
+								",left"+                   //",수취인휴대번호"+       
+								",left"+                   //",수취인일반번호"+       
+								",center"+                   //",우편번호"+          
+								",left"+                   //",주소"+            
+								",left"+                   //",상세주소"+          
+								",left"+                   //",배송메세지"+         
+								",left"+                   //",고객사특이사항"+       
+								",center"+                   //",운임구분코드"+        
+								",center"+                   //",운임구분명칭"+        
+								",right"+                   //",착불비"+           
+								",right"+                   //",통행료"+           
+								",center"+                   //",시공일"+           
+								",right"+                   //",팔렛트번호"+         
+								",center"+                   //",시공기사"+          
+								",center"+                   //",시공기사(팀)"+       
+								",left"+                   //",기사메모"+          
+								",right"+                   //",시공비"+           
+								",right"+                   //",물류비"+           
+								",center"+                   //",AL오더고유ID"+      
+								",center"+                   //",미마감조치유무"+       
+								",center"+                   //",미마감조치유형코드"+     
+								",center"                    //",미마감조치유형명칭"      
+					);
+					
+					myGrid.setColTypes(		
+								"ch"+                          // "#master_checkbox
+								",ro"+                         //",CUD"			
+								",ro"+                         //",회사코드"+          
+								",ro"+                         //",타업체"+           
+								",ro"+                         //",화주코드"+          
+								",ro"+                         //",화주명칭"+          
+								",ro"+                         //",오더유형코드"+        
+								",ro"+                         //",오더유형명칭"+        
+								",ro"+                         //",오더상태코드"+        
+								",ro"+                         //",오더상태명칭"+        
+								",ro"+                         //",물류센터코드"+        
+								",ro"+                         //",물류센터코드"+        
+								",ro"+                         //",시공카테고리코드"+      
+								",ro"+                         //",시공카테고리명칭"+      
+								",ro"+                         //",시스템등록일"+        
+								",ro"+                         //",고객접수일"+         
+								",ro"+                         //",고객배숑요청일"+       
+								",ro"+                         //",배송확정일"+         
+								",ro"+                         //",공장출고일"+         
+								",ro"+                         //",쇼핑몰"+           
+								",ro"+                         //",브랜드"+           
+								",ro"+                         //",AL오더번호"+        
+								",ro"+                         //",고객사주문번호"+       
+								",ro"+                         //",수취인"+           
+								",ro"+                         //",수취인휴대번호"+       
+								",ro"+                         //",수취인일반번호"+       
+								",ro"+                         //",우편번호"+          
+								",ro"+                         //",주소"+            
+								",ro"+                         //",상세주소"+          
+								",ro"+                         //",배송메세지"+         
+								",ro"+                         //",고객사특이사항"+       
+								",ro"+                         //",운임구분코드"+        
+								",ro"+                         //",운임구분명칭"+        
+								",ro"+                         //",착불비"+           
+								",ro"+                         //",통행료"+           
+								",ro"+                         //",시공일"+           
+								",ro"+                         //",팔렛트번호"+         
+								",ro"+                         //",시공기사"+          
+								",ro"+                         //",시공기사(팀)"+       
+								",ro"+                         //",기사메모"+          
+								",ro"+                         //",시공비"+           
+								",ro"+                         //",물류비"+           
+								",ro"+                         //",AL오더고유ID"+      
+								",ro"+                         //",미마감조치유무"+       
+								",ro"+                         //",미마감조치유형코드"+     
+								",ro"                          //",미마감조치유형명칭"      
+					);
+					
+					myGrid.setColSorting(	
+										""+                      // "#master_checkbox
+										","+                     //",CUD"			
+										",str"+                  //",회사코드"+          
+										",str"+                  //",타업체"+           
+										",str"+                  //",화주코드"+          
+										",str"+                  //",화주명칭"+          
+										",str"+                  //",오더유형코드"+        
+										",str"+                  //",오더유형명칭"+        
+										",str"+                  //",오더상태코드"+        
+										",str"+                  //",오더상태명칭"+        
+										",str"+                  //",물류센터코드"+        
+										",str"+                  //",물류센터코드"+        
+										",str"+                  //",시공카테고리코드"+      
+										",str"+                  //",시공카테고리명칭"+      
+										",str"+                  //",시스템등록일"+        
+										",str"+                  //",고객접수일"+         
+										",str"+                  //",고객배숑요청일"+       
+										",str"+                  //",배송확정일"+         
+										",str"+                  //",공장출고일"+         
+										",str"+                  //",쇼핑몰"+           
+										",str"+                  //",브랜드"+           
+										",str"+                  //",AL오더번호"+        
+										",str"+                  //",고객사주문번호"+       
+										",str"+                  //",수취인"+           
+										",str"+                  //",수취인휴대번호"+       
+										",str"+                  //",수취인일반번호"+       
+										",str"+                  //",우편번호"+          
+										",str"+                  //",주소"+            
+										",str"+                  //",상세주소"+          
+										",str"+                  //",배송메세지"+         
+										",str"+                  //",고객사특이사항"+       
+										",str"+                  //",운임구분코드"+        
+										",str"+                  //",운임구분명칭"+        
+										",str"+                  //",착불비"+           
+										",str"+                  //",통행료"+           
+										",str"+                  //",시공일"+           
+										",str"+                  //",팔렛트번호"+         
+										",str"+                  //",시공기사"+          
+										",str"+                  //",시공기사(팀)"+       
+										",str"+                  //",기사메모"+          
+										",str"+                  //",시공비"+           
+										",str"+                  //",물류비"+           
+										",str"+                  //",AL오더고유ID"+      
+										",str"+                  //",미마감조치유무"+       
+										",str"+                  //",미마감조치유형코드"+     
+										",str"                   //",미마감조치유형명칭"      
+					);
+					
+					myGrid.attachHeader(	
+							""+                                      // "#master_checkbox
+							","+                                     //",CUD"			
+							",#text_filter"+                         //",회사코드"+          
+							",#text_filter"+                         //",타업체"+           
+							",#text_filter"+                         //",화주코드"+          
+							",#text_filter"+                         //",화주명칭"+          
+							",#text_filter"+                         //",오더유형코드"+        
+							",#text_filter"+                         //",오더유형명칭"+        
+							",#text_filter"+                         //",오더상태코드"+        
+							",#text_filter"+                         //",오더상태명칭"+        
+							",#text_filter"+                         //",물류센터코드"+        
+							",#text_filter"+                         //",물류센터코드"+        
+							",#text_filter"+                         //",시공카테고리코드"+      
+							",#text_filter"+                         //",시공카테고리명칭"+      
+							",#text_filter"+                         //",시스템등록일"+        
+							",#text_filter"+                         //",고객접수일"+         
+							",#text_filter"+                         //",고객배숑요청일"+       
+							",#text_filter"+                         //",배송확정일"+         
+							",#text_filter"+                         //",공장출고일"+         
+							",#text_filter"+                         //",쇼핑몰"+           
+							",#text_filter"+                         //",브랜드"+           
+							",#text_filter"+                         //",AL오더번호"+        
+							",#text_filter"+                         //",고객사주문번호"+       
+							",#text_filter"+                         //",수취인"+           
+							",#text_filter"+                         //",수취인휴대번호"+       
+							",#text_filter"+                         //",수취인일반번호"+       
+							",#text_filter"+                         //",우편번호"+          
+							",#text_filter"+                         //",주소"+            
+							",#text_filter"+                         //",상세주소"+          
+							",#text_filter"+                         //",배송메세지"+         
+							",#text_filter"+                         //",고객사특이사항"+       
+							",#text_filter"+                         //",운임구분코드"+        
+							",#text_filter"+                         //",운임구분명칭"+        
+							",#text_filter"+                         //",착불비"+           
+							",#text_filter"+                         //",통행료"+           
+							",#text_filter"+                         //",시공일"+           
+							",#text_filter"+                         //",팔렛트번호"+         
+							",#text_filter"+                         //",시공기사"+          
+							",#text_filter"+                         //",시공기사(팀)"+       
+							",#text_filter"+                         //",기사메모"+          
+							",#text_filter"+                         //",시공비"+           
+							",#text_filter"+                         //",물류비"+           
+							",#text_filter"+                         //",AL오더고유ID"+      
+							",#text_filter"+                         //",미마감조치유무"+       
+							",#text_filter"+                         //",미마감조치유형코드"+     
+							",#text_filter"		                     //",미마감조치유형명칭"      
+					);
+					
+					myGrid.setColumnColor(	
+							""+                                      // "#master_checkbox
+							","+                                     //",CUD"			
+							","+                         //",회사코드"+          
+							","+                         //",타업체"+           
+							","+                         //",화주코드"+          
+							","+                         //",화주명칭"+          
+							","+                         //",오더유형코드"+        
+							","+                         //",오더유형명칭"+        
+							","+                         //",오더상태코드"+        
+							","+                         //",오더상태명칭"+        
+							","+                         //",물류센터코드"+        
+							","+                         //",물류센터코드"+        
+							","+                         //",시공카테고리코드"+      
+							","+                         //",시공카테고리명칭"+      
+							","+                         //",시스템등록일"+        
+							","+                         //",고객접수일"+         
+							","+                         //",고객배숑요청일"+       
+							","+                         //",배송확정일"+         
+							","+                         //",공장출고일"+         
+							","+                         //",쇼핑몰"+           
+							","+                         //",브랜드"+           
+							","+                         //",AL오더번호"+        
+							","+                         //",고객사주문번호"+       
+							","+                         //",수취인"+           
+							","+                         //",수취인휴대번호"+       
+							","+                         //",수취인일반번호"+       
+							","+                         //",우편번호"+          
+							","+                         //",주소"+            
+							","+                         //",상세주소"+          
+							","+                         //",배송메세지"+         
+							","+                         //",고객사특이사항"+       
+							","+                         //",운임구분코드"+        
+							","+                         //",운임구분명칭"+        
+							","+                         //",착불비"+           
+							","+                         //",통행료"+           
+							","+                         //",시공일"+           
+							","+                         //",팔렛트번호"+         
+							","+                         //",시공기사"+          
+							","+                         //",시공기사(팀)"+       
+							","+                         //",기사메모"+          
+							","+                         //",시공비"+           
+							","+                         //",물류비"+           
+							","+                         //",AL오더고유ID"+      
+							","+                         //",미마감조치유무"+       
+							","+                         //",미마감조치유형코드"+     
+							",yellow"		                     //",미마감조치유형명칭"      
+					);
+		
+					myGrid.setColumnHidden(myGrid.getColIndexById("cud"),true);	
+					myGrid.setColumnHidden(myGrid.getColIndexById("cmpyCd"),true);	
+					myGrid.setColumnHidden(myGrid.getColIndexById("agntCd"),true);	
+					myGrid.setColumnHidden(myGrid.getColIndexById("soType"),true);	
+					myGrid.setColumnHidden(myGrid.getColIndexById("soStatCd"),true);	
+					myGrid.setColumnHidden(myGrid.getColIndexById("dcCd"),true);	
+					myGrid.setColumnHidden(myGrid.getColIndexById("instCtgr"),true);	
+					myGrid.setColumnHidden(myGrid.getColIndexById("brand"),true);	
+					myGrid.setColumnHidden(myGrid.getColIndexById("acptTel2"),true);	
+					myGrid.setColumnHidden(myGrid.getColIndexById("dlvyCostType"),true);	
+					myGrid.setColumnHidden(myGrid.getColIndexById("tblSoMId"),true);	
+					myGrid.setColumnHidden(myGrid.getColIndexById("missCloseType"),true);	
+					
+					myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
+					
+					myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+					myGrid.enablePreRendering(10);
+					
+					fnObj.gridOpen.setWidth();
+																								//그래야 진짜 화면에 보이는 높이가 만들어진다
+					myGrid.addRow(1,"");	//로우 추가
+					myGrid.deleteRow(1);
+					
+					myGrid.enableEditEvents(true,false,false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+					myGrid.enableBlockSelection(true);
+			
+					myGrid.attachEvent("onKeyPress",fnObj.keyOpen.onKeyPressed);
+					
+					myGrid.attachEvent("onRowDblClicked", function(rId,cInd){
+						//오더 상세보기 팝업 오픈
+						var tblSoMId = myGrid.cellById(rId,myGrid.getColIndexById("tblSoMId")).getValue();
+						fnObj.winOpen.missDetailPopup(tblSoMId);
+					});					
+				},//grid
+				
+				setWidth : function(){
+					c_width =  top.myLayout.cells("c").getWidth();
+					searchDiv_height =  $("#searchDiv").height();
+					searchDiv2nd_height =  $("#searchDiv2nd").height();
+					page_height =  $("#page").height();
+					xhdr_height =  $(".xhdr").height();
+					
+					myGrid.enableAutoWidth(true,c_width-25,100);
+					myGrid.enableAutoHeight(true,window.innerHeight-searchDiv_height-searchDiv2nd_height-page_height-xhdr_height-30);	//그리드 자동높이
+
+					$("#searchDiv").width(c_width-25);
+					$("#searchDiv2nd").width(c_width-25);
+				},	//END of setWidth
+			},	//END of gridOpen
+			
+			searchOpen : {
+				//조회하기 
+				search : function() {	//그리드 목록 조회하기
+					myGrid.clearAll(false);
+
+					if(!fnObj.searchOpen.searchChkVal.chkVal("search")){
+						alert(chkValMsg);
+						return false;
+					}
+
+					var srchData = {};
+					srchData.cmpyCd				=	myComboCmpyCd.getSelectedValue();
+					srchData.dtType				=	myComboDtType.getSelectedValue();
+					srchData.fromDt				=	$("#dateFrom").val().replace(/-/g,"");	
+					srchData.toDt				=	$("#dateTo").val().replace(/-/g,"")	;
+					srchData.dcList				=	myComboDcCd.getChecked().toString();
+					srchData.acptNm				=	$("#rcptNm").val();
+					srchData.addr				=	$("#srchAddr").val();
+					srchData.acptTel			=	$("#rcptTel").val();
+					srchData.soList				=	$("#soList").val().replace(/\n/g,",");
+					srchData.refSoList			=	$("#refSoList").val().replace(/\n/g,",");
+					srchData.instCtgrList		=	myComboInstCapaCtgr.getChecked().toString();
+					srchData.soTypeList			=	myComboSoType.getChecked().toString();
+					srchData.soStatCdList		=	myComboSoStat.getChecked().toString();
+					srchData.useYn				=	myComboUseYn.getSelectedValue().toString();
+					srchData.missCloseTypeList	=	myComboMissCloseType.getChecked().toString();
+
+					$.ajax({
+				        url: "/erp101016List",
+				        processData : false,
+						contentType : "application/json",
+				        data: JSON.stringify(srchData),
+				        type:"POST",
+				        datatype:"json",
+				        success : function(res){
+				        	if(res){
+				        		searchRes = res;
+				        		searchPaging(1);
+				        	}
+				        	else{
+				       			alert("조회 수행 결과 없음");
+				        	}
+				        },
+					});
+				},	//END of search : function() {
+				
+				searchChkVal : {
+					chkVal : function(chkGubn){
+						chkValMsg="";	//메세지 초기화
+						var rtnVal = true;
+						
+						if(chkGubn == "search"){
+							if(!myComboCmpyCd.getSelectedValue()){
+								chkValMsg = chkValMsg + "회사코드가 없습니다\n";
+								rtnVal = false;
+							}
+							
+							if(!myComboDtType.getSelectedValue()){
+								chkValMsg = chkValMsg + "달력유형을 선택해주세요\n";
+								rtnVal = false;
+							}
+							if(!$("#dateFrom").val()){
+								chkValMsg = chkValMsg + "검색시작일을 입력해주세요\n";
+								rtnVal = false;
+							}
+							if(!$("#dateTo").val()){
+								chkValMsg = chkValMsg + "검색종료일을 입력해주세요\n";
+								rtnVal = false;
+							}
+				
+							if($("#dateFrom").val() && $("#dateTo").val()){
+								var date1 = new Date($("#dateFrom").val());
+								var date2 = new Date($("#dateTo").val());
+								//시작날짜가 크고 종료날짜가 작을때
+								if(date1 > date2){
+									chkValMsg = chkValMsg + "검색시작일이 검색종료일보다 작습니다.\n";
+									rtnVal = false;
+								}
+							}
+						
+							if($("#dateFrom").val() && $("#dateTo").val()){
+								var date1 = new Date($("#dateFrom").val());
+								var date2 = new Date($("#dateTo").val());
+								var gapDate = (date2.getTime() - date1.getTime()) / (1000*60*60*24);
+								//시작날짜가 크고 종료날짜가 작을때
+								if(gapDate > 31){
+									chkValMsg = chkValMsg + "검색일은 최대 31일입니다.\n";
+									rtnVal = false;
+								}
+							}							
+						}
+						return rtnVal;
+					},	//END of chkVal : function(){
+				},	//END of searchChkVal
+		},	//END of searchOpen
+		
+		keyOpen : {
+			enterKey : function(enterType){
+				 if (window.event.keyCode == 13) {
+
+		        }
+			},
+			onKeyPressed : function (code,ctrl,shift){
+			    if(code==67&&ctrl){
+			        myGrid.setCSVDelimiter("\t");
+			        myGrid.copyBlockToClipboard()
+			    }
+			    if(code==86&&ctrl){
+			        myGrid.pasteBlockFromClipboard()
+			    }
+			    return true;
+			},
+		}
+	}
+
+	//엑셀 헨들러
+	var excelHandler = {
+	    getExcelFileName : function(){
+	        return '미마감 조회 및 관리.xlsx';		//엑셀파일명
+	    },
+	    getSheetName : function(){
+	        return '미마감 조회 및 관리';		//시트명
+	    },
+	    getExcelData : function(){
+	        return	get_json_res(myGrid,searchRes);		//그리드를 엑셀다운로드dyd json 으로 변경
+	    },
+	    getWorksheet : function(){
+	        return XLSX.utils.json_to_sheet(this.getExcelData());
+	    }
+	}
+	
+	function searchPaging(page) {
+		if($("#rowPerPage").val()) {
+			pagePerRow = parseInt($("#rowPerPage").val());
+		}
+		var pageRange	=	10;	//페이지범위를 몇개씩짜를것인가. 예) 23페이지 라면 1 2 3 4 5 6 7 8 9 10  이 한번 나오고 >> 누르면 11 12 13 14 15 16 17 18 19 20 나오고 >> 누르면 21 22 23 나옴
+		var totalPageCnt	=	searchRes.length % pagePerRow == 0 ? parseInt(searchRes.length / pagePerRow) : parseInt(searchRes.length / pagePerRow) + 1
+		var a="";
+
+		//패이징 처리 
+		var start=(page-1);
+		var end  = (page-1)+pageRange;
+
+		if(start%pageRange != 0) {
+			start = parseInt(start/pageRange)*pageRange ;
+		}
+
+		if(end%pageRange !=  0 || page == 1) {
+			end = parseInt(end/pageRange)*pageRange;
+		}
+
+		if(start >= pageRange) {
+			a=a +	"<input type='button' onclick='searchPaging("+1+");' value='<<'></input>";
+			a=a +	"<input type='button' onclick='searchPaging("+(start -1)+");' value='<'></input>";
+		}
+
+		var r=0;
+		
+		for(r=start;r<end;r++) {
+			if(r < totalPageCnt) {
+				if(r+1 == page) {		//현재페이지 강조
+					a=a+"<input type='button' onclick='searchPaging("+(r+1)+");' style='color:red;font-weight:bold;' value="+(r+1)+"></input>";
+				}
+				else {
+					a=a+"<input type='button' onclick='searchPaging("+(r+1)+");' value="+(r+1)+"></input>";
+				}
+			}
+		}
+
+		if(end*pagePerRow  < searchRes.length ) {
+			a=a +	"<input type='button' onclick='searchPaging("+(end+1)+");' value='>'></input>";
+			a=a +	"<input type='button' onclick='searchPaging("+totalPageCnt+");' value='>>'></input>";
+		}
+
+		a=a+"&nbsp;&nbsp;<input type='number' maxlength=4 style='width:60px;' id='rowPerPage' value="+pagePerRow+"></input><input type='button' value='적용' onclick='searchPaging("+1+");'></input>";
+		a=a+"&nbsp;&nbsp;<i class='fa fa-calculator fa-lg' aria-hidden='true'></i>&nbsp;" + searchRes.length; 
+		$("#page").html(a);
+
+		var is=(page-1)*pagePerRow;	//시작점
+		var ie=(page-1)*pagePerRow+pagePerRow;	//종료점
+
+		if(searchRes.length < ie) {
+			ie = searchRes.length;
+		}
+
+		myGrid.clearAll(false);
+	
+		var columns = myGrid.getColumnCount()
+		
+		for(var i=is;i<ie;i++){	
+   			var jsonData = {};
+   			for (var c=0; c<columns; c++){ 
+   				jsonData[myGrid.getColumnId(c)] = searchRes[i][myGrid.getColumnId(c)];
+       		}
+   			
+   			myGrid.addRow(i+1,"");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+   			myGrid.setRowData(i+1,jsonData);
+  
+		}
+	}			
+	
+function excelDn()
+{
+	if(!myGrid.getRowsNum()){
+		alert("엑셀다운로드 대상이 없습니다.\n조회를해주세요");
+		return;
+	}
+	exportExcel();	
+}
+			
+$(document).ready(function() {
+	myWins = new dhtmlXWindows();
+	myGrid = new dhtmlXGridObject('grid');	//그리드
+	myCalendar = new dhtmlXCalendarObject([{input:"dateFrom",button:"dateFromIcon"},{input:"dateTo",button:"dateToIcon"}]);
+
+	var now = new Date()
+	var year = now.getFullYear()+"";
+	var month = (now.getMonth()+1)+"";
+	var date = now.getDate()+"";
+	if(month.length == 1 ) {
+		month = "0"+month;
+	}
+	if(date.length == 1 ) {
+		date = "0"+date;
+	}	
+	var today =  year+"-" + month + "-" + date;
+	
+	$("#dateFrom").val(today);
+	$("#dateTo").val(today);
+	
+	//20220605 0505 테스트
+	//$("#dateFrom").val("2022-03-01");
+	//$("#dateTo").val("2022-03-31");
+	
+	myCalendar.loadUserLanguage("ko");
+	
+	fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+	fnObj.comboOpen.comboDtType();	//달력유형콤보 바인드
+	fnObj.comboOpen.comboDcCd();	//물류센터 콤보	
+	fnObj.comboOpen.comboSoType();	//주문유형
+	fnObj.comboOpen.comboSoStat();	//주문상태
+	fnObj.comboOpen.comboInstCapaCtgr();	//시공카테고리콤보 바인드
+	fnObj.comboOpen.comboUseYn();
+	fnObj.comboOpen.comboMissCloseType();
+	
+	fnObj.gridOpen.grid()
+
+	window.onresize = function(event) {		//윈도우의 사이즈가 변경했을떄
+		fnObj.gridOpen.setWidth();
+		fnObj.gridOpen.setWidth();
+	};
+	
+	sessionUserGrntCd =  /*[[${session.userGrntCd}]]*/
+	sessionAgntCd = /*[[${session.agntCd}]]*/
+	sessionAgntNm = /*[[${session.agntNm}]]*/
+	
+});
+//20211226 정연호 추가. 키보드에서 F2 누르면 조회하기
+$(document).keydown(function(event) {
+    if ( event.keyCode == 113 || event.which == 113 ) {
+    	fnObj.searchOpen.search()
+    }
+});
+
+</script>
+</head>
+<body>
+	<div id="mainDiv" style="padding: 10px 10px 0 10px;">
+		<div id="searchDiv" style="width: 100%; font-size: 12px; padding-bottom: 5px;">
+			<div id="btnDiv1" style="width: 100%;">
+				<span class="cell" style="float: right;">
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<input id="btnSearch" type="button" onclick="fnObj.searchOpen.search()" value="조회(F2)">
+					</span>
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<!-- <input id="btnSearch" style="width:100px;" type="button" onclick="fnObj.winOpen.popup001()" value="AS요청"> -->
+						<input id="btnSearch" style="width:100px;" type="button" onclick="fnObj.winOpen.soOriOrdrSrchPopup('6000')" value="AS요청">
+						
+					</span>
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<!-- <input id="btnSearch" style="width:100px;" type="button" onclick="fnObj.winOpen.popup002()" value="반품오더"> -->
+						<input id="btnSearch" style="width:100px;" type="button" onclick="fnObj.winOpen.soOriOrdrSrchPopup('2000')" value="반품오더">
+					</span>
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<!-- <input id="btnSearch" style="width:100px;" type="button" onclick="fnObj.winOpen.popup004()" value="교환오더"> -->
+						<input id="btnSearch" style="width:100px;" type="button" onclick="fnObj.winOpen.soOriOrdrSrchPopup('3100')" value="교환오더">
+					</span>
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<!-- <input id="btnSearch" style="width:100px;" type="button" onclick="fnObj.winOpen.popup005()" value="오출고 처리"> -->
+						<input id="btnSearch" style="width:100px;" type="button" onclick="fnObj.winOpen.soOriOrdrSrchPopup('9904')" value="오출고 처리">
+					</span>
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<input id="btnSearch" style="width:100px;" type="button" onclick="fnObj.winOpen.popup006()" value="취할 조치 없음">
+					</span>
+					
+
+					<span class="item-data" style="padding: 0 0 0 20px;">
+						<input id="btnExcelDown" type="button" onclick="excelDn();" value="엑셀다운로드">
+					</span>
+					<span class="item-data" style="padding: 0 20px 0 20px;"><input id="btnReload" type="button" onclick="location.reload(true);" value="초기화"></span>
+				</span>
+			</div>
+			<div id="searchDiv1" style="width: 100%;">
+				<span class="cell" style="width: 320px;">
+					<span class="item-head" style="font-size: 14px; font-weight: bold; color: darkblue; text-align: left; padding: 0 0 10px 0;">
+						미마감 조회 및 관리 <font size=2 color=black>erp101016</font>
+					</span>
+				</span>
+				<br>
+				<span class="cell" style="width: 220px; display: none;">
+					<span class="item-head" style="width: 80px;">회사</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="cmpyCd"></div>
+					</span>
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">달력유형</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="dtType"></div>
+					</span>
+				</span>
+
+
+				<span id="fromTo" class="cell" style="width: 360px;">
+					<span class="item-head" style="width: 80px;">달력</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="dateFrom" style="height: 20px; width: 90px;" readonly>
+						<i id="dateFromIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+					</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="dateTo" style="height: 20px; width: 90px;" readonly>
+						<i id="dateToIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+					</span>
+				</span>
+
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">물류센터</span>
+					<span class="item-data" style="width: 140px;">
+						<div opt_type="checkbox" id="dcCd"></div>
+					</span>
+				</span>
+
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">수령인</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="rcptNm" style="height: 20px; width: 132px;">
+						</input>
+					</span>
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">주소검색</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="srchAddr" style="height: 20px; width: 132px;">
+						</input>
+					</span>
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">전화번호</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" id="rcptTel" style="height: 20px; width: 132px;" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');" />
+					</span>
+				</span>
+
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">AL 오더</span>
+					<span class="item-data" style="width: 140px;">
+						<textArea id="soList" style="width: 122px;" oninput="this.value = this.value.replace(/[^0-9\n]/g, '').replace(/(\..*)\./g, '$1');" /></textArea>
+					</span>
+				</span>
+
+				<span class="cell" style="width: 260px;">
+					<span class="item-head" style="width: 120px;">고객사 주문번호</span>
+					<span class="item-data" style="width: 140px;">
+						<textArea id="refSoList" style="width: 122px;"/></textArea>
+					</span>
+				</span>
+				
+				
+				<span class="cell" style="width:220px;">
+					<span class="item-head" style="width:80px;">시공카테고리</span>
+					<span class="item-data" style="width:140px;">
+						<div opt_type="checkbox" id="instCapaCtgr" ></div>
+					</span>
+				</span>
+			
+
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">주문유형</span>
+					<span class="item-data" style="width: 140px;">
+						<div opt_type="checkbox" id="soType"></div>
+					</span>
+				</span>
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">주문상태</span>
+					<span class="item-data" style="width: 140px;">
+						<div opt_type="checkbox" id="soStat"></div>
+					</span>
+				</span>
+				
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">조치유무</span>
+					<span class="item-data" style="width: 140px;">
+						<div id="useYn"></div>
+					</span>
+				</span>
+				
+				<span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">조치유형</span>
+					<span class="item-data" style="width: 140px;">
+						<div opt_type="checkbox" id="missCloseType"></div>
+					</span>
+				</span>
+			</div>
+		</div>
+
+		<div id="searchDiv2nd" style="width: 100%; font-size: 12px; padding-bottom: 5px; background-color: papayawhip; display: none;">
+			<div id="btnDiv2nd1" style="width: 100%;">
+				<span class="cell" style="float: right;"> </span>
+			</div>
+			<div id="searchDiv2nd1" style="width: 100%;"></div>
+		</div>
+
+		<div id="gridDiv" style="width: 100%; font-size: 12px; padding-bottom: 5px;">
+			<div id="grid" style="width: 25%; height: 100%;"></div>
+		</div>
+		<div id="page" style="width: 100%; height: 30px;"></div>
+	</div>
+</body>
+</html>

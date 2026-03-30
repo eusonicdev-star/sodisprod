@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.hyapp.info.mapper.HyappInvMapper">
+
+    <select id="selectProductList" resultType="map">
+        SELECT TOP 100
+        ISNULL(A.AGNT_NM, '')                         AS CUST_NM,
+        M.MTRL_CD                                     AS MTRL_CD,
+        M.MTRL_NM                                     AS MTRL_NM,
+        COALESCE(SUM(CAST(S.STOCK_QTY AS BIGINT)), 0) AS QTY
+        FROM dbo.TBL_MTRL_M M
+        LEFT JOIN dbo.TBL_AGENCY_M A
+        ON M.CMPY_CD = A.CMPY_CD
+        AND M.AGNT_CD = A.AGNT_CD
+        LEFT JOIN dbo.TBL_STOCK S
+        ON M.CMPY_CD = S.CMPY_CD
+        AND M.AGNT_CD = S.AGNT_CD
+        AND M.MTRL_CD = S.MTRL_CD
+
+        <where>
+            <if test="keyword != null and keyword != ''">
+                <choose>
+                    <when test="hasSpace == true">
+                        AND (
+                        <foreach collection="tokens" item="t" separator=" AND ">
+                            M.MTRL_NM LIKE '%' + #{t} + '%'
+                        </foreach>
+                        )
+                    </when>
+                    <otherwise>
+                        AND (
+                        M.MTRL_CD LIKE '%' + #{keyword} + '%'
+                        OR M.MTRL_NM LIKE '%' + #{keyword} + '%'
+                        OR M.BARCODE = #{keyword}
+                        )
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+
+        GROUP BY
+        A.AGNT_NM,
+        M.MTRL_CD,
+        M.MTRL_NM
+        HAVING
+        COALESCE(SUM(CAST(S.STOCK_QTY AS BIGINT)), 0) > 0
+        ORDER BY
+        M.MTRL_NM, M.MTRL_CD
+    </select>
+
+    <select id="selectLocationListByMtrlCd" parameterType="string" resultType="map">
+        SELECT
+        S.MTRL_CD                                     AS MTRL_CD,
+        L.LOC_CD                                      AS LOC_CD,
+        L.LOC_NM                                      AS LOC_NM,
+        COALESCE(SUM(CAST(S.STOCK_QTY AS BIGINT)), 0) AS QTY
+        FROM dbo.TBL_STOCK S
+        INNER JOIN dbo.TBL_MTRL_M M
+        ON S.CMPY_CD = M.CMPY_CD
+        AND S.AGNT_CD = M.AGNT_CD
+        AND S.MTRL_CD = M.MTRL_CD
+        INNER JOIN dbo.TBL_WH_LOC_M L
+        ON S.LOC_ID = L.LOC_ID
+        <where>
+            <if test="mtrlCd != null and mtrlCd != ''">
+                AND M.MTRL_CD = #{mtrlCd}
+            </if>
+        </where>
+        GROUP BY
+        S.MTRL_CD,
+        L.LOC_CD,
+        L.LOC_NM
+        ORDER BY
+        L.LOC_CD
+    </select>
+
+    <select id="selectRackList" parameterType="map" resultType="map">
+        SELECT
+        D.ZONE_ID,
+        D.ZONE_NM                                     AS zoneNm,
+
+        E.LOC_ID                                      AS locId,
+        E.LOC_CD                                      AS locCd,
+        E.LOC_NM                                      AS locNm,
+
+        C.MTRL_CD                                     AS mtrlCd,
+        C.MTRL_NM                                     AS mtrlNm,
+
+        COALESCE(SUM(CAST(A.STOCK_QTY AS BIGINT)), 0) AS qty
+        FROM TBL_WH_LOC_M E
+        JOIN TBL_WH_ZONE_M D
+        ON E.ZONE_ID = D.ZONE_ID
+
+        -- 재고가 없어도 랙은 나와야 하므로 LEFT JOIN
+        LEFT JOIN TBL_STOCK A
+        ON E.LOC_ID = A.LOC_ID
+        AND A.STOCK_QTY > 0  -- 재고 0인 '껍데기' 데이터는 제외하고 조인
+
+        -- 상품 정보도 재고가 있을 때만 붙음
+        LEFT JOIN TBL_MTRL_M C
+        ON A.MTRL_CD = C.MTRL_CD
+
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                E.LOC_CD LIKE '%' + #{keyword} + '%'
+                OR E.LOC_NM LIKE '%' + #{keyword} + '%'
+                OR C.MTRL_NM LIKE '%' + #{keyword} + '%'
+                )
+            </if>
+        </where>
+
+        GROUP BY
+        D.ZONE_ID, D.ZONE_NM,
+        E.LOC_ID, E.LOC_CD, E.LOC_NM,
+        C.MTRL_CD, C.MTRL_NM
+
+        <if test="emptyOnly == true">
+            HAVING COALESCE(SUM(CAST(A.STOCK_QTY AS BIGINT)), 0) = 0
+        </if>
+
+        ORDER BY
+        D.ZONE_NM,
+        E.LOC_CD,
+        C.MTRL_NM
+    </select>
+
+
+    <select id="selectRackItemList" resultType="map">
+        SELECT
+        M.MTRL_CD                                     AS MTRL_CD,
+        M.MTRL_NM                                     AS MTRL_NM,
+        COALESCE(SUM(CAST(S.STOCK_QTY AS BIGINT)), 0) AS QTY
+        FROM TBL_STOCK S
+        INNER JOIN TBL_MTRL_M M
+        ON S.CMPY_CD = M.CMPY_CD
+        AND S.AGNT_CD = M.AGNT_CD
+        AND S.MTRL_CD = M.MTRL_CD
+        LEFT JOIN TBL_WH_LOC_M L
+        ON S.LOC_ID = L.LOC_ID
+        <where>
+            <choose>
+                <when test="locId != null and locId != ''">
+                    AND S.LOC_ID = #{locId}
+                </when>
+                <when test="locCd != null and locCd != ''">
+                    AND L.LOC_CD = #{locCd}
+                </when>
+            </choose>
+            AND S.STOCK_QTY > 0
+        </where>
+        GROUP BY
+        M.MTRL_CD,
+        M.MTRL_NM
+        ORDER BY
+        M.MTRL_NM
+    </select>
+
+    <select id="selectGlobalStockList" resultType="map">
+        SELECT TOP 300  S.AGNT_CD                                     AS AGNT_CD,
+            MAX(A.AGNT_NM)                                AS AGNT_NM, -- GroupBy 집계함수 처리
+               S.MTRL_CD                                     AS MTRL_CD,
+               MAX(M.MTRL_NM)                                AS MTRL_NM,
+               COALESCE(SUM(CAST(S.STOCK_QTY AS BIGINT)), 0) AS QTY
+        FROM TBL_STOCK S
+                 INNER JOIN TBL_AGENCY_M A
+                            ON S.CMPY_CD = A.CMPY_CD
+                                AND S.AGNT_CD = A.AGNT_CD
+                 INNER JOIN TBL_MTRL_M M
+                            ON S.CMPY_CD = M.CMPY_CD
+                                AND S.AGNT_CD = M.AGNT_CD
+                                AND S.MTRL_CD = M.MTRL_CD
+        WHERE S.STOCK_QTY > 0
+        GROUP BY
+            S.AGNT_CD,
+            S.MTRL_CD
+        ORDER BY
+            MAX(A.AGNT_NM),
+            MAX(M.MTRL_NM)
+    </select>
+
+    <select id="selectCustLocationList" parameterType="map" resultType="map">
+        SELECT
+            L.LOC_CD                                      AS LOC_CD,
+            Z.ZONE_NM                                     AS ZONE_NM,
+            COALESCE(SUM(CAST(S.STOCK_QTY AS BIGINT)), 0) AS QTY
+        FROM TBL_STOCK S
+                 INNER JOIN TBL_WH_LOC_M L
+                            ON S.LOC_ID = L.LOC_ID
+                 LEFT JOIN TBL_WH_ZONE_M Z
+                           ON L.ZONE_ID = Z.ZONE_ID
+        WHERE S.AGNT_CD = #{custCd}
+          AND S.MTRL_CD = #{mtrlCd}
+          AND S.STOCK_QTY > 0
+        GROUP BY
+            L.LOC_CD,
+            Z.ZONE_NM
+        ORDER BY
+            L.LOC_CD
+    </select>
+</mapper>

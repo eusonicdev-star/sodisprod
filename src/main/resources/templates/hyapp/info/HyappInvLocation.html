@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>로케이션(랙) 재고 조회 (HyappInvLocation)</title>
+    <style>
+        :root{
+            --bg:#f5f5f5; --card:#ffffff; --bd:#e0e0e0;
+            --txt:#111; --sub:#666; --primary:#2563eb;
+            --dark:#1f2937; --warn:#dc2626;
+        }
+        *{box-sizing:border-box;}
+        body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--txt);padding-bottom:40px;}
+
+        header{
+            position:sticky;top:0;background:var(--card);
+            border-bottom:1px solid var(--bd);padding:14px 16px;z-index:100;
+            display:flex;align-items:center;justify-content:space-between;
+        }
+        h1{margin:0;font-size:17px;font-weight:900;letter-spacing:-.2px;}
+        #topBadge{font-size:13px;color:#666;}
+
+        .search-area{padding:16px;background:var(--card);border-bottom:1px solid var(--bd);}
+        .input-group{display:flex;gap:8px;margin-bottom:10px;}
+        .input-wrapper{position:relative;flex:1;}
+
+        .input{
+            width:100%;height:48px;padding:0 12px;padding-right:40px;
+            border:1px solid #ccc;border-radius:10px;font-size:16px;
+            background:#fff;appearance:none;
+        }
+        .input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(37,99,235,.12);}
+
+        .clear-icon{
+            position:absolute;right:0;top:0;height:48px;width:40px;
+            display:flex;align-items:center;justify-content:center;
+            color:#999;cursor:pointer;font-size:18px;
+        }
+
+        .btn{
+            height:48px;padding:0 16px;border-radius:10px;border:none;
+            font-size:15px;font-weight:800;cursor:pointer;white-space:nowrap;
+        }
+        .btn.search{background:var(--primary);color:#fff;width:100%;}
+        .btn.scan{background:var(--dark);color:#fff;min-width:64px;}
+        .btn:active{opacity:.9;transform:scale(.98);}
+        .btn:disabled{opacity:.6;cursor:not-allowed;}
+
+        .filters{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:10px;}
+        .chip{
+            display:flex;gap:8px;align-items:center;
+            padding:10px 12px;border:1px solid var(--bd);border-radius:999px;background:#fff;
+            font-size:13px;color:#333;user-select:none;
+        }
+        .chip input{transform:scale(1.15);}
+
+        .status-msg{font-size:13px;color:var(--sub);text-align:center;margin-top:10px;min-height:16px;}
+
+        .main-container{padding:16px;display:flex;flex-direction:column;gap:12px;}
+        .section-header{
+            font-size:13px;font-weight:800;color:var(--sub);margin:0 0 8px 0;
+            display:flex;justify-content:space-between;align-items:center;
+        }
+
+        .group{margin-bottom:12px;}
+        .group-title{
+            display:flex;align-items:center;justify-content:space-between;
+            margin:10px 2px 8px 2px;
+            font-size:13px;font-weight:900;color:#374151;
+        }
+        .group-title .count{font-weight:700;color:#6b7280;font-size:12px;}
+
+        .item-card{
+            background:var(--card);border:1px solid var(--bd);border-radius:14px;
+            padding:14px;margin-bottom:10px;
+            box-shadow:0 1px 2px rgba(0,0,0,.03);
+            transition:all .2s ease;
+        }
+        .rack-card{cursor:pointer;position:relative;}
+        .rack-card:active{background:#fafafa;}
+        .rack-card.selected{
+            border-color:var(--primary);
+            box-shadow:0 0 0 2px rgba(37,99,235,.16);
+        }
+
+        .row{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+        .zone{font-size:12px;color:var(--sub);font-weight:700;}
+        .loc{font-size:16px;font-weight:900;color:#111;letter-spacing:-.2px;}
+        .locnm{font-size:12px;color:#6b7280;font-weight:600;}
+
+        .qty{font-size:18px;font-weight:1000;color:var(--primary);}
+        .qty.zero{color:#9ca3af;}
+        .subline{font-size:12px;color:#6b7280;font-weight:700;}
+
+        .pill{
+            display:inline-flex;align-items:center;gap:6px;
+            padding:4px 8px;border-radius:999px;border:1px solid #e5e7eb;
+            font-size:12px;font-weight:800;color:#374151;background:#f9fafb;
+        }
+        .pill.ok{border-color:#bbf7d0;background:#f0fdf4;color:#14532d;}
+        .pill.zero{border-color:#e5e7eb;background:#f9fafb;color:#6b7280;}
+
+        .empty-state{
+            padding:26px 0;text-align:center;color:#9aa0a6;font-size:13px;
+            background:rgba(0,0,0,.02);border-radius:12px;border:1px dashed #d1d5db;
+        }
+
+        /* 상세(로케이션 내 상품) */
+        .detail-box{margin-top:10px;padding-top:10px;border-top:1px dashed #e5e7eb;display:none;}
+        .detail-title{font-size:12px;font-weight:900;color:#374151;margin-bottom:8px;}
+        .detail-item{
+            display:flex;justify-content:space-between;gap:10px;
+            padding:10px 0;border-bottom:1px solid #f1f5f9;
+        }
+        .detail-item:last-child{border-bottom:none;}
+        .mtrl{font-size:13px;font-weight:900;color:#111;}
+        .mtrlcd{font-size:11px;color:#6b7280;font-weight:700;margin-top:2px;}
+        .dqty{font-size:13px;font-weight:1000;color:#111;}
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>로케이션(랙) 재고 조회</h1>
+    <div id="topBadge">0건</div>
+</header>
+
+<div class="search-area">
+    <div class="input-group">
+        <div class="input-wrapper">
+            <input id="locKeyword" class="input" type="text" placeholder="랙 바코드(로케이션 코드) 스캔/입력" autocomplete="off" />
+            <div class="clear-icon" id="clearBtn">&times;</div>
+        </div>
+        <button id="scanBtn" class="btn scan" type="button">스캔</button>
+    </div>
+
+    <button id="searchBtn" class="btn search" type="button">조회</button>
+
+    <div class="filters">
+        <div style="display:flex; gap:8px;">
+            <label class="chip" title="총수량이 0인 랙만 표시">
+                <input id="emptyOnly" type="checkbox" onchange="handleFilterChange('empty')" />
+                빈 랙만(0)
+            </label>
+            <label class="chip" title="재고가 1개라도 있는 랙만 표시">
+                <input id="filledOnly" type="checkbox" onchange="handleFilterChange('filled')" />
+                찬 랙만(>0)
+            </label>
+        </div>
+        <label class="chip">
+            <input id="autoDetail" type="checkbox" checked />
+            선택 시 상세
+        </label>
+    </div>
+
+    <div class="status-msg" id="status"></div>
+</div>
+
+<main class="main-container">
+    <div class="section-header">
+        <span>?? 존/랙 목록</span>
+        <span style="font-size:12px;color:#6b7280;font-weight:700;">(검색 결과)</span>
+    </div>
+    <div id="listBox">
+        <div class="empty-state">랙 바코드를 입력(또는 스캔) 후 조회하세요.</div>
+    </div>
+</main>
+
+<script>
+    // ==============================
+    // API URL
+    // ==============================
+    const API_RACKS = "/hyapp/api/inv/racks";
+    const API_RACK_ITEMS = "/hyapp/api/inv/rack/items";
+
+    // ==============================
+    // 유틸
+    // ==============================
+    const el = (id) => document.getElementById(id);
+    const setStatus = (msg) => { const s = el("status"); if (s) s.textContent = msg || ""; };
+    const fmt = (n) => Number(n || 0).toLocaleString();
+    const escape = (s) => String(s ?? "").replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+    }[m]));
+
+    function pick(obj, keys, def = "") {
+        for (const k of keys) {
+            const v = obj?.[k];
+            if (v != null && String(v) !== "") return v;
+        }
+        return def;
+    }
+
+    // ==============================
+    // 상태 관리
+    // ==============================
+    let state = {
+        list: [],
+        selectedKey: null,
+        itemsCache: new Map()
+    };
+
+    /**
+     * [추가] 체크박스 배타적 선택 제어
+     */
+    function handleFilterChange(type) {
+        if (type === 'empty' && el("emptyOnly").checked) {
+            el("filledOnly").checked = false;
+        } else if (type === 'filled' && el("filledOnly").checked) {
+            el("emptyOnly").checked = false;
+        }
+
+        // 키워드가 있는 상태에서 필터 변경 시 즉시 재조회 실행
+        if (el("locKeyword").value.trim()) {
+            searchRacks();
+        }
+    }
+
+    /**
+     * [수정] 로케이션(랙) 조회 및 필터링 로직
+     */
+    async function searchRacks() {
+        const keyword = el("locKeyword").value.trim();
+        const emptyOnly = el("emptyOnly").checked;  // 빈 랙만(0)
+        const filledOnly = el("filledOnly").checked; // 찬 랙만(>0)
+
+        // 초기화
+        state.list = [];
+        state.selectedKey = null;
+        state.itemsCache.clear();
+        renderList([]);
+        el("topBadge").textContent = "0건";
+
+        setStatus("조회 중...");
+        el("searchBtn").disabled = true;
+
+        try {
+            const params = new URLSearchParams();
+            params.set("keyword", keyword);
+
+            // 서버 API 호출
+            const res = await fetch(`${API_RACKS}?${params}`, {
+                headers: {"Accept":"application/json"}
+            });
+            if (!res.ok) throw new Error(`랙 조회 실패`);
+
+            const data = await res.json();
+            const list = Array.isArray(data) ? data : (data.list || data.items || []);
+
+            // [핵심] 필터링 처리: 재고 수량(totalQty)을 기준으로 분기
+            let finalList = list;
+
+            if (emptyOnly) {
+                // 총수량이 0인 것만 필터링
+                finalList = list.filter(x => {
+                    const qty = Number(pick(x, ["totalQty","TOTALQTY","qty","QTY"], 0));
+                    return qty === 0;
+                });
+            } else if (filledOnly) {
+                // 총수량이 0보다 큰 것만 필터링
+                finalList = list.filter(x => {
+                    const qty = Number(pick(x, ["totalQty","TOTALQTY","qty","QTY"], 0));
+                    return qty > 0;
+                });
+            }
+
+            // 결과 저장 및 렌더링
+            state.list = finalList;
+            renderList(finalList);
+
+            el("topBadge").textContent = `${finalList.length}건`;
+            setStatus(finalList.length ? "조회 완료" : "검색 결과가 없습니다.");
+
+        } catch (e) {
+            console.error(e);
+            el("listBox").innerHTML = `<div class="empty-state" style="color:var(--warn)">오류 발생: ${e.message}</div>`;
+            setStatus("서버 통신 오류");
+        } finally {
+            el("searchBtn").disabled = false;
+        }
+    }
+
+    function groupByZone(list) {
+        const map = new Map();
+        for (const it of list) {
+            const zoneNm = pick(it, ["zoneNm","ZONE_NM"], "미지정");
+            if (!map.has(zoneNm)) map.set(zoneNm, []);
+            map.get(zoneNm).push(it);
+        }
+        // 존 이름 정렬
+        const zones = Array.from(map.entries()).sort((a,b) => String(a[0]).localeCompare(String(b[0])));
+        // 존 내부 로케이션 정렬
+        for (const entry of zones) {
+            entry[1].sort((x,y) => String(pick(x,["locCd","LOC_CD"])).localeCompare(String(pick(y,["locCd","LOC_CD"]))));
+        }
+        return zones;
+    }
+
+    function renderList(list) {
+        const box = el("listBox");
+        if (!list || list.length === 0) {
+            box.innerHTML = `<div class="empty-state">검색 결과가 없습니다.</div>`;
+            return;
+        }
+
+        const zones = groupByZone(list);
+        box.innerHTML = zones.map(([zoneNm, arr]) => {
+            const cards = arr.map((item) => {
+                const locId = pick(item, ["locId","LOC_ID"]);
+                const locCd = pick(item, ["locCd","LOC_CD"]);
+                const locNm = pick(item, ["locNm","LOC_NM"]);
+                const itemCount = pick(item, ["itemCount","ITEMCOUNT"], 0);
+                const totalQty = Number(pick(item, ["totalQty","TOTALQTY","qty","QTY"], 0));
+
+                const key = String(locId || locCd);
+                const isZero = totalQty === 0;
+
+                return `
+                  <div class="item-card rack-card"
+                       data-loc-id="${String(locId||"")}"
+                       data-loc-cd="${String(locCd||"")}"
+                       data-key="${String(key||"")}">
+                    <div class="row">
+                      <div>
+                        <div class="zone">${String(zoneNm||"")}</div>
+                        <div class="loc">${String(locCd||"-")}</div>
+                        <div class="locnm">${String(locNm||"")}</div>
+                      </div>
+                      <div style="text-align:right;">
+                        <div class="qty ${isZero ? "zero" : ""}">${fmt(totalQty)}</div>
+                        <div class="subline">품목 ${fmt(itemCount)} / 총수량</div>
+                        <div style="margin-top:6px;">
+                          <span class="pill ${isZero ? "zero" : "ok"}">${isZero ? "비어있음" : "재고있음"}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="detail-box"></div>
+                  </div>
+                `;
+            }).join("");
+
+            return `
+                <div class="group">
+                  <div class="group-title">
+                    <span>${String(zoneNm||"")}</span>
+                    <span class="count">${arr.length}개</span>
+                  </div>
+                  ${cards}
+                </div>
+            `;
+        }).join("");
+
+        // 클릭 이벤트 연결
+        box.querySelectorAll(".rack-card").forEach(card => {
+            card.addEventListener("click", () => onSelectRack(card));
+        });
+    }
+
+    // ==============================
+    // 로직: 상세(랙 내부 상품) 조회
+    // ==============================
+    async function onSelectRack(card) {
+        const locId = card.dataset.locId || "";
+        const locCd = card.dataset.locCd || "";
+        const key   = card.dataset.key || "";
+
+        state.selectedKey = key;
+
+        // UI 선택 처리
+        document.querySelectorAll(".rack-card").forEach(c => {
+            c.classList.toggle("selected", (c.dataset.key || "") === key);
+            const box = c.querySelector(".detail-box");
+            if (box) box.style.display = "none"; // 다른 건 닫기
+        });
+
+        // 상세조회 옵션 체크
+        const autoDetail = el("autoDetail").checked;
+        const detailBox = card.querySelector(".detail-box");
+        if (!autoDetail || !detailBox) return;
+
+        // 토글 (이미 열려있었으면 위에서 닫혔으므로 다시 열기)
+        // 위 로직에서 전부 닫았으므로, 선택된 것만 열면 됨
+
+        // 캐시 확인
+        if (locId && state.itemsCache.has(String(locId))) {
+            renderItems(detailBox, state.itemsCache.get(String(locId)));
+            detailBox.style.display = "block";
+            return;
+        }
+
+        detailBox.style.display = "block";
+        detailBox.innerHTML = `<div class="detail-title">상품 목록</div><div style="font-size:12px;color:#6b7280;">로딩 중...</div>`;
+
+        try {
+            const params = new URLSearchParams();
+            if (locId) params.set("locId", locId);
+            else if (locCd) params.set("locCd", locCd);
+
+            const res = await fetch(`${API_RACK_ITEMS}?${params}`, { headers: {"Accept":"application/json"} });
+            if (!res.ok) throw new Error("상세 조회 실패");
+
+            const data = await res.json();
+            const items = Array.isArray(data) ? data : (data.items || []);
+            if (locId) state.itemsCache.set(String(locId), items);
+
+            renderItems(detailBox, items);
+        } catch (e) {
+            console.error(e);
+            detailBox.innerHTML = `<div class="detail-title">상품 목록</div><div style="font-size:12px;color:var(--warn);">오류 발생</div>`;
+        }
+    }
+
+    function renderItems(container, items) {
+        if (!items || items.length === 0) {
+            container.innerHTML = `<div class="detail-title">상품 목록</div><div style="font-size:12px;color:#6b7280;">해당 로케이션에 재고가 없습니다.</div>`;
+            return;
+        }
+
+        // 이름순 정렬
+        const list = [...items].sort((a,b) => String(pick(a,["mtrlNm"])).localeCompare(String(pick(b,["mtrlNm"]))));
+
+        container.innerHTML = `
+          <div class="detail-title">상품 목록</div>
+          ${list.map(it => {
+            const mtrlNm = pick(it, ["mtrlNm","MTRL_NM"], "-");
+            const mtrlCd = pick(it, ["mtrlCd","MTRL_CD"], "");
+            const qty    = Number(pick(it, ["qty","QTY"], 0));
+            return `
+                  <div class="detail-item">
+                    <div>
+                      <div class="mtrl">${String(mtrlNm)}</div>
+                      <div class="mtrlcd">${String(mtrlCd)}</div>
+                    </div>
+                    <div class="dqty">${fmt(qty)}</div>
+                  </div>
+                `;
+        }).join("")}
+        `;
+    }
+
+    // ==============================
+    // [중요] 스캔 브릿지 (React Native)
+    // ==============================
+    function requestScan() {
+        if (window.ReactNativeWebView) {
+            setStatus("스캔 화면 요청...");
+            // 재고조회 화면(HyappInvMtrl)과 동일한 메시지 규격 사용
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: "requestBarcodeScan",
+                target: "KEYWORD" // 앱이 이 값을 보고 처리하므로 그대로 유지
+            }));
+        } else {
+            alert("모바일 앱 환경에서만 카메라 스캔이 가능합니다.");
+        }
+    }
+
+    function handleAppMessage(e) {
+        try {
+            let data = e.data;
+            if (typeof data === "string") {
+                try { data = JSON.parse(data); } catch(ex) { data = { value: data }; }
+            }
+
+            // 앱에서 보내주는 다양한 키값 대응 (value, code, barcode ...)
+            const code = data.value || data.code || data.barcode || (typeof data === 'string' ? data : '');
+
+            if (code) {
+                el("locKeyword").value = code; // 검색창에 입력
+                setStatus("스캔 완료");
+                searchRacks(); // 자동 조회
+            }
+        } catch (err) {
+            console.error("Scan Error", err);
+        }
+    }
+
+    // 메시지 리스너 등록
+    document.addEventListener("message", handleAppMessage); // Android
+    window.addEventListener("message", handleAppMessage);   // iOS
+
+    // ==============================
+    // 이벤트 연결
+    // ==============================
+    el("searchBtn").addEventListener("click", searchRacks);
+
+    // 버튼 이벤트가 먹통이 되지 않도록 확실히 연결
+    el("scanBtn").addEventListener("click", requestScan);
+
+    el("emptyOnly").addEventListener("change", () => {
+        if (el("locKeyword").value.trim()) searchRacks();
+    });
+
+    el("locKeyword").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") searchRacks();
+    });
+
+    el("clearBtn").addEventListener("click", () => {
+        el("locKeyword").value = "";
+        el("locKeyword").focus();
+    });
+
+</script>
+
+</body>
+</html>

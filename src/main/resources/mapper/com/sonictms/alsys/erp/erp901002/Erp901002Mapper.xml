@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.erp.erp901002.mapper.Erp901002Mapper">
+
+	<!-- 그리드 목록 조회하기 -->
+    <select id="erp901002List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO"
+    															resultType		="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO">
+        {
+	      CALL ${schema}..USP_MTRL_LISTBYALL (
+	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{agntCd	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{mtrlCd	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{mtrlCtgr1	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{mtrlCtgr2	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{mtrlCtgr3	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{statCd	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{useYn		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+	
+    
+  
+ 	<!-- 고유 ID 로 정보 찾기 -->
+    <select id="erp901002p1mtrlSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO"
+    															resultType		="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO">
+        {
+	      CALL ${schema}..USP_MTRL_LOAD (
+	      	#{tblMtrlMId		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+       
+  	<!-- 팝업 화주 등록/ 수정 하기 -->
+    <select id="erp901002p1ComdSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO"
+    															resultType		="com.sonictms.alsys.erp.erp901002.entity.Erp901002VO">
+        {
+	      CALL ${schema}..USP_MTRL_SAVE (
+	     	#{saveGubn			,mode=IN	,	jdbcType=VARCHAR},	
+			#{tblMtrlMId		,mode=IN	,	jdbcType=VARCHAR},
+			#{cmpyCd			,mode=IN	,	jdbcType=VARCHAR},
+			#{agntCd			,mode=IN	,	jdbcType=VARCHAR},
+			#{mtrlType			,mode=IN	,	jdbcType=VARCHAR},
+			#{mtrlCd			,mode=IN	,	jdbcType=VARCHAR},
+			#{mtrlNm			,mode=IN	,	jdbcType=VARCHAR},
+			#{mtrlDesc			,mode=IN	,	jdbcType=VARCHAR},
+			#{statCd			,mode=IN	,	jdbcType=VARCHAR},
+			#{smplCd			,mode=IN	,	jdbcType=VARCHAR},
+			#{custPrc			,mode=IN	,	jdbcType=VARCHAR},
+			#{salePrc			,mode=IN	,	jdbcType=VARCHAR},
+			#{factPrc			,mode=IN	,	jdbcType=VARCHAR},
+			#{purcPrc			,mode=IN	,	jdbcType=VARCHAR},
+			#{sizeNm			,mode=IN	,	jdbcType=VARCHAR},
+			#{lnth				,mode=IN	,	jdbcType=VARCHAR},
+			#{dpth				,mode=IN	,	jdbcType=VARCHAR},
+			#{hght				,mode=IN	,	jdbcType=VARCHAR},
+			#{hght2				,mode=IN	,	jdbcType=VARCHAR},
+			#{cbm				,mode=IN	,	jdbcType=VARCHAR},
+			#{wght				,mode=IN	,	jdbcType=VARCHAR},
+			#{mtrlCtgr1			,mode=IN	,	jdbcType=VARCHAR},
+			#{mtrlCtgr2			,mode=IN	,	jdbcType=VARCHAR},
+			#{mtrlCtgr3			,mode=IN	,	jdbcType=VARCHAR},
+			#{setYn				,mode=IN	,	jdbcType=VARCHAR},
+			#{bomYn				,mode=IN	,	jdbcType=VARCHAR},
+			#{mtoYn				,mode=IN	,	jdbcType=VARCHAR},
+			#{stdYn				,mode=IN	,	jdbcType=VARCHAR},
+			#{instYn			,mode=IN	,	jdbcType=VARCHAR},
+			#{instCtgr			,mode=IN	,	jdbcType=VARCHAR},
+			#{instType			,mode=IN	,	jdbcType=VARCHAR},
+			#{instSeatType		,mode=IN	,	jdbcType=VARCHAR},
+			#{instCost			,mode=IN	,	jdbcType=VARCHAR},
+			#{instUrl			,mode=IN	,	jdbcType=VARCHAR},
+			#{instImgPath		,mode=IN	,	jdbcType=VARCHAR},
+			#{pstnNm			,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyYn			,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyType			,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyCost			,mode=IN	,	jdbcType=VARCHAR},
+			#{ndlvyYn			,mode=IN	,	jdbcType=VARCHAR},
+			#{thrDlvyYn			,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyLt			,mode=IN	,	jdbcType=VARCHAR},
+			#{cnvtMtrlCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{cnvtMtrlNm		,mode=IN	,	jdbcType=VARCHAR},
+			#{cnvtQty			,mode=IN	,	jdbcType=VARCHAR},
+			#{cnvtUnit			,mode=IN	,	jdbcType=VARCHAR},
+			#{memo				,mode=IN	,	jdbcType=VARCHAR},
+			#{useYn				,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser			,mode=IN	,	jdbcType=VARCHAR},
+			
+			<!-- 20211204 피킹존 추가 -->
+			#{pickZone			,mode=IN	,	jdbcType=VARCHAR},
+
+			<!-- 20260219 고정 로케이션 추가 -->
+			#{fixedLoc			,mode=IN	,	jdbcType=VARCHAR},
+
+			<!-- 교환/반품 제외여부 추가 -->
+			#{exchangeReturnExcludeYn	,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+    
+    
+    
+    
+    
+    	<!-- 상품관리 엑셀업로드 -->
+    <select id="erp901002p2ExcelUploadJson"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901002.entity.Erp901002ExcelVO"
+    															resultType		="com.sonictms.alsys.erp.erp901002.entity.Erp901002ExcelVO">
+        {
+	      CALL ${schema}..USP_MTRL_EXCL_SAVE (
+	     	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},					
+			#{agntCd		,mode=IN	,	jdbcType=VARCHAR},	
+			#{mtrlType		,mode=IN	,	jdbcType=VARCHAR},	
+			#{mtrlCd		,mode=IN	,	jdbcType=VARCHAR},	
+			#{mtrlNm		,mode=IN	,	jdbcType=VARCHAR},	
+			#{mtrlDesc		,mode=IN	,	jdbcType=VARCHAR},	
+			#{statCd		,mode=IN	,	jdbcType=VARCHAR},	
+			#{smplCd		,mode=IN	,	jdbcType=VARCHAR},	
+			#{custPrc		,mode=IN	,	jdbcType=VARCHAR},	
+			#{salePrc		,mode=IN	,	jdbcType=VARCHAR},	
+			#{factPrc		,mode=IN	,	jdbcType=VARCHAR},	
+			#{purcPrc		,mode=IN	,	jdbcType=VARCHAR},	
+			#{sizeNm		,mode=IN	,	jdbcType=VARCHAR},	
+			#{lnth			,mode=IN	,	jdbcType=VARCHAR},	
+			#{dpth			,mode=IN	,	jdbcType=VARCHAR},	
+			#{hght			,mode=IN	,	jdbcType=VARCHAR},	
+			#{hght2			,mode=IN	,	jdbcType=VARCHAR},	
+			#{cbm			,mode=IN	,	jdbcType=VARCHAR},	
+			#{wght			,mode=IN	,	jdbcType=VARCHAR},	
+			#{mtrlCtgr1		,mode=IN	,	jdbcType=VARCHAR},	
+			#{mtrlCtgr2		,mode=IN	,	jdbcType=VARCHAR},	
+			#{mtrlCtgr3		,mode=IN	,	jdbcType=VARCHAR},	
+			#{setYn			,mode=IN	,	jdbcType=VARCHAR},	
+			#{bomYn			,mode=IN	,	jdbcType=VARCHAR},	
+			#{mtoYn			,mode=IN	,	jdbcType=VARCHAR},	
+			#{stdYn			,mode=IN	,	jdbcType=VARCHAR},	
+			#{instYn		,mode=IN	,	jdbcType=VARCHAR},	
+			#{instCtgr		,mode=IN	,	jdbcType=VARCHAR},	
+			#{instType		,mode=IN	,	jdbcType=VARCHAR},	
+			#{instSeatType	,mode=IN	,	jdbcType=VARCHAR},	
+			#{instCost		,mode=IN	,	jdbcType=VARCHAR},	
+			#{instUrl		,mode=IN	,	jdbcType=VARCHAR},	
+			#{instImgPath	,mode=IN	,	jdbcType=VARCHAR},	
+			#{pstnNm		,mode=IN	,	jdbcType=VARCHAR},	
+			#{dlvyYn		,mode=IN	,	jdbcType=VARCHAR},	
+			#{dlvyType		,mode=IN	,	jdbcType=VARCHAR},	
+			#{dlvyCost		,mode=IN	,	jdbcType=VARCHAR},	
+			#{ndlvyYn		,mode=IN	,	jdbcType=VARCHAR},	
+			#{thrDlvyYn		,mode=IN	,	jdbcType=VARCHAR},	
+			#{dlvyLt		,mode=IN	,	jdbcType=VARCHAR},	
+			#{cnvtMtrlCd	,mode=IN	,	jdbcType=VARCHAR},	
+			#{cnvtMtrlNm	,mode=IN	,	jdbcType=VARCHAR},	
+			#{cnvtQty		,mode=IN	,	jdbcType=VARCHAR},	
+			#{cnvtUnit		,mode=IN	,	jdbcType=VARCHAR},	
+			#{memo			,mode=IN	,	jdbcType=VARCHAR},	
+			#{useYn			,mode=IN	,	jdbcType=VARCHAR},	
+			#{zoneType		,mode=IN	,	jdbcType=VARCHAR},	
+			#{pickZone		,mode=IN	,	jdbcType=VARCHAR},	
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR},
+			
+			<!-- 교환/반품 제외여부 추가 -->
+			#{exchangeReturnExcludeYn	,mode=IN	,	jdbcType=VARCHAR}  		      		      		      
+	      )
+      }
+    </select>
+    
+         
+</mapper>

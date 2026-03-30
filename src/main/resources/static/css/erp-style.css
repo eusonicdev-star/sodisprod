@@ -1,0 +1,373 @@
+/* 기본 셀 스타일 */
+.cell {
+  margin: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 5px;
+  background: #fff;
+  padding: 0.3rem;
+}
+
+.icon-cell {
+  margin-right: 5px;
+}
+
+#dateFrom,
+#dateTo {
+  width: 100px;
+}
+
+/* 검색 영역 스타일 */
+#searchDiv1 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+.item-head {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  font-weight: bold;
+  color: #555;
+  padding-right: 4px;
+}
+
+.item-data {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+}
+
+.item-data input[type="text"],
+.item-data textarea {
+  height: 24px;
+  padding: 2px 5px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+#soList,
+#soNoList,
+#refSoNoList,
+#refSoList {
+  height: 45px;
+}
+
+.h-cell {
+  padding: 1.2rem 0.5rem;
+}
+
+.item-data i {
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.item-data i:hover {
+  color: #4a90e2;
+}
+
+/* dhtmlx combo 컨테이너 정렬 */
+.item-data div[id^="combo"] {
+  display: flex;
+  align-items: center;
+}
+
+/* 페이지네이션 스타일 */
+.pagination-container {
+  margin: 5px 0;
+  text-align: center;
+}
+
+.pagination-button {
+  display: inline-block;
+  padding: 5px 10px;
+  margin: 0 2px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.msg-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#searchDiv {
+  background: #f7f7f7;
+  border-radius: 5px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.pagination-button:hover {
+  background-color: #f5f5f5;
+  border-color: #999;
+}
+
+.pagination-button.active {
+  background-color: #4a90e2;
+  color: white;
+  border-color: #4a90e2;
+}
+
+.pagination-info {
+  display: inline-block;
+  margin-left: 15px;
+  color: #666;
+}
+
+/* 버튼 스타일 */
+.action-button {
+  padding: 6px 6px;
+  margin: 0 5px;
+  border: 1px solid #e1e5e9;
+  background-color: #ffffff;
+  color: #495057;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.action-button:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.action-button.primary {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.action-button.primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.action-button.danger {
+  background-color: #6c757d;
+  color: white;
+  border-color: #6c757d;
+}
+
+.action-button.danger:hover {
+  background-color: #545b62;
+  border-color: #545b62;
+}
+
+.action-button.success {
+  background-color: #28a745;
+  color: white;
+  border-color: #28a745;
+}
+
+.action-button.success:hover {
+  background-color: #1e7e34;
+  border-color: #1e7e34;
+}
+
+.action-button.warning {
+  background-color: #ffc107;
+  color: #212529;
+  border-color: #ffc107;
+}
+
+.action-button.warning:hover {
+  background-color: #e0a800;
+  border-color: #e0a800;
+}
+
+/* disabled 버튼 스타일 */
+.action-button:disabled,
+.action-button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  color: #6c757d;
+  transform: none;
+  box-shadow: none;
+}
+
+.action-button.primary:disabled,
+.action-button.primary[disabled] {
+  background-color: #b3d7ff;
+  border-color: #b3d7ff;
+  color: #6c757d;
+}
+
+/* disabled input[type="file"] 스타일 */
+input[type="file"]:disabled,
+input[type="file"][disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#rowPerPage {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  margin: 0 5px;
+}
+.sub-title {
+  margin-left: 5px;
+}
+
+.title-container {
+  background: none;
+}
+
+/* 레이아웃 스타일 */
+#searchDiv {
+  width: 100%;
+  font-size: 12px;
+  padding: 5px;
+}
+
+#btnDiv1 {
+  width: 100%;
+  padding: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.btn-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-content: center;
+}
+
+#searchDiv1 {
+  width: 100%;
+}
+
+#searchDiv2nd {
+  padding: 5px 0;
+  font-size: 12px;
+  background-color: rgb(227, 244, 255);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.cell.right {
+  float: right;
+}
+
+#gridDiv {
+  width: 100%;
+  font-size: 12px;
+  padding-bottom: 5px;
+}
+
+#grid {
+  width: 25%;
+  height: 100%;
+}
+
+#page {
+  width: 100%;
+  height: 30px;
+}
+
+.title-text {
+  font-size: 18px;
+  color: #333;
+  text-align: left;
+}
+
+/* 입력 필드 너비 */
+#srchName {
+  width: 70px;
+}
+
+#srchCode {
+  width: 50px;
+}
+
+#mall {
+  width: 100px;
+}
+
+#rcptNm {
+  width: 100px;
+}
+
+#srchAddr {
+  width: 120px;
+}
+
+/* 마진 조정 */
+.margin-right-5 {
+  margin-right: 5px;
+}
+
+.middle-menu {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+/* 요일 체크박스 스타일 */
+.weekday-checkbox-container {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.weekday-checkbox-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.weekday-checkbox-group {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  gap: 15px;
+}
+
+.weekday-checkbox-label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.weekday-checkbox-input {
+  transform: scale(1.2);
+}
+
+.weekday-checkbox-text {
+  font-weight: 500;
+}
+
+/* 저장 버튼을 우측 끝으로 배치 */
+#searchDiv2nd .btn-container {
+  position: absolute;
+  right: 10px;
+}

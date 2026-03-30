@@ -1,0 +1,473 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>화주관리(erp901001)</title>
+	<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+	<link rel="stylesheet" type="text/css"
+		href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/web/dhtmlx.css">
+	<link rel="stylesheet" type="text/css" href="/css/common.css">
+	<link rel="stylesheet" type="text/css" href="/css/erp-style.css">
+	<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+		integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="/js/common.js"></script>
+	<script type="text/javascript" src="/js/commCode.js"></script>
+
+
+	<!-- 엑셀 다운로드 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+
+	<script th:inline="javascript">
+
+		var myWins;
+		var myGrid;
+
+
+
+		fnObj = {
+			winOpen: {
+				save: function (saveGubn, tblAgencyMId) {	//사용자 추가 팝업
+					/*
+					if(!myGrid.getSelectedRowId())
+					{
+						alert("마스터 공통코드를 선택해주세요");
+						return;
+					} 
+					*/
+					var selData;
+
+					if (saveGubn == "INS") {
+						windowId = "commSave";
+						windowText = "등록 erp901001p1";
+					}
+					else if (saveGubn == "UPDT") {
+						windowId = "commUpdt";
+						windowText = "수정 erp901001p1";
+						selData = myGrid.getRowData(myGrid.getSelectedRowId());
+					}
+
+
+
+					windowUrl = "/erp901001p1"
+					windowLeft = 0;
+					windowTop = 0;
+					windowWidth = 900;
+					windowHeight = 600;
+					windowsModal = true;
+					windowOnClose = function (windowId) {
+
+					};
+					windowSendObject = {
+						windowId: windowId,
+						cmpyCd: myComboCmpyCd.getSelectedValue(),
+						saveGubn: saveGubn,
+						tblAgencyMId: tblAgencyMId
+
+					};
+
+					myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+					myWins.window(windowId).attachEvent("onClose", function (win) {
+
+						$(top.document).find('#loader').hide();
+						return true;
+					});
+
+				},	//END of save
+				//20220209 정연호 추가
+				save2: function (saveGubn, tblAgencyMId, agntCd) {	//사용자 추가 팝업
+					var selData;
+
+					if (saveGubn == "INS") {
+						windowId = "commSave";
+						windowText = "등록 erp901001p2";
+					}
+					else if (saveGubn == "UPDT") {
+						windowId = "commUpdt";
+						windowText = "수정 erp901001p2";
+						selData = myGrid.getRowData(myGrid.getSelectedRowId());
+					}
+
+
+
+					windowUrl = "/erp901001p2"
+					windowLeft = 0;
+					windowTop = 0;
+					windowWidth = 1150;
+					windowHeight = 600;
+					windowsModal = true;
+					windowOnClose = function (windowId) {
+
+					};
+					windowSendObject = {
+						windowId: windowId,
+						cmpyCd: myComboCmpyCd.getSelectedValue(),
+						saveGubn: saveGubn,
+						tblAgencyMId: tblAgencyMId,
+						agntCd: agntCd					//20220124 정연호 추가. agntCd 추가
+					};
+
+					myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+					myWins.window(windowId).attachEvent("onClose", function (win) {
+
+						$(top.document).find('#loader').hide();
+						return true;
+					});
+
+				},	//END of save2
+				//20220209 정연호 추가. 끝
+
+				commSrch: function (title, cmpyCd, srchCtgr, srchInput) {		//공통코드 찾기 팝업
+					windowId = "commSrch";
+					windowText = title + " commSrch";
+					windowUrl = "/commSrch"
+					windowLeft = -14400;
+					windowTop = -14400;
+					windowWidth = 800;
+					windowHeight = 600;
+					windowsModal = true;
+					windowOnClose = function (windowId) {
+
+						return true;
+					};
+					windowSendObject = {
+						cmpyCd: cmpyCd,
+						srchCtgr: srchCtgr,
+						srchInput: srchInput,
+						windowId: windowId,
+						srchCd: $("#srchCode").val(),
+						srchNm: $("#srchName").val()
+					};
+
+
+					myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+
+					myWins.window(windowId).attachEvent("onClose", function (win) {
+
+						return true;
+					});
+				},	//END of commSrch : function(){
+				rtnObject: function (windowId, rtnObj, srchInput) {	//popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+
+
+					if (windowId == "commSrch") {
+
+						if (rtnObj == null) {
+							myWins.window(windowId).setPosition(0, 0);
+							return;
+						}
+						if (srchInput == "text") {
+							$("#srchCode").val(rtnObj[0].commCd);
+							$("#srchName").val(rtnObj[0].commNm);
+						}
+					}
+				},	//END of rtnObject : function(windowId,rtnObj){
+			},	//END of winOpen
+			comboOpen: {
+				comboCmpyCd: function () {
+					myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+					comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+					myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/));
+					myComboCmpyCd.setFontSize("12px", "12px");
+					myComboCmpyCd.attachEvent("onChange", function (value, text) {
+						myGrid.clearAll(false);
+					});
+					myComboCmpyCd.disable();
+					myComboCmpyCd.readonly(true);
+				},
+				comboUseYn: function () {
+					myComboUseYn = new dhtmlXCombo("useYn");
+					myComboUseYn.addOption([{ value: "", text: "전체" }]);
+					myComboUseYn.addOption([{ value: "Y", text: "사용" }]);
+					myComboUseYn.addOption([{ value: "N", text: "미사용" }]);
+					myComboUseYn.readonly(true);
+					myComboUseYn.selectOption(0);
+					myComboUseYn.setFontSize("12px", "12px");
+					myComboUseYn.attachEvent("onChange", function (value, text) {
+						myGrid.clearAll(false);
+					});
+				},
+			},	//END of comboOpen
+			gridOpen: {
+				grid: function () {
+					myGrid.setImagePath("https://cdn.dhtmlx.com/edge/skins/web/imgs/");
+					myGrid.setHeader("고유ID,회사코드,화주코드,화주명,알림톡<br>발송여부,알림톡<br>연락처,사업자번호,우편번호,주소1,주소2,대표자명,일반전화번호,휴대전화번호,팩스번호,담당자,담당일반전화,담당휴대전화,사용여부,메모,저장자,저장일,수정자,수정일");
+					myGrid.setColumnIds("tblAgencyMId,cmpyCd,agntCd,agntNm,alrmTlkYn,alrmTlkHp,bizNo,postCd,addr,addrDtl,bossNm,bossTel,officeTel,fax,mngeNm,mngeTel,mngeHp,useYn,memo,saveUser,saveTime,updtUser,updtTime");	//컬럼은 공백이 있으면 표시가 안된다
+					myGrid.setInitWidths("80,80,80,120,100,100,120,120,160,200,80,120,120,120,80,120,120,80,200,80,160,80,160");
+					myGrid.setColAlign("center,center,center,center,center,center,center,center,left,center,center,center,center,center,center,center,center,center,left,left,left,left,left");
+					myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+					myGrid.setColSorting("str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str");
+					myGrid.attachHeader(",#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,,,,,");
+					myGrid.init();		//이걸써야 세팅한 그리드가 표시가 된다
+					myGrid.enableSmartRendering(true);	//스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+					myGrid.enablePreRendering(10);	//20220423 정연호 추가
+
+					myGrid.setColumnHidden(myGrid.getColIndexById("tblAgencyMId"), true);
+
+
+					fnObj.gridOpen.setWidth();
+					fnObj.gridOpen.setWidth();																//그래야 진짜 화면에 보이는 높이가 만들어진다
+					myGrid.addRow(1, "");	//로우 추가
+					myGrid.deleteRow(1);
+
+					myGrid.enableEditEvents(true, false, false);	//이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+					myGrid.enableBlockSelection(true);
+					myGrid.attachEvent("onKeyPress", fnObj.keyOpen.onKeyPressed);
+					myGrid.attachEvent("onRowDblClicked", function (rId, cInd) {
+
+						var leftParam = myGrid.getRowData(rId);
+
+
+						//fnObj.winOpen.save('UPDT',leftParam.tblAgencyMId);
+						fnObj.winOpen.save2('UPDT', leftParam.tblAgencyMId, leftParam.agntCd)	//20220124 정연호 추가. agntCd 추가
+
+					});
+
+
+				},
+				setWidth: function () {
+					c_width = top.myLayout.cells("c").getWidth();
+					searchDiv_height = $("#searchDiv").height();
+					btnDiv1_height = $("#btnDiv1").height();
+					searchDiv1_height = $("#searchDiv1").height();
+
+					xhdr_height = $(".xhdr").height();
+
+
+					myGrid.enableAutoWidth(true, c_width - 30, 100);
+					myGrid.enableAutoHeight(true, window.innerHeight - searchDiv_height - xhdr_height - 25);	//그리드 자동높이
+
+
+					$("#searchDiv").width(c_width - 25);
+
+				},	//END of setWidth
+			},	//END of gridOpen
+			searchOpen: {
+
+				search: function () {	//조회
+
+					myGrid.clearAll(false);
+					if (!fnObj.searchOpen.searchChkVal.chkVal("search")) {
+						alert(chkValMsg);
+						return false;
+					}
+
+					var srchData = new FormData();
+					srchData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+					srchData.append("agntCd", $("#srchCode").val());
+					srchData.append("agntNm", $("#srchName").val());
+					srchData.append("useYn", myComboUseYn.getSelectedValue());
+
+					$.ajax({
+						url: "/erp901001List",
+						processData: false,
+						contentType: false,
+						data: srchData,
+						type: "POST",
+						datatype: "json",
+						async: false,
+						success: function (res) {
+							if (res) {
+								console.log(res);
+								var columns = myGrid.getColumnCount()
+								for (var i = 0; i < res.length; i++) {
+									var jsonData = {};
+									for (var c = 0; c < columns; c++) {
+										jsonData[myGrid.getColumnId(c)] = res[i][myGrid.getColumnId(c)];
+									}
+									myGrid.addRow(i + 1, "");	//로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+									myGrid.setRowData(i + 1, jsonData);
+								}
+
+							}
+							else {
+								alert("조회 수행 결과 없음");
+							}
+						},
+					});
+				},	//END of search : function() {
+				delSrchCode: function () {
+					$("#srchCode").val("");
+					$("#srchName").val("");
+				},	//END of delSrchCode : function(){
+				searchChkVal: {
+					chkVal: function (chkGubn) {
+						chkValMsg = "";	//메세지 초기화
+						var rtnVal = true;
+						if (chkGubn == "search") {
+							if (!myComboCmpyCd.getSelectedValue()) {
+								chkValMsg = chkValMsg + "회사를 선택해주세요\n";
+								rtnVal = false;
+							}
+							/* if(!$("#srchCode").val()){
+								chkValMsg = chkValMsg + "화주사를 선택해주세요\n";
+								rtnVal = false;
+							} */
+
+						}
+
+						/* if(!myComboCmpyCd.getSelectedValue()){
+							chkValMsg = chkValMsg + "회사를 선택해주세요\n";
+							rtnVal = false;
+						} */
+						return rtnVal;
+					},	//END of chkVal : function(){
+				},	//END of searchChkVal
+
+
+			},	//END of searchOpen
+			keyOpen: {
+				enterKey: function (enterType) {
+					if (window.event.keyCode == 13) {
+
+						if (enterType == 'srchName') {
+							$("#srchName").blur();
+							$("#srchCode").blur();
+							$("#srchCode").val("");
+							fnObj.winOpen.commSrch('화주', 'A', 'AGENCY', 'text');
+						}
+
+					}
+				},
+				onKeyPressed: function (code, ctrl, shift) {
+					if (code == 67 && ctrl) {
+						myGrid.setCSVDelimiter("\t");
+						myGrid.copyBlockToClipboard()
+					}
+					if (code == 86 && ctrl) {
+						myGrid.pasteBlockFromClipboard()
+					}
+					return true;
+				},
+			},
+		}
+
+
+		//엑셀 헨들러
+		var excelHandler = {
+			getExcelFileName: function () {
+				return '화주관리.xlsx';		//엑셀파일명
+			},
+			getSheetName: function () {
+				return '화주관리';		//시트명
+			},
+			getExcelData: function () {
+				return get_json_for_excel(myGrid);		//그리드를 엑셀다운로드dyd json 으로 변경
+			},
+			getWorksheet: function () {
+				return XLSX.utils.json_to_sheet(this.getExcelData());
+			}
+		}
+
+
+		$(document).ready(function () {
+			console.log(pageUrl());
+
+			myWins = new dhtmlXWindows();
+
+			myGrid = new dhtmlXGridObject('grid');	//그리드
+
+			fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+			fnObj.comboOpen.comboUseYn();	//사용여부 콤보 바인드
+
+			//myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue('A'));		//A고정
+
+
+			fnObj.gridOpen.grid()
+
+
+
+			window.onresize = function (event) {		//윈도우의 사이즈가 변경했을떄
+				fnObj.gridOpen.setWidth();
+				fnObj.gridOpen.setWidth();
+			};
+
+		});
+
+		//20211226 정연호 추가. 키보드에서 F2 누르면 조회하기
+		$(document).keydown(function (event) {
+			if (event.keyCode == 113 || event.which == 113) {
+				fnObj.searchOpen.search()
+			}
+		});
+	</script>
+</head>
+<!-- top , left, bottom , right,  -->
+
+<body>
+	<div id="mainDiv">
+		<div id="searchDiv">
+			<div id="btnDiv1">
+				<span class="title-container">
+					<span class="item-head title-text">화주관리</span>
+					<span class="sub-title">erp901001</span>
+				</span>
+				<span class="btn-container">
+					<span class="item-data">
+						<input id="btnHistory" class="action-button primary" type="button"
+							onclick="fnObj.searchOpen.search()" value="조회(F2)">
+					</span>
+					<span class="item-data">
+						<input id="btnHistory" style="display:none;" type="button"
+							onclick="fnObj.winOpen.save('INS','')" value="등록1">
+					</span>
+					<span class="item-data">
+						<input id="btnHistory" class="action-button success" type="button"
+							onclick="fnObj.winOpen.save2('INS','','')" value="등록">
+					</span>
+					<span class="item-data">
+						<input id="btnExcelDown" class="action-button secondary" type="button" onclick="exportExcel();"
+							value="엑셀 다운로드">
+					</span>
+					<span class="item-data">
+						<input id="btnReload" class="action-button secondary" type="button"
+							onclick="location.reload(true);" value="초기화">
+					</span>
+				</span>
+			</div>
+			<div id="searchDiv1">
+
+				<span class="cell" style="display:none;">
+					<span class="item-head">회사</span>
+					<span class="item-data" disabled>
+						<div id="cmpyCd"></div>
+					</span>
+				</span>
+
+				<span class="cell">
+					<span class="item-head">화주사</span>
+					<span class="item-data">
+						<input type="text" id="srchName" placeholder="명칭"
+							onkeyup="fnObj.keyOpen.enterKey('srchName');"></input>
+						<i id="srchIcon" class="fa fa-search" aria-hidden="true"
+							onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"></i>
+					</span>
+					<span class="item-data">
+						<input type="text" id="srchCode" placeholder="코드" readonly></input>
+						<i id="delIcon" class="fa fa-minus-circle" aria-hidden="true"
+							onclick="fnObj.searchOpen.delSrchCode()"></i>
+					</span>
+				</span>
+
+				<span class="cell">
+					<span class="item-head">사용유무</span>
+					<span class="item-data">
+						<div id="useYn"></div>
+					</span>
+				</span>
+			</div>
+		</div>
+		<div id="gridDiv">
+			<div id="grid"></div>
+		</div>
+	</div>
+</body>
+
+</html>

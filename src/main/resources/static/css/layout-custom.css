@@ -1,0 +1,190 @@
+/* ===== 레이아웃 커스텀 스타일 ===== */
+
+/* 로더 스타일 */
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loader::after {
+  content: "";
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 상단 메뉴바 스타일 */
+#menuInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 15px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+#menuInfo img {
+  height: 60px;
+  margin-right: 15px;
+}
+
+.menu-action {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  margin: 0 5px;
+  color: #495057;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.menu-action:hover {
+  background-color: #e9ecef;
+  text-decoration: none;
+  color: #495057;
+}
+
+.menu-action i {
+  margin-right: 5px;
+}
+
+.pull-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 사용자 정보 스타일 */
+#userInfo {
+  font-size: 12px;
+  margin-left: 10px;
+  color: #6c757d;
+}
+
+/* 프로필 배지 스타일 */
+.profile-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: bold;
+  color: white;
+}
+
+.profile-badge.dev {
+  background-color: #28a745;
+}
+
+.profile-badge.prod {
+  background-color: #2a5ba9;
+}
+
+/* 세션 타이머 스타일 */
+#m {
+  font-size: 1.1em;
+  font-weight: lighter;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+#m:hover {
+  background-color: #f8f9fa;
+}
+
+/* DHTMLX 레이아웃 커스터마이징 */
+.dhx_layout_cont {
+  background-color: #ffffff;
+}
+
+/* 트리뷰 스타일 */
+.dhx_tree_item {
+  padding: 5px 0;
+}
+
+.dhx_tree_item:hover {
+  background-color: #f8f9fa;
+}
+
+/* 탭바 스타일 */
+.dhx_tabbar_tab {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  padding: 8px 15px;
+  margin-right: 2px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dhx_tabbar_tab:hover {
+  background-color: #e9ecef;
+}
+
+.dhx_tabbar_tab_active {
+  background-color: #ffffff;
+  border-bottom: 1px solid #ffffff;
+  margin-bottom: -1px;
+}
+
+/* 환영 페이지 스타일 */
+.welcome-content {
+  padding: 40px;
+  text-align: center;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin: 20px;
+}
+
+.welcome-content h2 {
+  color: #495057;
+  margin-bottom: 20px;
+}
+
+.welcome-content p {
+  color: #6c757d;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  #menuInfo {
+    flex-direction: column;
+    height: auto;
+    padding: 10px;
+  }
+
+  .pull-right {
+    margin-top: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .menu-action {
+    margin: 2px;
+  }
+}

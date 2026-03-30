@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.common.mapper.AddressCoordMapper">
+
+    <select id="selectCoordByKey" parameterType="String" resultType="hashmap">
+        SELECT
+            COORD_LAT AS lat,  /* Y좌표 (위도) */
+            COORD_LNG AS lng,  /* X좌표 (경도) */
+            APT_NM    AS aptNm,
+            DONG_NM   AS dongNm
+        FROM TBL_ADDR_COORD WITH(NOLOCK)
+        WHERE SEARCH_KEY = #{searchKey}
+    </select>
+
+    <update id="insertCoord" parameterType="hashmap">
+        MERGE INTO TBL_ADDR_COORD AS T
+            USING (SELECT #{searchKey} AS SEARCH_KEY) AS S
+            ON (T.SEARCH_KEY = S.SEARCH_KEY)
+
+            WHEN MATCHED THEN
+                UPDATE SET
+                    UPDATE_TIME = GETDATE()
+
+            WHEN NOT MATCHED THEN
+                INSERT (
+                        SEARCH_KEY,
+                        RAW_ADDR,
+                        COORD_LAT,
+                        COORD_LNG,
+                        APT_NM,
+                        DONG_NM,
+                        API_TYPE,
+                        REG_TIME,
+                        UPDATE_TIME
+                    )
+                    VALUES (
+                               #{searchKey},
+                               #{rawAddr},
+                               #{lat},
+                               #{lng},
+                               #{aptNm},
+                               #{dongNm},
+                               ISNULL(#{apiType}, 'GOOGLE'),
+                               GETDATE(),
+                               GETDATE()
+                           );
+    </update>
+
+</mapper>

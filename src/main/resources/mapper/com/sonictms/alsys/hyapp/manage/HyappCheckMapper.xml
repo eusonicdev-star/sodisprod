@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.hyapp.manage.mapper.HyappCheckMapper">
+
+    <select id="selectSystemStock" parameterType="string" resultType="map">
+        SELECT
+        M.MTRL_CD                                     AS MTRL_CD,
+        M.MTRL_NM                                     AS MTRL_NM,
+        COALESCE(SUM(CAST(S.STOCK_QTY AS BIGINT)), 0) AS QTY,
+        M.BARCODE,
+        /* [추가] 화주사명 가져오기 */
+        A.AGNT_NM                                     AS AGNT_NM,
+        M.AGNT_CD                                     AS AGNT_CD
+        FROM TBL_STOCK S
+        INNER JOIN TBL_MTRL_M M
+        ON S.CMPY_CD = M.CMPY_CD
+        AND S.AGNT_CD = M.AGNT_CD
+        AND S.MTRL_CD = M.MTRL_CD
+        /* [추가] 화주사 정보 조인 */
+        LEFT JOIN TBL_AGENCY_M A
+        ON M.AGNT_CD = A.AGNT_CD
+        LEFT JOIN TBL_WH_LOC_M L
+        ON S.LOC_ID = L.LOC_ID
+        <where>
+            <if test="locCd != null and locCd != ''">
+                AND L.LOC_CD = #{locCd}
+            </if>
+            AND S.STOCK_QTY > 0
+        </where>
+        GROUP BY
+        M.MTRL_CD,
+        M.MTRL_NM,
+        M.BARCODE,
+        A.AGNT_NM,
+        M.AGNT_CD
+        ORDER BY
+        M.MTRL_NM
+    </select>
+
+
+    <update id="mergeStockTake" parameterType="map">
+        MERGE INTO TBL_STOCK_TAKE AS T
+            USING (
+                SELECT CONVERT(VARCHAR(8), GETDATE(), 112) AS TAKE_DATE,
+                       #{locCd}   AS LOC_CD,
+                       #{mtrlCd}  AS MTRL_CD,
+                       #{pltSize} AS PLT_SIZE
+            ) AS S
+            ON (T.TAKE_DATE = S.TAKE_DATE
+                AND T.LOC_CD = S.LOC_CD
+                AND T.MTRL_CD = S.MTRL_CD
+                AND T.PLT_SIZE = S.PLT_SIZE)
+
+            WHEN MATCHED THEN
+                UPDATE SET
+                    T.QTY = #{qty},
+                    T.REG_TIME = GETDATE()
+
+            WHEN NOT MATCHED THEN
+                INSERT (TAKE_DATE, LOC_CD, MTRL_CD, PLT_SIZE, QTY, REG_TIME, APPLY_YN)
+                    VALUES (CONVERT(VARCHAR(8), GETDATE(), 112),
+                            #{locCd}, #{mtrlCd}, #{pltSize}, #{qty}, GETDATE(), 'N');
+    </update>
+
+    <select id="selectCheckHistorySummary" resultType="map">
+        SELECT
+            TAKE_DATE,
+            COUNT(*) AS CNT
+        FROM TBL_STOCK_TAKE
+        WHERE TAKE_DATE >= CONVERT(VARCHAR(8), DATEADD(MONTH, -3, GETDATE()), 112)
+        GROUP BY TAKE_DATE
+        ORDER BY TAKE_DATE DESC
+    </select>
+
+    <select id="selectCheckList" parameterType="string" resultType="map">
+        SELECT
+            A.MTRL_CD,
+            B.MTRL_NM,
+            A.PLT_SIZE,
+            A.QTY,
+            B.BARCODE
+        FROM TBL_STOCK_TAKE A
+                 LEFT JOIN TBL_MTRL_M B ON A.MTRL_CD = B.MTRL_CD
+        WHERE A.TAKE_DATE = CONVERT(VARCHAR(8), GETDATE(), 112)
+          AND A.LOC_CD = #{locCd}
+        ORDER BY A.REG_TIME DESC
+    </select>
+
+
+    <select id="selectProductInfo" parameterType="string" resultType="map">
+        SELECT TOP 1 MTRL_CD, MTRL_NM
+        FROM TBL_MTRL_M
+        WHERE MTRL_CD = #{barcode} OR BARCODE = #{barcode}
+    </select>
+
+
+    <select id="selectCheckHistory" parameterType="string" resultType="map">
+        SELECT
+            A.LOC_CD,
+            A.MTRL_CD,
+            B.MTRL_NM,
+            A.PLT_SIZE,
+            A.QTY,
+            CONVERT(VARCHAR(19), A.REG_TIME, 120) AS REG_TIME
+        FROM TBL_STOCK_TAKE A
+                 LEFT JOIN TBL_MTRL_M B ON A.MTRL_CD = B.MTRL_CD
+        WHERE A.TAKE_DATE = #{date}
+        ORDER BY A.REG_TIME DESC
+    </select>
+
+</mapper>

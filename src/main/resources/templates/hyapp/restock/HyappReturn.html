@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>HyApp 불량/반품 입고 (통합 스캔)</title>
+    <style>
+        :root { --accent:#ef4444; --bg:#f8fafc; --border:#e2e8f0; --dark:#1e293b; }
+        body { background: var(--bg); font-family: system-ui, sans-serif; margin:0; padding-bottom:100px; overflow-x: hidden; }
+
+        /* [핵심] 리더기용 숨김 입력창 - 가상 키보드 방지용 */
+        #hidBarcode { position: absolute; left: -9999px; opacity: 0; }
+
+        /* 상단 고정 필터 */
+        .header-section { background:#fff; padding:15px; border-bottom:1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .filter-row { display:flex; gap:8px; margin-bottom:8px; }
+        input[type="date"], select { flex:1; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; height: 44px; box-sizing: border-box; }
+        .btn-search { background:var(--dark); color:#fff; border:none; padding:0 20px; border-radius:8px; font-weight:800; font-size:15px; }
+
+        /* 상태 요약 */
+        .status-bar { background: #fff1f2; padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 14px; color: var(--dark); }
+        .status-bar b { color: var(--accent); font-size: 16px; }
+
+        /* 리스트 카드 스타일 */
+        #restockList { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .card { background:#fff; padding:15px; border-radius:12px; display: flex; justify-content: space-between; align-items: center; border:1px solid var(--border); transition: 0.2s; }
+        .card.done { background-color: #f1f5f9; border-color: #e2e8f0; opacity: 0.8; }
+        .card h4 { margin: 0 0 5px 0; font-size: 16px; color: #334155; }
+        .card .sub { font-size: 13px; color: #64748b; }
+        .qty-badge { background: #f1f5f9; padding: 6px 12px; border-radius: 8px; font-weight: 800; color: var(--accent); }
+        .card.done .qty-badge { background: #e2e8f0; color: #94a3b8; }
+
+        /* 토스트 알림 */
+        .toast-msg {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(30, 41, 59, 0.9); color: #fff; padding: 20px 30px;
+            border-radius: 16px; z-index: 9999; font-size: 18px; font-weight: 800;
+            display: none; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        /* 하단 고정 스캔 버튼 */
+        .scan-btn {
+            position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+            width:90%; background:var(--dark); color:#fff; padding:18px;
+            border-radius:15px; border:none; font-size:18px; font-weight:800;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* 모달 스타일 */
+        .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000; justify-content:center; align-items:center; }
+        .modal-content { background:#fff; width:85%; border-radius:20px; padding:25px; max-height:70%; overflow-y:auto; }
+    </style>
+</head>
+<body>
+
+<input type="text" id="hidBarcode" readonly inputmode="none" autocomplete="off">
+<div id="toast" class="toast-msg"></div>
+
+<header class="header-section">
+    <div class="filter-row">
+        <input type="date" id="fromDt">
+        <input type="date" id="toDt">
+    </div>
+    <div class="filter-row">
+        <select id="dcList"></select>
+        <button class="btn-search" onclick="loadList()">데이터 조회</button>
+    </div>
+</header>
+
+<div class="status-bar">
+    <div>전체 대상: <span id="totalCnt">0</span>건</div>
+    <div>미처리: <b id="remainCnt">0</b>건</div>
+</div>
+
+<div id="restockList"></div>
+
+<div id="itemModalOverlay" class="modal-overlay">
+    <div class="modal-content">
+        <h3 style="margin-top:0; color:var(--accent);">입고 품목을 선택하세요</h3>
+        <div id="modalItemList"></div>
+        <button onclick="closeItemModal()" style="width:100%; padding:15px; background:#94a3b8; color:#fff; border:none; border-radius:10px; margin-top:15px; font-weight:800;">닫기</button>
+    </div>
+</div>
+
+<button class="scan-btn" onclick="requestScan()">📷 카메라 스캔 시작</button>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/js/commCode.js"></script>
+
+<script>
+    const hidInp = document.getElementById('hidBarcode');
+
+    window.onload = function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById("fromDt").value = "2025-10-02";
+        document.getElementById("toDt").value = today;
+        initDcCombo();
+        setFocus();
+    };
+
+    /** 리더기 포커스 제어 */
+    function setFocus() {
+        if (document.visibilityState !== 'visible') return;
+        hidInp.readOnly = true;
+        hidInp.focus();
+        setTimeout(() => {
+            if (document.activeElement === hidInp) hidInp.readOnly = false;
+        }, 100);
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!['INPUT', 'SELECT', 'BUTTON'].includes(e.target.tagName)) setFocus();
+    });
+
+    /** 통합 바코드 처리 */
+    async function onReceiveBarcode(barcode, selectedId = null) {
+        if (!barcode) return;
+        showToast("🔍 인식: " + barcode);
+
+        const payload = {
+            barcode: barcode,
+            userName: '작업자',
+            selectedId: selectedId || ""
+        };
+
+        try {
+            // [수정] 불량/반품 전용 처리 엔드포인트 호출
+            const res = await fetch('/hyapp/api/restock/process', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+
+            if (result.status === 'SELECT_ITEM') {
+                openItemModal(barcode, result.itemList);
+            } else if (result.status === 'OK') {
+                closeItemModal();
+                showToast("✅ 입고 검수 완료");
+                await loadList();
+            } else {
+                alert(result.msg || "처리 중 오류 발생");
+            }
+        } catch (e) {
+            showToast("⚠️ 서버 통신 에러");
+        } finally {
+            setFocus();
+        }
+    }
+
+    /** 입력 경로 처리 */
+    hidInp.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            this.readOnly = true;
+            const barcode = this.value.trim();
+            if (barcode) onReceiveBarcode(barcode);
+            this.value = '';
+            setFocus();
+        }
+    });
+
+    const handleAppMsg = (e) => {
+        try {
+            let data = e.data;
+            if (typeof data === "string") data = JSON.parse(data);
+            if (['requestBarcodeScan', 'barcode', 'barcodeScan'].includes(data.type)) {
+                const val = data.value || data.barcode || data.code;
+                if (val) onReceiveBarcode(val);
+            }
+        } catch(err) {}
+    };
+    window.addEventListener("message", handleAppMsg);
+    document.addEventListener("message", handleAppMsg);
+
+    /** 리스트 조회 */
+    async function loadList() {
+        const params = new URLSearchParams({
+            fromDt: document.getElementById("fromDt").value,
+            toDt: document.getElementById("toDt").value,
+            dcCd: document.getElementById("dcList").value, // dcList 필드명 유지
+            cmpyCd: 'A'
+        });
+
+        // [수정] 불량/반품 전용 리스트 API 호출
+        const res = await fetch(`/hyapp/api/restock/return-list?${params}`);
+        const data = await res.json();
+        renderList(data);
+        setFocus();
+    }
+
+    function renderList(items) {
+        const list = document.getElementById("restockList");
+        document.getElementById("totalCnt").textContent = items.length;
+        document.getElementById("remainCnt").textContent = items.filter(i => (i.inboundYn||'N')==='N').length;
+
+        const sorted = [...items].sort((a,b) => (a.inboundYn||'N').localeCompare(b.inboundYn||'N'));
+        list.innerHTML = sorted.map(item => {
+            const isDone = (item.inboundYn === 'Y');
+            return `
+                <div class="card ${isDone ? 'done' : ''}">
+                    <div>
+                        <h4 style="${isDone ? 'text-decoration:line-through; color:#94a3b8;' : ''}">${item.prodNm}</h4>
+                        <div class="sub">SO: ${item.soNo} | ${item.agntNm || '화주미상'}</div>
+                    </div>
+                    <div class="qty-badge">${item.returnQty} 개</div>
+                </div>
+            `;
+        }).join('') || '<p style="text-align:center; padding:50px; color:#94a3b8;">조회 내역이 없습니다.</p>';
+    }
+
+    function initDcCombo() {
+        const adapter = { addOption: (opts) => opts.forEach(o => {
+                const el = document.createElement("option");
+                el.value = o.value; el.textContent = o.text;
+                document.getElementById("dcList").appendChild(el);
+            })};
+        comboList(adapter, 'A', 'DC_CD', '', '', 'Y', 'req');
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        $(t).fadeIn(150).delay(1500).fadeOut(150);
+    }
+
+    function openItemModal(barcode, list) {
+        document.getElementById("modalItemList").innerHTML = list.map(item => `
+            <div onclick="onReceiveBarcode('${barcode}', '${item.tblRestockWaitId}')"
+                 style="padding:18px; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:12px; background:#f8fafc;">
+                <div style="font-weight:800;">${item.prodNm}</div>
+                <div style="font-size:13px; color:#64748b; margin-top:5px;">수량: ${item.returnQty}개 / 화주: ${item.agntNm}</div>
+            </div>
+        `).join('');
+        document.getElementById("itemModalOverlay").style.display = "flex";
+    }
+
+    function closeItemModal() {
+        document.getElementById("itemModalOverlay").style.display = "none";
+        setFocus();
+    }
+
+    function requestScan() {
+        if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: "requestBarcodeScan" }));
+        } else {
+            const bc = prompt("반품 바코드(SO) 입력:");
+            if(bc) onReceiveBarcode(bc);
+        }
+    }
+</script>
+</body>
+</html>

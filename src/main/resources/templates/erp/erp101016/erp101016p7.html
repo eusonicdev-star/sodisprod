@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head> 
+	<title>미마감 주문유형 선택 팝업 (erp101016p7)</title>
+	<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<link rel="stylesheet" type="text/css" href="/css/common.css"> 
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css"> 
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css"> 
+	<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css"> 
+
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>	
+	
+	<script th:inline="javascript" >
+	fnObj	=	{
+			winOpen : {
+			},	//END of winOpen:{
+			comboOpen : {
+
+				comboCmpyCd : function(){		//회사콤보목록
+					myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+			    	comboList(myComboCmpyCd,'A','COMM','CMPY_CD','','Y','');		     
+			    	myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${sendObject.cmpyCd}]]*/));
+			    	myComboCmpyCd.setFontSize("12px","12px");
+			    	myComboCmpyCd.disable();
+			    	
+				},	
+				comboSoType : function(){		//주문유형
+					myComboSoType = new dhtmlXCombo("soType");
+			    	comboList(myComboSoType,'A','COMM','SO_ORDR_TYPE','','Y','req');		     
+			    	myComboSoType.selectOption(1);	//테스트로 1 일반오더. 원래는 0 선택해주세요
+			    	myComboSoType.setFontSize("12px","12px");
+				},
+			},	//END of comboOpen : {
+			gridOpen : {
+			
+			},		//ENd of gridOpen : {
+			searchOpen : {
+				selectData : function (){		//선택 버튼 눌렀을때
+					if(!myComboSoType.getSelectedValue()){
+						alert("주문유형을 선택해주세요.");
+						return;
+					}
+
+					//erp101001 화면 (이 팝업의 부모창)으로 보낼 리턴 데이터 담을 틀
+					rtn={};
+					rtn.openType="normalOrder";
+					rtn.soType = myComboSoType.getSelectedValue();
+					rtn.soTypeNm = myComboSoType.getSelectedText();
+					rtn.tblSoMId	=	sendObj.tblSoMId;
+					rtnObj = [];
+					rtnObj.push(rtn);
+					rtn={};
+					
+					//이 팝업은 닫고 erp101016 화면 (이 팝업의 부모창) 으로 다시 가서 거기에서 미마감 주문등록 팝업이 열림
+					parent.fnObj.winOpen.rtnObject(/*[[${sendObject.windowId}]]*/,rtnObj,"");
+					parent.myWins.window(/*[[${sendObject.windowId}]]*/).close();
+				},	//END of selectData
+			},		//ENd of searchOpen : {
+
+	}	//END of fnObj
+
+
+$(document).ready(function() {
+	sendObj = /*[[${sendObject}]]*/
+	fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+	fnObj.comboOpen.comboSoType();	//주문유형 콤보
+});
+</script>
+</head>
+<body>
+	<div id="mainDiv"  style="padding:10px 10px 0 10px;border:1px solid black;" >
+		<div id="searchDiv" style="width:100%;height:50px;font-size:12px;"><!-- 검색조건영역 -->
+			<div id="inputDiv1" style="width:100%;height:50px;font-size:12px;"> 
+				<span class="cell" style="float:right;">
+					<span class="item-data" style="padding: 0 0 0 20px;"><input id="btnSearch" type="button" onclick="fnObj.searchOpen.selectData()" value="선택"></span>
+					<span class="item-data" style="padding: 0 0 0 20px;"><input id="btnSearch" type="button" onclick="parent.myWins.window('erp101016p7').close()" value="닫기"></span>
+
+				</span>
+				<span class="cell" style="width:220px;display:none;">
+					<span class="item-head" style="width:80px;">회사</span>
+					<span class="item-data" style="width:140px;"><div id="cmpyCd" ></div></span>
+				</span>
+				<span class="cell" style="width:220px;">
+					<span class="item-head" style="width:80px;">주문유형</span>
+					<span class="item-data" style="width:140px;"><div id="soType"></div></span>
+				</span>
+				
+			</span>
+			</div>	
+		</div>
+	</div>
+</body>
+</html>

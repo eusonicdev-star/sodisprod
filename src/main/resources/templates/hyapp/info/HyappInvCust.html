@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>고객별 재고 현황</title>
+    <style>
+        :root { --bg:#fff; --bd:#e5e7eb; --primary:#2563eb; --txt:#111; --sub:#6b7280; --header-bg:#f9fafb; }
+
+        /* [수정 1] body에 헤더 높이(50px)만큼 여백 추가하여 내용이 가려지지 않게 함 */
+        body {
+            margin:0; font-family:-apple-system, sans-serif;
+            background:var(--bg); color:var(--txt);
+            padding-top: 50px; /* 헤더 높이만큼 밀어줌 */
+        }
+
+        /* [수정 2] 헤더를 fixed로 변경하여 항상 최상단에 고정 */
+        header {
+            position:fixed; top:0; left:0; right:0;
+            background:#fff; border-bottom:1px solid var(--bd);
+            height:50px; display:flex; align-items:center; padding:0 12px; z-index:1000;
+        }
+        h1 { margin:0; font-size:16px; font-weight:700; flex:1; }
+
+        #backBtn { display:none; margin-right:10px; font-size:18px; border:none; background:none; padding:0; cursor:pointer; }
+
+        /* === 테이블 스타일 === */
+        .tbl-container { width:100%; overflow-x:hidden; }
+
+        table { width:100%; border-collapse:collapse; table-layout:fixed; }
+
+        /* [수정 3] 테이블 헤더의 sticky 위치를 헤더 높이(50px)에 맞춤 */
+        thead th {
+            position:sticky;
+            top:50px; /* 헤더 바로 아래에 붙음 */
+            background:var(--header-bg); z-index:90;
+            padding:10px 12px; font-size:13px; color:var(--sub); font-weight:600; text-align:left;
+            border-bottom:1px solid var(--bd);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* 헤더와 구분감 */
+        }
+
+        /* 테이블 바디 */
+        tbody td {
+            padding:12px 12px; border-bottom:1px solid var(--bd); font-size:14px; color:#333;
+            vertical-align:middle; cursor:pointer;
+        }
+        tbody tr:active { background:#f3f4f6; }
+
+        /* 상품명 컬럼: 줄바꿈 허용 */
+        .col-nm {
+            width:auto; font-weight:600;
+            white-space: normal; word-break: break-word; line-height: 1.4;
+        }
+
+        /* 수량 컬럼 */
+        .col-qty { width:25%; text-align:right; font-weight:700; color:var(--primary); font-size:15px; vertical-align: top; padding-top: 14px; }
+
+        /* 상세 화면 */
+        #detailView { display:none; padding:16px; background:#f9fafb; min-height:calc(100vh - 50px); }
+        .detail-card { background:#fff; border:1px solid var(--bd); border-radius:8px; padding:16px; box-shadow:0 1px 2px rgba(0,0,0,0.05); }
+
+        .detail-header { margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #eee; }
+        .detail-cust { font-size:13px; color:#666; margin-bottom:4px; font-weight:400; }
+        .detail-title { font-size:18px; font-weight:800; color:#111; line-height:1.3; }
+
+        .loc-row { display:flex; justify-content:space-between; padding:10px 0; font-size:14px; border-bottom:1px solid #f3f4f6; }
+        .loc-row:last-child { border-bottom:none; }
+        .zone { color:var(--sub); font-size:12px; margin-left:4px; }
+
+        .empty-state { padding:40px 0; text-align:center; color:#999; font-size:13px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <button id="backBtn" onclick="goBack()">←</button>
+    <h1 id="pageTitle">고객별 재고 현황</h1>
+</header>
+
+<div id="masterView" class="tbl-container">
+    <table>
+        <tbody id="masterList">
+        </tbody>
+    </table>
+</div>
+
+<div id="detailView">
+    <div class="detail-card">
+        <div id="detailHeader" class="detail-header"></div>
+        <div style="font-size:13px; font-weight:700; color:#888; margin-bottom:8px;">로케이션 상세</div>
+        <div id="detailList"></div>
+    </div>
+</div>
+
+<script>
+    const el = (id) => document.getElementById(id);
+    const fmt = (n) => Number(n||0).toLocaleString();
+
+    // API URL
+    const API_ALL_STOCK = "/hyapp/api/inv/stock/all";
+    const API_LOC_DTL   = "/hyapp/api/inv/cust/locations";
+
+    window.onload = loadAllStocks;
+
+    // 1. 전체 목록 조회
+    async function loadAllStocks() {
+        const tbody = el("masterList");
+        tbody.innerHTML = `<tr><td colspan="2" class="empty-state">로딩 중...</td></tr>`;
+
+        try {
+            const res = await fetch(API_ALL_STOCK);
+            const list = await res.json();
+
+            if (!list || list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="empty-state">재고 데이터가 없습니다.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(item => `
+                <tr onclick="showDetail('${item.AGNT_CD}', '${escape(item.AGNT_NM)}', '${item.MTRL_CD}', '${escape(item.MTRL_NM)}')">
+                    <td class="col-nm">
+                        <div style="font-size:15px; margin-bottom:4px;">${item.MTRL_NM}</div>
+                        <div style="font-size:12px; color:#999; font-weight:400;">${item.MTRL_CD}</div>
+                    </td>
+                    <td class="col-qty">${fmt(item.QTY)}</td>
+                </tr>
+            `).join("");
+
+        } catch(e) {
+            console.error(e);
+            tbody.innerHTML = `<tr><td colspan="2" class="empty-state">조회 실패</td></tr>`;
+        }
+    }
+
+    // 2. 상세 화면 전환
+    async function showDetail(custCd, custNm, mtrlCd, mtrlNm) {
+        el("masterView").style.display = "none";
+        el("detailView").style.display = "block";
+        el("backBtn").style.display = "inline-block";
+        el("pageTitle").innerText = "상세 정보";
+
+        el("detailHeader").innerHTML = `
+            <div class="detail-cust">${unescape(custNm)}</div>
+            <div class="detail-title">${unescape(mtrlNm)}</div>
+        `;
+
+        el("detailList").innerHTML = `<div style="padding:20px; text-align:center; color:#999;">로딩 중...</div>`;
+
+        try {
+            const params = new URLSearchParams({ custCd, mtrlCd });
+            const res = await fetch(`${API_LOC_DTL}?${params}`);
+            const list = await res.json();
+
+            if (!list || list.length === 0) {
+                el("detailList").innerHTML = `<div style="text-align:center; padding:20px; color:#999;">위치 정보 없음</div>`;
+                return;
+            }
+
+            el("detailList").innerHTML = list.map(item => `
+                <div class="loc-row">
+                    <div>
+                        <span style="font-weight:600; color:#333; font-size:15px;">${item.LOC_CD}</span>
+                        <span class="zone">(${item.ZONE_NM || '-'})</span>
+                    </div>
+                    <div style="font-weight:700; color:#2563eb;">${fmt(item.QTY)}</div>
+                </div>
+            `).join("");
+
+        } catch(e) {
+            el("detailList").innerHTML = "오류 발생";
+        }
+    }
+
+    function goBack() {
+        el("detailView").style.display = "none";
+        el("masterView").style.display = "block";
+        el("backBtn").style.display = "none";
+        el("pageTitle").innerText = "고객별 재고 현황";
+    }
+
+    const escape = (s) => String(s).replace(/'/g, "\\'");
+    const unescape = (s) => String(s).replace(/\\'/g, "'");
+
+</script>
+</body>
+</html>

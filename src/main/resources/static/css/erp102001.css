@@ -1,0 +1,211 @@
+.container {
+  padding: 10px;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-box {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.section-title h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.btn-container {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.action-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-button.primary {
+  background-color: #2563eb;
+  color: white;
+}
+
+.action-button.primary:hover {
+  background-color: #1d4ed8;
+}
+
+.action-button:not(.primary) {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.action-button:not(.primary):hover {
+  background-color: #e5e7eb;
+}
+
+.section-body {
+  font-size: 0.875rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.search-input {
+  display: flex;
+  align-items: center;
+  flex: 1 1 400px;
+  min-width: 320px;
+  gap: 0.75rem;
+}
+
+.search-textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: #1f2937;
+  width: 100%;
+  min-height: 80px;
+  resize: vertical; /* 필요에 따라 vertical or none */
+  transition: all 0.2s ease;
+}
+
+.search-label {
+  width: 100px;
+  font-weight: 500;
+  color: #4b5563;
+  white-space: nowrap;
+}
+
+.search-condition-input,
+.search-control {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.date-range {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+}
+
+.date-item {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.date-item input[type="text"] {
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  width: 100%;
+  min-width: 160px;
+  box-sizing: border-box;
+  font-size: 0.875rem;
+  color: #1f2937;
+}
+
+.date-item input[type="text"]:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.date-item i.fa-calendar {
+  position: absolute;
+  right: 0.75rem;
+  color: #6b7280;
+  pointer-events: none;
+}
+
+.date-separator {
+  font-weight: 500;
+  color: #6b7280;
+  padding: 0 0.5rem;
+}
+
+/* 입력 필드 공통 스타일 */
+input[type="text"] {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: #1f2937;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* 아이콘 스타일 */
+.fa-search,
+.fa-minus-circle {
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.fa-search:hover,
+.fa-minus-circle:hover {
+  color: #2563eb;
+}
+
+.freight-input {
+  width: 200px;
+}
+
+#grid,
+#grid2 {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.half-horizontal {
+  display: flex;
+  gap: 1rem;
+}
+
+.half-horizontal .half-left,
+.half-horizontal .half-right {
+  flex: 1;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background-color: #f9fafb;
+  box-sizing: border-box;
+}

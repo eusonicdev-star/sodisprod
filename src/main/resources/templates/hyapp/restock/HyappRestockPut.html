@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>HyApp 재입고 적치 (Put-away)</title>
+    <style>
+        :root { --accent:#10b981; --bg:#f8fafc; --border:#e2e8f0; --dark:#1e293b; }
+        body { background: var(--bg); font-family: system-ui, sans-serif; margin:0; padding-bottom:100px; }
+
+        /* 가상 키보드 방지용 숨김 필드 */
+        #hidBarcode { position: absolute; left: -9999px; opacity: 0; }
+
+        header { background:#fff; padding:20px 15px; border-bottom:1px solid var(--border); position: sticky; top: 0; z-index: 100; text-align: center; }
+        h1 { margin:0; font-size:20px; color: var(--dark); font-weight: 800; }
+
+        .status-bar { background: #ecfdf5; padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 14px; }
+        .status-bar b { color: var(--accent); }
+
+        #putList { padding: 10px; display: flex; flex-direction: column; gap: 12px; }
+        .card { background:#fff; padding:18px; border-radius:15px; border:1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .card h4 { margin: 0 0 8px 0; font-size: 17px; color: #1e293b; }
+
+        /* 로케이션 정보 강조 */
+        .loc-box { background: #f1f5f9; padding: 10px; border-radius: 10px; margin: 10px 0; display: flex; align-items: center; gap: 10px; }
+        .loc-label { font-size: 12px; color: #64748b; font-weight: 600; }
+        .loc-val { font-size: 18px; color: var(--accent); font-weight: 800; }
+
+        .btn-put { width: 100%; background: var(--accent); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 15px; cursor: pointer; margin-top: 5px; }
+        .btn-put:active { transform: scale(0.98); }
+
+        .toast-msg {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(30, 41, 59, 0.9); color: #fff; padding: 20px 30px;
+            border-radius: 16px; z-index: 9999; font-size: 18px; font-weight: 800;
+            display: none; text-align: center;
+        }
+
+        .scan-btn { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:90%; background:var(--dark); color:#fff; padding:18px; border-radius:15px; border:none; font-size:18px; font-weight:800; }
+
+        .search-box { background: #fff; padding: 12px 15px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; }
+        .search-input-wrapper { flex: 1; position: relative; }
+        .search-input { width: 100%; height: 45px; border: 2px solid var(--border); border-radius: 10px; padding: 0 12px; font-size: 16px; box-sizing: border-box; }
+        .search-input:focus { border-color: var(--accent); outline: none; }
+
+        .btn-scan-sm { background: var(--dark); color: #fff; border: none; height: 45px; padding: 0 15px; border-radius: 10px; font-weight: 700; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+        .btn-reset { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: #e2e8f0; color: #64748b; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; cursor: pointer; display: none; }
+    </style>
+</head>
+<body>
+
+<input type="text" id="hidBarcode" readonly inputmode="none" autocomplete="off">
+<div id="toast" class="toast-msg"></div>
+
+<header>
+    <h1>재입고 적치 작업</h1>
+</header>
+
+<div class="status-bar">
+    <div>적치 대상: <b id="totalCnt">0</b>건</div>
+    <button onclick="loadPutList()" style="border:none; background:none; color:var(--accent); font-weight:700;">🔄 새로고침</button>
+</div>
+
+<div id="putList"></div>
+
+<button class="scan-btn" onclick="requestScan()">📷 상품 스캔 (적치 위치 확인)</button>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    const hidInp = document.getElementById('hidBarcode');
+
+    window.onload = function() {
+        loadPutList();
+        setFocus();
+    };
+
+    /**
+     * [표준] 가상 키보드 방지 포커스 로직
+     */
+    function setFocus() {
+        hidInp.readOnly = true;
+        hidInp.focus();
+        setTimeout(() => { hidInp.readOnly = false; }, 100);
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!['BUTTON'].includes(e.target.tagName)) setFocus();
+    });
+
+    /**
+     * 적치 대기 리스트 조회 (검수 완료 건)
+     */
+    async function loadPutList() {
+        try {
+            // 1. 세션에서 고객사 정보를 안전하게 가져옴
+            const raw = sessionStorage.getItem("SELECTED_CUSTOMER");
+            let cmpyCd = 'A'; // 기본값
+            let dcCd = '1000'; // 기본값 (프로젝트 설정에 맞게 수정 필요)
+
+            if (raw) {
+                const selectedCustomer = JSON.parse(raw);
+                cmpyCd = selectedCustomer.cmpyCd || 'A';
+                dcCd = selectedCustomer.dcCd || dcCd;
+            }
+
+            // 2. 쿼리 파라미터 생성 (에러 로그의 원인 해결)
+            const params = new URLSearchParams({
+                cmpyCd: cmpyCd,
+                dcCd: dcCd
+            });
+
+            console.log("API 호출 시도:", `/hyapp/api/restock/put-list?${params.toString()}`);
+
+            // 3. 호출 실행
+            const res = await fetch(`/hyapp/api/restock/put-list?${params.toString()}`);
+
+            if (!res.ok) {
+                throw new Error(`HTTP 에러! 상태코드: ${res.status}`);
+            }
+
+            const data = await res.json();
+            renderPutList(data);
+            setFocus(); // 리더기 포커스 유지
+
+        } catch (e) {
+            console.error("리스트 로드 실패:", e.message);
+            showToast("⚠️ 목록을 불러올 수 없습니다.");
+        }
+    }
+
+    function renderPutList(items) {
+        const list = document.getElementById("putList");
+        document.getElementById("totalCnt").textContent = items.length;
+
+        list.innerHTML = items.map(item => {
+            const isAssigned = (item.fixedLocNm && item.fixedLocNm.trim() !== '' && item.fixedLocNm !== '미지정');
+
+            return `
+    <div class="card" id="card_${item.barcode}">
+        <h4>${item.prodNm}</h4>
+        <div style="font-size:13px; color:#64748b;">바코드: ${item.barcode}</div>
+
+        <div class="loc-box">
+            <span class="loc-label">적치 로케이션</span>
+            <span class="loc-val" id="loc_text_${item.tblRestockWaitId}">${item.fixedLocNm || '미지정'}</span>
+        </div>
+
+        ${!isAssigned ? `
+            <div style="margin-top:10px;">
+                <input type="text" class="search-input"
+                       id="loc_input_${item.tblRestockWaitId}"
+                       placeholder="로케이션 스캔/입력"
+                       onkeypress="if(event.keyCode==13) validateAndFocusBtn('${item.tblRestockWaitId}')">
+            </div>
+        ` : ''}
+
+            <button class="btn-put"
+                    id="btn_${item.tblRestockWaitId}"
+                    ${!isAssigned ? 'disabled style="background:#cbd5e1;"' : ''}
+                    onclick="incrementPutQty('${item.tblRestockWaitId}', '${item.prodNm}')">
+                ${isAssigned ? '권장 위치 적치 완료' : '로케이션 지정 후 완료'}
+            </button>
+        </div>
+        `;
+        }).join('') || '<p style="text-align:center; padding:50px; color:#94a3b8;">적치할 상품이 없습니다.</p>';
+    }
+
+    /**
+     * 로케이션 입력/스캔 시 화면에 반영 및 버튼 활성화
+     */
+    function validateAndFocusBtn(waitId) {
+        const locInput = document.getElementById(`loc_input_${waitId}`);
+        const locVal = locInput.value.trim();
+        const locDisplay = document.getElementById(`loc_text_${waitId}`);
+        const btn = document.getElementById(`btn_${waitId}`);
+
+        if (locVal.length >= 2) {
+            // 1. 화면의 '미지정' 글자를 스캔한 로케이션으로 교체
+            locDisplay.textContent = locVal;
+            locDisplay.style.color = "#2563eb"; // 강조 색상 (파란색 계열)
+
+            // 2. 버튼 활성화 및 스타일 변경
+            btn.disabled = false;
+            btn.style.background = "var(--accent)";
+            btn.textContent = "지정 위치 적치 완료";
+
+            // 3. 입력창 초기화 및 포커스 이동
+            locInput.value = "";
+            btn.focus();
+
+            showToast("📍 로케이션 지정됨: " + locVal);
+        } else {
+            alert("유효한 로케이션 바코드를 스캔해주세요.");
+        }
+    }
+
+    /**
+     * [수정] 적치 완료 처리 (로케이션 값 포함)
+     */
+    async function incrementPutQty(waitId, prodNm) {
+        // 화면에 표시된 로케이션 텍스트를 가져옴 (미지정이었다가 스캔으로 바뀐 값 포함)
+        const targetLoc = document.getElementById(`loc_text_${waitId}`).textContent;
+
+        if (!targetLoc || targetLoc === '미지정') {
+            return alert("적치할 로케이션을 먼저 스캔하여 지정해주세요.");
+        }
+
+        if (!confirm(`[${targetLoc}] 위치에 적치를 완료하시겠습니까?`)) return;
+
+        try {
+            const res = await fetch('/hyapp/api/restock/put-increment', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    waitId: waitId,
+                    locBarcode: targetLoc // 이제 스캔된 바코드가 정확히 전달됨
+                })
+            });
+            const result = await res.json();
+
+            if (result.status === 'OK') {
+                showToast(`✅ ${prodNm}\n[${targetLoc}] 적치 완료!`);
+                loadPutList(); // 리스트 새로고침
+            } else {
+                alert("실패: " + (result.msg || "알 수 없는 오류"));
+            }
+        } catch (e) {
+            showToast("⚠️ 서버 통신 오류 발생");
+        } finally {
+            setFocus();
+        }
+    }
+
+    /**
+     * 통합 스캔 수신 (카메라/리더기)
+     */
+    function onReceiveBarcode(barcode) {
+        const targetCard = document.getElementById(`card_${barcode}`);
+
+        if (targetCard) {
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetCard.style.border = "3px solid var(--accent)";
+
+            // [핵심] 해당 카드 안에 입력창(search-input)이 있다면 강제로 포커스
+            const input = targetCard.querySelector('.search-input');
+            if (input) {
+                input.readOnly = false; // 가상키보드 방지 해제
+                input.focus();
+                showToast("📍 로케이션을 스캔하세요");
+            } else {
+                showToast("📍 권장 위치에 적치하세요");
+            }
+
+            setTimeout(() => { targetCard.style.border = "1px solid var(--border)"; }, 2000);
+        } else {
+            // 만약 현재 포커스가 이미 입력창에 있다면, 그 값을 로케이션으로 인식
+            const activeEl = document.activeElement;
+            if (activeEl && activeEl.classList.contains('search-input')) {
+                activeEl.value = barcode;
+                const waitId = activeEl.id.replace('loc_input_', '');
+                validateAndFocusBtn(waitId);
+            } else {
+                showToast("❌ 목록에 없는 상품입니다");
+            }
+        }
+    }
+
+    // 리더기 입력 수신
+    hidInp.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            onReceiveBarcode(this.value.trim());
+            this.value = '';
+            setFocus();
+        }
+    });
+
+    // 카메라 메시지 수신
+    window.addEventListener("message", (e) => {
+        try {
+            let data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+            if (['requestBarcodeScan', 'barcode'].includes(data.type)) {
+                onReceiveBarcode(data.value || data.barcode);
+            }
+        } catch(err) {}
+    });
+
+    function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        $(t).fadeIn(150).delay(1500).fadeOut(150);
+    }
+
+    function requestScan() {
+        if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: "requestBarcodeScan" }));
+        } else {
+            const bc = prompt("바코드 입력:");
+            if(bc) onReceiveBarcode(bc);
+        }
+    }
+</script>
+</body>
+</html>

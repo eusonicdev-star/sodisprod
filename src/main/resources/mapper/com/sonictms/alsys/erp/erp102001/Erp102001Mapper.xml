@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.erp.erp102001.mapper.Erp102001Mapper">
+
+	<!-- 팝업 그리드 목록 조회하기 -->
+    <select id="erp102001p1List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    															resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+        {
+	      CALL ${schema}..USP_SO_CNSL_STATUS_SOLIST (
+	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},		
+			#{dtType	,mode=IN	,	jdbcType=VARCHAR},	
+			#{fromDt	,mode=IN	,	jdbcType=VARCHAR},	
+			#{toDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{acptNm	,mode=IN	,	jdbcType=VARCHAR},	
+			#{acptTel	,mode=IN	,	jdbcType=VARCHAR},
+			#{agntCd	,mode=IN	,	jdbcType=VARCHAR},
+			#{mallNm	,mode=IN	,	jdbcType=VARCHAR},	
+			#{soNo		,mode=IN	,	jdbcType=VARCHAR},	
+			#{refSoNo	,mode=IN	,	jdbcType=VARCHAR},
+			#{srchAddr	,mode=IN	,	jdbcType=VARCHAR},
+			
+			<!-- 20220106 정연호 추가. 시공카테고리 -->
+			#{srchInstCapaCtgr		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+	<!-- 메인화면 주문헤더조회 -->
+    <select id="erp102001SoHeadSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    																resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+        {
+	      CALL ${schema}..USP_SO_CNSL_STATUS_LOAD_M (
+	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}	
+		
+	      )      
+      }
+    </select>
+	<!-- 메인화면 주문상세조회 -->
+    <select id="erp102001SoDetailSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+        {
+	      CALL ${schema}..USP_SO_CNSL_STATUS_LOAD_D (
+	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}	
+	      )      
+      }
+    </select>
+
+	<!-- 메인화면 상담내역조회 -->
+    <select id="erp102001HappyCallSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+        {
+	      CALL ${schema}..USP_SO_CNSL_STATUS_HAPPYCALL_LOAD (
+	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}	
+	      )      
+      }
+    </select>
+    
+    
+    
+   	<!-- 메인화면 상담정보 등록하기   -->   
+    <select id="erp102001CnslSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+        {
+	      CALL ${schema}..USP_SO_CNSL_STATUS_HAPPYCALL_INS (
+	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
+			#{soNo			,mode=IN	,	jdbcType=VARCHAR},
+			#{cnslEr		,mode=IN	,	jdbcType=VARCHAR},
+			#{cnslTxt		,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+    
+    
+  	<!-- 해피콜상담리스트 팝업 조회 -->
+    <select id="erp102001p2List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    															resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+        {
+	      CALL ${schema}..USP_SO_CNSL_STATUS_HAPPYCALL_LOAD_HIST (
+	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}		
+	      )      
+      }
+    </select>  
+    
+
+
+
+
+   
+   	<!-- 메인화면 오더정보 변경한것 수정하기   -->   
+    <select id="erp102001p1Updt"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+        {
+	      CALL ${schema}..USP_SO_CNSL_STATUS_SAVE (
+	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
+			#{acptTel1		,mode=IN	,	jdbcType=VARCHAR},
+			#{acptTel2		,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyCnfmDt	,mode=IN	,	jdbcType=VARCHAR},
+			#{postCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{addr1			,mode=IN	,	jdbcType=VARCHAR},
+			#{addr2			,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyRqstMsg	,mode=IN	,	jdbcType=VARCHAR},
+			#{custSpclTxt	,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+ 
+	<!-- 메인화면 알림톡 조회 -->
+    <select id="erp102001talkCallSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+     {
+	      CALL ${schema}..USP_SO_CNSL_STATUS_ALRMTALK_LOAD (
+	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}	
+	      )      
+      }
+    </select>
+       
+       
+       
+       
+       
+     <!-- 알림톡 발송할 내용을 불러온다 -->
+    <select id="erp102001p4LoadAlrmTmp"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+     {
+	      CALL ${schema}..USP_SO_CNSL_STATUS_ALRMTALK_SEND_LOAD (
+	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},	
+	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR},	
+	      	#{tmplId	,mode=IN	,	jdbcType=VARCHAR}	
+	      )      
+      }
+    </select>  
+       
+   
+   
+   
+  	<!-- 알림톡발송리스트 팝업 조회-->
+    <select id="erp102001p3List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    															resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+        {
+	      CALL ${schema}..USP_SO_CNSL_STATUS_ALRMTALK_LOAD_HIST (
+	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}		
+	      )      
+      }
+    </select>  
+         
+         
+         
+    <!-- 배송정보 & 이미지-->
+    <select id="erp102001soDlvyInfoData"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+        {
+	      CALL ${schema}..USP_SO_CNSL_STATUS_DLVYINFO_LOAD (
+	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}		
+	      )      
+      }
+    </select>  
+
+
+	<!-- 메인화면 상담정보 등록하기   -->   
+    <select id="erp101001DlvyCnfm"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+        {
+	      CALL ${schema}..USP_SO_CNSL_DLVYCNFMDT_INS (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},    	
+			#{dlvyCnfmDt	,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+	<!-- 주문이력보기 팝업의 리스트조회 -->
+    <select id="erp102001p5List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    															resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+        {
+	      CALL ${schema}..USP_CNSL_STATUS_HISTORY_LOAD (
+	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}		
+	      )      
+      }
+    </select>  
+    
+    
+    
+    <!-- 20211231 정연호 메인화면의 착불비 합계 update   -->   
+    <select id="erp102001UpdtRcptCost"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO"
+    																	resultType		="com.sonictms.alsys.erp.erp102001.entity.Erp102001VO">
+        {
+	      CALL ${schema}..USP_SO_M_RCPT_COST_UPDT_ERP102001 (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
+			#{rcptCost		,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.wh.mapper.WhLocMapper">
+
+    <select id="selectLocList" resultType="com.sonictms.alsys.wh.entity.WhLocVO">
+        SELECT
+        L.*,
+        Z.ZONE_CD,
+        Z.ZONE_NM
+        FROM TBL_WH_LOC_M L
+        INNER JOIN TBL_WH_ZONE_M Z ON L.ZONE_ID = Z.ZONE_ID
+        WHERE L.CMPY_CD = #{cmpyCd}
+        AND L.WH_CD = #{whCd}
+        <if test="zoneId != null and zoneId != ''">
+            AND L.ZONE_ID = #{zoneId}
+        </if>
+        AND L.DELETED_YN = 'N'
+        ORDER BY Z.ZONE_CD, L.LOC_CD
+    </select>
+
+    <update id="saveLocation">
+        MERGE INTO TBL_WH_LOC_M AS target
+            USING (SELECT #{locId} AS LOC_ID) AS source
+            ON (target.LOC_ID = source.LOC_ID)
+            WHEN MATCHED THEN
+                UPDATE SET
+                    LOC_NM = #{locNm},
+                    AISLE = #{aisle},
+                    RACK = #{rack},
+                    LEVEL_NO = #{levelNo},
+                    PICKING_YN = #{pickingYn},
+                    USE_YN = #{useYn}, -- 추가
+                    UPDT_USER = #{saveUser},
+                    UPDT_TIME = GETDATE()
+            WHEN NOT MATCHED THEN
+                INSERT (CMPY_CD, WH_CD, ZONE_ID, LOC_CD, LOC_NM, AISLE, RACK, LEVEL_NO, PICKING_YN, USE_YN, SAVE_USER, SAVE_TIME, DELETED_YN)
+                    VALUES (#{cmpyCd}, #{whCd}, #{zoneId}, #{locCd}, #{locNm}, #{aisle}, #{rack}, #{levelNo}, #{pickingYn}, #{useYn}, #{saveUser}, GETDATE(), 'N');
+    </update>
+
+</mapper>

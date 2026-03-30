@@ -1,0 +1,160 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <title>주문유형 선택 팝업 (erp101001p1)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/erp-style.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/web/dhtmlx.css">
+
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+
+    <script th:inline="javascript">
+        var pagePerRow =	10;/*[[${@environment.getProperty('common.html.pagePerRow')}]]*/	//페이지당 몇줄을 보여줄것인가
+        var srchInput;
+        fnObj = {
+            winOpen: {},	//END of winOpen:{
+            comboOpen: {
+
+                comboCmpyCd: function () {		//회사콤보목록
+                    myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+                    comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+                    //myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(sendObj.cmpyCd));
+                    myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${sendObject.cmpyCd}]]*/));
+
+                    myComboCmpyCd.setFontSize("12px", "12px");
+                    myComboCmpyCd.attachEvent("onChange", function (value, text) {
+                    });
+                    myComboCmpyCd.disable();
+
+                },
+                comboSoType: function () {		//주문유형
+                    myComboSoType = new dhtmlXCombo("soType");
+                    comboList(myComboSoType, 'A', 'COMM', 'SO_ORDR_TYPE', '', 'Y', 'req');
+                    myComboSoType.selectOption(1);	//테스트로 1 일반오더. 원래는 0 선택해주세요
+                    myComboSoType.setFontSize("12px", "12px");
+                    myComboSoType.attachEvent("onChange", function (value, text) {
+                    });
+                },
+            },	//END of comboOpen : {
+            gridOpen: {},		//ENd of gridOpen : {
+            searchOpen: {
+                selectData: function () {		//선택 버튼 눌렀을때
+                    if (!myComboSoType.getSelectedValue()) {
+                        alert("주문유형을 선택해주세요");
+                        return;
+                    }
+
+                    /***********************************
+                     1000, 일반오더
+                     2000, 반품오더
+                     3100, 교환오더(일반)
+                     3200, 교환오더(반품)
+                     4000, 업체직출
+                     5000, 일반(고객지정)
+                     6000, A/S오더
+                     9901, 일반(2인배송)
+                     9902, 익일
+                     9903, 익일(반품)
+                     9904, 반품(정품)
+                     9906, 택배반품
+                     9907, 기타
+                     9905, 택배
+                     ***************************/
+
+                    //반품오더, 교환오더(일반), 교환오더(반품), AS 이렇게 4가지는 원오더찾기 팝업이 열려서 리스트를 조회한후 리스트 중 1개를 선택하면 "반품등록하기 팝업이 열림"
+                    if (myComboSoType.getSelectedValue() == "2000"
+                        || myComboSoType.getSelectedValue() == "3100"
+                        || myComboSoType.getSelectedValue() == "3200"
+                        || myComboSoType.getSelectedValue() == "6000"
+                    ) {
+                        rtn = {};
+                        rtn.openType = "returnOrder";
+                        rtn.soType = myComboSoType.getSelectedValue();
+                        rtnObj = [];
+                        rtnObj.push(rtn);
+                        rtn = {};
+
+                        //이 팝업은 닫고 erp101001 화면 (이 팝업의 부모창) 으로 다시 가서 거기에서  "원오더찾기 팝업 erp101001p4" 이 열림
+                        parent.fnObj.winOpen.rtnObject(/*[[${sendObject.windowId}]]*/, rtnObj, "");
+                        parent.myWins.window(/*[[${sendObject.windowId}]]*/).close();
+
+
+                    } else {
+                        //erp101001 화면 (이 팝업의 부모창)으로 보낼 리턴 데이터 담을 틀
+                        rtn = {};
+                        rtn.openType = "normalOrder";
+                        rtn.soType = myComboSoType.getSelectedValue();
+                        rtnObj = [];
+                        rtnObj.push(rtn);
+                        rtn = {};
+
+                        //이 팝업은 닫고 erp101001 화면 (이 팝업의 부모창) 으로 다시 가서 거기에서  "주문등록하기 팝업 erp101001p2" 이 열림
+                        parent.fnObj.winOpen.rtnObject(/*[[${sendObject.windowId}]]*/, rtnObj, "");
+                        parent.myWins.window(/*[[${sendObject.windowId}]]*/).close();
+                    }
+
+
+                },	//END of selectData
+
+            },		//ENd of searchOpen : {
+
+        }	//END of fnObj
+
+
+        $(document).ready(function () {
+            console.log(pageUrl());
+            sendObj = /*[[${sendObject}]]*/
+                fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+            fnObj.comboOpen.comboSoType();	//주문유형 콤보
+
+        });
+    </script>
+</head>
+<body>
+<div id="mainDiv">
+    <div id="searchDiv" class="search-container" style="display:flex; align-items: center"><!-- 검색조건영역 -->
+        <div>
+                <span class="cell" style="width:220px;display:none;">
+                        <span class="item-head" style="width:80px;">회사</span>
+                        <span class="item-data" style="width:140px;">
+                            <div id="cmpyCd"></div>
+                        </span>
+                </span>
+            <span class="cell">
+                        <span class="item-head">주문유형</span>
+                        <span class="item-data"><div id="soType"></div></span>
+                </span>
+        </div>
+        <span class="btn-container">
+					<span class="item-data">
+                        <input id="btnSearch"
+                               class="action-button primary"
+                               type="button"
+                               onclick="fnObj.searchOpen.selectData()"
+                               value="선택">
+                    </span>
+					<span class="item-data">
+                        <input id="btnClose" type="button"
+                               class="action-button"
+                               onclick="parent.myWins.window('erp101001p1').close()"
+                               value="닫기">
+                    </span>
+            </span>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html
+  xmlns:sec="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <title>주문 상세보기 (erp104001p1)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css"
+    />
+    <link rel="stylesheet" type="text/css" href="/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="/css/popup.css" />
+    <script
+      src="https://cdn.dhtmlx.com/edge/dhtmlx.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script th:inline="javascript">
+      var myWins;
+      var srchMyCalendar;
+      var srchMyCalendar2;
+      var today;
+      var myGrid;
+      var myCalendar;
+      var myCalendar2;
+
+      fnObj = {
+        winOpen: {
+          srchCommSrch: function (title, cmpyCd, srchCtgr, srchInput) {
+            //공통코드 찾기 팝업
+            windowId = "srchCommSrch";
+            windowText = title + " commSrch";
+            windowUrl = "/commSrch";
+            windowLeft = -14400;
+            windowTop = -14400;
+            windowWidth = 800;
+            windowHeight = 600;
+            windowsModal = true;
+            windowOnClose = function (windowId) {
+              return true;
+            };
+            windowSendObject = {
+              cmpyCd: cmpyCd,
+              srchCtgr: srchCtgr,
+              srchInput: srchInput,
+              windowId: windowId,
+              srchCd: $("#srchSrchCode").val(),
+              srchNm: $("#srchSrchName").val(),
+            };
+
+            myWindowsOpen(
+              windowId,
+              windowText,
+              windowUrl,
+              windowLeft,
+              windowTop,
+              windowWidth,
+              windowHeight,
+              windowsModal,
+              windowOnClose,
+              windowSendObject
+            );
+
+            myWins.window(windowId).attachEvent("onClose", function (win) {
+              return true;
+            });
+          }, //END of srchCommSrch : function(){
+
+          //주문유형선택 팝업
+          soListPopup: function () {
+            //공통코드 찾기 팝업
+
+            windowId = "erp102001p1";
+            windowText = "주문리스트 팝업 erp102001p1";
+            windowUrl = "/erp102001p1";
+            windowLeft = 0;
+            windowTop = 0;
+            windowWidth = window.innerWidth;
+            windowHeight = 700;
+            windowsModal = true;
+            windowOnClose = function (windowId) {
+              return true;
+            };
+            windowSendObject = {
+              windowId: windowId,
+              cmpyCd: srchMyComboCmpyCd.getSelectedValue(),
+              dtType: srchMyComboDtType.getSelectedValue(),
+              fromDt: $("#srchDateFrom").val().replace(/-/g, ""),
+              toDt: $("#srchDateTo").val().replace(/-/g, ""),
+              acptNm: $("#srchAcptNm").val(),
+              acptTel: $("#srchAcptTel").val(),
+              agntCd: $("#srchSrchCode").val(),
+              mallNm: $("#srchMallNm").val(),
+              soNo: $("#srchSoNo").val(),
+              refSoNo: $("#srchRefSoNo").val(),
+            };
+            myWindowsOpen(
+              windowId,
+              windowText,
+              windowUrl,
+              windowLeft,
+              windowTop,
+              windowWidth,
+              windowHeight,
+              windowsModal,
+              windowOnClose,
+              windowSendObject
+            );
+            myWins.window(windowId).attachEvent("onClose", function (win) {
+              return true;
+            });
+          }, //END of soListPopup : function(){
+        }, //END of winOpen
+        comboOpen: {
+          srchComboCmpyCd: function () {
+            //회사콤보목록
+            srchMyComboCmpyCd = new dhtmlXCombo("srchCmpyCd");
+            comboList(srchMyComboCmpyCd, "A", "COMM", "CMPY_CD", "", "Y", "");
+            srchMyComboCmpyCd.selectOption(
+              srchMyComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/)
+            );
+            srchMyComboCmpyCd.setFontSize("12px", "12px");
+            srchMyComboCmpyCd.attachEvent(
+              "onChange",
+              function (value, text) {}
+            );
+            srchMyComboCmpyCd.disable();
+          },
+
+          //오더정보 란에 나올 콤보
+
+          comboCmpyCd: function () {
+            //회사콤보목록
+            myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+            comboList(myComboCmpyCd, "A", "COMM", "CMPY_CD", "", "Y", "");
+            myComboCmpyCd.selectOption(
+              myComboCmpyCd.getIndexByValue(/*[[${session.cmpyCd}]]*/)
+            );
+            myComboCmpyCd.setFontSize("12px", "12px");
+            myComboCmpyCd.attachEvent("onChange", function (value, text) {});
+            myComboCmpyCd.disable();
+          },
+
+          comboSoType: function () {
+            //주문유형
+            myComboSoType = new dhtmlXCombo("soType");
+            comboList(
+              myComboSoType,
+              "A",
+              "COMM",
+              "SO_ORDR_TYPE",
+              "",
+              "Y",
+              "req"
+            );
+            myComboSoType.selectOption(0);
+            myComboSoType.setFontSize("12px", "12px");
+            myComboSoType.attachEvent("onChange", function (value, text) {});
+            myComboSoType.disable();
+          },
+
+          comboSoStat: function () {
+            //주문상태
+            myComboSoStat = new dhtmlXCombo("soStatCd");
+            comboList(myComboSoStat, "A", "COMM", "SO_STAT_CD", "", "Y", "req");
+            myComboSoStat.selectOption(2); //주문접수로 고정
+            myComboSoStat.attachEvent("onChange", function (value, text) {});
+            myComboSoStat.disable();
+          },
+
+          comboDcCd: function () {
+            //출고물류센터 콤보
+            myComboDcCd = new dhtmlXCombo("dcCd");
+            comboList(myComboDcCd, "A", "DC_CD", "", "", "Y", "req");
+
+            myComboDcCd.selectOption(0);
+            myComboDcCd.setFontSize("12px", "12px");
+            myComboDcCd.attachEvent("onChange", function (value, text) {});
+            myComboDcCd.disable();
+          },
+
+          comboDlvyCostType: function () {
+            //운임구분 콤보
+            myComboDlvyCostType = new dhtmlXCombo("dlvyCostType");
+            comboList(
+              myComboDlvyCostType,
+              "A",
+              "COMM",
+              "DLVY_COST_TYPE",
+              "",
+              "Y",
+              "req"
+            );
+
+            myComboDlvyCostType.selectOption(0);
+            myComboDlvyCostType.setFontSize("12px", "12px");
+            myComboDlvyCostType.attachEvent(
+              "onChange",
+              function (value, text) {}
+            );
+            myComboDlvyCostType.disable();
+          },
+        }, //END of comboOpen
+        gridOpen: {
+          grid: function () {
+            myGrid.setImagePath(
+              "https://cdn.dhtmlx.com/edge/skins/terrace/imgs/"
+            );
+            myGrid.setHeader(
+              "순번,상품명,상품코드,수량,시공비,시공단가,사용여부,사용자,고객사주문번호,착불비"
+            );
+            myGrid.setColumnIds(
+              "prodSeq,prodNm,prodCd,qty,instCost,instCostOrg,useYn,userId,refSoNo,rcptCost"
+            );
+            myGrid.setInitWidths("60,520,240,60,100,100,80,80,160,80");
+            myGrid.setColAlign(
+              "right,left,center,right,right,right,center,center,center,right"
+            );
+            myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+            myGrid.setColSorting(",,,,,,,,");
+            //myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,,");
+
+            myGrid.setColumnHidden(myGrid.getColIndexById("useYn"), true); //컬럼 아이디로 해당 컬럼 가리기
+            myGrid.setColumnHidden(myGrid.getColIndexById("userId"), true); //컬럼 아이디로 해당 컬럼 가리기
+
+            myGrid.init(); //이걸써야 세팅한 그리드가 표시가 된다
+
+            myGrid.enableSmartRendering(true); //스마트렌더링기능 가능	//데이터를 많이 구했더라도 제일 처음 에는 화면 크기에 나올수있을만큼만 보여준다. 스크롤을 움직이면 그떄 갖고있던 데이터들을 그려주기 시작한다
+            myGrid.enablePreRendering(10);
+            fnObj.gridOpen.setWidth();
+            //그래야 진짜 화면에 보이는 높이가 만들어진다
+            myGrid.addRow(1, ""); //로우 추가
+            myGrid.deleteRow(1);
+
+            myGrid.enableBlockSelection(true);
+            myGrid.attachEvent("onKeyPress", fnObj.keyOpen.onKeyPressed);
+            myGrid.enableEditEvents(true, false, false); //이걸쓰면 로우의 onRowDblClicked 이벤트 때문에 onEditCell 이벤트가 안되는것을 막을수 있다	//클릭, 더블클릭,F2
+
+            window.onresize = function (event) {
+              //윈도우의 사이즈가 변경했을떄
+            };
+          }, //ENd of grid : function(){}
+
+          setWidth: function () {
+            searchDiv_height = $("#searchDiv").height();
+            page_height = $("#page").height();
+            xhdr_height = $(".xhdr").height();
+            myGrid.enableAutoWidth(true, window.innerWidth, 400);
+            myGrid.enableAutoHeight(
+              true,
+              window.innerHeight -
+                searchDiv_height -
+                page_height -
+                xhdr_height -
+                15
+            ); //그리드 자동높이
+          }, //END of setWidth
+        }, //END of gridOpen
+        searchOpen: {
+          postChange: function (postCd) {
+            //수정화면 오픈할때 조회하기
+
+            var postData = new FormData();
+            postData.append("cmpyCd", myComboCmpyCd.getSelectedValue());
+            postData.append("postCd", postCd);
+            //헤더조회
+            $.ajax({
+              url: "/erp101001p1PostCdDcCd",
+              processData: false,
+              contentType: false,
+              data: postData,
+              type: "POST",
+              datatype: "json",
+
+              success: function (res) {
+                if (res) {
+                  myComboDcCd.selectOption(
+                    myComboDcCd.getIndexByValue(res.dcCd)
+                  );
+                } else {
+                  alert("우편번호로 물류센터 찾기 실패");
+                }
+              },
+            });
+          },
+
+          searchSoLoadM: function (tblSoMId) {
+            //아래 주문정보의 헤더 조회하기
+
+            var soHeadData = new FormData();
+            soHeadData.append("tblSoMId", tblSoMId);
+
+            $.ajax({
+              url: "/erp102001SoHeadSrch",
+              processData: false,
+              contentType: false,
+              data: soHeadData,
+              type: "POST",
+              datatype: "json",
+              async: false,
+              success: function (res) {
+                if (res && res.tblSoMId) {
+                  //리턴값이 있고 그게 1건 이상일경우
+
+                  //시스템등록일
+                  $("#ordrInptDt")
+                    .val("")
+                    .val(dateTypeChange(res.ordrInptDt, 10)); //시스템등록일
+                  $("#tblSoMId").val("").val(res.tblSoMId); //주문헤더고유ID
+                  $("#srchCode").val("").val(res.agntCd); //화주사코드
+                  $("#srchName").val("").val(res.agntNm); //화주사명칭
+                  myComboCmpyCd.selectOption(0);
+                  myComboCmpyCd.selectOption(
+                    myComboCmpyCd.getIndexByValue(res.cmpyCd)
+                  ); //회사코드
+                  myComboSoType.selectOption(0);
+                  myComboSoType.selectOption(
+                    myComboSoType.getIndexByValue(res.soType)
+                  ); //주문유형
+                  myComboSoStat.selectOption(0);
+                  myComboSoStat.selectOption(
+                    myComboSoStat.getIndexByValue(res.soStatCd)
+                  ); //주문상태
+                  $("#soNo").val("").val(res.soNo); //AL 오더
+                  $("#refSoNo").val("").val(res.refSoNo); //고객사 주문번호
+                  $("#mallCd").val("").val(res.mallCd); //쇼핑몰
+                  $("#brand").val("").val(res.brand); //브랜드
+                  $("#rcptDt").val("").val(dateTypeChange(res.rcptDt, 10)); //고객접수일
+                  $("#rqstDt").val("").val(dateTypeChange(res.rqstDt, 10)); //고객배송요청일
+                  $("#dlvyCnfmDt")
+                    .val("")
+                    .val(dateTypeChange(res.dlvyCnfmDt, 10)); //배송확정일
+
+                  //배송확정일 달력아이콘 눌렀을때 날짜 범위 계산하기
+
+                  $("#acptEr").val("").val(res.acptEr);
+                  $("#ordrEr").val("").val(res.ordrEr);
+                  $("#acptTel1").val("").val(res.acptTel1);
+                  $("#acptTel2").val("").val(res.acptTel2);
+                  myComboDcCd.selectOption(0);
+                  myComboDcCd.selectOption(
+                    myComboDcCd.getIndexByValue(res.dcCd)
+                  );
+
+                  $("#findAdd_postcode").val("").val(res.postCd); //우편번호
+
+                  $("#findAdd_roadAddress").val("").val(res.addr1); //주소1
+                  $("#findAdd_detailAddress").val("").val(res.addr2); //주소2-상세주소
+                  $("#dlvyRqstMsg").val("").val(res.dlvyRqstMsg); //배송메세지
+
+                  $("#custSpclTxt").val("").val(res.custSpclTxt); //고객사메세지
+                  myComboDlvyCostType.selectOption(0);
+                  myComboDlvyCostType.selectOption(
+                    myComboDlvyCostType.getIndexByValue(res.dlvyCostType)
+                  );
+                  $("#rcptCost").val("").val(res.rcptCost); //착불비
+                  $("#passCost").val("").val(res.passCost); //통행료
+                  //$("#instCost").val("").val(res.instCost);	//시공비
+
+                  //20220106 정연호 추가 시공카테고리 추가
+                  $("#instCapaCtgr").val("").val(res.instCtgrNm);
+
+                  //맨 아래 배송정보 & 이미지 불러오는 팝업 열기
+                  fnObj.searchOpen.searchSoDlvyInfo(tblSoMId);
+
+                  fnObj.searchOpen.searchSoLoadD(res); //제품정보의 그리드 내용(상세) 불러오기
+                } else {
+                  ////////////alert("상세 조회 수행 결과 없음");
+                }
+              },
+            });
+          }, //END of searchSoLoadM : function() {
+
+          //맨 아래 배송정보 & 이미지 불러오는 팝업 열기
+          searchSoDlvyInfo: function (paramTblSoMId) {
+            var soDlvyInfoData = new FormData();
+            soDlvyInfoData.append("tblSoMId", paramTblSoMId);
+
+            $.ajax({
+              url: "/erp102001soDlvyInfoData",
+              processData: false,
+              contentType: false,
+              data: soDlvyInfoData,
+              type: "POST",
+              datatype: "json",
+              //async:false,
+              success: function (res) {
+                if (res) {
+                  //리턴값이 있음
+                  $("#dlvyInfoDiv").show();
+
+                  // var url = "http://gloakoreaimage.cafe24.com/alliance/";
+                  var url = "http://sodisprodimg.cafe24.com/alliance/";
+                  $("#instPlanDt").val(res.instPlanDt);
+                  $("#instDt").val(res.instDt);
+                  $("#dlvyStatNm").val(res.dlvyStatNm);
+                  $("#paltNoxx").val(res.paltNoxx);
+                  $("#xCmplTypeNm").val(res.xCmplTypeNm);
+                  $("#instEr").val(res.instEr);
+                  $("#hp").val(res.hp);
+                  $("#seq").val(res.seq);
+                  $("#dlvyStat9999ImgContainer").hide();
+                  $("#dlvyStat9999Memo").hide();
+                  $("#dlvyStat8000ImgContainer").hide();
+
+                  //배송완료 상태 일때
+                  if (
+                    res.dlvyStatCd == "9999" ||
+                    res.dlvyinfo == "DLVLY_CNFM"
+                  ) {
+                    //배송완료
+                    $("#dlvyStat9999ImgContainer").show();
+                    $("#dlvyStat9999Memo").show();
+                    $("#dlvyStat8000ImgContainer").hide();
+                  }
+                  //미마감 상태 일때
+                  if (res.dlvyStatCd == "8000" || res.dlvyinfo == "X_CMPL") {
+                    //미마감
+                    $("#dlvyStat9999ImgContainer").hide();
+                    $("#dlvyStat8000ImgContainer").show();
+                  }
+
+                  //착불비
+                  $("#item01").val(res.dlvyCostClctNm);
+                  $("#item01Text").val(res.dlvyCostTxt);
+
+                  //양중비
+                  $("#item02").val(res.liftCostYn == "Y" ? "있음" : "없음");
+                  $("#item02Text").val(res.listCostTxt);
+
+                  //내림서비스
+                  $("#item03").val(res.downSrvcYn == "Y" ? "있음" : "없음");
+                  $("#item03Text").val(res.downSrvcTxt);
+
+                  //기타
+                  $("#item04").val(res.walFstnYn == "Y" ? "있음" : "없음");
+                  $("#item04Text").val(res.walFstnTxt);
+
+                  //메모
+                  $("#item05Memo").val(res.dlvyCnfmMemo);
+
+                  if (res.dlvyCnfmImg1) {
+                    $("#imgA01").show();
+                    $("#imgA01").attr("href", url + res.dlvyCnfmImg1);
+                    $("#imgSrc01").attr("src", url + res.dlvyCnfmImg1);
+                  }
+                  if (res.dlvyCnfmImg2) {
+                    $("#imgA02").show();
+                    $("#imgA02").attr("href", url + res.dlvyCnfmImg2);
+                    $("#imgSrc02").attr("src", url + res.dlvyCnfmImg2);
+                  }
+                  if (res.dlvyCnfmImg3) {
+                    $("#imgA03").show();
+                    $("#imgA03").attr("href", url + res.dlvyCnfmImg3);
+                    $("#imgSrc03").attr("src", url + res.dlvyCnfmImg3);
+                  }
+                  if (res.dlvyCnfmImg4) {
+                    $("#imgA04").show();
+                    $("#imgA04").attr("href", url + res.dlvyCnfmImg4);
+                    $("#imgSrc04").attr("src", url + res.dlvyCnfmImg4);
+                  }
+                  if (res.dlvyCnfmImg5) {
+                    $("#imgA05").show();
+                    $("#imgA05").attr("href", url + res.dlvyCnfmImg5);
+                    $("#imgSrc05").attr("src", url + res.dlvyCnfmImg5);
+                  }
+                  if (res.dlvyCnfmImg6) {
+                    $("#imgA06").show();
+                    $("#imgA06").attr("href", url + res.dlvyCnfmImg6);
+                    $("#imgSrc06").attr("src", url + res.dlvyCnfmImg6);
+                  }
+
+                  if (res.dlvyCnfmSign) {
+                    $("#signImgA").show();
+                    $("#signImgA").attr("href", url + res.dlvyCnfmSign);
+                    $("#signImgSrc").attr("src", url + res.dlvyCnfmSign);
+                  }
+                  //미마감사유
+                  $("#xitem01Text").val(res.xcmplTypeNm);
+
+                  //메모
+                  $("#xitem05Memo").val(res.xcmplMemo);
+
+                  if (res.xcmplImg1) {
+                    $("#ximgA01").show();
+                    $("#ximgA01").attr("href", url + res.xcmplImg1);
+                    $("#ximgSrc01").attr("src", url + res.xcmplImg1);
+                  }
+                  if (res.xcmplImg2) {
+                    $("#ximgA02").show();
+                    $("#ximgA02").attr("href", url + res.xcmplImg2);
+                    $("#ximgSrc02").attr("src", url + res.xcmplImg2);
+                  }
+                  if (res.xcmplImg3) {
+                    $("#ximgA03").show();
+                    $("#ximgA03").attr("href", url + res.xcmplImg3);
+                    $("#ximgSrc03").attr("src", url + res.xcmplImg3);
+                  }
+                  if (res.xcmplImg4) {
+                    $("#ximgA04").show();
+                    $("#ximgA04").attr("href", url + res.xcmplImg4);
+                    $("#ximgSrc04").attr("src", url + res.xcmplImg4);
+                  }
+                  if (res.xcmplImg5) {
+                    $("#ximgA05").show();
+                    $("#ximgA05").attr("href", url + res.xcmplImg5);
+                    $("#ximgSrc05").attr("src", url + res.xcmplImg5);
+                  }
+                  if (res.xcmplImg6) {
+                    $("#ximgA06").show();
+                    $("#ximgA06").attr("href", url + res.xcmplImg6);
+                    $("#ximgSrc06").attr("src", url + res.xcmplImg6);
+                  }
+
+                  if (res.xcmplSign) {
+                    $("#xsignImgA").show();
+                    $("#xsignImgA").attr("href", url + res.xcmplSign);
+                    $("#xsignImgSrc").attr("src", url + res.xcmplSign);
+                  }
+                } else {
+                  $("#dlvyInfoDiv").hide();
+                  $("#dlvyStat9999").hide();
+                  $("#dlvyStat9999Memo").hide();
+                  $("#dlvyStat9999ImgContainer").hide();
+                  $("#dlvyStat8000ImgContainer").hide();
+                }
+              },
+            });
+          },
+
+          searchSoLoadD: function (param) {
+            //아래 주문정보의 상세(그리드부분)조회하기
+            var soDetailData = new FormData();
+            soDetailData.append("tblSoMId", param.tblSoMId);
+            $.ajax({
+              url: "/erp102001SoDetailSrch",
+              processData: false,
+              contentType: false,
+              data: soDetailData,
+              type: "POST",
+              datatype: "json",
+              async: false,
+              success: function (res) {
+                if (res && res.length > 0) {
+                  //리턴값이 있고 그게 1건 이상일경우
+                  myGrid.clearAll(false);
+                  var sumInstCost = 0;
+                  var columns = myGrid.getColumnCount();
+                  for (var i = 0; i < res.length; i++) {
+                    var jsonData = {};
+                    for (var c = 0; c < columns; c++) {
+                      if (myGrid.getColumnId(c) == "instCostOrg") {
+                        var instCostOrg =
+                          parseFloat(
+                            !res[i]["instCost"] ? 0 : res[i]["instCost"]
+                          ) / parseFloat(!res[i]["qty"] ? 0 : res[i]["qty"]);
+                        jsonData["instCostOrg"] =
+                          instCostOrg == 0 ? "" : instCostOrg;
+                      } else {
+                        jsonData[myGrid.getColumnId(c)] =
+                          res[i][myGrid.getColumnId(c)];
+                      }
+                      if (
+                        myGrid.getColumnId(c) == "instCost" &&
+                        parseFloat(res[i]["qty"])
+                      ) {
+                        sumInstCost =
+                          sumInstCost +
+                          parseFloat(
+                            !res[i]["instCost"] ? 0 : res[i]["instCost"]
+                          );
+                      }
+                    }
+
+                    myGrid.addRow(i + 1, ""); //로우 추가	//로우는 1부터 시작해야함. 0부터 시작하면 안됨. 그래서 i 에 1을 더함
+                    myGrid.setRowData(i + 1, jsonData);
+                  }
+
+                  $("#instCost").val(sumInstCost == 0 ? "" : sumInstCost);
+                  fnObj.searchOpen.searchHappyCall(param); //상담내역 불러오기
+                  fnObj.searchOpen.searchTalk(param); //알림톡내용 불러오기
+                } else {
+                }
+              },
+            });
+          }, //END of searchSoLoadD : function() {
+
+          searchHappyCall: function (param) {
+            //해피콜 정보 조회
+
+            //입력사항 초기화 하기
+            $("#cnslTblSoMId").val("");
+            $("#cnslSoNo").val("");
+            $("#cnslEr").val("");
+            $("#cnslTime").val("");
+            $("#cnslTxt").val("");
+            $("#cnslTxt").prop("disabled", true);
+            $("#happyCallSaveBtn").hide();
+
+            //상담내역
+            $("#cnslTblSoMId").val(param.tblSoMId);
+            $("#cnslSoNo").val(param.soNo);
+
+            var hpData = new FormData();
+            hpData.append("tblSoMId", param.tblSoMId);
+
+            $.ajax({
+              url: "/erp102001HappyCallSrch",
+              processData: false,
+              contentType: false,
+              data: hpData,
+              type: "POST",
+              datatype: "json",
+              async: false,
+              success: function (res) {
+                if (res) {
+                  $("#hpCallCnt").text(res.totCnt);
+                  $("#cnslEr").val(res.cnslEr);
+                  $("#cnslTime").val(res.cnslTime);
+                  $("#cnslTxt").val(res.cnslTxt);
+                } else {
+                  $("#hpCallCnt").text("없음");
+                }
+              },
+            });
+          }, //END of searchHappyCall : function() {
+
+          searchTalk: function (param) {
+            //알림톡이력보기
+
+            //입력사항 초기화 하기
+            $("#talkTblSoMId").val(""); //알림톡 주문헤더고유ID
+            $("#talkSoNo").val(""); //알림톡 AL 오더
+            $("#talkTmp").val(""); //알림톡 템플릿
+            $("#talkEr").val(""); //알림톡 전송자
+            $("#talkTime").val(""); //알림톡 전송시간
+            $("#talkTxt").val(""); //알림톡 전송내용
+
+            //상담내역
+            $("#talkTblSoMId").val(param.tblSoMId);
+            $("#talkSoNo").val(param.soNo);
+
+            var talkData = new FormData();
+            talkData.append("tblSoMId", param.tblSoMId);
+
+            $.ajax({
+              url: "/erp102001talkCallSrch",
+              processData: false,
+              contentType: false,
+              data: talkData,
+              type: "POST",
+              datatype: "json",
+              async: false,
+              success: function (res) {
+                //console.log("erp102001talkCallSrch");
+                //console.log(res);
+                if (res) {
+                  //알림톡카운트
+                  $("#talkCallCnt").text(res.totCnt);
+
+                  $("#talkTmp").val(res.tmplNm); //알림톡 템플릿
+                  $("#talkEr").val(res.saveUserNm); //알림톡 전송자
+                  $("#talkTime").val(res.talkReserveDt); //알림톡 전송시간
+                  $("#talkTxt").val(res.msg); //알림톡 전송내용
+                } else {
+                  //alert("상담정보 조회 수행 결과 없음");
+
+                  $("#talkCallCnt").text("없음");
+                }
+              },
+            });
+          }, //END of searchTalk : function() {
+          cnslSave: function () {
+            //상담내역 저장
+            if (!confirm("상담내역을 저장하시겠습니까?")) {
+              //alert("취소하였습니다.");
+              return;
+            }
+
+            if ($("#cnslTblSoMId").val().trim().length == 0) {
+              alert("주문헤더 고유ID가 없습니다.\n조회를해주세요");
+              return;
+            }
+            if ($("#cnslSoNo").val().trim().length == 0) {
+              alert("AL 오더가 없습니다.\n조회를해주세요");
+              return;
+            }
+
+            if ($("#cnslEr").val().trim().length == 0) {
+              alert("상담사 이름을 확인해주세요");
+              return;
+            }
+
+            if ($("#cnslTxt").val().trim().length == 0) {
+              alert("상담내역을 입력해주세요");
+              return;
+            }
+
+            var cnslSave = {};
+            cnslSave.tblSoMId = $("#cnslTblSoMId").val();
+            cnslSave.soNo = $("#cnslSoNo").val();
+            cnslSave.cnslEr = $("#cnslEr").val();
+            cnslSave.cnslTxt = $("#cnslTxt").val();
+            cnslSave.saveUser = /*[[${session.tblUserMId}]]*/ "";
+
+            $.ajax({
+              url: "/erp102001CnslSave",
+              processData: false,
+              contentType: "application/json",
+              data: JSON.stringify(cnslSave),
+              type: "POST",
+              datatype: "json",
+              //				        async:false,
+              success: function (res) {
+                if (res) {
+                  if (res.rtnYn == "Y") {
+                    //상담내역 조회를 다시 해서 최근것을 다시 불러온다
+                    fnObj.searchOpen.searchHappyCall(cnslSave); //상담내역 불러오기
+                    $(top.document).find("#loader").hide();
+                  } else {
+                    alert("상담내역입력 실패");
+                    $(top.document).find("#loader").hide();
+                  }
+                } else {
+                  alert("상담내역 수행 실패");
+                  $(top.document).find("#loader").hide();
+                }
+                $(top.document).find("#loader").hide();
+              },
+            });
+          }, //END of cnslSave : function() {
+          searchChkVal: {
+            chkVal: function (chkGubn) {
+              chkValMsg = ""; //메세지 초기화
+              var rtnVal = true;
+
+              return rtnVal;
+            }, //END of chkVal : function(){
+          }, //end of searchChkVal
+        }, //END of searchOpen
+        keyOpen: {
+          enterKey: function (enterType) {
+            if (window.event.keyCode == 13) {
+              if (enterType == "srchSrchName") {
+                $("#srchSrchName").blur();
+                $("#srchSrchCode").blur();
+
+                $("#srchSrchCode").val("");
+
+                fnObj.winOpen.srchCommSrch("화주", "A", "AGENCY", "text");
+              }
+            }
+          }, //end of enterKey
+          onKeyPressed: function (code, ctrl, shift) {
+            if (code == 67 && ctrl) {
+              myGrid.setCSVDelimiter("\t");
+              myGrid.copyBlockToClipboard();
+            }
+            if (code == 86 && ctrl) {
+              myGrid.pasteBlockFromClipboard();
+            }
+            return true;
+          }, //end of onKeyPressed
+        }, //end of keyOpen
+
+        inputOpen: {
+          hpInput: function () {
+            $("#cnslEr").val("");
+            $("#cnslEr").val(/*[[${session.userNm}]]*/);
+            $("#cnslTime").val("");
+            $("#cnslTxt").val("");
+            $("#cnslTxt").prop("disabled", false);
+            $("#happyCallSaveBtn").show();
+          },
+        },
+        downloadOpen: {
+          downloadAllImages: function () {
+            var imageUrls = [];
+            var imageNames = [];
+
+            // 주문번호와 고객명 가져오기
+            var soNo = $("#soNo").val() || "주문";
+            var acptEr = $("#acptEr").val() || "고객";
+
+            // 배송완료 상태의 이미지들 수집
+            if ($("#dlvyStat9999ImgContainer").is(":visible")) {
+              for (var i = 1; i <= 6; i++) {
+                var imgSrc = $("#imgSrc0" + i).attr("src");
+                if (imgSrc && imgSrc !== "") {
+                  imageUrls.push(imgSrc);
+                  imageNames.push(
+                    "배송완료_" + soNo + "_" + acptEr + "_" + i + ".jpg"
+                  );
+                }
+              }
+              var signImgSrc = $("#signImgSrc").attr("src");
+              if (signImgSrc && signImgSrc !== "") {
+                imageUrls.push(signImgSrc);
+                imageNames.push(
+                  "배송완료_" + soNo + "_" + acptEr + "_서명.jpg"
+                );
+              }
+            }
+
+            // 미마감 상태의 이미지들 수집
+            if ($("#dlvyStat8000ImgContainer").is(":visible")) {
+              for (var i = 1; i <= 6; i++) {
+                var imgSrc = $("#ximgSrc0" + i).attr("src");
+                if (imgSrc && imgSrc !== "") {
+                  imageUrls.push(imgSrc);
+                  imageNames.push(
+                    "미마감_" + soNo + "_" + acptEr + "_" + i + ".jpg"
+                  );
+                }
+              }
+              var signImgSrc = $("#xsignImgSrc").attr("src");
+              if (signImgSrc && signImgSrc !== "") {
+                imageUrls.push(signImgSrc);
+                imageNames.push("미마감_" + soNo + "_" + acptEr + "_서명.jpg");
+              }
+            }
+
+            if (imageUrls.length === 0) {
+              alert("다운로드할 이미지가 없습니다.");
+              return;
+            }
+
+            // 서버에 이미지 다운로드 요청
+            var downloadData = new FormData();
+            downloadData.append("tblSoMId", $("#tblSoMId").val());
+            downloadData.append("imageUrls", JSON.stringify(imageUrls));
+            downloadData.append("imageNames", JSON.stringify(imageNames));
+
+            $.ajax({
+              url: "/erp104001DownloadImages",
+              processData: false,
+              contentType: false,
+              data: downloadData,
+              type: "POST",
+              xhrFields: {
+                responseType: "blob",
+              },
+              success: function (data, status, xhr) {
+                var soNo = $("#soNo").val() || "주문";
+                var acptEr = $("#acptEr").val() || "고객";
+                var fileName = soNo + "_" + acptEr + "_시공사진.zip";
+
+                // Blob을 다운로드
+                var blob = new Blob([data], { type: "application/zip" });
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement("a");
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+              },
+              error: function (xhr, status, error) {
+                console.error("이미지 다운로드 실패:", error);
+                alert("이미지 다운로드에 실패했습니다: " + error);
+              },
+            });
+          },
+        },
+      };
+
+      $(document).ready(function () {
+        myGrid = new dhtmlXGridObject("grid"); //그리드
+        fnObj.gridOpen.grid();
+
+        myWins = new dhtmlXWindows();
+
+        srchMyCalendar = new dhtmlXCalendarObject([
+          { input: "srchDateFrom", button: "srchDateFromIcon" },
+        ]);
+        srchMyCalendar2 = new dhtmlXCalendarObject([
+          { input: "srchDateTo", button: "srchDateToIcon" },
+        ]);
+
+        var now = new Date();
+        var year = now.getFullYear() + "";
+        var month = now.getMonth() + 1 + "";
+        var date = now.getDate() + "";
+        if (month.length == 1) {
+          month = "0" + month;
+        }
+        if (date.length == 1) {
+          date = "0" + date;
+        }
+
+        today = year + "-" + month + "-" + date;
+
+        $("#srchDateFrom").val(today);
+        $("#srchDateTo").val(today);
+
+        srchMyCalendar.loadUserLanguage("ko");
+        srchMyCalendar2.loadUserLanguage("ko");
+
+        //오더정보 콤보
+        fnObj.comboOpen.comboCmpyCd(); //회사콤보 바인드
+        fnObj.comboOpen.comboSoType(); //주문유형 콤보
+        fnObj.comboOpen.comboSoStat(); //주문상태 콤보
+        fnObj.comboOpen.comboDcCd();
+        fnObj.comboOpen.comboDlvyCostType();
+
+        window.onresize = function (event) {
+          //윈도우의 사이즈가 변경했을떄
+        };
+
+        srchMyCalendar.attachEvent("onChange", function (date, state) {
+          if (state) {
+            var dayPlus = new Date($("#srchDateFrom").val());
+            dayPlus.setDate(
+              dayPlus.getDate() + parseInt(myComboSrchDtSpan.getSelectedValue())
+            );
+            var yearPlus = dayPlus.getFullYear() + "";
+            var monthPlus = dayPlus.getMonth() + 1 + "";
+            var datePlus = dayPlus.getDate() + "";
+            if (monthPlus.length == 1) {
+              monthPlus = "0" + monthPlus;
+            }
+            if (datePlus.length == 1) {
+              datePlus = "0" + datePlus;
+            }
+
+            var todayPlus = yearPlus + "-" + monthPlus + "-" + datePlus;
+            $("#srchDateTo").val(todayPlus);
+          }
+        });
+
+        //배송확정일
+
+        fnObj.searchOpen.searchSoLoadM(/*[[${sendObject.tblSoMId}]]*/);
+      });
+    </script>
+  </head>
+  <body>
+    <div id="mainDiv">
+      <div id="searchDiv">
+        <div class="popup-header-container">
+          <div class="popup-header-text sub">오더 정보</div>
+        </div>
+      </div>
+      <div id="searchDiv2nd" style="display: none">
+        <div id="btnDiv2nd1" style="width: 100%">
+          <span class="cell" style="float: right"> </span>
+        </div>
+        <div id="searchDiv2nd1" style="width: 100%"></div>
+      </div>
+
+      <div class="search-container">
+        <span class="cell" style="display: none">
+          <span class="item-head">회사</span>
+          <span class="item-data">
+            <div id="cmpyCd"></div>
+          </span>
+        </span>
+        <span class="cell" style="display: none">
+          <span class="item-head">tblSoMId</span>
+          <span class="item-data">
+            <input
+              type="text"
+              id="tblSoMId"
+              style="width: 122px; height: 20px"
+              disabled
+            />
+          </span>
+        </span>
+
+        <div class="search-item">
+          <span class="search-label"> 등록일 </span>
+          <input type="text" id="ordrInptDt" class="search-input" disabled />
+        </div>
+
+        <div class="search-item">
+          <span class="search-label"> 화주사 </span>
+          <input
+            type="text"
+            id="srchName"
+            class="search-input"
+            onkeyup="fnObj.keyOpen.enterKey('srchName');"
+            disabled
+          />
+          <i
+            id="srchIcon"
+            class="fa fa-search search-icon"
+            onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text');"
+          ></i>
+          <input type="text" id="srchCode" class="search-input" disabled />
+          <i
+            id="delIcon"
+            class="fa fa-minus-circle"
+            aria-hidden="true"
+            onclick="fnObj.searchOpen.delSrchCode()"
+          ></i>
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">주문유형</span>
+          <div id="soType" class="search-input"></div>
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">주문상태</span>
+          <div id="soStatCd" class="search-input"></div>
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">AL 오더</span>
+          <input type="text" id="soNo" class="search-input" disabled />
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">고객사 주문번호</span>
+          <input
+            type="text"
+            id="refSoNo"
+            class="search-input"
+            disabled
+            onKeyUp="javascript:fnChkByte(this,'100')"
+          />
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">쇼핑몰</span>
+          <input
+            type="text"
+            id="mallCd"
+            class="search-input"
+            disabled
+            onKeyUp="javascript:fnChkByte(this,'50')"
+          />
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">브랜드</span>
+          <input
+            type="text"
+            id="brand"
+            class="search-input"
+            disabled
+            onKeyUp="javascript:fnChkByte(this,'50')"
+          />
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">고객접수일</span>
+          <input type="text" id="rcptDt" class="search-input" disabled />
+          <i
+            id="rcptDtIcon"
+            class="fa fa-calendar search-icon"
+            aria-hidden="true"
+          ></i>
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">고객배송요청일</span>
+          <input type="text" id="rqstDt" class="search-input" disabled />
+          <i
+            id="rqstDtIcon"
+            class="fa fa-calendar search-icon"
+            aria-hidden="true"
+          ></i>
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">배송확정일</span>
+          <input type="text" id="dlvyCnfmDt" class="search-input" disabled />
+          <i
+            id="dlvyCnfmDtIcon"
+            class="fa fa-calendar search-icon"
+            aria-hidden="true"
+          ></i>
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">시공 카테고리</span>
+          <input type="text" class="search-input" id="instCapaCtgr" disabled />
+        </div>
+      </div>
+
+      <div class="popup-header-container">
+        <div class="popup-header-text sub">
+          <span>고객정보(수령인)</span>
+        </div>
+      </div>
+
+      <div class="search-container">
+        <div class="search-item">
+          <span class="search-label">고객명(수취인)</span>
+          <input
+            type="text"
+            id="acptEr"
+            class="search-input"
+            disabled
+            onKeyUp="javascript:fnChkByte(this,'50')"
+          />
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">주문자</span>
+          <input
+            type="text"
+            id="ordrEr"
+            class="search-input"
+            disabled
+            onKeyUp="fnChkByte(this,'50')"
+          />
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">연락처</span>
+          <input type="text" id="acptTel2" class="search-input" disabled />
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">연락처(보조)</span>
+          <input type="text" id="acptTel1" class="search-input" disabled />
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">우편번호</span>
+          <input
+            type="text"
+            id="findAdd_postcode"
+            class="search-input"
+            name="findAdd_postcode"
+            disabled
+          />
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">출고 물류센터</span>
+          <div id="dcCd" class="search-input combo-box"></div>
+        </div>
+
+        <!-- 주소 -->
+        <div class="search-item full-width">
+          <span class="search-label">주소</span>
+          <input
+            type="text"
+            id="findAdd_roadAddress"
+            class="search-input"
+            disabled
+            style="width: 550px"
+            placeholder="주소"
+          />
+        </div>
+
+        <!-- 상세주소 -->
+        <div class="search-item full-width">
+          <span class="search-label">상세주소</span>
+          <input
+            type="text"
+            id="findAdd_detailAddress"
+            class="search-input"
+            disabled
+            onKeyUp="fnChkByte(this,'200')"
+          />
+        </div>
+
+        <!-- 배송메시지 -->
+        <div class="search-item full-width">
+          <span class="search-label">배송메시지</span>
+          <textarea
+            id="dlvyRqstMsg"
+            class="textarea"
+            disabled
+            onKeyUp="fnChkByte(this,'500')"
+          ></textarea>
+        </div>
+
+        <!-- 고객사 메시지 -->
+        <div class="search-item full-width">
+          <span class="search-label">고객사메시지</span>
+          <textarea
+            id="custSpclTxt"
+            class="textarea"
+            disabled
+            onKeyUp="fnChkByte(this,'500')"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="popup-header-container">
+        <div class="popup-header-text sub">
+          <span>운임 정보</span>
+        </div>
+      </div>
+
+      <div class="search-container">
+        <!-- 운임구분 -->
+        <div class="search-item">
+          <span class="search-label">운임구분</span>
+          <div id="dlvyCostType" class="search-input"></div>
+        </div>
+
+        <div class="search-item">
+          <span class="search-label">착불비</span>
+          <input type="text" id="rcptCost" class="search-input" disabled />
+        </div>
+
+        <!-- 통행료 -->
+        <div class="search-item">
+          <span class="search-label">통행료</span>
+          <input type="text" id="passCost" class="search-input" disabled />
+        </div>
+
+        <!-- 시공비 -->
+        <div class="search-item">
+          <span class="search-label">시공비</span>
+          <input type="text" id="instCost" class="search-input" disabled />
+        </div>
+      </div>
+
+      <div class="popup-header-container">
+        <div class="popup-header-text sub">
+          <span>제품 정보</span>
+        </div>
+      </div>
+      <div class="search-container">
+        <div id="grid"></div>
+      </div>
+
+      <div id="dlvyInfoDiv">
+        <div class="popup-header-container">
+          <div class="popup-header-text sub">
+            <span>배송 정보</span>
+          </div>
+        </div>
+
+        <div class="search-container">
+          <div class="search-item">
+            <span class="search-label"> 배송계획일자 </span>
+            <input type="text" id="instPlanDt" class="search-input" disabled />
+          </div>
+
+          <div class="search-item">
+            <span class="search-label"> 시공일(고객배송일) </span>
+            <input type="text" id="instDt" class="search-input" disabled />
+          </div>
+
+          <div class="search-item">
+            <span class="search-label"> 배송 상태 </span>
+            <input type="text" id="dlvyStatNm" class="search-input" disabled />
+          </div>
+
+          <div class="search-item">
+            <span class="search-label"> 팔렛트 번호 </span>
+            <input type="text" id="paltNoxx" class="search-input" disabled />
+          </div>
+
+          <div class="search-item">
+            <span class="search-label"> 시공기사 </span>
+            <input type="text" id="instEr" class="search-input" disabled />
+          </div>
+
+          <div class="search-item">
+            <span class="search-label"> 연락처 </span>
+            <input type="text" id="hp" class="search-input" disabled />
+          </div>
+
+          <div class="search-item">
+            <span class="search-label"> 순번 </span>
+            <input type="text" id="seq" class="search-input" disabled />
+          </div>
+
+          <div class="search-item">
+            <span class="search-label"> 배송사유 </span>
+            <input type="text" class="search-input" disabled />
+          </div>
+        </div>
+      </div>
+
+      <div id="dlvyStat9999">
+        <div class="popup-header-container">
+          <div class="popup-header-text sub">
+            <span>배송 완료 내역</span>
+          </div>
+        </div>
+
+        <div class="search-container">
+          <div class="search-item">
+            <span class="search-label"> 착불비 </span>
+            <input type="text" readonly id="item01" class="search-input" />
+            <input type="text" readonly id="item01Text" class="search-input" />
+          </div>
+
+          <div class="search-item">
+            <span class="search-label"> 양중비 </span>
+            <input type="text" class="search-input" readonly id="item02" />
+            <input type="text" class="search-input" readonly id="item02Text" />
+          </div>
+
+          <div class="search-item">
+            <span class="search-label"> 내림 서비스 </span>
+            <input type="text" class="search-input" readonly id="item03" />
+            <input type="text" class="search-input" readonly id="item03Text" />
+          </div>
+
+          <div class="search-item">
+            <span class="search-label"> 기타 </span>
+            <input type="text" class="search-input" readonly id="item04" />
+            <input type="text" class="search-input" readonly id="item04Text" />
+          </div>
+
+          <div id="dlvyStat9999Memo" class="search-item">
+            <span class="search-label"> 메모 </span>
+            <input
+              type="text"
+              style="width: 1300px; height: 70px"
+              class="search-input"
+              readonly
+              id="item05Memo"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div id="dlvyStat9999ImgContainer">
+        <div class="popup-header-container">
+          <span class="popup-header-text sub">시공 사진</span>
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="fnObj.downloadOpen.downloadAllImages()"
+            style="
+              float: right;
+              margin-right: 10px;
+              padding: 5px 15px;
+              background-color: #007bff;
+              color: white;
+              border: none;
+              border-radius: 3px;
+              cursor: pointer;
+            "
+          >
+            <i class="fa fa-download"></i> 일괄 다운로드
+          </button>
+        </div>
+
+        <div class="search-container">
+          <span class="item-data">
+            <span class="image-title">전면사진 </span>
+            <span class="image-title">측면(좌)</span>
+            <span class="image-title">측면(우)</span>
+            <span class="image-title">후면사진</span>
+            <span class="image-title">전체사진</span>
+            <span class="image-title">시리얼번호</span>
+            <span class="image-title">고객서명</span>
+          </span>
+          <span id="dlvyStat9999Img" class="cell">
+            <span class="item-data">
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="imgA01" href="" target="_blank">
+                    <img
+                      id="imgSrc01"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="imgA02" href="" target="_blank">
+                    <img
+                      id="imgSrc02"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="imgA03" href="" target="_blank">
+                    <img
+                      id="imgSrc03"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="imgA04" href="" target="_blank">
+                    <img
+                      id="imgSrc04"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="imgA05" href="" target="_blank">
+                    <img
+                      id="imgSrc05"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="imgA06" href="" target="_blank">
+                    <img
+                      id="imgSrc06"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="signImgA" href="" target="_blank">
+                    <img
+                      id="signImgSrc"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <div id="dlvyStat8000ImgContainer">
+        <div class="popup-header-container">
+          <span class="popup-header-text sub">미마감 내역</span>
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="fnObj.downloadOpen.downloadAllImages()"
+            style="
+              float: right;
+              margin-right: 10px;
+              padding: 5px 15px;
+              background-color: #007bff;
+              color: white;
+              border: none;
+              border-radius: 3px;
+              cursor: pointer;
+            "
+          >
+            <i class="fa fa-download"></i> 일괄 다운로드
+          </button>
+        </div>
+
+        <div class="search-container">
+          <div class="search-item">
+            <span class="search-label"> 미마감 사유 </span>
+
+            <input type="text" readonly id="xitem01Text" class="search-input" />
+          </div>
+
+          <div class="search-item">
+            <span class="search-label"> 메모 </span>
+            <input
+              type="text"
+              style="width: 1300px; height: 70px"
+              readonly
+              id="xitem05Memo"
+              class="search-input"
+            />
+          </div>
+
+          <span class="item-data">
+            <span class="image-title"><center>전체사진</center></span>
+            <span class="image-title"><center>하자부위</center></span>
+            <span class="image-title"><center>하자부위(근접)</center></span>
+            <span class="image-title"><center>개포상태(박스)</center></span>
+            <span class="image-title"><center>시리얼번호</center></span>
+            <span class="image-title"><center>기타</center></span>
+            <span class="image-title"><center>고객서명</center></span>
+          </span>
+
+          <span id="dlvyStat8000Img" class="cell">
+            <span class="item-data">
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="ximgA01" href="" target="_blank">
+                    <img
+                      id="ximgSrc01"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="ximgA02" href="" target="_blank">
+                    <img
+                      id="ximgSrc02"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="ximgA03" href="" target="_blank">
+                    <img
+                      id="ximgSrc03"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="ximgA04" href="" target="_blank">
+                    <img
+                      id="ximgSrc04"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="ximgA05" href="" target="_blank">
+                    <img
+                      id="ximgSrc05"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="ximgA06" href="" target="_blank">
+                    <img
+                      id="ximgSrc06"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+              <figure class="card">
+                <div class="ratio-box">
+                  <a id="xsignImgA" href="" target="_blank">
+                    <img
+                      id="xsignImgSrc"
+                      src=""
+                      class="the-image"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+              </figure>
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

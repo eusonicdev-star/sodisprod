@@ -1,0 +1,348 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>교환/반품 용인센터 입고 관리 (erp105005)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/web/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/erp-style.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/erp105005.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+    <script src=" https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <!-- Thymeleaf 변수 전역 설정 -->
+    <script th:inline="javascript">
+        var sessionUserGrntCd = /*[[${session.userGrntCd}]]*/ null;
+        var sessionAgntCd = /*[[${session.agntCd}]]*/ null;
+        var sessionAgntNm = /*[[${session.agntNm}]]*/ null;
+        var sessionUserGrdCd = /*[[${session.userGrdCd}]]*/ null;
+        var sessionDcCd = /*[[${session.dcCd}]]*/ null;
+        var sessionDcNm = /*[[${session.dcNm}]]*/ null;
+        var sessionUserName = /*[[${session.userName}]]*/ null;
+        var sessionCmpyCd = /*[[${session.cmpyCd}]]*/ null;
+        var pagePerRowConfig = /*[[${@environment.getProperty('common.html.pagePerRow')}]]*/ null;
+    </script>
+    
+    <script type="text/javascript" src="/js/erp105005.js?v=20241220"></script>
+
+    <!-- 엑셀 다운로드 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+
+</head>
+<body>
+<div id="mainDiv">
+    <div id="searchDiv">
+        <div id="btnDiv1">
+            <div class="title-container">
+                <div>
+                    <span class="item-head title-text">
+                        교환/반품 입고 관리
+                    </span>
+                    <span class="sub-title">erp105005</span>
+                    <div style="margin-top: 5px; color: #666; font-size: 12px;">
+                        배송확정일 기준 2025년 10월 2일부터 조회 가능
+                    </div>
+                </div>
+            </div>
+            <div class="btn-container">
+                <input id="btnSearch" class="action-button primary" type="button" onclick="fnObj.searchOpen.sTime()"
+                       value="조회(F2)">
+                <input id="btnInboundComplete" class="action-button" type="button" onclick="inboundComplete();"
+                       value="용인센터입고완료">
+                <input id="btnInboundRevert" class="action-button danger" type="button" onclick="inboundRevert();"
+                       value="입고완료 되돌리기">
+                <input id="btnOutboundComplete" class="action-button" type="button" onclick="outboundComplete();"
+                       value="반출완료">
+                <input id="btnOutboundRevert" class="action-button danger" type="button" onclick="outboundRevert();"
+                       value="반출완료 되돌리기">
+                <input id="btnSetOutboundTarget" class="action-button" type="button"
+                       onclick="setOutboundTarget('Y');"
+                       value="반출대상으로 변경">
+                <input id="btnSetNonTarget" class="action-button" type="button"
+                       onclick="setOutboundTarget('N');"
+                       value="반출대상아님으로 변경">
+                <input id="btnSetPending" class="action-button" type="button"
+                       onclick="setOutboundTarget('P');"
+                       value="판별중으로 변경">
+                <input id="btnExcelDown" class="action-button" type="button" onclick="excelDn();" value="엑셀 다운로드">
+                <input id="btnReload" class="action-button" type="button"
+                       onclick="location.reload(true);"
+                       value="초기화">
+            </div>
+        </div>
+        <div id="searchDiv1">
+            <span class="cell" style="width: 220px; display: none;">
+                <span class="item-head">회사</span>
+                <span class="item-data">
+                    <div id="cmpyCd"></div>
+                </span>
+            </span>
+            <span class="cell">
+                <span class="item-head" style="width: 80px;">달력유형</span>
+                <span class="item-data" style="width: 140px;">
+                    <div id="dtType"></div>
+                </span>
+            </span>
+
+            <span id="fromTo" class="cell" style="width: 360px;">
+                <span class="item-head" style="width: 80px;">달력</span>
+                <span class="item-data" style="width: 140px;">
+                    <input type="text" id="dateFrom" style="height: 20px; width: 90px;" readonly>
+                    <i id="dateFromIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+                </span>
+                <span class="item-data" style="width: 140px;">
+                    <input type="text" id="dateTo" style="height: 20px; width: 90px;" readonly>
+                    <i id="dateToIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+                </span>
+            </span>
+
+            <span class="cell" style="width: 380px;">
+                <span class="item-head" style="width: 80px;">화주사</span>
+                <span class="item-data" style="width: 160px;">
+                    <input type="text" id="srchName" style="width: 112px;"
+                           onkeyup="fnObj.keyOpen.enterKey('srchName');"></input>
+                    <i id="srchIcon" class="fa fa-search" aria-hidden="true"
+                       onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"></i>
+                </span>
+                <span class="item-data" style="width: 140px;">
+                    <input type="text" id="srchCode" style="width: 102px;" readonly></input>
+                    <i id="delIcon" class="fa fa-minus-circle" aria-hidden="true"
+                       onclick="fnObj.searchOpen.delSrchCode()"></i>
+                </span>
+            </span>
+
+            <span class="cell" style="width: 220px;">
+                <span class="item-head" style="width: 80px;">물류센터</span>
+                <span class="item-data" style="width: 140px;">
+                    <div opt_type="checkbox" id="dcCd"></div>
+                </span>
+            </span>
+
+            <span class="cell" style="width: 220px;">
+                <span class="item-head" style="width: 80px;">수령인</span>
+                <span class="item-data" style="width: 140px;">
+                    <input type="text" id="rcptNm" style="height: 20px; width: 132px;">
+                </span>
+            </span>
+
+            <span class="cell" style="width: 220px;">
+                <span class="item-head" style="width: 80px;">주소검색</span>
+                <span class="item-data" style="width: 140px;">
+                    <input type="text" id="srchAddr" style="height: 20px; width: 132px;">
+                </span>
+            </span>
+
+            <span class="cell" style="width: 220px;">
+                <span class="item-head" style="width: 80px;">전화번호</span>
+                <span class="item-data" style="width: 140px;">
+                    <input type="text" id="rcptTel" style="height: 20px; width: 132px;"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"/>
+                </span>
+            </span>
+
+            <span class="cell h-cell" style="width: 220px;">
+                <span class="item-head" style="width: 80px;">AL 오더</span>
+                <span class="item-data" style="width: 140px;">
+                    <textArea id="soList" style="width: 122px;"/></textArea>
+                </span>
+            </span>
+
+            <span class="cell" style="width: 240px;">
+                <span class="item-head" style="width: 80px;">주문유형</span>
+                <span class="item-data" style="width: 160px;">
+                    <div opt_type="checkbox" id="soType"></div>
+                </span>
+            </span>
+
+            <span class="cell" style="width: 220px;">
+                <span class="item-head" style="width: 80px;">상품코드</span>
+                <span class="item-data" style="width: 140px;">
+                    <textArea id="prodList" style="width: 122px;"/></textArea>
+                </span>
+            </span>
+
+            <span class="cell" style="width: 220px;">
+                <span class="item-head" style="width: 80px;">상품명</span>
+                <span class="item-data" style="width: 140px;">
+                    <input type="text" id="prodNm" style="height: 20px; width: 132px;">
+                </span>
+            </span>
+
+            <span class="cell" style="width: 220px;">
+                <span class="item-head" style="width: 80px;">입고상태</span>
+                <span class="item-data" style="width: 140px;">
+                    <div id="inboundStatus"></div>
+                </span>
+            </span>
+
+            <span class="cell" style="width: 220px;">
+                <span class="item-head" style="width: 80px;">반출상태</span>
+                <span class="item-data" style="width: 140px;">
+                    <div id="outboundStatus"></div>
+                </span>
+            </span>
+
+            <span class="cell" style="width: 220px;">
+                <span class="item-head" style="width: 80px;">반출대상</span>
+                <span class="item-data" style="width: 140px;">
+                    <div id="outboundTarget"></div>
+                </span>
+            </span>
+        </div>
+    </div>
+
+    <div id="searchDiv2nd"
+         style="width: 100%; font-size: 12px; padding-bottom: 5px; background-color: papayawhip; display: none;">
+        <div id="btnDiv2nd1" style="width: 100%;">
+            <span class="cell" style="float: right;"> </span>
+        </div>
+        <div id="searchDiv2nd1" style="width: 100%;"></div>
+    </div>
+
+    <div id="gridDiv" style="width: 100%; font-size: 12px; padding-bottom: 5px;">
+        <div id="grid" style="width: 25%; height: 100%;"></div>
+    </div>
+    <div id="page" style="width: 100%; height: 30px;"></div>
+</div>
+
+<!-- 입고일 선택 모달 -->
+<div id="inboundModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>용인센터 입고 완료 처리</h3>
+            <span class="modal-close" onclick="closeInboundModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="inboundDate">입고일 선택:</label>
+                <input type="date" id="inboundDate" style="width: 200px;">
+            </div>
+            <div class="form-group">
+                <label for="inboundRemark">비고:</label>
+                <textarea id="inboundRemark" name="inboundRemark" rows="3" style="width: 100%;" placeholder="입고 관련 비고를 입력하세요"></textarea>
+            </div>
+            <div class="modal-info">
+                <p>선택한 항목을 용인센터 입고 완료 처리합니다.</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="confirmInboundComplete()">확인</button>
+            <button type="button" class="btn btn-secondary" onclick="closeInboundModal()">취소</button>
+        </div>
+    </div>
+</div>
+
+<!-- 반출일 선택 모달 -->
+<div id="outboundModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>반출 완료 처리</h3>
+            <span class="modal-close" onclick="closeOutboundModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="outboundDate">반출일 선택:</label>
+                <input type="date" id="outboundDate" style="width: 200px;">
+            </div>
+            <div class="form-group">
+                <label for="outboundRemark">비고:</label>
+                <textarea id="outboundRemark" name="outboundRemark" rows="3" style="width: 100%;" placeholder="반출 관련 비고를 입력하세요"></textarea>
+            </div>
+            <div class="modal-info">
+                <p>선택한 항목을 반출 완료 처리합니다.</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="confirmOutboundComplete()">확인</button>
+            <button type="button" class="btn btn-secondary" onclick="closeOutboundModal()">취소</button>
+        </div>
+    </div>
+</div>
+
+<!-- 입고완료 되돌리기 확인 모달 -->
+<div id="inboundRevertModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>입고완료 되돌리기</h3>
+            <span class="modal-close" onclick="closeInboundRevertModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="inboundRevertRemark">되돌리기 사유:</label>
+                <textarea id="inboundRevertRemark" name="inboundRevertRemark" rows="3" style="width: 100%;" placeholder="되돌리기 사유를 입력하세요" required></textarea>
+            </div>
+            <div class="modal-info warning">
+                <p><strong>경고:</strong> 선택한 항목의 입고완료 상태를 되돌립니다.</p>
+                <p>이 작업은 되돌릴 수 없습니다. 신중히 확인해주세요.</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" onclick="confirmInboundRevert()">되돌리기</button>
+            <button type="button" class="btn btn-secondary" onclick="closeInboundRevertModal()">취소</button>
+        </div>
+    </div>
+</div>
+
+<!-- 반출완료 되돌리기 확인 모달 -->
+<div id="outboundRevertModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>반출완료 되돌리기</h3>
+            <span class="modal-close" onclick="closeOutboundRevertModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="outboundRevertRemark">되돌리기 사유:</label>
+                <textarea id="outboundRevertRemark" name="outboundRevertRemark" rows="3" style="width: 100%;" placeholder="되돌리기 사유를 입력하세요" required></textarea>
+            </div>
+            <div class="modal-info warning">
+                <p><strong>경고:</strong> 선택한 항목의 반출완료 상태를 되돌립니다.</p>
+                <p>이 작업은 되돌릴 수 없습니다. 신중히 확인해주세요.</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" onclick="confirmOutboundRevert()">되돌리기</button>
+            <button type="button" class="btn btn-secondary" onclick="closeOutboundRevertModal()">취소</button>
+        </div>
+    </div>
+</div>
+
+<!-- 반출대상아님으로 변경 모달 -->
+<div id="outboundTargetNonModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>반출대상아님으로 변경</h3>
+            <span class="modal-close" onclick="closeOutboundTargetNonModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="outboundTargetNonRemark">반출비고:</label>
+                <textarea id="outboundTargetNonRemark" name="outboundTargetNonRemark" rows="3" style="width: 100%;" placeholder="반출대상아님으로 변경하는 사유를 입력하세요"></textarea>
+            </div>
+            <div class="modal-info">
+                <p>선택한 항목을 반출대상아님으로 변경합니다.</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="confirmOutboundTargetNon()">확인</button>
+            <button type="button" class="btn btn-secondary" onclick="closeOutboundTargetNonModal()">취소</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

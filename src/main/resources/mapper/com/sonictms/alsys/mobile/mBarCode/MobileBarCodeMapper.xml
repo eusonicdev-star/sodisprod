@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.mobile.mBarCode.mapper.MobileBarCodeMapper">
+
+	<!-- 모바일 바코드(판매오더번호) 로 상차조회 하기 -->
+    <select id="mBarCodeScan"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mBarCode.entity.MobileBarCodeVO"
+    															resultType		="com.sonictms.alsys.mobile.mBarCode.entity.MobileBarCodeVO">
+        {
+	      CALL ${schema}..USP_MOBILE_LIFT_UPDT_SCAN (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
+	      	#{barcode		,mode=IN	,	jdbcType=VARCHAR}	
+			
+	      )      
+      }
+    </select>
+    
+    <!-- 모바일 바코드(판매오더번호) 로 상차변경 하기  -->
+    <select id="mBarCodeLiftChange"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mBarCode.entity.MobileBarCodeVO"
+    															resultType		="com.sonictms.alsys.mobile.mBarCode.entity.MobileBarCodeVO">
+        {
+	      CALL ${schema}..USP_MOBILE_LIFT_UPDT_SAVE (
+	      	#{instMobileMId	,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      	
+			
+	      )      
+      }
+    </select>
+   
+  
+</mapper>

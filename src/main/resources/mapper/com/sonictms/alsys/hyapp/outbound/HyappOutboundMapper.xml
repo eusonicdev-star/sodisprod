@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.hyapp.outbound.mapper.HyappOutboundMapper">
+
+    <select id="selectInspectionMasterList"
+            parameterType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO"
+            resultType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO">
+    <![CDATA[
+        SELECT
+            M.DLVY_CNFM_DT                       AS dlvyCnfmDt,
+            ISNULL(IP.PALT_NOXX, '시공계획 X')     AS paltNoxx,
+            ISNULL(UM.USER_NM, '기사배정 X')       AS dlvyEr,
+            ISNULL(DBO.F_COL_NM(M.CMPY_CD, 'COMM', 'TEAM', UM.TEAM), '팀없음') AS dlvyTeam,
+
+            COUNT(DISTINCT CASE WHEN M.SO_STAT_CD != '0000' THEN P.PROD_CD END) AS itemCount,
+
+            SUM(CASE WHEN M.SO_STAT_CD != '0000' THEN P.QTY ELSE 0 END)
+                / NULLIF(COUNT(*) / COUNT(DISTINCT P.TBL_SO_P_ID), 0) AS totalQty,
+
+            SUM(CASE WHEN M.SO_STAT_CD != '0000' THEN ISNULL(P.SCAN_QTY, 0) ELSE 0 END)
+                / NULLIF(COUNT(*) / COUNT(DISTINCT P.TBL_SO_P_ID), 0) AS scanQty,
+
+            COUNT(DISTINCT CASE WHEN M.SO_STAT_CD = '0000' THEN P.PROD_CD END) AS cancelCount,
+
+            ISNULL(IP.MOBILE_TRAN_YN, 'N')       AS mobileTranYn,
+            M.DC_CD                              AS dcCd
+        FROM TBL_SO_M M WITH(NOLOCK)
+        INNER JOIN TBL_SO_P P WITH(NOLOCK) ON M.TBL_SO_M_ID = P.TBL_SO_M_ID
+            LEFT OUTER JOIN TBL_INST_PLAN_M IP WITH(NOLOCK) ON M.TBL_SO_M_ID = IP.TBL_SO_M_ID
+            LEFT OUTER JOIN TBL_USER_M UM WITH(NOLOCK) ON IP.TBL_USER_M_ID = UM.TBL_USER_M_ID
+        WHERE M.USE_YN = 'Y'
+          AND P.USE_YN = 'Y'
+          AND M.CMPY_CD = #{cmpyCd}
+          AND M.DC_CD = #{dcCd}
+          AND M.DLVY_CNFM_DT = REPLACE(#{dlvyDt}, '-', '')
+          AND (M.SO_STAT_CD >= '2500' OR M.SO_STAT_CD = '0000')
+        GROUP BY
+            M.DLVY_CNFM_DT, IP.PALT_NOXX, UM.USER_NM, UM.TEAM,
+            ISNULL(IP.MOBILE_TRAN_YN, 'N'), M.DC_CD, M.CMPY_CD
+        ORDER BY paltNoxx, dlvyTeam, dlvyEr
+        ]]>
+    </select>
+
+    <select id="selectInspectionDetailList"
+            parameterType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO"
+            resultType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO">
+        SELECT
+            MAX(P.TBL_SO_P_ID)                  AS tblSoPId,
+            MM.MTRL_CD                          AS mtrlCd,
+            MM.MTRL_NM                          AS mtrlNm,
+            SUM(P.QTY)                          AS qty,
+            SUM(ISNULL(P.SCAN_QTY, 0))          AS scanQty,
+            MAX(M.SO_STAT_CD)                   AS soStatCd,
+            MAX(MM.PICKING_LOC_ID)              AS pickingLocId, -- 고정 피킹 로케이션 ID 추가
+            MAX(L.LOC_CD)                       AS locCd         -- 로케이션 코드 추가
+        FROM TBL_SO_M M WITH(NOLOCK)
+            INNER JOIN TBL_SO_P P WITH(NOLOCK) ON M.TBL_SO_M_ID = P.TBL_SO_M_ID
+            INNER JOIN TBL_INST_PLAN_M IP WITH(NOLOCK) ON M.TBL_SO_M_ID = IP.TBL_SO_M_ID
+            INNER JOIN TBL_MTRL_M MM WITH(NOLOCK) ON P.PROD_CD = MM.MTRL_CD
+        WHERE M.AGNT_CD = MM.AGNT_CD
+          AND M.CMPY_CD = #{cmpyCd}
+          AND IP.PALT_NOXX = #{paltNoxx}
+          AND M.DLVY_CNFM_DT = REPLACE(#{dlvyDt}, '-', '')
+          AND M.USE_YN = 'Y'
+          AND P.USE_YN = 'Y'
+        GROUP BY
+            MM.MTRL_CD,
+            MM.MTRL_NM
+        ORDER BY MM.MTRL_NM ASC
+    </select>
+
+    <select id="checkScanItem"
+            parameterType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO"
+            resultType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO">
+        SELECT TOP 1
+            P.TBL_SO_P_ID    AS tblSoPId,
+            P.QTY            AS qty,
+               ISNULL(P.SCAN_QTY, 0) AS scanQty,
+               M.SO_STAT_CD     AS soStatCd,
+               P.PROD_CD        AS mtrlCd,
+               M.AGNT_CD        AS agntCd,
+               M.CMPY_CD        AS cmpyCd
+        FROM TBL_SO_P P WITH(NOLOCK)
+        INNER JOIN TBL_SO_M M WITH(NOLOCK) ON P.TBL_SO_M_ID = M.TBL_SO_M_ID
+            INNER JOIN TBL_INST_PLAN_M IP WITH(NOLOCK) ON M.TBL_SO_M_ID = IP.TBL_SO_M_ID
+            INNER JOIN TBL_MTRL_M MM WITH(NOLOCK) ON P.PROD_CD = MM.MTRL_CD
+        WHERE M.AGNT_CD = MM.AGNT_CD
+          AND P.PROD_CD = MM.MTRL_CD
+          AND IP.PALT_NOXX = #{paltNoxx}
+          AND (BARCODE = #{barcode} OR MTRL_CD = #{barcode})
+          AND M.CMPY_CD = #{cmpyCd}
+          AND M.DLVY_CNFM_DT = REPLACE(#{dlvyDt}, '-', '')
+          AND ISNULL(P.SCAN_QTY, 0) &lt; P.QTY
+        ORDER BY P.TBL_SO_P_ID ASC
+    </select>
+
+    <update id="updateScanQty" parameterType="long">
+        UPDATE TBL_SO_P
+        SET SCAN_QTY = ISNULL(SCAN_QTY, 0) + 1
+        WHERE TBL_SO_P_ID = #{tblSoPId}
+    </update>
+
+    <select id="selectAllAvailableStocks"
+            parameterType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO"
+            resultType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO">
+        SELECT
+            S.STOCK_ID    AS stockId,
+            S.LOC_ID      AS locId,
+            S.STOCK_QTY   AS stockQty,
+            S.WH_CD       AS whCd,
+            S.ZONE_ID     AS zoneId,
+            S.EXPIRE_DATE AS expireDate,
+            L.LOC_NM      AS locNm
+        FROM TBL_MTRL_M MM WITH(NOLOCK)
+    /* 상품 마스터에 지정된 PICKING_LOC_ID로 해당 창고의 재고와 직접 조인 */
+    INNER JOIN TBL_STOCK S WITH(NOLOCK)
+        ON MM.CMPY_CD = S.CMPY_CD
+            AND MM.AGNT_CD = S.AGNT_CD
+            AND MM.MTRL_CD = S.MTRL_CD
+            AND MM.PICKING_LOC_ID = S.LOC_ID  /* 핵심: 지정된 피킹 로케이션만 타겟팅 */
+            INNER JOIN TBL_WH_LOC_M L WITH(NOLOCK)
+        ON S.LOC_ID = L.LOC_ID AND S.CMPY_CD = L.CMPY_CD
+        WHERE MM.CMPY_CD = #{cmpyCd}
+          AND MM.AGNT_CD = #{agntCd}
+          AND MM.MTRL_CD = #{mtrlCd}
+          AND S.STOCK_QTY > 0
+          AND S.WH_CD = #{whCd}
+        ORDER BY S.EXPIRE_DATE ASC, S.UPDT_TIME ASC
+    </select>
+
+    <update id="updateStockDecrementById" parameterType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO">
+        UPDATE TBL_STOCK
+        SET STOCK_QTY = STOCK_QTY - 1,
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{userId}
+        WHERE STOCK_ID = #{stockId}
+          AND STOCK_QTY > 0
+    </update>
+
+    <select id="selectStorageStocks"
+            parameterType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO"
+            resultType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO">
+        SELECT
+            A.STOCK_ID AS stockId,
+            A.LOC_ID AS locId,
+            B.LOC_NM AS locNm,
+            A.STOCK_QTY AS stockQty,
+            A.WH_CD AS whCd,
+            A.ZONE_ID AS zoneId,
+            A.EXPIRE_DATE AS expireDate
+        FROM TBL_STOCK A
+                 INNER JOIN TBL_WH_LOC_M B ON A.LOC_ID = B.LOC_ID AND A.CMPY_CD = B.CMPY_CD
+        WHERE A.MTRL_CD = #{mtrlCd}
+          AND A.CMPY_CD = #{cmpyCd}
+          AND B.PICKING_YN = 'N'
+          AND A.STOCK_QTY > 0
+        ORDER BY A.EXPIRE_DATE ASC
+    </select>
+
+    <select id="getRemainingStock" resultType="int">
+        SELECT ISNULL(STOCK_QTY, 0)
+        FROM TBL_STOCK
+        WHERE STOCK_ID = #{stockId}
+    </select>
+
+    <update id="upsertStock" parameterType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO">
+        MERGE INTO TBL_STOCK AS target
+            USING (
+                SELECT
+                    #{cmpyCd} as cmpyCd,
+                    #{agntCd} as agntCd,
+                    #{whCd} as whCd,
+                    #{mtrlCd} as mtrlCd,
+                    #{zoneId} as zoneId,
+                    #{locId} as locId
+            ) AS source
+            ON (
+                target.CMPY_CD = source.cmpyCd
+                    AND target.LOC_ID = source.locId
+                    AND target.MTRL_CD = source.mtrlCd
+                )
+            WHEN MATCHED THEN
+                UPDATE SET
+                    STOCK_QTY = target.STOCK_QTY + #{moveQty},
+                    UPDT_TIME = GETDATE(),
+                    UPDT_USER = #{userId}
+            WHEN NOT MATCHED THEN
+                INSERT (
+                        CMPY_CD, AGNT_CD, WH_CD, MTRL_CD,
+                        ZONE_ID, LOC_ID, STOCK_QTY,
+                        UPDT_TIME, UPDT_USER
+                    )
+                    VALUES (
+                               source.cmpyCd, source.agntCd, source.whCd, source.mtrlCd,
+                               source.zoneId, source.locId, #{moveQty},
+                               GETDATE(), #{userId}
+                           );
+    </update>
+
+    <select id="getStockLocationInfo" resultType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO">
+        SELECT
+            A.CMPY_CD AS cmpyCd,
+            A.AGNT_CD AS agntCd,
+            A.MTRL_CD AS mtrlCd,
+            A.WH_CD AS whCd,
+            A.ZONE_ID AS zoneId,
+            A.LOC_ID AS locId,
+            B.LOC_NM AS locNm  /* [중요] 이름을 가져와야 알림에 정상 표시됨 */
+        FROM TBL_STOCK A WITH(NOLOCK)
+    INNER JOIN TBL_WH_LOC_M B WITH(NOLOCK) ON A.LOC_ID = B.LOC_ID AND A.CMPY_CD = B.CMPY_CD
+        WHERE A.STOCK_ID = #{stockId}
+    </select>
+
+    <update id="updateStockDecrementByQty">
+        UPDATE TBL_STOCK
+        SET STOCK_QTY = STOCK_QTY - #{moveQty},
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{userId}
+        WHERE STOCK_ID = #{stockId}
+    </update>
+
+    <insert id="insertNotice" parameterType="map">
+        INSERT INTO TBL_NOTICE (CMPY_CD, NOTICE_TYPE, TITLE, CONTENT, SAVE_USER)
+        VALUES (#{cmpyCd}, #{noticeType}, #{title}, #{content}, #{userId})
+    </insert>
+
+    <select id="selectUnconfirmedNotices" parameterType="string" resultType="map">
+        SELECT * FROM TBL_NOTICE
+        WHERE CMPY_CD = #{cmpyCd} AND CONFIRM_YN = 'N'
+        ORDER BY SAVE_TIME DESC
+    </select>
+
+    <update id="updateNoticeConfirm" parameterType="int">
+        UPDATE TBL_NOTICE
+        SET CONFIRM_YN = 'Y', CONFIRM_TIME = GETDATE()
+        WHERE NOTICE_ID = #{noticeId}
+    </update>
+
+
+    <select id="getOutCancleList"
+            parameterType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO"
+            resultType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO">
+        SELECT
+            P.TBL_SO_P_ID                  AS tblSoPId,
+            MM.MTRL_CD                     AS mtrlCd,
+            MM.MTRL_NM                     AS mtrlNm,
+            MM.BARCODE                     AS barcode,
+            MAX(P.QTY)                     AS qty,
+            MAX(ISNULL(P.SCAN_QTY, 0))     AS scanQty,
+            MAX(M.SO_STAT_CD)              AS soStatCd,
+            MAX(L.LOC_NM)                  AS locNm,      -- 값이 있는 로케이션명을 우선적으로 가져옴
+            MAX(L.LOC_CD)                  AS locCd
+        FROM TBL_SO_M M WITH(NOLOCK)
+    INNER JOIN TBL_SO_P P WITH(NOLOCK) ON M.TBL_SO_M_ID = P.TBL_SO_M_ID
+            INNER JOIN TBL_INST_PLAN_M IP WITH(NOLOCK) ON M.TBL_SO_M_ID = IP.TBL_SO_M_ID
+            INNER JOIN TBL_MTRL_M MM WITH(NOLOCK) ON P.PROD_CD = MM.MTRL_CD
+            LEFT JOIN TBL_STOCK S WITH(NOLOCK)
+        ON MM.CMPY_CD = S.CMPY_CD
+            AND MM.AGNT_CD = S.AGNT_CD
+            AND M.AGNT_CD = S.AGNT_CD
+            AND MM.MTRL_CD = S.MTRL_CD
+            LEFT JOIN TBL_WH_LOC_M L WITH(NOLOCK)
+        ON S.CMPY_CD = L.CMPY_CD
+            AND S.LOC_ID = L.LOC_ID
+            AND L.PICKING_YN = 'Y'
+            AND L.USE_YN = 'Y'
+            AND L.DELETED_YN = 'N'
+        WHERE M.AGNT_CD = MM.AGNT_CD
+          AND M.CMPY_CD = #{cmpyCd}
+          AND M.DLVY_CNFM_DT = REPLACE(#{dlvyDt}, '-', '')
+          AND M.USE_YN = 'Y'
+          AND P.USE_YN = 'Y'
+          AND (ISNULL(P.RTN_CNFM_YN, 'N') = 'N')
+          AND M.SO_STAT_CD = '0000'            -- 출고 취소 대상 상태값
+        GROUP BY
+            P.TBL_SO_P_ID,
+            MM.MTRL_CD,
+            MM.MTRL_NM,
+            MM.BARCODE
+        ORDER BY MM.MTRL_NM ASC
+    </select>
+
+    <update id="updateReturnConfirm" parameterType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO">
+        UPDATE TBL_SO_P
+        SET RTN_CNFM_YN = 'Y',
+            RTN_CNFM_DT = GETDATE(),
+            RTN_CNFM_USER = #{userId},
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{userId}
+        WHERE TBL_SO_P_ID = #{tblSoPId}
+    </update>
+
+    <update id="updateMaterialMasterStock" parameterType="com.sonictms.alsys.hyapp.outbound.entity.HyappOutboundVO">
+        UPDATE MM
+        SET MM.CURRENT_QUANTITY = ST.total_qty,
+            MM.availableQty = ST.total_qty,
+            MM.UPDT_USER = #{userId},
+            MM.UPDT_TIME = GETDATE()
+            FROM TBL_MTRL_M MM
+    INNER JOIN (
+        SELECT CMPY_CD, AGNT_CD, MTRL_CD, SUM(ISNULL(stock_qty, 0)) as total_qty
+        FROM TBL_STOCK WITH(NOLOCK)
+        GROUP BY CMPY_CD, AGNT_CD, MTRL_CD
+    ) ST ON MM.CMPY_CD = ST.CMPY_CD AND MM.MTRL_CD = ST.MTRL_CD
+        WHERE MM.MTRL_CD = #{mtrlCd} AND MM.CMPY_CD = #{cmpyCd}
+    </update>
+
+</mapper>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.hyapp.restock.mapper.HyappRestockMapper">
+
+    <select id="selectHyappRestockWaitList" resultType="com.sonictms.alsys.hyapp.restock.entity.HyappRestockVO">
+        SELECT
+            SP.TBL_SO_P_ID AS tblRestockWaitId,
+            SM.SO_NO,
+            SP.PROD_CD,
+            SP.PROD_NM,
+            SP.QTY AS returnQty,
+            AG.AGNT_NM,
+            ISNULL(SP.RESTOCK_INBOUNDED, 'N') AS inboundYn
+        FROM TBL_SO_P SP
+                 INNER JOIN TBL_SO_M SM ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
+                 LEFT JOIN TBL_AGENCY_M AG ON SM.AGNT_CD = AG.AGNT_CD
+        WHERE SM.CMPY_CD = #{cmpyCd}
+          AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = 'N'  AND SM.DC_CD = #{dcCd}
+          AND SM.DLVY_CNFM_DT BETWEEN #{fromDt} AND #{toDt} AND SP.USE_YN = 'Y'
+        ORDER BY SM.SAVE_TIME DESC
+    </select>
+
+    <select id="selectTargetIdsByBarcode" resultType="string">
+        SELECT SP.TBL_SO_P_ID
+        FROM TBL_SO_P SP
+                 INNER JOIN TBL_SO_M SM ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
+        WHERE SM.SO_NO = #{barcode}
+          AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = 'N'
+    </select>
+
+    <select id="selectTargetItemsBySoNo" resultType="com.sonictms.alsys.hyapp.restock.entity.HyappRestockVO">
+        SELECT
+            SP.TBL_SO_P_ID AS tblRestockWaitId,
+            SP.PROD_CD,
+            SP.PROD_NM,
+            SP.QTY AS returnQty,
+            AG.AGNT_NM,
+            SM.SO_NO
+        FROM TBL_SO_P SP
+                 INNER JOIN TBL_SO_M SM ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
+                 LEFT JOIN TBL_AGENCY_M AG ON SM.AGNT_CD = AG.AGNT_CD
+        WHERE SM.SO_NO = #{soNo}
+          AND ISNULL(SP.RESTOCK_INBOUNDED, 'N') = 'N'  AND SP.USE_YN = 'Y'
+    </select>
+
+    <update id="updateRestockComplete" parameterType="com.sonictms.alsys.hyapp.restock.entity.HyappRestockVO">
+        UPDATE TBL_SO_P
+        SET RESTOCK_INBOUNDED = 'Y',
+            RESTOCK_INBOUND_DT = CONVERT(VARCHAR(8), GETDATE(), 112),
+            RESTOCK_INBOUND_USER = #{saveUser},
+            RESTOCK_INBOUND_TIME = GETDATE(),
+            UPDT_USER = #{saveUser},
+            UPDT_TIME = GETDATE()
+        WHERE TBL_SO_P_ID = #{tblRestockWaitId}
+          AND ISNULL(RESTOCK_INBOUNDED, 'N') = 'N'
+    </update>
+
+    <select id="selectHyappRestockPutList" resultType="com.sonictms.alsys.hyapp.restock.entity.HyappRestockVO">
+        SELECT
+            SP.TBL_SO_P_ID AS tblRestockWaitId,
+            MM.BARCODE AS barcode,
+            SP.PROD_CD AS prodCd,
+            MM.MTRL_NM AS prodNm,
+            SP.QTY AS returnQty,
+            AG.AGNT_NM AS agntNm,
+            /* [수정] 상품의 실제 재고가 있는 피킹 가능 로케이션 조회 */
+            ISNULL((
+                       SELECT TOP 1 L.LOC_CD
+                       FROM TBL_STOCK S
+                                INNER JOIN TBL_WH_LOC_M L ON S.LOC_ID = L.LOC_ID
+                       WHERE S.MTRL_CD = SP.PROD_CD
+                         AND S.CMPY_CD = SM.CMPY_CD
+                         AND L.PICKING_YN = 'Y'
+                         AND L.USE_YN = 'Y'
+                         AND S.STOCK_QTY > 0 /* 실제 재고가 있는 곳 우선 */
+                       ORDER BY S.STOCK_QTY DESC /* 재고가 가장 많은 곳을 추천 */
+                   ), '미지정') AS fixedLocNm
+        FROM TBL_SO_P SP
+                 INNER JOIN TBL_SO_M SM ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
+                 LEFT JOIN TBL_AGENCY_M AG ON SM.AGNT_CD = AG.AGNT_CD
+                 LEFT JOIN TBL_MTRL_M MM ON SP.PROD_CD = MM.MTRL_CD AND SM.CMPY_CD = MM.CMPY_CD
+        WHERE SM.CMPY_CD = #{cmpyCd}
+          AND SM.DC_CD = #{dcCd}
+          AND SP.RESTOCK_INBOUNDED = 'Y'
+          AND ISNULL(SP.PUTAWAY_YN, 'N') = 'N'
+          AND SP.USE_YN = 'Y'
+    </select>
+
+    <update id="updatePutawayStatus">
+        UPDATE TBL_SO_P
+        SET PUTAWAY_YN = 'Y',
+            PUTAWAY_DT = CONVERT(VARCHAR(8), GETDATE(), 112),
+            PUTAWAY_TIME = GETDATE(),
+            UPDT_USER = #{saveUser},
+            UPDT_TIME = GETDATE()
+        WHERE TBL_SO_P_ID = #{tblRestockWaitId}
+    </update>
+
+    <update id="updateLocationStockIncrement" parameterType="map">
+        MERGE INTO TBL_STOCK AS TARGET
+            USING (
+                /* TOP 1을 사용하여 중복 조인 방지 */
+                SELECT TOP 1
+            SM.CMPY_CD, SM.AGNT_CD, SP.PROD_CD AS MTRL_CD,
+                       LM.ZONE_ID, LM.LOC_ID, ISNULL(SM.DC_CD, '1000') AS WH_CD
+                FROM TBL_SO_P SP
+                         INNER JOIN TBL_SO_M SM ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
+                         INNER JOIN TBL_MTRL_M MM ON SP.PROD_CD = MM.MTRL_CD AND SM.CMPY_CD = MM.CMPY_CD
+                         INNER JOIN TBL_WH_LOC_M LM ON LM.CMPY_CD = SM.CMPY_CD
+                    AND LM.LOC_CD = ISNULL(#{locBarcode}, MM.FIXED_LOC_CD)
+                WHERE SP.TBL_SO_P_ID = #{waitId}
+                  AND LM.USE_YN = 'Y'
+                  AND LM.DELETED_YN = 'N'
+            ) AS SOURCE
+            ON (
+                TARGET.CMPY_CD = SOURCE.CMPY_CD AND
+                TARGET.MTRL_CD = SOURCE.MTRL_CD AND
+                TARGET.LOC_ID = SOURCE.LOC_ID AND
+                TARGET.WH_CD = SOURCE.WH_CD /* 센터 코드 매칭 추가로 정확도 향상 */
+                )
+            WHEN MATCHED THEN
+                UPDATE SET
+                    TARGET.STOCK_QTY = TARGET.STOCK_QTY + 1,
+                    TARGET.UPDT_TIME = GETDATE(),
+                    TARGET.UPDT_USER = 'SYSTEM_PUT'
+            WHEN NOT MATCHED THEN
+                INSERT (CMPY_CD, AGNT_CD, MTRL_CD, ZONE_ID, LOC_ID, STOCK_QTY, ALLOCATED_QTY, UPDT_TIME, UPDT_USER, WH_CD)
+                    VALUES (SOURCE.CMPY_CD, SOURCE.AGNT_CD, SOURCE.MTRL_CD, SOURCE.ZONE_ID, SOURCE.LOC_ID, 1, 0, GETDATE(), 'SYSTEM_PUT', SOURCE.WH_CD);
+    </update>
+
+    <select id="selectReturnInboundWaitList" parameterType="com.sonictms.alsys.hyapp.restock.entity.HyappRestockVO"
+            resultType="com.sonictms.alsys.hyapp.restock.entity.HyappRestockVO">
+        SELECT
+            SP.TBL_SO_P_ID AS tblRestockWaitId,
+            SM.SO_NO,
+            SM.REF_SO_NO,
+            SP.PROD_CD,
+            SP.PROD_NM,
+            SP.QTY AS returnQty,
+            AG.AGNT_NM,
+            ISNULL(SP.YONGIN_INBOUNDED, 'N') AS inboundYn,
+            SM.DLVY_CNFM_DT,
+            SM.DC_CD,
+            SM.AGNT_CD
+        FROM TBL_SO_P SP
+                 INNER JOIN TBL_SO_M SM ON SP.TBL_SO_M_ID = SM.TBL_SO_M_ID
+                 LEFT JOIN TBL_MTRL_M PM ON SP.PROD_CD = PM.MTRL_CD AND SM.AGNT_CD = PM.AGNT_CD
+                 LEFT JOIN TBL_AGENCY_M AG ON SM.AGNT_CD = AG.AGNT_CD
+        WHERE SP.USE_YN = 'Y'
+          AND SM.CMPY_CD = #{cmpyCd}
+          AND SM.DC_CD = #{dcCd}
+            /* 불량/반품 관련 SO 유형 필터링 */
+          AND SM.SO_TYPE IN ('2000', '3200', '4200', '9903', '9906', '6000')
+            /* 입고되지 않은 건만 조회 */
+          AND ISNULL(SP.YONGIN_INBOUNDED, 'N') = 'N'
+          AND SM.DLVY_CNFM_DT BETWEEN #{fromDt} AND #{toDt}
+        ORDER BY SM.SAVE_TIME DESC
+    </select>
+
+</mapper>

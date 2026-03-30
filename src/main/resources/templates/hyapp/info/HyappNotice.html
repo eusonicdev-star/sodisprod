@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>최근 알림 10건</title>
+    <style>
+        body { margin:0; background:#f8fafc; font-family:-apple-system, sans-serif; padding:16px; }
+        header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+        .back-btn { border:none; background:none; font-size:20px; color:#475569; }
+        .limit-info { font-size:12px; color:#94a3b8; }
+
+        .notice-container { display: flex; flex-direction: column; gap: 12px; }
+
+        /* 알림 카드 스타일 */
+        .card {
+            background:#fff; border-radius:12px; padding:16px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0;
+            position: relative; overflow: hidden;
+        }
+        /* 미확인 알림 강조 (왼쪽 파란 선) */
+        .card.unread { border-left: 4px solid #3b82f6; background: #f0f7ff; }
+        .card.confirmed { opacity: 0.6; background: #fdfdfd; }
+
+        .notice-title { font-weight: bold; font-size: 15px; color: #1e293b; margin-bottom: 4px; }
+        .notice-content { font-size: 14px; color: #475569; line-height: 1.4; margin-bottom: 8px; }
+        .notice-date { font-size: 11px; color: #94a3b8; }
+
+        /* 확인 버튼 */
+        .btn-confirm {
+            margin-top: 10px; width: 100%; padding: 8px;
+            background: #3b82f6; color: white; border: none;
+            border-radius: 6px; font-weight: 600; font-size: 13px;
+        }
+        .check-icon { color: #64748b; font-size: 12px; font-weight: bold; margin-top: 8px; display: block; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="display:flex; align-items:center; gap:8px;">
+        <button class="back-btn" onclick="location.replace('/hyapp/main')">✕</button>
+        <h2 style="margin:0; font-size:18px; color:#1e293b;">알림 센터</h2>
+    </div>
+    <span class="limit-info">최근 10건</span>
+</header>
+
+<div id="noticeList" class="notice-container">
+</div>
+
+<script>
+    window.onload = loadNotices;
+
+    async function loadNotices() {
+        try {
+            const res = await fetch('/hyapp/api/notice/list?cmpyCd=A');
+            const notices = await res.json();
+            const listEl = document.getElementById("noticeList");
+            listEl.innerHTML = "";
+
+            if (notices.length === 0) {
+                listEl.innerHTML = '<div style="text-align:center; padding:50px; color:#94a3b8;">알림 내역이 없습니다.</div>';
+                return;
+            }
+
+            notices.forEach(n => {
+                const isUnread = n.confirmYn === 'N';
+                const card = document.createElement("div");
+                card.className = `card ${isUnread ? 'unread' : 'confirmed'}`;
+
+                card.innerHTML = `
+                    <div class="notice-title">${n.title}</div>
+                    <div class="notice-content">${n.content.replace(/\n/g, '<br>')}</div>
+                    <div class="notice-date">${n.saveTime}</div>
+                    ${isUnread ?
+                    `<button class="btn-confirm" onclick="confirmNotice(${n.noticeId})">읽음 확인</button>` :
+                    `<span class="check-icon">✓ 확인 완료</span>`}
+                `;
+                listEl.appendChild(card);
+            });
+        } catch (e) { console.error("알림 로드 실패", e); }
+    }
+
+    async function confirmNotice(noticeId) {
+        try {
+            const res = await fetch(`/hyapp/api/notice/confirm?noticeId=${noticeId}`, { method: 'POST' });
+            if (res.ok) loadNotices(); // 즉시 리프레시
+        } catch (e) { console.error("확인 처리 실패", e); }
+    }
+</script>
+</body>
+</html>

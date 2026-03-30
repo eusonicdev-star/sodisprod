@@ -1,0 +1,507 @@
+/* 교환/반품 재입고 관리 페이지 스타일 */
+
+/* 상태별 행 색상 */
+.grid-row-inbound-waiting {
+  background-color: #ffe6e6 !important; /* 재입고대기: 연한 빨간색 */
+}
+
+.grid-row-inbound-complete {
+  background-color: #fff2cc !important; /* 재입고완료, 반출대기: 연한 노란색 */
+}
+
+.grid-row-outbound-complete {
+  background-color: #e8f5e8 !important; /* 완료: 연한 녹색 */
+}
+
+/* 버튼 스타일 */
+.btn-inbound-complete {
+  background-color: #28a745;
+  color: white;
+  border: 1px solid #28a745;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-inbound-complete:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+.btn-outbound-complete {
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-outbound-complete:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+/* 상태 표시 스타일 */
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: bold;
+  text-align: center;
+  min-width: 60px;
+}
+
+.status-waiting {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.status-complete {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-processing {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+/* 그리드 헤더 스타일 */
+.grid-header-return {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  text-align: center;
+  padding: 8px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* 검색 영역 스타일 */
+.search-section {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 10px;
+}
+
+.search-section .title-text {
+  color: #495057;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* 액션 버튼 영역 */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+.action-buttons .action-button {
+  padding: 8px 16px;
+  border: 1px solid #6c757d;
+  background-color: #ffffff;
+  color: #495057;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.action-buttons .action-button:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.action-buttons .action-button.primary {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.action-buttons .action-button.primary:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+/* 상태 필터 스타일 */
+.status-filter {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.status-filter .filter-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-filter .filter-item label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #495057;
+  min-width: 80px;
+}
+
+/* 그리드 행 상태 표시 */
+.grid-row-status {
+  position: relative;
+}
+
+.grid-row-status::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #dee2e6;
+}
+
+.grid-row-status.inbound-waiting::before {
+  background-color: #dc3545;
+}
+
+.grid-row-status.inbound-complete::before {
+  background-color: #ffc107;
+}
+
+.grid-row-status.outbound-complete::before {
+  background-color: #28a745;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1200px) {
+  .search-section {
+    padding: 10px;
+  }
+
+  .action-buttons {
+    flex-wrap: wrap;
+  }
+
+  .status-filter {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .action-buttons .action-button {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  .status-filter .filter-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* 툴팁 스타일 */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 11px;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* 로딩 스피너 */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 알림 메시지 스타일 */
+.notification-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.notification-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.notification-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+/* 모달 오버레이 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 모달 컨텐츠 */
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  width: 400px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: hidden;
+}
+
+/* 모달 헤더 */
+.modal-header {
+  background-color: #f8f9fa;
+  padding: 15px 20px;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.modal-close {
+  font-size: 24px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #000;
+}
+
+/* 모달 바디 */
+.modal-body {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* 뱃지 스타일 */
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 4px;
+  color: white;
+}
+
+.badge-success {
+  background-color: #28a745;
+}
+
+.badge-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.badge-primary {
+  background-color: #007bff;
+}
+
+.badge-secondary {
+  background-color: #6c757d;
+}
+
+.form-group i {
+  margin-left: 8px;
+  cursor: pointer;
+  color: #007bff;
+}
+
+.form-group i:hover {
+  color: #0056b3;
+}
+
+.modal-info {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.modal-info p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* 모달 푸터 */
+.modal-footer {
+  background-color: #f8f9fa;
+  padding: 15px 20px;
+  border-top: 1px solid #dee2e6;
+  text-align: right;
+}
+
+.btn {
+  padding: 8px 16px;
+  margin-left: 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #545b62;
+}
+
+/* 되돌리기 버튼 스타일 */
+.action-button.danger {
+  background-color: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.action-button.danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* 되돌리기 모달 경고 스타일 */
+.modal-info.warning {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+}
+
+.modal-info.warning p {
+  color: #856404;
+  font-weight: 500;
+}
+
+/* 되돌리기 버튼 아이콘 */
+.action-button.danger::before {
+  content: "↶ ";
+  font-weight: bold;
+}
+
+/* 모달 경고 아이콘 */
+.modal-info.warning::before {
+  content: "⚠️ ";
+  margin-right: 5px;
+}

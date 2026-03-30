@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>재고 실사 등록</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    :root { --bg:#f5f7fb; --card:#ffffff; --primary:#0d9488; --blue:#2563eb; --txt:#1f2937; --bd:#e5e7eb; }
+    body { margin:0; font-family:-apple-system, sans-serif; background:var(--bg); color:var(--txt); padding-bottom:30px; }
+
+    header {
+      position:sticky; top:0; z-index:100; padding:14px 16px; background:#fff;
+      border-bottom:1px solid var(--bd); font-weight:700; font-size:18px;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+
+    .container { padding:16px; display:flex; flex-direction:column; gap:16px; }
+    .form-card { background:#fff; padding:16px; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+
+    /* [수정] 그룹 간격 대폭 축소 (10px -> 5px) */
+    .input-group { margin-bottom:5px; }
+
+    /* [수정] 라벨 간격 축소 */
+    .label { font-size:13px; font-weight:600; color:#6b7280; margin-bottom:2px; display:block; }
+    .input-row { display:flex; gap:8px; }
+
+    .input {
+      width:100%; height:44px; padding:0 12px;
+      border:1px solid #d1d5db; border-radius:8px;
+      font-size:16px; background:#fff;
+    }
+    .input:read-only { background:#f3f4f6; color:#999; }
+    .input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 2px rgba(13,148,136,0.1); }
+
+    .btn-scan { width:50px; flex-shrink:0; background:#374151; color:#fff; border:none; border-radius:8px; font-size:18px; cursor:pointer;}
+
+    /* 저장 버튼 위쪽 여백 살짝 줌 */
+    .btn-save { width:100%; height:48px; background:var(--primary); color:#fff; font-size:16px; font-weight:700; border:none; border-radius:8px; margin-top:10px; cursor:pointer;}
+
+    .plt-group { display:flex; gap:8px; }
+    .plt-btn { flex:1; height:40px; border:1px solid #d1d5db; background:#fff; border-radius:8px; font-weight:600; color:#374151; cursor:pointer; }
+    .plt-btn.active { background:#0f766e; color:#fff; border-color:#0f766e; }
+
+    .section-title { font-size:14px; font-weight:700; color:#374151; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;}
+    .card-item { background:#fff; border:1px solid var(--bd); border-radius:8px; padding:12px; margin-bottom:8px; transition:0.3s; }
+    .card-row { display:flex; justify-content:space-between; align-items:center; }
+    .nm { font-weight:700; font-size:15px; color:#111; margin-bottom:4px; }
+    .cd { font-size:12px; color:#888; }
+    .qty { font-size:18px; font-weight:800; color:var(--primary); }
+
+    .sys-card { border-left:4px solid var(--blue); }
+    .sys-card.done { border-left-color:#ccc; opacity:0.6; background:#f9fafb; }
+    .sys-qty { color:var(--blue); }
+
+    .btn-group { display:flex; gap:8px; margin-top:10px; border-top:1px solid #f3f4f6; padding-top:10px; }
+    .btn-sm { flex:1; height:36px; border-radius:6px; border:none; font-weight:700; font-size:13px; cursor:pointer;}
+    .btn-confirm { background:#eff6ff; color:var(--blue); }
+    .btn-adjust  { background:#f3f4f6; color:#374151; }
+
+    .empty-msg { text-align:center; color:#999; font-size:13px; padding:20px; border:1px dashed #ccc; border-radius:8px; }
+
+    /* [수정] 상품명 영역 스타일: 기본적으로 숨기고 내용 있을때만 공간 차지하도록 할 수도 있으나,
+       여기서는 최소 높이를 아주 작게 잡아서 점프 방지 */
+    #mtrlNm { font-size:13px; color:#2563eb; font-weight:700; margin-top:2px; min-height:16px; line-height:16px; }
+
+    input[type="number"]::-webkit-inner-spin-button { opacity: 1; } /* 수량 조절 버튼 표시 */
+    .card-item { margin-bottom: 10px; border: 1px solid var(--bd); }
+  </style>
+</head>
+<body>
+
+<header>
+  <button onclick="history.back()" style="border:none; background:none; font-size:18px;">←</button>
+  <span>재고 실사 시작</span>
+  <div style="width:20px;"></div>
+</header>
+
+<div class="container">
+  <div class="form-card">
+    <div class="input-group">
+      <label class="label">로케이션 (Loc)</label>
+      <div class="input-row">
+        <input id="locCd" class="input" placeholder="스캔하세요" onchange="onLocChange()" />
+        <button class="btn-scan" onclick="reqScan('LOC')">📷</button>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label class="label">팔레트 규격 <span style="color:red">*</span></label>
+      <div class="plt-group">
+        <button class="plt-btn active" onclick="setPlt(this, '110*110')">110*110</button>
+        <button class="plt-btn" onclick="setPlt(this, '110*140')">110*140</button>
+      </div>
+      <input type="hidden" id="pltSize" value="110*110" />
+    </div>
+
+    <div class="input-group" style="margin-bottom:2px;">
+      <label class="label">상품코드</label>
+      <div class="input-row">
+        <input id="mtrlCd" class="input" placeholder="상품 스캔" onchange="getMtrlName()" />
+        <button class="btn-scan" onclick="reqScan('MTRL')">📷</button>
+      </div>
+      <div id="mtrlNm"></div>
+    </div>
+
+    <div class="input-group" style="margin-top:0;">
+      <label class="label">수량</label>
+      <input id="qty" type="number" class="input" placeholder="0" inputmode="numeric" />
+    </div>
+
+    <button class="btn-save" onclick="saveManual()">저장 (Save)</button>
+  </div>
+
+  <div>
+    <div class="section-title">
+      <span>💻 전산 재고 (System)</span>
+      <button onclick="loadSystemStock()" style="font-size:12px; border:none; background:none; color:#666;">↻</button>
+    </div>
+    <div id="systemList">
+      <div class="empty-msg">로케이션을 스캔하세요.</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-title">
+      <span>✅ 실사 완료 (Counted)</span>
+      <span id="checkedCnt" style="color:var(--primary)">0건</span>
+    </div>
+    <div id="checkedList"></div>
+  </div>
+</div>
+
+<script>
+  let selectedCustomer = null; // [추가] 고객사 정보 변수 선언
+
+  window.onload = function() {
+    // [추가] 세션에서 선택된 고객사 정보 로드
+    const raw = sessionStorage.getItem("SELECTED_CUSTOMER");
+    if (raw) {
+      selectedCustomer = JSON.parse(raw);
+    }
+
+    // 기존 날짜 세팅 로직 유지
+    const today = new Date().toISOString().split('T')[0];
+    el("dateFrom") ? el("dateFrom").value = "2025-10-02" : null;
+    el("dateTo") ? el("dateTo").value = today : null;
+  };
+
+  const el = (id) => document.getElementById(id);
+  const API = {
+    SYSTEM: "/hyapp/api/check/system-stock",
+    SAVE: "/hyapp/api/check/save",
+    LIST: "/hyapp/api/check/list",
+    MTRL: "/hyapp/api/check/product"
+  };
+
+  let activeScanTarget = null;
+
+  function setPlt(btn, val) {
+    document.querySelectorAll('.plt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    el('pltSize').value = val;
+  }
+
+  el("locCd").addEventListener("keydown", (e) => { if(e.key==="Enter") onLocChange(); });
+  el("mtrlCd").addEventListener("keydown", (e) => {
+    if(e.key==="Enter") { getMtrlName(); el("qty").focus(); }
+  });
+
+  function onLocChange() {
+    const val = el("locCd").value.trim();
+    if (val) { loadSystemStock(); loadCheckedList(); }
+  }
+
+  function reqScan(target) {
+    activeScanTarget = target;
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "requestBarcodeScan", target: target }));
+    } else {
+      alert("앱 환경 아님");
+    }
+  }
+
+  document.addEventListener("message", handleAppMessage);
+  window.addEventListener("message", handleAppMessage);
+
+  function handleAppMessage(e) {
+    try {
+      let data = e.data;
+      if (typeof data === "string") {
+        try { data = JSON.parse(data); } catch (err) { data = { value: data }; }
+      }
+      const code = data.value || data.code || data.barcode || (typeof data === 'string' ? data : '');
+      if (!code) return;
+
+      const target = data.target || activeScanTarget;
+
+      if (target === 'LOC') {
+        el("locCd").value = code;
+        onLocChange();
+      } else if (target === 'MTRL') {
+        el("mtrlCd").value = code;
+        getMtrlName();
+        el("qty").focus();
+      } else {
+        if (!el("locCd").value) {
+          el("locCd").value = code;
+          onLocChange();
+        } else {
+          el("mtrlCd").value = code;
+          getMtrlName();
+          el("qty").focus();
+        }
+      }
+    } catch(err){}
+  }
+
+  // HyappInvCheckReg.html 내 loadSystemStock 함수 수정
+  async function loadSystemStock() {
+    const locCd = el("locCd").value;
+    if(!locCd) return;
+    const box = el("systemList");
+    box.innerHTML = `<div class="empty-msg">조회 중...</div>`;
+
+    try {
+      const res = await fetch(`${API.SYSTEM}?locCd=${locCd}`);
+      const list = await res.json();
+      if (!list || !list.length) {
+        box.innerHTML = `<div class="empty-msg">전산 재고 없음</div>`;
+        return;
+      }
+
+      box.innerHTML = list.map(item => {
+        const mtrlCd = item.MTRL_CD;
+        // 특수문자 처리를 위해 escape 처리
+        const mtrlNm = (item.MTRL_NM || '').replace(/'/g, "\\'");
+        const agntNm = (item.AGNT_NM || '').replace(/'/g, "\\'");
+        const barcode = (item.BARCODE && item.BARCODE !== "null") ? item.BARCODE : mtrlCd;
+        const sysQty = Number(item.QTY || 0); // 수량 연산을 위해 숫자로 변환
+
+        return `
+            <div class="card-item sys-card">
+                <div class="card-row">
+                    <div><div class="nm">${item.MTRL_NM||''}</div><div class="cd">${mtrlCd}</div></div>
+                    <div class="qty sys-qty">${sysQty}</div>
+                </div>
+                <div style="margin-top:12px; padding-top:12px; border-top:1px dashed #eee; display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:14px; font-weight:700; color:#475569;">매수:</span>
+                    <input type="number" id="pQty_${mtrlCd}" value="${sysQty + 1}" min="1"
+                           style="width:80px; height:42px; text-align:center; border:2px solid #cbd5e1; border-radius:8px; font-size:18px; font-weight:800;">
+                    <button onclick="requestBarcodePrint('${mtrlCd}', '${mtrlNm}', '${barcode}', '${agntNm}')"
+                            id="pBtn_${mtrlCd}"
+                            style="width:120px; height:42px; background:#475569; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:700; flex-shrink:0;">
+                        바코드 출력
+                    </button>
+                </div>
+                <div class="btn-group">
+                    <button class="btn-sm btn-adjust" onclick="fillForm('${mtrlCd}', '${mtrlNm}', ${sysQty})">조정</button>
+                    <button class="btn-sm btn-confirm" onclick="saveDirect(this, '${mtrlCd}', ${sysQty})">확인</button>
+                </div>
+            </div>`;
+      }).join("");
+    } catch(e) { box.innerHTML = `<div class="empty-msg">오류 발생</div>`; }
+  }
+
+  async function saveDirect(btn, mtrlCd, qty) {
+    const locCd = el("locCd").value;
+    const pltSize = el("pltSize").value;
+    if(!confirm(`[확인]\n규격: ${pltSize}\n수량: ${qty}개\n\n반영합니까?`)) return;
+
+    const success = await doSave(locCd, mtrlCd, pltSize, qty);
+    if (success) {
+      const card = btn.closest('.card-item');
+      const btnGroup = btn.closest('.btn-group');
+      card.classList.add('done');
+      btnGroup.innerHTML = `<div style="width:100%; text-align:center; color:#2563eb; font-weight:700;">✅ 반영 완료</div>`;
+    }
+  }
+
+  function fillForm(mtrlCd, mtrlNm, qty) {
+    el("mtrlCd").value = mtrlCd;
+    el("mtrlNm").innerText = unescape(mtrlNm);
+    el("qty").value = qty;
+    el("qty").focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function saveManual() {
+    const locCd = el("locCd").value;
+    const mtrlCd = el("mtrlCd").value;
+    const pltSize = el("pltSize").value;
+    const qty = el("qty").value;
+    if(!locCd || !mtrlCd || !qty) return alert("필수 정보를 입력하세요.");
+    if(!confirm(`[저장]\n수량: ${qty}개 저장합니까?`)) return;
+
+    const success = await doSave(locCd, mtrlCd, pltSize, qty);
+    if (success) {
+      el("mtrlCd").value = "";
+      el("mtrlNm").innerText = "";
+      el("qty").value = "";
+    }
+  }
+
+  async function doSave(locCd, mtrlCd, pltSize, qty) {
+    try {
+      const res = await fetch(API.SAVE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locCd, mtrlCd, pltSize, qty })
+      });
+      if(res.ok) {
+        loadCheckedList();
+        return true;
+      } else {
+        alert("저장 실패");
+        return false;
+      }
+    } catch(e) {
+      alert("오류: " + e.message);
+      return false;
+    }
+  }
+
+  async function loadCheckedList() {
+    const locCd = el("locCd").value;
+    if(!locCd) return;
+    try {
+      const res = await fetch(`${API.LIST}?locCd=${locCd}`);
+      const list = await res.json();
+      el("checkedCnt").innerText = `${list.length}건`;
+      el("checkedList").innerHTML = list.map(item => `
+                <div class="card-item" style="border-left:4px solid #0d9488; background:#f0fdfa;">
+                    <div class="card-row">
+                        <div><div class="nm">${item.MTRL_NM||''}</div><div class="cd"><span style="background:#fff; border:1px solid #ccc; padding:2px 4px; border-radius:4px; font-weight:700;">${item.PLT_SIZE}</span> ${item.MTRL_CD}</div></div>
+                        <div class="qty" style="color:#0d9488;">${item.QTY}</div>
+                    </div>
+                </div>`).join("");
+    } catch(e) {}
+  }
+
+  async function getMtrlName() {
+    const cd = el("mtrlCd").value;
+    if (!cd) return;
+    try {
+      const res = await fetch(`${API.MTRL}?barcode=${cd}`);
+      const data = await res.json();
+      el("mtrlNm").innerText = data.MTRL_NM || "";
+    } catch(e) {}
+  }
+
+  function renderSystemList(list) {
+    el("systemList").innerHTML = list.map(item => `
+    <div class="card-item">
+        <div class="card-row">
+            <div>
+                <div class="nm">${item.MTRL_NM}</div>
+                <div class="cd">${item.MTRL_CD}</div>
+            </div>
+            <div class="qty">${item.QTY}</div>
+        </div>
+        <div style="margin-top:12px; padding-top:12px; border-top:1px dashed #eee; display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:14px; font-weight:700; color:#475569;">출력매수:</span>
+                    <input type="number" id="pQty_${mtrlCd}" value="1" min="1"
+                           style="width:80px; height:40px; text-align:center; border:2px solid #cbd5e1; border-radius:8px; font-size:18px; font-weight:800;">
+                    <button onclick="requestBarcodePrint('${mtrlCd}', '${mtrlNm}', '${barcode}')"
+                            id="pBtn_${mtrlCd}"
+                            style="width:120px; height:40px; background:#475569; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:700; flex-shrink:0;">
+                        바코드 출력
+                    </button>
+                </div>
+    </div>
+  `).join('') || '<p style="text-align:center; padding:20px; color:#999;">조회된 전산재고가 없습니다.</p>';
+  }
+
+  async function requestBarcodePrint(mtrlCd, mtrlNm, barcode, agentNm) {
+    // 상품별 고유 ID를 통해 정확한 수량을 읽어옴
+    const qtyInput = document.getElementById(`pQty_${mtrlCd}`);
+    const printQty = qtyInput ? qtyInput.value : 1;
+    const btn = document.getElementById(`pBtn_${mtrlCd}`);
+
+    const agntName = agentNm;
+    const companyCd = (window.selectedCustomer && window.selectedCustomer.cmpyCd) ? window.selectedCustomer.cmpyCd : 'A';
+
+    if (!barcode || barcode === "null") return alert("바코드 정보가 없습니다.");
+    if (!confirm(`[${mtrlNm}]\n${printQty}매를 출력하시겠습니까?`)) return;
+
+    try {
+      if (btn) { btn.disabled = true; btn.textContent = "요청 중..."; }
+
+      const res = await fetch("/hyapp/api/print/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mtrlNm: String(mtrlNm),
+          mtrlCd: String(mtrlCd),
+          barcode: String(barcode),
+          qty: Number(printQty),
+          agntNm: String(agntName), // 정의된 변수 사용
+          cmpyCd: companyCd   // 정의된 변수 사용
+        })
+      });
+
+      if (res.ok) alert("출력 요청 완료!");
+      else throw new Error("서버 응답 오류");
+    } catch (e) {
+      alert("출력 실패: " + e.message);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = "바코드 출력"; }
+    }
+  }
+</script>
+</body>
+</html>

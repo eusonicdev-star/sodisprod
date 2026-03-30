@@ -1,0 +1,352 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <title>양식 등록 팝업 (erp901006p1)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/popup.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/commCode.js"></script>
+
+    <script th:inline="javascript">
+
+        var myComboAtoz = [];
+
+        var myWins;
+
+        var atoz;
+
+        fnObj = {
+            winOpen: {
+                commSrch: function (title, cmpyCd, srchCtgr, srchInput) {		//공통코드 찾기 팝업
+                    windowId = "commSrch";
+                    windowText = title + " commSrch";
+                    windowUrl = "/commSrch"
+                    windowLeft = -14400;
+                    windowTop = -14400;
+                    windowWidth = 800;
+                    windowHeight = 600;
+                    windowsModal = true;
+                    windowOnClose = function (windowId) {
+
+                        return true;
+                    };
+                    windowSendObject = {
+                        cmpyCd: cmpyCd,
+                        srchCtgr: srchCtgr,	//
+                        srchInput: srchInput,
+                        windowId: windowId,
+                        srchCd: $("#srchCode").val(),
+                        srchNm: $("#srchName").val()
+                    };
+
+
+                    myWindowsOpen(windowId, windowText, windowUrl, windowLeft, windowTop, windowWidth, windowHeight, windowsModal, windowOnClose, windowSendObject);
+
+                    myWins.window(windowId).attachEvent("onClose", function (win) {
+
+                        return true;
+                    });
+                },	//END of commSrch : function(){
+
+
+                rtnObject: function (windowId, rtnObj, srchInput) {	//popup window 에서 주는 리턴을 여기서 처리하고싶은데로 처리함
+                    if (rtnObj == null) {
+                        myWins.window(windowId).setPosition(0, 0);
+                        return;
+                    }
+                    if (windowId == "commSrch") {
+                        if (srchInput == "text") {
+                            $("#srchCode").val(rtnObj[0].commCd);
+                            $("#srchName").val(rtnObj[0].commNm);
+                        }
+                    }
+
+                },	//END of rtnObject : function(windowId,rtnObj){
+            },	//END of winOpen:{
+
+            comboOpen: {
+                comboCmpyCd: function () {		//회사콤보목록
+                    myComboCmpyCd = new dhtmlXCombo("cmpyCd");
+                    comboList(myComboCmpyCd, 'A', 'COMM', 'CMPY_CD', '', 'Y', '');
+                    //myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(sendObj.cmpyCd));
+                    myComboCmpyCd.selectOption(myComboCmpyCd.getIndexByValue(/*[[${sendObject.cmpyCd}]]*/));
+
+                    myComboCmpyCd.setFontSize("12px", "12px");
+                    myComboCmpyCd.attachEvent("onChange", function (value, text) {
+                    });
+                    myComboCmpyCd.disable();
+
+                },
+
+                comboExclTmplType: function () {		//주문양식
+                    myComboExclTmplType = new dhtmlXCombo("exclTmplType");
+                    comboList(myComboExclTmplType, 'A', 'COMM', 'EXCL_TMPL_TYPE', '', 'Y', 'req');
+                    //myComboExclTmplType.selectOption(0);
+                    myComboExclTmplType.selectOption(myComboExclTmplType.getIndexByValue(/*[[${sendObject.exclTmplType}]]*/));
+                    myComboExclTmplType.setFontSize("12px", "12px");
+                    myComboExclTmplType.attachEvent("onChange", function (value, text) {
+
+                    });
+                },
+
+                comboAtoz: function (alph) {
+                    myComboAtoz[alph] = new dhtmlXCombo(alph);
+                    comboList(myComboAtoz[alph], 'A', 'COMM', 'EXCEL_TMPL_SO', '', 'Y', 'req');
+                    myComboAtoz[alph].selectOption(0);
+                    myComboAtoz[alph].setFontSize("12px", "12px");
+                    myComboAtoz[alph].attachEvent("onChange", function (value, text) {
+
+                    });
+                },
+
+
+            },	//END of comboOpen : {
+
+            gridOpen: {},		//ENd of gridOpen : {
+            searchOpen: {
+
+                //20220423 정연호 추가. 기본양식적용하기
+                defaultSet: function () {
+                    myComboAtoz[atoz[0]].selectOption(2);	//A : 시스템등록일
+                    myComboAtoz[atoz[1]].selectOption(5);	//B : 주문번호(화주)
+                    myComboAtoz[atoz[2]].selectOption(6);	//C : 쇼핑몰명
+                    myComboAtoz[atoz[3]].selectOption(9);	//D	: 운임구분
+                    myComboAtoz[atoz[4]].selectOption(24);	//E : 착불비
+                    myComboAtoz[atoz[5]].selectOption(10);	//F : 상품코드
+                    myComboAtoz[atoz[6]].selectOption(11);	//G : 상품명
+                    myComboAtoz[atoz[7]].selectOption(12);	//H : 수량
+                    myComboAtoz[atoz[8]].selectOption(13);	//I : 주문자
+                    myComboAtoz[atoz[9]].selectOption(15);	//J : 주문자연락처(HP)
+                    myComboAtoz[atoz[10]].selectOption(16);	//K : 수취인명
+                    myComboAtoz[atoz[11]].selectOption(18);	//L : 수취인연락처(주)
+                    myComboAtoz[atoz[12]].selectOption(17);	//M : 수취인연락초(보조)
+                    myComboAtoz[atoz[13]].selectOption(19);	//N : 수취인우편번호
+                    myComboAtoz[atoz[14]].selectOption(20);	//O : 수취인주소1
+                    myComboAtoz[atoz[15]].selectOption(3);	//P : 고객접수일
+                    myComboAtoz[atoz[16]].selectOption(4);	//Q : 고객배송요청
+                    myComboAtoz[atoz[17]].selectOption(22);	//R : 배송메세지
+                    myComboAtoz[atoz[18]].selectOption(25);	//S : 고객사요구사항
+                    myComboAtoz[atoz[19]].selectOption(1);	//T : 주문유형
+
+                    myComboAtoz[atoz[20]].selectOption(0);
+                    myComboAtoz[atoz[21]].selectOption(0);
+                    myComboAtoz[atoz[22]].selectOption(0);
+
+                    myComboAtoz[atoz[23]].selectOption(0);
+                    myComboAtoz[atoz[24]].selectOption(0);
+                    myComboAtoz[atoz[25]].selectOption(0);
+                },
+
+                //20220423 정연호 추가. 선택해주세요 되돌리기
+                defaultSelect: function () {
+                    for (var t = 0; t < atoz.length; t++) {
+                        myComboAtoz[atoz[t]].selectOption(0);
+                    }
+                },
+
+                saveData: function () {	//저장하기
+
+                    if (!fnObj.searchOpen.searchChkVal.chkVal("saveData")) {
+                        alert(chkValMsg);
+                        return false;
+                    }
+
+                    var save = {};
+
+                    save.cmpyCd = myComboCmpyCd.getSelectedValue();
+                    save.agntCd = $("#srchCode").val();
+                    save.exclTmplType = myComboExclTmplType.getSelectedValue();
+                    save.saveGubn = "INS";
+                    save.saveUser =	/*[[${session.tblUserMId}]]*/;
+                    save.tmplId = "";
+                    for (var i = 0; i < atoz.length; i++) {
+                        /*
+                        var getText="";
+                        if(myComboAtoz[atoz[i]].getSelectedValue())
+                        {
+                            getText = myComboAtoz[atoz[i]].getSelectedValue();
+                        }
+                        save[atoz[i]] = getText;
+                        */
+                        save[atoz[i]] = myComboAtoz[atoz[i]].getSelectedValue();
+
+                    }
+
+                    $.ajax({
+                        url: "/erp901006p1Save",
+                        processData: false,
+                        contentType: "application/json",
+                        data: JSON.stringify(save),
+                        type: "POST",
+                        datatype: "json",
+                        success: function (res) {
+
+
+                            if (res) {
+
+                                if (res.rtnYn == "Y") {
+
+                                    alert(res.rtnMsg + "\n    ㄴ> 반드시 다시 조회하여 확인해주세요.")
+                                    $(top.document).find('#loader').hide();
+                                    parent.myWins.window('erp901006p1').close();	//팝업창 닫기
+
+
+                                } else {
+                                    alert(res.rtnMsg ? res.rtnMsg : "양식등록 : 실패")
+                                    $(top.document).find('#loader').hide();
+                                }
+                            } else {
+                                alert("등록 수행 실패");
+                                $(top.document).find('#loader').hide();
+                            }
+                            $(top.document).find('#loader').hide();
+                        },
+                    });
+                },	//END of saveData : function() {
+                delSrchCode: function () {
+                    $("#srchCode").val("");
+                    $("#srchName").val("");
+                },	//END of delSrchCode : function(){
+                searchChkVal: {
+                    chkVal: function (chkGubn) {
+                        chkValMsg = "";	//메세지 초기화
+                        var rtnVal = true;
+
+                        if (chkGubn == "saveData") {
+                            if (!myComboCmpyCd.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "회사코드가 없습니다\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#srchCode").val()) {
+                                chkValMsg = chkValMsg + "화주사 코드가 없습니다. 화주사를 선택해주세요\n";
+                                rtnVal = false;
+                            }
+                            if (!$("#srchName").val()) {
+                                chkValMsg = chkValMsg + "화주사 명칭이 없습니다. 화주사를 선택해주세요\n";
+                                rtnVal = false;
+                            }
+                            if (!myComboExclTmplType.getSelectedValue()) {
+                                chkValMsg = chkValMsg + "양식구분을 선택해주세요\n";
+                                rtnVal = false;
+                            }
+                        }
+                        return rtnVal;
+                    },	//END of chkVal : function(){
+                },	//END of searchChkVal
+            },		//ENd of searchOpen : {
+            keyOpen: {
+                enterKey: function (enterType) {
+                    if (window.event.keyCode == 13) {
+                        if (enterType == 'srch') {
+                            $("#srchName").blur();
+                            $("#srchCode").blur();
+                            $("#srchCode").val("");
+                            fnObj.winOpen.commSrch('화주', 'A', 'AGENCY', 'text');
+                        }
+                    }
+                },
+
+            },
+            delSrchCode: function () {
+                $("#srchCode").val("");
+                $("#srchName").val("");
+            },	//END of delSrchCode : function(){
+
+        }	//END of fnObj
+
+
+        $(document).ready(function () {
+            console.log(pageUrl());
+
+            myWins = new dhtmlXWindows();
+
+
+            fnObj.comboOpen.comboCmpyCd();	//회사콤보 바인드
+            fnObj.comboOpen.comboExclTmplType();	//양식구분
+            atoz = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+            for (var i = 0; i < atoz.length; i++) {
+                $("#inputDiv1").append('<span class="cell" style="width:160px;padding:10px 10px 10px 10px;"><span class="item-head" style="width:20px;">' + atoz[i].toUpperCase() + '</span><span class="item-data" style="width:120px;"><div id="' + atoz[i].toLowerCase() + '" ></div></span>	</span>');
+
+                fnObj.comboOpen.comboAtoz(atoz[i]);
+
+            }
+
+
+            sendObj = /*[[${sendObject}]]*/;
+
+            $("#srchCode").val(sendObj.srchCode);
+            $("#srchName").val(sendObj.srchName);
+        });
+    </script>
+</head>
+<body>
+<div id="mainDiv">
+    <div class="popup-header-container">
+        <div class="popup-header-text">
+            엑셀양식 등록
+        </div>
+
+        <div class="button-container">
+            <input id="btnSrch" class="action-button" type="button"
+                   onclick="fnObj.searchOpen.defaultSelect();"
+                   value="초기값">
+
+            <input id="btnDefaultAccept" class="action-button primary" type="button"
+                   onclick="fnObj.searchOpen.defaultSet();"
+                   value="기본양식적용">
+
+            <input id="btnSave" class="action-button success" type="button"
+                   onclick="fnObj.searchOpen.saveData();" value="저장">
+
+            <input id="btnClose" class="action-button danger" type="button"
+                   onclick="parent.myWins.window('erp901006p1').close();"
+                   value="닫기">
+        </div>
+    </div>
+    <div class="search-container">
+            <span class="cell" style="display:none;">
+			    <span class="item-head">회사</span>
+				<span class="item-data">
+                    <div id="cmpyCd"></div>
+                </span>
+            </span>
+
+        <div class="search-item">
+            <span class="search-label">화주사</span>
+            <input type="text" id="srchName" class="search-input"
+                   onkeyup="fnObj.keyOpen.enterKey('srch');">
+            <i id="srchIcon" class="fa fa-search search-icon" aria-hidden="true"
+               onclick="fnObj.winOpen.commSrch('화주','A','AGENCY','text')"></i>
+            <input type="text" id="srchCode" class="search-input" readonly>
+            <i id="delIcon" class="fa fa-minus-circle search-icon" aria-hidden="true"
+               onclick="fnObj.searchOpen.delSrchCode()"></i>
+        </div>
+
+        <div class="search-item">
+            <span class="search-label">양식구분</span>
+            <div id="exclTmplType"></div>
+        </div>
+
+        <div id="inputDiv1" class="search-item">
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

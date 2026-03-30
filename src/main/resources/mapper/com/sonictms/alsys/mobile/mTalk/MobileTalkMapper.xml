@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.mobile.mTalk.mapper.MobileTalkMapper">
+
+	<!-- 모바일 알림톡 불러오기 - 알림톡 보내기 전에 불러오기 -->
+    <select id="mSrchTalk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO"
+    															resultType		="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO">
+        {
+	      CALL ${schema}..USP_MOBILE_DELIVERY_LIST_DETAIL_HAPPYCALL_LOAD (
+	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR}		
+			
+	      )      
+      }
+    </select>
+    
+    <!-- 모바일 알림톡 발송결과를 DB에 저장 -->
+    <select id="mSaveTalk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO"
+    															resultType		="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO">
+        {
+	      CALL ${schema}..USP_MOBILE_DELIVERY_LIST_DETAIL_HAPPYCALL_SAVE_TALK (
+	      	#{instMobileMId	,mode=IN	,	jdbcType=VARCHAR},
+			#{sendComplete	,mode=IN	,	jdbcType=VARCHAR},
+			#{userid		,mode=IN	,	jdbcType=VARCHAR},	
+			#{messageType	,mode=IN	,	jdbcType=VARCHAR},
+			#{phn			,mode=IN	,	jdbcType=VARCHAR},	
+			#{profile		,mode=IN	,	jdbcType=VARCHAR},	
+			#{reserveDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{alrmTlkMsg	,mode=IN	,	jdbcType=VARCHAR},
+			#{title			,mode=IN	,	jdbcType=VARCHAR},
+			#{tmplId		,mode=IN	,	jdbcType=VARCHAR},	
+			#{message		,mode=IN	,	jdbcType=VARCHAR},	
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+
+	      )      
+      }
+    </select>
+  
+  
+  
+  <!-- 모바일 해피콜완료 4000 => 5000 으로 바꾸기 -->
+    <select id="mSaveStat"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO"
+    															resultType		="com.sonictms.alsys.mobile.mTalk.entity.MobileTalkVO">
+        {
+	      CALL ${schema}..USP_MOBILE_DELIVERY_LIST_DETAIL_HAPPYCALL_SAVE_STAT (
+	      	#{instMobileMId	,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyDt		,mode=IN	,	jdbcType=VARCHAR},	
+			#{fromDlvyTime	,mode=IN	,	jdbcType=VARCHAR},
+			#{toDlvyTime	,mode=IN	,	jdbcType=VARCHAR},
+			#{msg			,mode=IN	,	jdbcType=VARCHAR},	
+			
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+
+	      )      
+      }
+    </select>
+</mapper>

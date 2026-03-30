@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.erp.erp102003.mapper.Erp102003Mapper">
+
+	<!-- 그리드 목록 조회하기 -->
+    <select id="erp102003List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102003.entity.Erp102003VO"
+    															resultType		="com.sonictms.alsys.erp.erp102003.entity.Erp102003VO">
+        {
+	      CALL ${schema}..USP_ALRM_SEND_MNG_LISTBYALL (
+	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{dtType	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{fromDt	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{toDt		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{agntList	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{soList	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{soTypeList,mode=IN	,	jdbcType=VARCHAR},
+	      	#{soStatList,mode=IN	,	jdbcType=VARCHAR},
+	      	#{rcptNm	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{rcptTel	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{alrmSendYn,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+		<!-- 팝업  등록/ 수정 하기 -->
+    <select id="erp102003p1ComdSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102003.entity.Erp102003VO"
+    																resultType		="com.sonictms.alsys.erp.erp102003.entity.Erp102003VO">
+        {
+	      CALL ${schema}..USP_ALRM_SCDL_SAVE (
+	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{tblAlrmScdlId	,mode=IN	,	jdbcType=VARCHAR},
+      		#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+   			#{agntCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{alrmMsgType	,mode=IN	,	jdbcType=VARCHAR},
+			#{dtCalType		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{dtCalDay		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{sendTime		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{useYn			,mode=IN	,	jdbcType=VARCHAR},	
+	      	#{memo			,mode=IN	,	jdbcType=VARCHAR},	    
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}	 	      	    		      		      		      		      
+	      )      
+      }
+    </select>
+         
+    
+  
+ 	<!-- 고유 ID 로 정보 찾기 -->
+    <select id="erp102003p1AlrmSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp102003.entity.Erp102003VO"
+    															resultType		="com.sonictms.alsys.erp.erp102003.entity.Erp102003VO">
+        {
+	      CALL ${schema}..USP_ALRM_SCDL_LOAD    (
+	      	#{tblAlrmScdlId		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+       
+  
+</mapper>

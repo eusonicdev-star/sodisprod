@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>입고 고객 선택</title>
+    <style>
+        body { margin:0; font-family: system-ui, -apple-system, sans-serif; background:#f5f7fb; color: #333; }
+        header { position: sticky; top:0; background:#fff; border-bottom:1px solid #e0e0e0; padding:16px; z-index: 10; text-align: center; }
+        h1 { margin:0; font-size:18px; font-weight: 600; }
+
+        main { padding:16px; }
+
+        /* 상단 검색 및 추가 버튼 구역 */
+        .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .row { display: flex; gap: 8px; }
+        .date-input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
+        .btn-search { padding: 0 20px; background: #333; color: #fff; border: none; border-radius: 8px; font-weight: 500; }
+
+        .btn-add-new {
+            width: 100%; padding: 14px; background: #fff; border: 2px dashed #007bff; color: #007bff;
+            border-radius: 10px; font-weight: bold; font-size: 15px; cursor: pointer;
+        }
+
+        /* 고객 리스트 버튼 스타일 */
+        .customer-list { display: flex; flex-direction: column; gap: 12px; }
+        .customer-btn {
+            display: flex; flex-direction: column; width: 100%; padding: 18px;
+            background: #fff; border: 1px solid #e0e6ed; border-radius: 12px;
+            text-align: left; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.1s;
+        }
+        .customer-btn:active { transform: scale(0.98); background: #f0f0f0; }
+
+        .customer-name { font-size: 18px; font-weight: bold; color: #1a1a1a; margin-bottom: 8px; }
+        .customer-info { display: flex; gap: 15px; font-size: 14px; color: #666; }
+        .info-item b { color: #007bff; }
+
+        .status-msg { text-align: center; margin-top: 20px; color: #888; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>입고 검수 - 고객 선택</h1>
+</header>
+
+<main>
+    <div class="controls">
+        <div class="row">
+            <input type="date" id="dateInput" class="date-input">
+            <button id="searchBtn" class="btn-search">조회</button>
+        </div>
+        <button class="btn-add-new" onclick="location.href='/hyapp/in_manual_reg'">
+            + 입고 예정 없는 차량 신규 등록
+        </button>
+    </div>
+
+    <div id="status" class="status-msg">입고 예정 정보를 불러오는 중...</div>
+
+    <div id="customerList" class="customer-list">
+    </div>
+</main>
+
+<script>
+    const dateInput = document.getElementById('dateInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const customerListEl = document.getElementById('customerList');
+    const statusEl = document.getElementById('status');
+
+    // 오늘 날짜 설정
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.value = today;
+
+    async function loadInboundCustomers() {
+        const selectedDate = dateInput.value;
+        statusEl.textContent = `${selectedDate} 조회 중...`;
+        customerListEl.innerHTML = "";
+
+        try {
+            // API 호출 (기존 컨트롤러 사용)
+            const res = await fetch("/hyapp/api/inbound/pending-list", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    dateFrom: selectedDate,
+                    dateTo: selectedDate,
+                    pageNum: 1, pageSize: 1000
+                })
+            });
+
+            const json = await res.json();
+            if (!json.success) throw new Error(json.message);
+
+            // 데이터 그룹화 (AGNT_CD 기준)
+            const grouped = groupByCustomer(json.data || []);
+            renderCustomerButtons(grouped);
+
+            statusEl.textContent = grouped.length > 0 ? `총 ${grouped.length}개의 고객사 예정 정보가 있습니다.` : "조회된 예정 정보가 없습니다.";
+
+        } catch (e) {
+            statusEl.textContent = "오류 발생: " + e.message;
+        }
+    }
+
+    // TBL_INBOUND_PRODUCT 데이터를 고객사별로 합산
+    function groupByCustomer(items) {
+        const groups = {};
+        items.forEach(item => {
+            const cd = item.AGNT_CD || item.agntCd || "UNKNOWN";
+            const nm = item.AGNT_NM || item.agntNm || cd; // 이름 필드가 없으면 코드 표시
+
+            if (!groups[cd]) {
+                groups[cd] = {
+                    agntCd: cd,
+                    agntNm: nm,
+                    itemCount: 0,
+                    totalQty: 0
+                };
+            }
+            groups[cd].itemCount += 1;
+            groups[cd].totalQty += Number(item.INBOUND_QUANTITY || item.inboundQuantity || 0);
+        });
+        return Object.values(groups);
+    }
+
+    function renderCustomerButtons(groups) {
+        customerListEl.innerHTML = groups.map(g => `
+            <button class="customer-btn" onclick="selectCustomer('${g.agntCd}', '${g.agntNm}')">
+                <div class="customer-name">${g.agntNm}</div>
+                <div class="customer-info">
+                    <span class="info-item">상품 종류: <b>${g.itemCount}종</b></span>
+                    <span class="info-item">총 예정 수량: <b>${g.totalQty.toLocaleString()}</b></span>
+                </div>
+            </button>
+        `).join("");
+    }
+
+    function selectCustomer(cd, nm) {
+        // 선택한 고객 정보를 세션에 저장하고 다음 단계(차량 정보 입력)로 이동
+        sessionStorage.setItem("SELECTED_CUSTOMER", JSON.stringify({ cd, nm }));
+        // 다음 단계 페이지로 이동 (2번/3번 절차: 차량톤수, 파렛트 입력 화면)
+        location.href = "/hyapp/in_ass";
+    }
+
+    searchBtn.addEventListener('click', loadInboundCustomers);
+    loadInboundCustomers(); // 초기 로드
+</script>
+
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>바코드 출력 시스템 (로컬 에이전트 모드)</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; padding: 20px; background: #f4f7f6; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: center; }
+        th { background-color: #f8f9fa; color: #7f8c8d; }
+        .status-ready { color: #27ae60; font-weight: bold; }
+        .status-error { color: #e74c3c; font-weight: bold; }
+        .btn-print { background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🖨️ 바코드 출력 시스템 <span id="syncStatus" class="status-ready">(에이전트 감시 중)</span></h2>
+    <p style="font-size: 13px; color: #666;">로컬 서비스: <span id="agentStatus">확인 중...</span> (localhost:9100)</p>
+
+    <table>
+        <thead>
+        <tr>
+            <th>순번</th>
+            <th>화주명</th>
+            <th>상품명</th>
+            <th>상품코드</th>
+            <th>수량</th>
+            <th>상태</th>
+        </tr>
+        </thead>
+        <tbody id="listBody">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // 1. 페이지 로드 시 로컬 에이전트(9100) 연결 확인
+    async function checkAgent() {
+        try {
+            // 로컬 에이전트가 살아있는지 단순 체크 (혹은 빈 GET 요청)
+            const res = await fetch('http://localhost:9100/health', { mode: 'no-cors' });
+            document.getElementById('agentStatus').innerHTML = "<b style='color:green'>정상 가동 중</b>";
+        } catch (e) {
+            document.getElementById('agentStatus').innerHTML = "<b style='color:red'>중단됨 (에이전트를 실행하세요)</b>";
+        }
+    }
+
+    // 2. 메인 서버에서 대기 목록 가져오기 및 출력 처리
+    async function runAgent() {
+        try {
+            // 메인 서버 API 호출 (URL은 환경에 맞게 수정하세요)
+            const res = await fetch('/api/print/pending');
+            const list = await res.json();
+            renderList(list);
+
+            if (list.length === 0) return;
+
+            for (const item of list) {
+                console.log("출력 시도:", item.MTRL_NM);
+
+                // 3. [핵심] 로컬 에이전트(9100)에 출력 명령 전달
+                const localRes = await fetch('http://localhost:9100/local-print', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        SEQ: item.SEQ,
+                        BARCODE: item.BARCODE || item.MTRL_CD, // 바코드 필드명 확인 필요
+                        MTRL_NM: item.MTRL_NM,
+                        MTRL_CD: item.MTRL_CD,
+                        AGNT_NM: item.AGNT_NM,
+                        QTY: item.QTY || 1
+                    })
+                });
+
+                const result = await localRes.text();
+
+                if (result === "SUCCESS") {
+                    // 4. 출력이 성공하면 메인 서버에 완료 보고
+                    await fetch('/api/print/complete', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ SEQ: item.SEQ })
+                    });
+                    console.log(item.SEQ + "번 출력 및 완료 처리 성공");
+                } else {
+                    console.error("로컬 출력 실패:", result);
+                }
+            }
+        } catch (e) {
+            console.error("에이전트 통신 오류:", e);
+        }
+    }
+
+    function renderList(list) {
+        const listBody = document.getElementById('listBody');
+        if (list.length === 0) {
+            listBody.innerHTML = '<tr><td colspan="6">대기 중인 출력 내역이 없습니다.</td></tr>';
+            return;
+        }
+
+        const html = list.map(item => `
+            <tr>
+                <td>${item.SEQ}</td>
+                <td>${item.AGNT_NM || '-'}</td>
+                <td style="text-align:left;">${item.MTRL_NM}</td>
+                <td>${item.MTRL_CD}</td>
+                <td>${item.QTY}</td>
+                <td><span class="status-ready">대기</span></td>
+            </tr>
+        `).join('');
+        listBody.innerHTML = html;
+    }
+
+    // 초기 실행 및 5초마다 자동 체크
+    checkAgent();
+    setInterval(runAgent, 5000);
+    runAgent();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.erp.erp901006.mapper.Erp901006Mapper">
+
+	<!-- 그리드 목록 조회하기 -->
+    <select id="erp901006List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901006.entity.Erp901006VO"
+    															resultType		="com.sonictms.alsys.erp.erp901006.entity.Erp901006VO">
+        {
+	      CALL ${schema}..USP_COMM_TEMPLT_LISTBYALL (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
+			#{agntCd		,mode=IN	,	jdbcType=VARCHAR},	
+			#{exclTmplType	,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+    
+    
+    
+    
+     <!-- 양식 저장하기   -->
+	<select id="erp901006p1Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901006.entity.Erp901006VO"
+    															resultType		="com.sonictms.alsys.erp.erp901006.entity.Erp901006VO">
+        {
+	      CALL ${schema}..USP_COMM_TEMPLT_SAVE (
+	      	#{saveGubn		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{tmplId		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{agntCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{exclTmplType	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{a				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{b				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{c				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{d				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{e				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{f				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{g				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{h				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{i				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{j				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{k				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{l				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{m				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{n				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{o				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{p				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{q				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{r				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{s				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{t				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{u				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{v				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{w				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{x				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{y				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{z				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+
+    </select>
+
+	<!-- 수정팝업에서 내용 조회하기 -->
+    <select id="erp901006p2List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp901006.entity.Erp901006VO"
+    															resultType		="com.sonictms.alsys.erp.erp901006.entity.Erp901006VO">
+        {
+	      CALL ${schema}..USP_COMM_TEMPLT_LOAD (
+	      	#{tmplId		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+         
+</mapper>

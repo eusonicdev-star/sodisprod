@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.mobile.mLogin.mapper.MobileLoginMapper">
+
+	<!-- 아이디로 아이디,암호 정보찾기 기존SP이용 -->
+    <select id="mLogin"  statementType="CALLABLE"  parameterType="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    resultType="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
+        {
+	      CALL ${schema}..USP_LOGIN_ID (
+	      	#{loginId		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+    <!-- 아이디로 사람정보 찾기 -->
+    <select id="mUserInfo"  statementType="CALLABLE"  parameterType="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    resultType="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
+        {
+	      CALL ${schema}..USP_USER_INFO_R (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{loginId		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+
+
+   <!-- 로그인 되었으면 히스토리를 저장한다 -->
+    <select  id="mUserHist"  statementType="CALLABLE"  parameterType="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    resultType="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
+        {
+	      CALL ${schema}..USP_USER_H_SAVE(
+	      	
+	      	#{id			,mode=IN	,	jdbcType=VARCHAR},
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{userId		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{cnntSysCd		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{cnntIp		,mode=IN	,	jdbcType=VARCHAR},
+	      	<!-- #{userId		,mode=IN	,	jdbcType=VARCHAR} -->
+	      	#{tblUserMId	,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select> 
+
+	<!-- 그리드 목록 조회하기 -->
+    <select id="mobileLoginList"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    															resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
+        {
+	      CALL ${schema}..USP_SO_LISTBYALL (
+	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},		
+			#{dtType	,mode=IN	,	jdbcType=VARCHAR},	
+			#{fromDt	,mode=IN	,	jdbcType=VARCHAR},	
+			#{toDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{agntList	,mode=IN	,	jdbcType=VARCHAR},
+			#{dcList	,mode=IN	,	jdbcType=VARCHAR},	
+			#{soList	,mode=IN	,	jdbcType=VARCHAR},	
+			#{soTypeList,mode=IN	,	jdbcType=VARCHAR},	
+			#{soStatList,mode=IN	,	jdbcType=VARCHAR},	
+			#{mallNm	,mode=IN	,	jdbcType=VARCHAR},	
+			#{acptNm	,mode=IN	,	jdbcType=VARCHAR},	
+			#{acptTel	,mode=IN	,	jdbcType=VARCHAR},
+			#{useYn		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+	<!-- 배송확정일 가능한 날짜 조회 -->
+    <select id="mobileLoginp1List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    															resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
+        {
+	      CALL ${schema}..USP_SO_INST_ABLE_LISTBYALL (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
+			#{dcCd			,mode=IN	,	jdbcType=VARCHAR},	
+			#{fromDt		,mode=IN	,	jdbcType=VARCHAR},	
+			#{srchDay		,mode=IN	,	jdbcType=VARCHAR},
+			#{prodCdList	,mode=IN	,	jdbcType=VARCHAR},
+			#{qtyList		,mode=IN	,	jdbcType=VARCHAR},	
+			#{postCd		,mode=IN	,	jdbcType=VARCHAR},	
+			#{addr			,mode=IN	,	jdbcType=VARCHAR}	
+			
+	      )      
+      }
+    </select>
+
+	<!-- 헤더저장  -->
+    <select id="mobileLoginp1HeaderSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    															resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
+        {
+	      CALL ${schema}..USP_SO_M_INS (
+	      	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{soNo			,mode=IN	,	jdbcType=VARCHAR},
+			#{refSoNo		,mode=IN	,	jdbcType=VARCHAR},
+			#{orgnSoNo		,mode=IN	,	jdbcType=VARCHAR},
+			#{soType		,mode=IN	,	jdbcType=VARCHAR},
+			#{soStatCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{agntCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{mallCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{brand			,mode=IN	,	jdbcType=VARCHAR},
+			#{ordrInptDt	,mode=IN	,	jdbcType=VARCHAR},
+			#{rcptDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{rqstDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyCnfmDt	,mode=IN	,	jdbcType=VARCHAR},
+			#{acptEr		,mode=IN	,	jdbcType=VARCHAR},
+			#{ordrEr		,mode=IN	,	jdbcType=VARCHAR},
+			#{acptTel1		,mode=IN	,	jdbcType=VARCHAR},
+			#{acptTel2		,mode=IN	,	jdbcType=VARCHAR},
+			#{postCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{addr1			,mode=IN	,	jdbcType=VARCHAR},
+			#{addr2			,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyRqstMsg	,mode=IN	,	jdbcType=VARCHAR},
+			#{custSpclTxt	,mode=IN	,	jdbcType=VARCHAR},
+			#{costType		,mode=IN	,	jdbcType=VARCHAR},
+			#{rcptCost		,mode=IN	,	jdbcType=VARCHAR},
+			#{passCost		,mode=IN	,	jdbcType=VARCHAR},
+			#{dcCd			,mode=IN	,	jdbcType=VARCHAR},
+			#{useYn			,mode=IN	,	jdbcType=VARCHAR},
+			#{memo			,mode=IN	,	jdbcType=VARCHAR},
+			#{inptSys		,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+    <!-- 상세저장  -->
+    <select id="mobileLoginp1DetailSave"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    																	resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
+        {
+	      CALL ${schema}..USP_SO_P_INS (
+	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
+			#{soNo			,mode=IN	,	jdbcType=VARCHAR},
+			#{agntCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{prodSeq		,mode=IN	,	jdbcType=VARCHAR},
+			#{prodCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{prodNm		,mode=IN	,	jdbcType=VARCHAR},
+			#{qty			,mode=IN	,	jdbcType=VARCHAR},
+			#{instCost		,mode=IN	,	jdbcType=VARCHAR},	<!-- 20210913 정연호. 시공비입력 추가 -->
+			#{zoneCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{dcCd			,mode=IN	,	jdbcType=VARCHAR},
+			#{rqstDt        ,mode=IN	,	jdbcType=VARCHAR}, 
+			#{dlvyCnfmDt    ,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyRqstMsg	,mode=IN	,	jdbcType=VARCHAR},
+			#{useYn			,mode=IN	,	jdbcType=VARCHAR},
+			#{memo			,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+    <!-- 주문수정 팝업에서 헤더 불러오기		헤더는 1줄만 불러옴 -->
+    <select id="mobileLoginp3HeaderList"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    															resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
+        {
+	      CALL ${schema}..USP_SO_M_LOAD  (
+	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}
+			
+	      )      
+      }
+    </select>
+    
+    <!-- 주문수정 팝업에서 상세 불러오기		상세는 리스트 -->
+    <select id="mobileLoginp3DetailList"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    															resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
+        {
+	      CALL ${schema}..USP_SO_P_LOAD  (
+	      	#{tblSoMId	,mode=IN	,	jdbcType=VARCHAR}
+	      )
+      }
+    </select>
+    
+     <!-- 상세삭제  -->
+    <select id="mobileLoginp3DelDetail"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    																	resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
+        {
+	      CALL ${schema}..USP_SO_P_DEL (
+	      	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{tblSoPId		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{useYn			,mode=IN	,	jdbcType=VARCHAR},
+	      	#{delResn		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{memo			,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+ 	<!-- 헤더수정  -->
+    <select id="mobileLoginp1HeaderUpdt"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO"
+    															resultType		="com.sonictms.alsys.mobile.mLogin.entity.MobileLoginVO">
+        {
+	      CALL ${schema}..USP_SO_M_UPDT (
+	     	#{tblSoMId		,mode=IN	,	jdbcType=VARCHAR},
+			#{refSoNo		,mode=IN	,	jdbcType=VARCHAR},
+			#{orgnSoNo		,mode=IN	,	jdbcType=VARCHAR},
+			#{soType		,mode=IN	,	jdbcType=VARCHAR},
+			#{soStatCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{agntCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{mallCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{brand			,mode=IN	,	jdbcType=VARCHAR},
+			#{ordrInptDt	,mode=IN	,	jdbcType=VARCHAR},
+			#{rcptDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{rqstDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyCnfmDt	,mode=IN	,	jdbcType=VARCHAR},
+			#{acptEr		,mode=IN	,	jdbcType=VARCHAR},
+			#{ordrEr		,mode=IN	,	jdbcType=VARCHAR},
+			#{acptTel1		,mode=IN	,	jdbcType=VARCHAR},
+			#{acptTel2		,mode=IN	,	jdbcType=VARCHAR},
+			#{postCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{addr1			,mode=IN	,	jdbcType=VARCHAR},
+			#{addr2			,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyRqstMsg	,mode=IN	,	jdbcType=VARCHAR},
+			#{custSpclTxt	,mode=IN	,	jdbcType=VARCHAR},
+			#{costType		,mode=IN	,	jdbcType=VARCHAR},
+			#{rcptCost		,mode=IN	,	jdbcType=VARCHAR},
+			#{passCost		,mode=IN	,	jdbcType=VARCHAR},
+			#{dcCd			,mode=IN	,	jdbcType=VARCHAR},
+			#{useYn			,mode=IN	,	jdbcType=VARCHAR},
+			#{memo			,mode=IN	,	jdbcType=VARCHAR},
+			#{inptSys		,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>   
+</mapper>

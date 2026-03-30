@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>출고 검수 마스터 (VO 기반)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root { --bg:#f7f7f7; --card:#fff; --border:#e8e8e8; --text:#111; --sub:#666; --primary:#0d6efd; --danger:#ef4444; }
+    body { background-color: var(--bg); font-family: 'Pretendard', system-ui, -apple-system, sans-serif; color: var(--text); }
+
+    .search-container { background: white; padding: 20px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+
+    /* 카드형 리스트 스타일 */
+    .card-list { padding: 10px 16px; }
+    .card-item {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      cursor: pointer; transition: transform 0.1s;
+    }
+    .card-item:active { transform: scale(0.98); background: #fafafa; }
+
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; border:none; background:none; padding:0; margin-bottom:12px; }
+    .main-title { font-size: 18px; font-weight: 700; color: var(--text); line-height: 1.3; }
+    .sub-team { font-size: 13px; color: var(--sub); font-weight: 400; margin-top: 2px; }
+
+    .meta-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 14px; border-top: 1px solid #f0f0f0; margin-top: 12px; padding-top: 12px; }
+    .meta-item { display: flex; flex-direction: column; }
+    .meta-label { font-size: 12px; color: var(--sub); margin-bottom: 2px; }
+    .meta-value { font-weight: 600; }
+    .meta-value.cancel { color: var(--danger); font-weight: 800; }
+
+    .badge-status { font-size: 12px; padding: 3px 10px; border-radius: 999px; font-weight: 500; }
+    .badge-wait { background: #f0f0f0; color: #666; }
+    .badge-done { background: #dcfce7; color: #15803d; }
+    .badge-scan-done { background: #22c55e; color: #fff; }
+
+    .card-item.done { background-color: #f0fdf4; border-color: #bbf7d0; }
+    .card-item.done .main-title { color: #15803d; }
+
+    .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 1000; justify-content: center; align-items: center; }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner-border text-primary" role="status"></div>
+</div>
+
+<header class="bg-white p-3 border-bottom sticky-top">
+  <h1 class="h6 mb-0 fw-bold">📦 출고 검수 마스터</h1>
+</header>
+
+<main>
+  <div class="search-container">
+    <div class="row g-2">
+      <div class="col-6">
+        <label class="form-label small fw-bold">출고일자</label>
+        <input type="date" id="dlvyDt" class="form-control">
+      </div>
+      <div class="col-6">
+        <label class="form-label small fw-bold">물류센터(DC)</label>
+        <select id="dcCd" class="form-select">
+          <option value="">로딩 중...</option>
+        </select>
+      </div>
+      <div class="col-12 mt-3">
+        <button class="btn btn-primary w-100 fw-bold py-2" onclick="searchMasterList()">데이터 조회하기</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="masterBody" class="card-list">
+    <div class="text-center py-5 text-muted small">조회 버튼을 눌러 데이터를 불러오세요.</div>
+  </div>
+</main>
+
+<script>
+  // 페이지 로드 시 초기화
+  document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('dlvyDt').value = new Date().toISOString().substring(0, 10);
+    await loadDcList();
+
+    // 저장된 검색 조건 복구
+    const savedDcCd = localStorage.getItem('lastDcCd');
+    const savedDlvyDt = localStorage.getItem('lastDlvyDt');
+
+    if (savedDcCd) document.getElementById('dcCd').value = savedDcCd;
+    if (savedDlvyDt) document.getElementById('dlvyDt').value = savedDlvyDt;
+
+    // 자동 조회 실행
+    if (document.getElementById('dcCd').value && document.getElementById('dlvyDt').value) {
+      searchMasterList();
+    }
+  });
+
+  async function loadDcList() {
+    const dcSelect = document.getElementById('dcCd');
+    try {
+      // 회사 코드는 세션이나 전역 설정값에 따라 유동적으로 변경 가능
+      const response = await fetch(`/api/common/dc-list?cmpyCd=A`);
+      const dcList = await response.json();
+      dcSelect.innerHTML = '';
+      if (dcList && dcList.length > 0) {
+        dcList.forEach(dc => {
+          const option = document.createElement('option');
+          option.value = dc.dcCd;
+          option.textContent = dc.dcNm;
+          dcSelect.appendChild(option);
+        });
+      }
+    } catch (e) {
+      console.error("센터 목록 로드 실패", e);
+      dcSelect.innerHTML = '<option value="">로드 실패</option>';
+    }
+  }
+
+  async function searchMasterList() {
+    const dlvyDt = document.getElementById('dlvyDt').value;
+    const dcCd = document.getElementById('dcCd').value;
+    const body = document.getElementById('masterBody');
+    const loading = document.getElementById('loading');
+
+    if (!dcCd) return alert("물류센터를 선택해주세요.");
+
+    // 검색 조건 저장
+    localStorage.setItem('lastDcCd', dcCd);
+    localStorage.setItem('lastDlvyDt', dlvyDt);
+
+    loading.style.display = 'flex';
+
+    try {
+      // 쿼리 스트링 파라미터 명칭을 VO의 필드명과 일치시킴
+      const response = await fetch(`/hyapp/api/outbound/master-list?cmpyCd=A&dcCd=${dcCd}&dlvyDt=${dlvyDt}`);
+      const data = await response.json();
+
+      body.innerHTML = '';
+
+      if (data.length === 0) {
+        body.innerHTML = '<div class="text-center py-5 text-muted">조회된 데이터가 없습니다.</div>';
+      } else {
+        data.forEach(item => {
+          // VO의 필드명을 사용하여 검수 완료 여부 판단
+          const isScanFinished = (item.totalQty > 0 && item.totalQty === item.scanQty);
+          const cancelCount = item.cancelCount || 0;
+
+          const card = document.createElement('div');
+          card.className = `card-item ${isScanFinished ? 'done' : ''}`;
+          card.onclick = () => goToDetail(item.paltNoxx, item.dlvyEr, dlvyDt);
+
+          const statusBadge = isScanFinished
+                  ? '<span class="badge-status badge-scan-done">검수완료</span>'
+                  : (item.mobileTranYn === 'Y'
+                          ? '<span class="badge-status badge-done">전송완료</span>'
+                          : '<span class="badge-status badge-wait">대기중</span>');
+
+          card.innerHTML = `
+            <div class="card-header">
+                <div>
+                    <div class="main-title">
+                        ${isScanFinished ? '✅ ' : ''}${item.paltNoxx || '팔레트 미지정'}
+                        <span style="color:${isScanFinished ? '#15803d' : '#0d6efd'}">(${item.dlvyEr || '기사 미지정'})</span>
+                    </div>
+                    <div class="sub-team">${item.dlvyTeam || '팀 미지정'}</div>
+                </div>
+                ${statusBadge}
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <span class="meta-label">상품종류</span>
+                    <span class="meta-value">${item.itemCount || 0} 종</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">검수/총수량</span>
+                    <span class="meta-value" style="color:${isScanFinished ? '#15803d' : 'var(--text)'}">
+                        ${item.scanQty || 0} / ${item.totalQty || 0} 개
+                    </span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">취소건수</span>
+                    <span class="meta-value ${cancelCount > 0 ? 'cancel' : ''}">
+                        ${cancelCount} 건
+                    </span>
+                </div>
+            </div>
+          `;
+          body.appendChild(card);
+        });
+      }
+    } catch (error) {
+      alert("데이터를 가져오는 중 오류가 발생했습니다.");
+      console.error(error);
+    } finally {
+      loading.style.display = 'none';
+    }
+  }
+
+  function goToDetail(paltNoxx, dlvyEr, dlvyDt) {
+    // 상세 페이지 이동 시 필요한 파라미터 전달
+    location.href = `/hyapp/out/detail?paltNoxx=${paltNoxx}&dlvyEr=${encodeURIComponent(dlvyEr)}&dlvyDt=${dlvyDt}&cmpyCd=A`;
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>취할 조치 없음 팝업 (erp101016p6)</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" type="text/css" href="/css/common.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css">
+
+<style>
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	overflow: auto;
+}
+</style>
+<script src="https://cdn.dhtmlx.com/edge/dhtmlx.js" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/js/commCode.js"></script>
+
+<script th:inline="javascript">
+
+	fnObj	=	{
+			winOpen : {
+			},	//END of winOpen:{
+			
+			comboOpen : {
+				
+			},	//END of comboOpen : {
+			
+			gridOpen : {
+	
+			},		//ENd of gridOpen : {
+			
+			searchOpen : {	
+				//20220605 정연호 예/아니오 버튼을 눌렀을때
+				saveAct : function(value) {		
+					var save = {};
+
+					save.midValueArray		=	sendObj.midValueArray;
+					save.missCloseType		=	value				
+					save.saveUser		=		/*[[${session.tblUserMId}]]*/			
+
+					$.ajax({
+				        url: "/erp101016p6Save",
+				        processData : false,
+						contentType : "application/json",
+				        data: JSON.stringify(save),
+				        type:"POST",
+				        datatype:"json",
+				        success : function(res){
+							alert("수행 완료\n팝업을 닫고 다시 조회 합니다.\n결과를 꼭 확인해보세요.");
+							$(top.document).find('#loader').hide();
+							var rtnObj=[]; 
+							var rtn={};
+							rtn.windowId = "erp101016p6";
+							rtnObj.push(rtn);
+							rtn={};
+							parent.fnObj.winOpen.rtnObject("erp101016p6",rtnObj,"");
+							parent.myWins.window("erp101016p6").close();	//팝업창 닫기
+				        },
+					});
+				},	//END of saveData : function() {
+					
+				
+			},		//ENd of searchOpen : {
+			keyOpen : {
+				enterKey : function(enterType){
+					 if (window.event.keyCode == 13) {
+						
+					 }
+				},
+				onKeyPressed : function (code,ctrl,shift){
+				    if(code==67&&ctrl){
+				        myGrid.setCSVDelimiter("\t");
+				        myGrid.copyBlockToClipboard()
+				    }
+				    if(code==86&&ctrl){
+				    	
+				    }
+				    return true;
+				},
+			},			
+	}	//END of fnObj
+		
+$(document).ready(function() {
+
+	sendObj = /*[[${sendObject}]]*/
+	
+	console.log(sendObj.midValueArray);
+	console.log(JSON.stringify(sendObj.midValueArray));
+	
+});
+</script>
+</head>
+<body>
+	<div id="mainDiv" style="padding: 10px 10px 10px 10px; border: 1px solid black;">
+		<div id="searchDiv" style="width: 100%; font-size: 12px;">
+			<!-- 검색조건영역 -->
+			<div id="inputDiv1" style="width: 100%; font-size: 12px;">
+
+				<span class="cell">
+					<span class="item-head" style="font-size: 14px; font-weight: bold; color: darkblue; text-align: left; padding: 0 0 10px 0;">
+						취할 조치 없음 팝업 <font size=2 color=black>erp101016p6</font>
+					</span>
+				</span>
+				<br><br>
+				<center>
+					<span class="cell">
+						<span class="item-head" style="font-size: 18px; font-weight: bold; color: black; text-align: left; padding: 0 0 10px 0;">
+							해당 현장에 더 이상 조치할 내용이 없습니까?
+						</span>
+					</span>
+					<br><br><br>
+					<span class="item-data" style="width: 90px;">
+						<input id="btnSrch" type="button" onclick="fnObj.searchOpen.saveAct('ACT_CMPL');" value="예" style="width: 70px;">
+					</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<span class="item-data" style="width: 90px;">
+						<input id="btnSrch" type="button" onclick="fnObj.searchOpen.saveAct('NO_ACT');" value="아니오" style="width: 70px;">
+						<!--  <input id="btnSrch" type="button" onclick="parent.myWins.window('erp101016p6').close();" value="닫기" style="width: 70px;">  -->
+					</span>
+				</center>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

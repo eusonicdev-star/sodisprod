@@ -1,0 +1,298 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>시공계획 관리 (erp2030010)</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css"
+          th:href="@{/css/common.css(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}">
+    <link rel="stylesheet" type="text/css"
+          th:href="@{https://cdn.dhtmlx.com/edge/fonts/font_roboto/roboto.css(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}">
+    <link rel="stylesheet" type="text/css"
+          th:href="@{https://cdn.dhtmlx.com/edge/fonts/font_awesome/css/font-awesome.min.css(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}">
+    <link rel="stylesheet" type="text/css"
+          th:href="@{https://cdn.dhtmlx.com/edge/skins/terrace/dhtmlx.css(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}">
+    <link rel="stylesheet" type="text/css" href="/css/erp-style.css">
+    <link rel="stylesheet" type="text/css"
+          th:href="@{https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}">
+    <link rel="stylesheet" type="text/css"
+          th:href="@{/css/erp203001/erp203001.css(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}">
+
+    <script th:src="@{https://cdn.dhtmlx.com/edge/dhtmlx.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"
+            crossorigin="anonymous"></script>
+    <script
+            th:src="@{https://code.jquery.com/jquery-3.6.0.min.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript"
+            th:src="@{/js/common.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"></script>
+    <script type="text/javascript"
+            th:src="@{/js/commCode.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"></script>
+    <script
+            th:src="@{https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"></script>
+    <script
+            th:src="@{https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"></script>
+    <script
+            th:src="@{https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"></script>
+
+    <!-- 세션 변수 주입 (Thymeleaf 필수) -->
+    <script th:inline="javascript">
+        var sessionCmpyCd = /*[[${session.cmpyCd}]]*/'';
+        var sessionTblUserMId = /*[[${session.tblUserMId}]]*/'';
+        var sessionUserGrntCd = /*[[${session.userGrntCd}]]*/'';
+        var sessionUserGrdCd = /*[[${session.userGrdCd}]]*/'';
+        var sessionDcCd = /*[[${session.dcCd}]]*/'';
+        var sessionDcNm = /*[[${session.dcNm}]]*/'';
+    </script>
+    <script type="text/javascript"
+            th:src="@{/js/erp203001/erp203001.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"></script>
+</head>
+<body>
+<div id="mainDiv" style="height:100%;">
+    <div id="searchDiv" style="width:100%;font-size:12px;padding-bottom:5px;">
+        <div id="btnDiv1" style="width:100%;">
+            <div class="title-container">
+                    <span class="item-head title-text">
+                        시공 계획 관리
+                    </span>
+                <span class="sub-title">erp203001</span>
+            </div>
+            <span class="btn-container">
+                    <span class="item-data">
+                        <input id="btnSearch" class="action-button primary" type="button"
+                               onclick="fnObj.searchOpen.search()" value="조회(F2)">
+                    </span>
+                    <span class="item-data" style="padding: 0 20px 0 20px;">
+                        <input id="btnReload" class="action-button" type="button" onclick="location.reload(true);"
+                               value="초기화">
+                    </span>
+                </span>
+        </div>
+        <div id="searchDiv1" style="width: 100%;">
+                <span class="cell" style="width: 220px; display: none;">
+                    <span class="item-head" style="width: 80px;">회사</span>
+                    <span class="item-data" style="width: 140px;">
+                        <div id="cmpyCd"></div>
+                    </span>
+                </span>
+            <span class="cell" style="width: 220px;">
+                    <span class="item-head" style="width: 100px;">
+                        배송확정일<font size=1>(시공일)</font>
+                    </span>
+                    <span class="item-data" style="width: 120px;">
+                        <input type="text" id="dateFrom" style="height: 20px; width: 90px;" readonly>
+                        <i id="dateFromIcon" class="fa fa-calendar fa-lg" aria-hidden="true"></i>
+                    </span>
+                </span>
+            <span class="cell" style="width: 220px;">
+                    <span class="item-head" style="width: 80px;">
+                        <b>물류센터<font color=red>*</font></b>
+                    </span>
+                    <span class="item-data" style="width: 140px;">
+                        <div id="dcCd"></div>
+                    </span>
+                </span>
+            <span class="cell" style="width: 240px;">
+                    <span class="item-head" style="width: 100px;">시공카테고리</span>
+                    <span class="item-data" style="width: 140px;">
+                        <div opt_type="checkbox" id="instCapaCtgr"></div>
+                    </span>
+                </span>
+            <span class="cell" style="width: 220px;">
+                    <span class="item-head" style="width: 80px;">시공유형</span>
+                    <span class="item-data" style="width: 140px;">
+                        <div opt_type="checkbox" id="instCapaType"></div>
+                    </span>
+                </span>
+            <span class="cell" style="width: 240px;">
+                    <span class="item-head" style="width: 100px;">시공좌석분류</span>
+                    <span class="item-data" style="width: 140px;">
+                        <div opt_type="checkbox" id="seatType"></div>
+                    </span>
+                </span>
+            <span class="cell" style="width: 280px;">
+                    <span class="item-head" style="width: 80px;">권역유형</span>
+                    <span class="item-data" style="width: 200px;">
+                        <div opt_type="checkbox" id="zoneType"></div>
+                    </span>
+                </span>
+            <span class="cell" style="width: 360px;">
+                    <span class="item-head" style="width: 80px;">권역</span>
+                    <span class="item-data" style="width: 280px;">
+                        <div opt_type="checkbox" id="zone"></div>
+                    </span>
+                </span>
+            <span class="cell" style="width: 220px;">
+                    <span class="item-head" style="width: 80px;">시공계획유무</span>
+                    <span class="item-data" style="width: 140px;">
+                        <div id="useYn"></div>
+                    </span>
+                </span>
+            <span class="cell" style="width: 220px; display: none;">
+                    <span class="item-head" style="width: 80px;">grid1RowId</span>
+                    <span class="item-data" style="width: 140px;">
+                        <input type="text" style="width: 132px; height: 20px;" id="grid1RowId">
+                    </span>
+                </span>
+            <span class="cell" style="width: 220px;">
+                    <span class="item-head" style="width: 80px;">팔렛트넘버</span>
+                    <span class="item-data" style="width: 140px;">
+                        <input type="text" style="width: 132px; height: 20px;" id="paltNoxx">
+                    </span>
+                </span>
+            <span class="cell" style="width: 220px;">
+					<span class="item-head" style="width: 80px;">시공기사</span>
+					<span class="item-data" style="width: 140px;">
+						<input type="text" style="width: 132px; height: 20px;" id="instEr">
+					</span>
+				</span>
+        </div>
+    </div>
+    <div id="searchDiv2nd"
+         style="width: 100%; font-size: 12px; padding-bottom: 5px; background-color: papayawhip; display: none;">
+        <div id="btnDiv2nd1" style="width: 100%;">
+            <span class="cell" style="float: right;"> </span>
+        </div>
+        <div id="searchDiv2nd1" style="width: 100%;"></div>
+    </div>
+    <hr style="width: 100%; border: solid 2px darkgray;">
+    <div id="minaContents" style="width: 100%; height: 85%; font-size: 12px; padding-bottom: 5px;">
+        <div id="mapDiv" style="width: 40%; height: 100%; font-size: 12px; padding-bottom: 5px; float: left;">
+            <div id="map" style="width: 100%; height: 100%;"></div>
+
+            <!-- 글로아코리아 얼라이언스 계정 alliancelogistics2024@gmail.com의 카카오맵api 앱키 -->
+            <script type="text/javascript"
+                    th:src="@{//dapi.kakao.com/v2/maps/sdk.js?appkey=1e45febd3fd4990712b693ce6b60e976&libraries=services(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}">
+            </script>
+            <!-- 카카오 맵 JavaScript 파일 -->
+            <script type="text/javascript"
+                    th:src="@{/js/erp203001/erp203001-map.js(${#calendars.format(#calendars.createNow(), 'yyyyMMdd')})}"></script>
+            <script>
+                // 카카오 맵 초기화
+                initKakaoMap();
+            </script>
+        </div>
+
+        <!-- 세로라인 -->
+        <div id="centerLine"
+             style="width: 1%; height: 100%; float: left; border-right: solid 4px darkgray; margin-right: 10px;">
+        </div>
+
+        <div id="gridDiv"
+             style="width: 57%; height: 100%; font-size: 12px; padding-bottom: 5px; float: left; border: solid 0px black;">
+            <div style="width: 100%; border: solid 0px black; overflow: hidden">
+                <div id="notice" style="width: 100%; border: solid 0px black">
+                        <span class="cell" style="width: 480px;">
+                            <span class="item-head title-text">
+                                전체현황표
+                            </span>
+                            <span class="item-data" style="width: 20px;"></span>
+                            <span class="item-head" style="width: 80px;">총건수</span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px;" id="totCnt" readOnly
+                                       disabled>
+                            </span>
+                            <span class="item-head" style="width: 80px;">미확정건수</span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px;" id="xtotCnt" readOnly
+                                       disabled>
+                            </span>
+                        </span>
+                    <span class="cell" style="float: right;">
+                            <span class="item-data" style="padding: 0 0 0 20px;">
+                                <input id="btnDelChk" class="action-button warning" type="button"
+                                       onclick="fnObj.searchOpen.delChk()" value="팔렛트 초기화">
+                            </span>
+                        </span>
+
+                </div>
+                <div id="grid" style="width: 100%; height: 66%;"></div>
+
+                <hr style="width: 100%; border: solid 1px lightgray;">
+                <div id="notice2" style="width: 100%; border: solid 0px black">
+
+                        <span class="cell" style="width: 140px;">
+                            <span class="item-head" style="width: 80px;">CBM합계</span>
+                            <span class="item-data" style="width: 60px;">
+                                <input type="text" style="width: 52px; height: 20px; text-align: right;"
+                                       id="cbmSumInput" readOnly disabled>
+                            </span>
+                        </span>
+                    <span class="cell" style="width: 140px;">
+                            <span class="item-head" style="width: 80px;">시공비합계</span>
+                            <span class="item-data" style="width: 60px;">
+                                <input type="text" style="width: 52px; height: 20px; text-align: right;"
+                                       id="costSumInput" readOnly disabled>
+                            </span>
+                        </span>
+                    <span class="cell" style="width: 160px;">
+                            <span class="item-head" style="width: 80px;">거리합계</span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px; text-align: right;"
+                                       id="distance" readOnly disabled>
+                            </span>
+                        </span>
+                    <span class="cell" style="width: 200px;">
+                            <span class="item-head" style="width: 120px;">최근팔렛트번호</span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px;" id="prePaltNoInput" readonly
+                                       disabled>
+                            </span>
+                        </span>
+                    <span class="cell" style="width: 180px;">
+                            <span class="item-head" style="width: 100px;"><b>팔렛트번호<font color="red">*</font></b></span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px;" id="paltNoInput">
+                            </span>
+                        </span>
+                    <span class="cell" style="width: 180px;">
+                            <span class="item-head" style="width: 100px;"><b>시공기사이름<font color="red">*</font></b></span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px;" id="instErName"
+                                       onkeyup="fnObj.keyOpen.enterKey('instErName');">
+                            </span>
+                        </span>
+                    <span class="cell" style="width: 200px;display:none;">
+                            <span class="item-head" style="width: 120px;"><b>시공기사고유ID<font color="red">*</font>
+                                </b></span>
+                            <span class="item-data" style="width: 80px;">
+                                <input type="text" style="width: 72px; height: 20px;" id="tblUserMId" readOnly>
+                            </span>
+                        </span>
+                </div>
+
+                <div id="btnDiv2" style="width: 100%;">
+                        <span class="cell" style="float: left;">
+                            <span class="item-data" style="padding: 0 0 0 0px;">
+                                <input id="btnDelete" class="action-button danger" type="button"
+                                       onclick="fnObj.searchOpen.grid2Delete()" value="삭제">
+                            </span>
+                        </span>
+                    <span class="cell" style="float: right;">
+
+                            <span class="item-data" style="padding: 0 0px 0 20px;">
+                                <input id="btnArchitecturalEngineer" class="action-button" type="button"
+                                       onclick="fnObj.winOpen.grid2InstErStatOpen()" value="시공기사 현황">
+                            </span>
+                            <span class="item-data" style="padding: 0 0px 0 20px;">
+                                <input id="btnSave" class="action-button success" type="button"
+                                       onclick="fnObj.searchOpen.update()" value="저장">
+                            </span>
+
+                            <span class="item-data" style="padding: 0 0 0 20px;display:none;">
+                                <input id="btnUpdate" type="button" onclick="fnObj.searchOpen.grid2Distance()"
+                                       value="거리">
+                            </span>
+                        </span>
+                </div>
+                <div id="grid2" style="width: 100%; height: 33%; overflow: hidden;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

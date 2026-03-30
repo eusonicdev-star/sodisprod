@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.commCode.mapper.CommCodeMapper">
+
+
+    <!-- 공통코드 콤보목록 불러오기 -->
+    <select id="comComboList" statementType="CALLABLE" parameterType="com.sonictms.alsys.commCode.entity.CommCodeVO"
+            resultType="com.sonictms.alsys.commCode.entity.CommCodeVO">
+        {
+            CALL ${schema}..USP_COM_COMBO_LIST(
+                #{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+                #{comboType		,mode=IN	,	jdbcType=VARCHAR},
+                #{commCd		,mode=IN	,	jdbcType=VARCHAR},
+                #{comdCd		,mode=IN	,	jdbcType=VARCHAR},
+                #{useYn			,mode=IN	,	jdbcType=VARCHAR}
+                 )
+            }
+    </select>
+
+    <!--  공통코드 그리드 리스트 불러오기   -->
+    <select id="commSrchList" statementType="CALLABLE" parameterType="com.sonictms.alsys.commCode.entity.CommCodeVO"
+            resultType="com.sonictms.alsys.commCode.entity.CommCodeVO">
+        {
+            CALL ${schema}..USP_COM_LISTBYALL(
+                #{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+                #{srchCtgr		,mode=IN	,	jdbcType=VARCHAR},
+                #{srchType		,mode=IN	,	jdbcType=VARCHAR},
+                #{srchNm		,mode=IN	,	jdbcType=VARCHAR},
+                #{srchCd		,mode=IN	,	jdbcType=VARCHAR},
+                #{srchList		,mode=IN	,	jdbcType=VARCHAR}
+                 )
+            }
+    </select>
+
+    <!--  공통코드 그리드 리스트 불러오기 (MTO 제외)   -->
+    <select id="commSrchListMto" statementType="CALLABLE" parameterType="com.sonictms.alsys.commCode.entity.CommCodeVO"
+            resultType="com.sonictms.alsys.commCode.entity.CommCodeVO">
+        {
+            CALL ${schema}..USP_COM_LISTBYALL_MTO(
+                #{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+                #{srchCtgr		,mode=IN	,	jdbcType=VARCHAR},
+                #{srchType		,mode=IN	,	jdbcType=VARCHAR},
+                #{srchNm		,mode=IN	,	jdbcType=VARCHAR},
+                #{srchCd		,mode=IN	,	jdbcType=VARCHAR},
+                #{srchList		,mode=IN	,	jdbcType=VARCHAR},
+                #{mtoYn			,mode=IN	,	jdbcType=VARCHAR}
+                 )
+            }
+    </select>
+
+    <!--  알람톡 발송 결과를 성공일때만 저장   -->
+    <select id="saveAlrmTmpResult" statementType="CALLABLE"
+            parameterType="com.sonictms.alsys.commCode.entity.SendAlrmTalkVO"
+            resultType="com.sonictms.alsys.commCode.entity.SendAlrmTalkVO">
+        {
+        CALL ${schema}..USP_SO_CNSL_STATUS_ALRMTALK_SEND_SAVE (
+        #{tblSoMId			,mode=IN	,	jdbcType=VARCHAR},
+        #{code				,mode=IN	,	jdbcType=VARCHAR},
+        #{userid			,mode=IN	,	jdbcType=VARCHAR},
+        #{message_type		,mode=IN	,	jdbcType=VARCHAR},
+        #{phn				,mode=IN	,	jdbcType=VARCHAR},
+        #{profile			,mode=IN	,	jdbcType=VARCHAR},
+        #{talkReserveDt		,mode=IN	,	jdbcType=VARCHAR},
+        #{msg			,mode=IN	,	jdbcType=VARCHAR},
+        #{smsLmsTit			,mode=IN	,	jdbcType=VARCHAR},
+        #{tmplId			,mode=IN	,	jdbcType=VARCHAR},
+        #{cmplMsgCd			,mode=IN	,	jdbcType=VARCHAR}, <!-- 알림톡의 결과코드 에 대한 원인코드 -->
+        #{saveUser			,mode=IN	,	jdbcType=VARCHAR}
+        )
+        }
+    </select>
+
+
+    <!--  알람톡 발송 결과를 스케줄 대량 발송의 결과값 저장  -->
+    <select id="sendScdlAlrmResult" statementType="CALLABLE"
+            parameterType="com.sonictms.alsys.commCode.entity.SendAlrmTalkVO"
+            resultType="com.sonictms.alsys.commCode.entity.SendAlrmTalkVO">
+        {
+        CALL ${schema}..USP_ALRM_SCDL_EXEC_SAVE (
+        #{tblSoMId			,mode=IN	,	jdbcType=VARCHAR},
+        #{code				,mode=IN	,	jdbcType=VARCHAR}, <!-- 알림톡의 success, fail 결과코드 -->
+        #{userid			,mode=IN	,	jdbcType=VARCHAR},
+        #{message_type		,mode=IN	,	jdbcType=VARCHAR},
+        #{phn				,mode=IN	,	jdbcType=VARCHAR},
+        #{profile			,mode=IN	,	jdbcType=VARCHAR},
+        #{talkReserveDt		,mode=IN	,	jdbcType=VARCHAR},
+        #{msg				,mode=IN	,	jdbcType=VARCHAR},
+        #{smsLmsTit			,mode=IN	,	jdbcType=VARCHAR},
+        #{tmplId			,mode=IN	,	jdbcType=VARCHAR},
+        #{cmplMsgCd			,mode=IN	,	jdbcType=VARCHAR}, <!-- 알림톡의 결과코드 에 대한 원인코드 -->
+        #{saveUser			,mode=IN	,	jdbcType=VARCHAR}
+        )
+        }
+    </select>
+
+
+</mapper>

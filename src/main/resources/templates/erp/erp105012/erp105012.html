@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>상품별 피킹랙 관리</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="https://cdn.dhtmlx.com/edge/skins/web/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="/css/common.css">
+    <script src="https://cdn.dhtmlx.com/edge/dhtmlx.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body { padding: 20px; font-family: 'Roboto', sans-serif; background-color: #f4f7f6; }
+        .title { font-size: 20px; font-weight: bold; margin-bottom: 20px; color: #333; }
+        .search-area { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; display: flex; align-items: center; gap: 10px; }
+        .main-container { display: flex; gap: 20px; height: calc(100vh - 150px); }
+        .left-panel { flex: 5; display: flex; flex-direction: column; }
+        .right-panel { flex: 2; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; }
+        .grid-box { width: 100%; flex-grow: 1; border: 1px solid #dfe4e8; background: #fff; }
+        .info-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .info-table th { background: #f8fafc; text-align: left; padding: 12px; border: 1px solid #eee; width: 120px; }
+        .info-table td { padding: 12px; border: 1px solid #eee; }
+        .btn-area { text-align: right; margin-bottom: 10px; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .status-none { background: #fee2e2; color: #dc2626; } /* 미지정 */
+        .status-ok { background: #dcfce7; color: #16a34a; }   /* 지정됨 */
+        /* 최적화 버튼 전용 스타일 */
+        .auto-assign-btn {
+            background-color: #059669 !important; /* 진한 녹색 */
+            color: white !important;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            padding: 10px 20px !important; /* 크기 확대 */
+            border-radius: 6px !important;
+            border: none !important;
+            cursor: pointer;
+            margin-left: auto; /* 오른쪽 끝 정렬 유지 */
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .auto-assign-btn:hover {
+            background-color: #047857 !important; /* 마우스 올렸을 때 더 진하게 */
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+
+        .auto-assign-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<div class="title">📦 상품별 피킹랙 관리 (erp105012)</div>
+
+<div class="search-area">
+    <span>화주사:</span>
+    <select id="selAgnt" style="padding: 5px; width: 150px;">
+        <option value="">전체</option>
+    </select>
+    <input type="text" id="schMtrl" placeholder="상품코드/명 입력" style="padding: 5px; width: 200px;">
+    <button class="action-button primary" onclick="fnSearch()">조회</button>
+
+    <button class="action-button"
+            style="background-color: #2563eb; color: white; font-weight: bold; padding: 10px 15px; border-radius: 6px; border: none; cursor: pointer; margin-left: 10px;"
+            onclick="fnUpdateFixedLocFromFloor()">
+        🏠 평치존 고정 로케이션 지정
+    </button>
+
+    <button class="action-button auto-assign-btn"
+            onclick="fnAutoAssignPickingRack()">
+        🚀 최적 피킹 로케이션 일괄 지정
+    </button>
+</div>
+
+<div class="main-container">
+    <div class="left-panel">
+        <div class="btn-area">
+            <span style="float: left; color: #666;">* 재고가 있는 상품 목록입니다.</span>
+            &nbsp;
+        </div>
+        <div id="gridbox" class="grid-box"></div>
+    </div>
+
+    <div class="right-panel">
+        <h3 style="margin-top:0;">📍 피킹랙 직접 지정</h3>
+        <table class="info-table">
+            <tr>
+                <th>상품코드</th>
+                <td id="tdMtrlCd">-</td>
+            </tr>
+            <tr>
+                <th>상품명</th>
+                <td id="tdMtrlNm">-</td>
+            </tr>
+            <tr>
+                <th>현재 피킹랙</th>
+                <td>
+                    <input type="text" id="currentPickLoc" readonly style="background:#eee; width:100%; border:none;">
+                </td>
+            </tr>
+            <tr>
+                <th>신규 피킹랙 코드</th>
+                <td>
+                    <input type="text" id="newPickLocCd" placeholder="예: PR62-16-02" style="width:100%; padding:8px; border:2px solid #3b82f6; border-radius:4px;">
+                    <div id="verifyMsg" style="font-size:12px; margin-top:5px;"></div>
+                </td>
+            </tr>
+        </table>
+        <div style="margin-top: 20px; text-align: center;">
+            <button class="action-button primary" style="width: 100%; height: 45px; font-size: 16px;" onclick="fnSavePickingRack()">피킹랙 저장</button>
+        </div>
+        <div style="margin-top: 30px; font-size: 13px; color: #666; line-height: 1.6;">
+            <strong>[가이드]</strong><br>
+            1. 왼쪽 리스트에서 상품을 선택하세요.<br>
+            2. '변경' 버튼을 눌러 비어있는 피킹랙을 선택합니다.<br>
+            3. '피킹랙 저장'을 누르면 해당 상품의 전용 피킹랙으로 지정됩니다.
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    var myGrid;
+    var sendObject = { cmpyCd: 'A', whCd: '1000' };
+
+    $(document).ready(function () {
+        initGrid();
+        fnSearch();
+    });
+
+    function initGrid() {
+        myGrid = new dhtmlXGridObject('gridbox');
+        myGrid.setImagePath("https://cdn.dhtmlx.com/edge/imgs/");
+        // 헤더 순서: 화주사(0), 상품코드(1), 상품명(2), 피킹랙(3), 고정 로케이션(4), 상태(5), AGNT_CD(6), LOC_ID(7)
+        myGrid.setHeader("화주사,상품코드,상품명,피킹랙,고정 로케이션,상태,AGNT_CD,LOC_ID");
+        myGrid.setInitWidths("80,120,*,120,120,80,0,0"); // 너비 조정
+        myGrid.setColAlign("left,left,left,center,center,center,left,left");
+        myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro");
+        myGrid.setColumnHidden(6, true);
+        myGrid.setColumnHidden(7, true);
+        myGrid.init();
+
+        // 행 선택 시 바인딩 로직 수정 (인덱스 밀림 주의)
+        myGrid.attachEvent("onRowSelect", function(id, ind) {
+            $("#tdMtrlCd").text(myGrid.cells(id, 1).getValue());
+            $("#tdMtrlNm").text(myGrid.cells(id, 2).getValue());
+            $("#currentPickLoc").val(myGrid.cells(id, 3).getValue());
+            $("#newPickLocCd").val("");
+        });
+    }
+
+    function fnSearch() {
+        $.ajax({
+            url: "/erp105012List",
+            type: "POST",
+            data: {
+                cmpyCd: sendObject.cmpyCd,
+                whCd: sendObject.whCd,
+                mtrlNm: $("#schMtrl").val()
+            },
+            success: function (res) {
+                myGrid.clearAll();
+                res.forEach(function(item, idx) {
+                    var rId = idx + 1;
+                    var statusHtml = item.locId ? "<span class='status-badge status-ok'>지정</span>" : "<span class='status-badge status-none'>미지정</span>";
+
+                    myGrid.addRow(rId, [
+                        item.agntNm,
+                        item.mtrlCd,
+                        item.mtrlNm,
+                        item.locCd || "미지정",
+                        item.fixedLocCd || "-",
+                        statusHtml,
+                        item.agntCd,
+                        item.locId
+                    ]);
+
+                    if(!item.locId) myGrid.setRowTextStyle(rId, "color: #dc2626;");
+                });
+            }
+        });
+    }
+
+    function fnOpenLocPopup() {
+        var mtrlCd = $("#tdMtrlCd").text();
+        var agntCd = myGrid.cells(myGrid.getSelectedRowId(), 5).getValue(); // 그리드에 숨겨진 AGNT_CD 사용
+
+        if(mtrlCd === "-") {
+            alert("먼저 상품을 선택하세요.");
+            return;
+        }
+
+        // 1. 해당 상품의 현재 재고 로케이션 목록 조회
+        $.ajax({
+            url: "/erp105012StockLocList",
+            type: "POST",
+            data: {
+                cmpyCd: sendObject.cmpyCd,
+                whCd: sendObject.whCd,
+                mtrlCd: mtrlCd,
+                agntCd: agntCd
+            },
+            success: function (res) {
+                if (res && res.length > 0) {
+                    // 재고 로케이션이 있는 경우 선택창(커스텀 레이어 또는 팝업) 오픈
+                    // 여기서는 간단하게 첫 번째 재고 로케이션을 제안하거나 팝업으로 연결
+                    fnShowLocationSelector(res);
+                } else {
+                    // 2. 재고 로케이션이 없는 경우 전체 피킹랙 조회 팝업 오픈
+                    alert("현재 재고가 잡힌 로케이션이 없습니다. 전체 피킹랙 마스터에서 선택합니다.");
+                    fnOpenFullLocSearchPopup();
+                }
+            }
+        });
+    }
+
+    // 재고 로케이션 선택창 (예시)
+    function fnShowLocationSelector(locList) {
+        // locList에는 TBL_STOCK과 조인된 LOC_CD, LOC_ID가 들어있음
+        // 실제 운영 환경에서는 dhtmlXWindows나 레이어 팝업으로 리스트를 보여주는 것이 좋습니다.
+        var msg = "현재 재고가 있는 로케이션 목록입니다. 지정할 로케이션을 클릭하세요.\n\n";
+        locList.forEach(function(loc, i) {
+            msg += (i+1) + ". " + loc.locCd + " (재고: " + loc.stockQty + ")\n";
+        });
+
+        // 임시로 prompt나 선택 로직 구현
+        var choice = prompt(msg + "\n다른 로케이션을 검색하려면 'S'를 입력하세요.");
+
+        if(choice && choice.toUpperCase() === 'S') {
+            fnOpenFullLocSearchPopup();
+        } else if(choice > 0 && choice <= locList.length) {
+            var selected = locList[choice-1];
+            $("#newPickLoc").val(selected.locCd);
+            $("#newLocId").val(selected.locId);
+        }
+    }
+
+    // 전체 피킹 로케이션 검색 팝업 (기존 공통 팝업 호출)
+    function fnOpenFullLocSearchPopup() {
+        // 기존 시스템의 로케이션 검색 팝업 함수 호출 (예: commonPopupLoc)
+        // 팝업 종료 후 callback으로 $("#newPickLoc"), $("#newLocId") 세팅
+        alert("전체 피킹랙 검색 팝업을 실행합니다.");
+    }
+
+    function fnSavePickingRack() {
+        var mtrlCd = $("#tdMtrlCd").text();
+        var locCd = $("#newPickLocCd").val().trim(); // 입력한 텍스트
+        var agntCd = myGrid.cells(myGrid.getSelectedRowId(), 5).getValue();
+
+        if (mtrlCd === "-") {
+            alert("상품을 먼저 선택해주세요.");
+            return;
+        }
+        if (!locCd) {
+            alert("변경할 로케이션 코드를 입력해주세요.");
+            return;
+        }
+
+        // [검증 및 저장] 서버에 LOC_CD를 보내서 처리
+        $.ajax({
+            url: "/erp105012SaveByCode",
+            type: "POST",
+            data: {
+                cmpyCd: 'A',
+                whCd: '1000',
+                agntCd: agntCd,
+                mtrlCd: mtrlCd,
+                locCd: locCd,
+                updtUser: 'ADMIN'
+            },
+            success: function(res) {
+                if (res.status === "SUCCESS") {
+                    alert("피킹랙이 정상적으로 저장되었습니다.");
+                    $("#newPickLocCd").val("");
+                    fnSearch();
+                } else {
+                    // 서버에서 던진 "존재하지 않는..." 메시지 출력
+                    alert("실패: " + res.message);
+                }
+            }
+        });
+    }
+
+    /**
+     * [신규] 최적 피킹 로케이션 자동 지정 프로세스 실행
+     * 재고가 있는 곳 중 BIN_NO가 가장 낮은 곳을 'Y'로 승격하고 마스터에 지정함
+     */
+    function fnAutoAssignPickingRack() {
+        if (!confirm("재고 위치(BIN_NO 기준)를 분석하여 최적의 피킹랙을 자동 지정하시겠습니까?\n이미 지정된 정보가 갱신될 수 있습니다.")) {
+            return;
+        }
+
+        // 대량 처리이므로 로딩 바를 띄우는 것이 좋음
+        $.ajax({
+            url: "/erp105012AutoAssign",
+            type: "POST",
+            data: {
+                cmpyCd: sendObject.cmpyCd,
+                whCd: sendObject.whCd,
+                updtUser: 'SYSTEM_AUTO'
+            },
+            success: function (res) {
+                if (res === "SUCCESS") {
+                    alert("최적 피킹 로케이션 지정이 완료되었습니다.");
+                    fnSearch(); // 그리드 새로고침
+                } else {
+                    alert("처리 중 오류가 발생했습니다.");
+                }
+            },
+            error: function() {
+                alert("서버 통신 오류가 발생했습니다.");
+            }
+        });
+    }
+
+    function fnUpdateFixedLocFromFloor() {
+        if (!confirm("현재 재고가 평치존(FLOOR_)에 있는 상품들의 고정 적치 로케이션을 일괄 업데이트하시겠습니까?")) {
+            return;
+        }
+
+        $.ajax({
+            url: "/erp105012UpdateFixedLoc",
+            type: "POST",
+            data: {
+                cmpyCd: sendObject.cmpyCd,
+                whCd: sendObject.whCd,
+                updtUser: 'ADMIN_FIXED'
+            },
+            success: function (res) {
+                if (res === "SUCCESS") {
+                    alert("평치존 기반 고정 로케이션 지정이 완료되었습니다.");
+                    fnSearch();
+                } else {
+                    alert("처리 중 오류가 발생했습니다.");
+                }
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        initGrid();
+        fnSearch();
+
+        // 창 크기 변경 시 그리드 리사이즈 처리
+        $(window).resize(function() {
+            if (myGrid) {
+                myGrid.setSizes();
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

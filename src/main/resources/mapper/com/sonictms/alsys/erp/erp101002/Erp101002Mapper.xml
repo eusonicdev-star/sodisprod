@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.erp.erp101002.mapper.Erp101002Mapper">
+
+
+
+	<!-- 그리드 헤더 조회하기 -->
+    <select id="gridHeaderSrch"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101002.entity.Erp101002VO"
+    															resultType		="com.sonictms.alsys.erp.erp101002.entity.Erp101002VO">
+        {
+	      CALL ${schema}..USP_SO_EXCL_TEMPLT_DOWNLOAD (
+	     	#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},		
+			#{agntCd		,mode=IN	,	jdbcType=VARCHAR},	
+			#{exclTmplType	,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+ <!-- 엑셀데이터를 json으로 바꾼것을 체크하기  -->
+	<select id="erp101002ExcelUploadCheck"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101002.entity.Erp101002VO"
+    															resultType		="com.sonictms.alsys.erp.erp101002.entity.Erp101002VO">
+        {
+	      CALL ${schema}..USP_SO_EXCL_INS_CHK (
+	      	#{exclRow		,mode=IN	,	jdbcType=VARCHAR},
+			#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{refSoNo		,mode=IN	,	jdbcType=VARCHAR},
+			#{orgnSoNo		,mode=IN	,	jdbcType=VARCHAR},
+			#{soType		,mode=IN	,	jdbcType=VARCHAR},
+			#{soStatCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{agntCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{mallCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{brand			,mode=IN	,	jdbcType=VARCHAR},
+			#{ordrInptDt	,mode=IN	,	jdbcType=VARCHAR},
+			#{rcptDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{rqstDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyCnfmDt	,mode=IN	,	jdbcType=VARCHAR},
+			#{acptEr		,mode=IN	,	jdbcType=VARCHAR},
+			#{ordrEr		,mode=IN	,	jdbcType=VARCHAR},
+			#{acptTel1		,mode=IN	,	jdbcType=VARCHAR},
+			#{acptTel2		,mode=IN	,	jdbcType=VARCHAR},
+			#{postCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{addr1			,mode=IN	,	jdbcType=VARCHAR},
+			#{addr2			,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyRqstMsg	,mode=IN	,	jdbcType=VARCHAR},
+			#{custSpclTxt	,mode=IN	,	jdbcType=VARCHAR},
+			#{costType		,mode=IN	,	jdbcType=VARCHAR},
+			#{rcptCost		,mode=IN	,	jdbcType=VARCHAR},
+			#{passCost		,mode=IN	,	jdbcType=VARCHAR},
+			#{prodCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{prodNm		,mode=IN	,	jdbcType=VARCHAR},
+			#{qty			,mode=IN	,	jdbcType=VARCHAR},
+			#{dcCd			,mode=IN	,	jdbcType=VARCHAR},
+			#{useYn			,mode=IN	,	jdbcType=VARCHAR},
+			#{memo			,mode=IN	,	jdbcType=VARCHAR},
+			#{inptSys		,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+   </select>
+ 
+  <!-- 엑셀데이터를 json으로 바꾼것을 저장하기       -->
+	<select id="erp101002ExcelUploadJson"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp101002.entity.Erp101002VO"
+    															resultType		="com.sonictms.alsys.erp.erp101002.entity.Erp101002VO">
+        {
+	      CALL ${schema}..USP_SO_EXCL_INS (
+	      	#{exclRow		,mode=IN	,	jdbcType=VARCHAR},
+			#{cmpyCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{refSoNo		,mode=IN	,	jdbcType=VARCHAR},
+			#{orgnSoNo		,mode=IN	,	jdbcType=VARCHAR},
+			#{soType		,mode=IN	,	jdbcType=VARCHAR},
+			#{soStatCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{agntCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{mallCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{brand			,mode=IN	,	jdbcType=VARCHAR},
+			#{ordrInptDt	,mode=IN	,	jdbcType=VARCHAR},
+			#{rcptDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{rqstDt		,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyCnfmDt	,mode=IN	,	jdbcType=VARCHAR},
+			#{acptEr		,mode=IN	,	jdbcType=VARCHAR},
+			#{ordrEr		,mode=IN	,	jdbcType=VARCHAR},
+			#{acptTel1		,mode=IN	,	jdbcType=VARCHAR},
+			#{acptTel2		,mode=IN	,	jdbcType=VARCHAR},
+			#{postCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{addr1			,mode=IN	,	jdbcType=VARCHAR},
+			#{addr2			,mode=IN	,	jdbcType=VARCHAR},
+			#{dlvyRqstMsg	,mode=IN	,	jdbcType=VARCHAR},
+			#{custSpclTxt	,mode=IN	,	jdbcType=VARCHAR},
+			#{costType		,mode=IN	,	jdbcType=VARCHAR},
+			#{rcptCost		,mode=IN	,	jdbcType=VARCHAR},
+			#{passCost		,mode=IN	,	jdbcType=VARCHAR},
+			#{prodCd		,mode=IN	,	jdbcType=VARCHAR},
+			#{prodNm		,mode=IN	,	jdbcType=VARCHAR},
+			#{qty			,mode=IN	,	jdbcType=VARCHAR},
+			#{dcCd			,mode=IN	,	jdbcType=VARCHAR},
+			#{useYn			,mode=IN	,	jdbcType=VARCHAR},
+			#{memo			,mode=IN	,	jdbcType=VARCHAR},
+			#{inptSys		,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+
+    </select>
+         
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.common.mapper.CommonSrchMapper">
+
+    <select id="selectLocationSearchList"
+            parameterType="com.sonictms.alsys.common.entity.CommonSrchVO"
+            resultType="com.sonictms.alsys.common.entity.CommonSrchVO">
+        SELECT
+        l.LOC_ID AS locId,
+        l.LOC_CD AS locCd,
+        l.LOC_NM AS locNm,
+        z.ZONE_NM AS zoneNm,
+        l.WH_CD AS whCd,
+        l.ZONE_ID AS zoneId,
+        l.LOC_TYPE AS locType
+        FROM TBL_WH_LOC_M l
+        LEFT JOIN TBL_WH_ZONE_M z ON l.ZONE_ID = z.ZONE_ID AND l.CMPY_CD = z.CMPY_CD
+        WHERE l.CMPY_CD = #{cmpyCd}
+        AND l.DELETED_YN = 'N'
+        AND l.USE_YN = 'Y'
+        <if test="keyword != null and keyword != ''">
+            AND (
+            l.LOC_CD LIKE '%' + #{keyword} + '%'
+            OR l.LOC_NM LIKE '%' + #{keyword} + '%'
+            OR z.ZONE_NM LIKE '%' + #{keyword} + '%'
+            )
+        </if>
+        ORDER BY l.LOC_CD ASC
+    </select>
+
+</mapper>

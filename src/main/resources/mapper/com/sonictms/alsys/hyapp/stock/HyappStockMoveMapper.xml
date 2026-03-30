@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.hyapp.stock.mapper.HyappStockMoveMapper">
+
+    <select id="selectStockListByLocation" resultType="map">
+        SELECT
+            A.MTRL_CD as mtrlCd,
+            C.MTRL_NM as mtrlNm,
+            A.STOCK_QTY as stockQty,
+            A.AGNT_CD as agntCd,
+            D.AGNT_NM AS agntNm
+        FROM TBL_STOCK A, TBL_WH_LOC_M B, TBL_MTRL_M C, TBL_AGENCY_M D
+        WHERE A.LOC_ID = B.LOC_ID
+          AND A.MTRL_CD = C.MTRL_CD
+          AND A.AGNT_CD = C.AGNT_CD
+          AND A.AGNT_CD = D.AGNT_CD
+          AND A.CMPY_CD = #{cmpyCd}
+          AND B.LOC_CD = #{locationCd}
+          AND A.STOCK_QTY > 0
+    </select>
+
+    <update id="updateDecreaseStock">
+        UPDATE TBL_STOCK
+        SET STOCK_QTY = STOCK_QTY - #{moveQty},
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{userId}
+        WHERE CMPY_CD = #{cmpyCd}
+          AND LOC_ID = ( SELECT LOC_ID FROM　TBL_WH_LOC_M WHERE LOC_CD = #{fromLocationCd} )
+          AND MTRL_CD = #{mtrlCd}
+          AND STOCK_QTY >= #{moveQty}
+    </update>
+
+    <update id="upsertIncreaseStock">
+        /* 1. 필요한 정보를 변수에 담고, 화주사 코드가 없으면 마스터에서 조회하여 보정 */
+        DECLARE @TargetLocId BIGINT;
+    DECLARE @TargetZoneId BIGINT;
+    DECLARE @WhCd VARCHAR(20);
+    DECLARE @AgntCd VARCHAR(20) = #{agntCd};
+
+        /* [보완] 전달받은 화주 코드가 NULL인 경우 상품 마스터에서 직접 조회 */
+        IF @AgntCd IS NULL OR @AgntCd = ''
+        BEGIN
+        SELECT TOP 1 @AgntCd = AGNT_CD
+        FROM TBL_MTRL_M
+        WHERE MTRL_CD = #{mtrlCd} AND CMPY_CD = #{cmpyCd};
+        END
+
+    /* 2. 목적지 로케이션 및 구역 정보 확보 */
+        SELECT TOP 1 @TargetLocId = LOC_ID, @TargetZoneId = ZONE_ID, @WhCd = WH_CD
+        FROM TBL_WH_LOC_M
+        WHERE LOC_CD = LTRIM(RTRIM(#{toLocationCd})) AND CMPY_CD = #{cmpyCd};
+
+        /* 3. 로케이션 검증 */
+        IF @TargetLocId IS NULL
+        BEGIN
+        RAISERROR('목적지 로케이션을 찾을 수 없습니다.', 16, 1);
+        RETURN;
+        END
+
+    /* 4. MERGE 수행: 보정된 @AgntCd를 사용하여 NULL 입력 에러 방지 */
+        MERGE INTO TBL_STOCK AS target
+            USING (
+                SELECT
+                    #{cmpyCd} as cmpyCd,
+                    @TargetLocId as loc,
+                    #{mtrlCd} as mtrl,
+                    @AgntCd as agnt
+            ) AS source
+            ON (target.CMPY_CD = source.cmpyCd AND target.LOC_ID = source.loc AND target.MTRL_CD = source.mtrl)
+            WHEN MATCHED THEN
+                UPDATE SET
+                    STOCK_QTY = target.STOCK_QTY + #{moveQty},
+                    UPDT_TIME = GETDATE(),
+                    UPDT_USER = #{userId}
+            WHEN NOT MATCHED THEN
+                INSERT (CMPY_CD, AGNT_CD, MTRL_CD, ZONE_ID, LOC_ID, STOCK_QTY, UPDT_TIME, UPDT_USER, WH_CD)
+                    VALUES (
+                               source.cmpyCd,
+                               source.agnt, /* 보정된 화주 코드 삽입 */
+                               source.mtrl,
+                               @TargetZoneId,
+                               @TargetLocId,
+                               #{moveQty},
+                               GETDATE(),
+                               #{userId},
+                               @WhCd
+                           );
+    </update>
+
+    <insert id="insertMoveLog">
+        INSERT INTO TBL_STOCK_MOVE_LOG (
+            CMPY_CD, AGNT_CD, MTRL_CD,
+            FROM_LOC_ID, TO_LOC_ID,
+            MOVE_QTY, MOVE_TYPE,
+            CREATE_TIME, CREATE_USER
+        )
+        SELECT
+            #{cmpyCd}, #{agntCd}, #{mtrlCd},
+            (SELECT TOP 1 LOC_ID FROM TBL_WH_LOC_M WHERE LOC_CD = #{fromLocationCd} AND CMPY_CD = #{cmpyCd}),
+            (SELECT TOP 1 LOC_ID FROM TBL_WH_LOC_M WHERE LOC_CD = #{toLocationCd} AND CMPY_CD = #{cmpyCd}),
+            #{moveQty},
+            /* [수정] 데이터 타입을 VARCHAR로 명시하여 varbinary 변환 오류 해결 */
+            ISNULL(CAST(#{moveType} AS VARCHAR(20)), 'NORMAL'),
+            GETDATE(), #{userId}
+            /* 로케이션 존재 여부 체크 (기존 로직 유지) */
+            WHERE EXISTS (SELECT 1 FROM TBL_WH_LOC_M WHERE LOC_CD = #{toLocationCd} AND CMPY_CD = #{cmpyCd})
+            AND EXISTS (SELECT 1 FROM TBL_WH_LOC_M WHERE LOC_CD = #{fromLocationCd} AND CMPY_CD = #{cmpyCd})
+    </insert>
+
+</mapper>

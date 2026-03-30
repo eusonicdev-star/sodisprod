@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>재고실사 메인</title>
+    <style>
+        :root { --bg:#f5f7fb; --primary:#0d9488; --blue:#2563eb; --txt:#1f2937; }
+        body { margin:0; font-family:-apple-system, sans-serif; background:var(--bg); color:var(--txt); padding:20px; }
+
+        header { margin-bottom:30px; text-align:center; padding-top:20px; }
+        h1 { margin:0; font-size:22px; font-weight:800; }
+
+        .btn-container { display:flex; flex-direction:column; gap:20px; }
+
+        .menu-btn {
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            height:160px; border-radius:20px; border:none; box-shadow:0 8px 16px rgba(0,0,0,0.08);
+            font-size:22px; font-weight:800; cursor:pointer; color:#fff; transition:0.1s;
+        }
+        .menu-btn:active { transform:scale(0.97); }
+
+        /* 색상 */
+        .btn-hist { background:var(--blue); }   /* 이력 조회 (파랑) */
+        .btn-start { background:var(--primary); } /* 실사 시작 (청록) */
+
+        .desc { font-size:14px; font-weight:400; opacity:0.9; margin-top:8px; }
+        .back-link { display:block; text-align:center; margin-top:30px; color:#666; text-decoration:none; font-size:14px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>재고실사</h1>
+</header>
+
+<div class="btn-container">
+    <button class="menu-btn btn-hist" onclick="location.href='/hyapp/check/hist'">
+        📋 실사 이력 조회
+        <span class="desc">과거 실사 내역 확인</span>
+    </button>
+
+    <button class="menu-btn btn-start" onclick="location.href='/hyapp/check/reg'">
+        🔎 재고 실사 시작
+        <span class="desc">현장 재고 조사 및 등록</span>
+    </button>
+</div>
+
+
+<a href="/hyapp/main" class="back-link">메인으로 돌아가기</a>
+
+</body>
+</html>

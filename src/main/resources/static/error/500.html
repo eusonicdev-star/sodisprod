@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <link
+      rel="icon"
+      href="/css/favicon.ico"
+      type="image/x-icon"
+      sizes="16x16"
+    />
+    <title>500 - 서버 오류 | 얼라이언스</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+      }
+
+      .error-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 3rem;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        width: 90%;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .error-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #fd79a8, #fdcb6e, #fd79a8);
+        background-size: 200% 100%;
+        animation: gradient 3s ease infinite;
+      }
+
+      @keyframes gradient {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .logo {
+        width: 120px;
+        height: auto;
+        margin-bottom: 2rem;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+      }
+
+      .error-code {
+        font-size: 6rem;
+        font-weight: 700;
+        color: #fd79a8;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        animation: shake 2s infinite;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translateX(-5px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translateX(5px);
+        }
+      }
+
+      .error-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+      }
+
+      .error-subtitle {
+        font-size: 1.1rem;
+        color: #7f8c8d;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+      }
+
+      .error-description {
+        font-size: 1rem;
+        color: #95a5a6;
+        margin-bottom: 2.5rem;
+        line-height: 1.6;
+      }
+
+      .status-indicator {
+        background: #fff5f5;
+        border: 2px solid #fed7d7;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .status-icon {
+        width: 24px;
+        height: 24px;
+        color: #e53e3e;
+        animation: pulse 2s infinite;
+      }
+
+      .status-text {
+        color: #c53030;
+        font-weight: 500;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #fd79a8, #e84393);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(253, 121, 168, 0.3);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.9);
+        color: #fd79a8;
+        border: 2px solid #fd79a8;
+      }
+
+      .btn-secondary:hover {
+        background: #fd79a8;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .btn-tertiary {
+        background: rgba(255, 255, 255, 0.9);
+        color: #6c757d;
+        border: 2px solid #6c757d;
+      }
+
+      .btn-tertiary:hover {
+        background: #6c757d;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .icon {
+        width: 18px;
+        height: 18px;
+      }
+
+      @media (max-width: 768px) {
+        .error-container {
+          padding: 2rem;
+          margin: 1rem;
+        }
+
+        .error-code {
+          font-size: 4rem;
+        }
+
+        .error-title {
+          font-size: 1.5rem;
+        }
+
+        .action-buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .btn {
+          width: 100%;
+          max-width: 250px;
+          justify-content: center;
+        }
+      }
+
+      .floating-shapes {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .shape {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+      }
+
+      .shape:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+      }
+
+      .shape:nth-child(2) {
+        width: 60px;
+        height: 60px;
+        top: 60%;
+        right: 10%;
+        animation-delay: 2s;
+      }
+
+      .shape:nth-child(3) {
+        width: 40px;
+        height: 40px;
+        top: 80%;
+        left: 20%;
+        animation-delay: 4s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(180deg);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="floating-shapes">
+      <div class="shape"></div>
+      <div class="shape"></div>
+      <div class="shape"></div>
+    </div>
+
+    <div class="error-container">
+      <img
+        class="logo"
+        src="https://sodisprod.cdn1.cafe24.com/logo.png"
+        alt="얼라이언스 로고"
+      />
+
+      <div class="error-code">500</div>
+
+      <h1 class="error-title">서버 오류가 발생했습니다</h1>
+      <p class="error-subtitle">Internal Server Error</p>
+
+      <p class="error-description">
+        서버에서 예상치 못한 오류가 발생했습니다.<br />
+        잠시 후 다시 시도해주시거나 관리자에게 문의해주세요.
+      </p>
+
+      <div class="status-indicator">
+        <svg class="status-icon" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        <span class="status-text">서버 상태: 점검 중</span>
+      </div>
+
+      <div class="action-buttons">
+        <button onclick="location.reload()" class="btn btn-primary">
+          <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          다시 시도
+        </button>
+        <a href="/" class="btn btn-secondary">
+          <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
+            />
+          </svg>
+          홈으로 돌아가기
+        </a>
+        <button onclick="contactSupport()" class="btn btn-tertiary">
+          <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
+            />
+            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+          </svg>
+          문의하기
+        </button>
+      </div>
+    </div>
+
+    <script>
+      function contactSupport() {
+        // 지원팀 연락처 정보 (실제 연락처로 변경 필요)
+        const supportEmail = "support@alliance-re.com";
+        const supportPhone = "02-1234-5678";
+
+        const message = `지원팀 연락처:\n\n이메일: ${supportEmail}\n전화: ${supportPhone}\n\n오류 발생 시간: ${new Date().toLocaleString(
+          "ko-KR"
+        )}`;
+
+        if (confirm("지원팀 연락처를 확인하시겠습니까?")) {
+          alert(message);
+        }
+      }
+
+      // 자동 새로고침 (선택적)
+      let retryCount = 0;
+      const maxRetries = 3;
+
+      function autoRetry() {
+        if (retryCount < maxRetries) {
+          retryCount++;
+          setTimeout(() => {
+            console.log(`자동 재시도 ${retryCount}/${maxRetries}`);
+            location.reload();
+          }, 5000 * retryCount); // 5초, 10초, 15초 후 재시도
+        }
+      }
+
+      // 자동 재시도 활성화 (필요시 주석 해제)
+      // autoRetry();
+    </script>
+  </body>
+</html>

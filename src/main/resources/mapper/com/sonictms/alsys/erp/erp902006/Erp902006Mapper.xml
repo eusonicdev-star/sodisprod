@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.erp.erp902006.mapper.Erp902006Mapper">
+
+	<!-- 그리드 목록 조회하기 -->
+    <select id="erp902006List"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902006.entity.Erp902006VO"
+    															resultType		="com.sonictms.alsys.erp.erp902006.entity.Erp902006VO">
+        {
+	      CALL ${schema}..USP_WEEKDLVY_LISTBYALL (
+	      	#{cmpyCd	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{zoneType	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{zoneList	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{siDo		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{siGu		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{useYn		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+
+	<!-- 권역매핑저장하기 -->
+    <select id="erp902006Save"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.erp.erp902006.entity.Erp902006VO"
+    															resultType		="com.sonictms.alsys.erp.erp902006.entity.Erp902006VO">
+        {
+	      CALL ${schema}..USP_WEEKDLVY_SAVE (
+	      	#{saveGubn				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{tblLgstWeekdlvyMId	,mode=IN	,	jdbcType=VARCHAR},
+	      	#{cmpyCd				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{zoneType				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{zoneCd				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{weekdlvyYn			,mode=IN	,	jdbcType=VARCHAR},
+	      	#{monYn					,mode=IN	,	jdbcType=VARCHAR},
+	      	#{tueYn					,mode=IN	,	jdbcType=VARCHAR},
+	      	#{wedYn					,mode=IN	,	jdbcType=VARCHAR},
+	      	#{thuYn					,mode=IN	,	jdbcType=VARCHAR},
+	      	#{friYn					,mode=IN	,	jdbcType=VARCHAR},
+	      	#{satYn					,mode=IN	,	jdbcType=VARCHAR},
+	      	#{sunYn					,mode=IN	,	jdbcType=VARCHAR},
+	      	#{strtDt				,mode=IN	,	jdbcType=VARCHAR},		
+	      	#{memo					,mode=IN	,	jdbcType=VARCHAR},
+	      	#{saveUser				,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+         
+</mapper>

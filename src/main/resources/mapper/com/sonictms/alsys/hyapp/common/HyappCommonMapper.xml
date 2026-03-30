@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sonictms.alsys.hyapp.common.mapper.HyappCommonMapper">
+
+    <select id="selectDcList" parameterType="map" resultType="map">
+        SELECT
+            DC_CD as dcCd,
+            DC_NM as dcNm
+        FROM TBL_LGST_DC_M
+        WHERE CMPY_CD = 'A'
+          AND USE_YN = 'Y'
+        ORDER BY DC_CD ASC
+    </select>
+
+</mapper>

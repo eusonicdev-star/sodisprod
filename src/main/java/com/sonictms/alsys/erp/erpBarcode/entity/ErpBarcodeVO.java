@@ -1,0 +1,22 @@
+package com.sonictms.alsys.erp.erpBarcode.entity;
+
+import com.sonictms.alsys.common.entity.CommonVO;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+
+
+@Getter
+@Setter
+//@ToString
+@ToString(callSuper=true)
+public class ErpBarcodeVO extends CommonVO {
+		
+	private static final long serialVersionUID = 1L;
+	
+	private	String	seq					;	//순번
+	
+	
+}

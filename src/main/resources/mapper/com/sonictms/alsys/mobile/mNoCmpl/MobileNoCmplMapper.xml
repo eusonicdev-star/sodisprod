@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonictms.alsys.mobile.mNoCmpl.mapper.MobileNoCmplMapper">
+
+	<!-- 모바일 미마감 onCreate 조회 -->
+    <select id="mNoCmplOnCreate"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO"
+    															resultType		="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO">
+        {
+	      CALL ${schema}..USP_MOBILE_DELIVERY_X_COMPLETE_LOAD (
+	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+    
+    <!-- 모바일 미마감 처리 결과 저장 SAVE -->
+    <select id="mNoCmplSaveStat"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO"
+    															resultType		="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO">
+        {
+	      CALL ${schema}..USP_MOBILE_DELIVERY_X_COMPLETE_SAVE_STAT (
+	      	#{instMobileMId				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{mobileXCmplType			,mode=IN	,	jdbcType=VARCHAR},
+			#{mobileXCmplTxt			,mode=IN	,	jdbcType=VARCHAR},
+			#{memo						,mode=IN	,	jdbcType=VARCHAR},
+			#{signImg					,mode=IN	,	jdbcType=VARCHAR},
+			#{img1						,mode=IN	,	jdbcType=VARCHAR},
+			#{img2						,mode=IN	,	jdbcType=VARCHAR},
+			#{img3						,mode=IN	,	jdbcType=VARCHAR},
+			#{img4						,mode=IN	,	jdbcType=VARCHAR},
+			#{img5						,mode=IN	,	jdbcType=VARCHAR},
+			#{img6						,mode=IN	,	jdbcType=VARCHAR},
+			#{img7						,mode=IN	,	jdbcType=VARCHAR},
+			#{img8						,mode=IN	,	jdbcType=VARCHAR},
+			#{img9						,mode=IN	,	jdbcType=VARCHAR},
+			#{img10						,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser					,mode=IN	,	jdbcType=VARCHAR}
+			
+	      )      
+      }
+    </select>
+    
+    <!-- 모바일 미마감 취소 처리 저장 DEL -->
+    <select id="mNoCmplDel"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO"
+    															resultType		="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO">
+        {
+	      CALL ${schema}..USP_MOBILE_DELIVERY_X_COMPLETE_DEL (
+	      	#{instMobileMId		,mode=IN	,	jdbcType=VARCHAR},
+	      	#{saveUser			,mode=IN	,	jdbcType=VARCHAR}
+	      )      
+      }
+    </select>
+    
+    
+
+    
+      <!-- 모바일 미마감 알림톡 결과 저장 SAVE -->
+    <select id="mNoCmplSaveTalk"  statementType="CALLABLE"		parameterType	="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO"
+    															resultType		="com.sonictms.alsys.mobile.mNoCmpl.entity.MobileNoCmplVO">
+        {
+	      CALL ${schema}..USP_MOBILE_DELIVERY_X_COMPLETE_SAVE_TALK (
+	      	#{instMobileMId				,mode=IN	,	jdbcType=VARCHAR},
+	      	#{sendComplete				,mode=IN	,	jdbcType=VARCHAR},
+			#{alrmTalkUserid			,mode=IN	,	jdbcType=VARCHAR},
+			#{messageType				,mode=IN	,	jdbcType=VARCHAR},
+			#{phn						,mode=IN	,	jdbcType=VARCHAR},
+			#{profile					,mode=IN	,	jdbcType=VARCHAR},
+			#{reserveDt					,mode=IN	,	jdbcType=VARCHAR},
+			#{alrmTlkMsg				,mode=IN	,	jdbcType=VARCHAR},
+			#{title						,mode=IN	,	jdbcType=VARCHAR},
+			#{tmplid					,mode=IN	,	jdbcType=VARCHAR},
+			#{message					,mode=IN	,	jdbcType=VARCHAR},
+			#{saveUser					,mode=IN	,	jdbcType=VARCHAR}
+			
+	      )      
+      }
+    </select>
+    
+</mapper>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>창고 존(Zone) 관리 시스템</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
+        .container { padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header h2 { margin: 0; color: #444; }
+
+        /* 조회 조건 영역 */
+        .search-bar { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 15px; align-items: center; }
+        .search-bar input, .search-bar select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; }
+
+        /* 테이블 영역 */
+        .grid-wrapper { background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background-color: #f1f3f5; padding: 12px 15px; border-bottom: 2px solid #dee2e6; color: #495057; font-weight: 600; }
+        td { padding: 12px 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+        tr:hover { background-color: #f8f9fa; cursor: pointer; }
+
+        /* 버튼 스타일 */
+        .btn { padding: 8px 16px; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; font-weight: 500; transition: 0.2s; }
+        .btn-blue { background-color: #007bff; color: white; border: none; }
+        .btn-blue:hover { background-color: #0056b3; }
+        .btn-gray { background-color: #6c757d; color: white; border: none; }
+
+        /* 모달 (팝업) */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
+        .modal-content { background: white; width: 500px; margin: 100px auto; padding: 25px; border-radius: 10px; }
+        .modal-header { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; font-size: 18px; font-weight: bold; }
+        .form-row { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+        .form-row input, .form-row select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>존(Zone) 마스터 관리</h2>
+        <div>
+            <button class="btn btn-blue" onclick="openModal()">신규 등록</button>
+        </div>
+    </div>
+
+    <div class="search-bar">
+        <span>창고코드: <b>1000</b></span>
+        <input type="text" id="searchZoneNm" placeholder="존 명칭 검색...">
+        <button class="btn btn-gray" onclick="loadZones()">조회</button>
+    </div>
+
+    <div class="grid-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>순서</th>
+                <th>존 코드</th>
+                <th>존 명칭</th>
+                <th>존 유형</th>
+                <th>사용여부</th>
+                <th>등록일시</th>
+                <th>관리</th>
+            </tr>
+            </thead>
+            <tbody id="zoneTableBody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="zoneModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" id="modalTitle">존 정보 설정</div>
+        <input type="hidden" id="zoneId">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-row">
+                <label>존 코드</label>
+                <input type="text" id="zoneCd" placeholder="자동 생성 또는 입력">
+            </div>
+            <div class="form-row">
+                <label>존 유형</label>
+                <select id="zoneType">
+                    <option value="STORAGE">보관랙(STORAGE)</option>
+                    <option value="FLOOR">평치존(FLOOR)</option>
+                    <option value="PICK">피킹존(PICK)</option>
+                    <option value="IN">입고장(IN)</option>
+                    <option value="OUT">출고장(OUT)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>존 명칭</label>
+            <input type="text" id="zoneNm">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-row">
+                <label>표시 순번</label>
+                <input type="number" id="viewSeq">
+            </div>
+            <div class="form-row">
+                <label>사용 여부</label>
+                <select id="useYn">
+                    <option value="Y">사용(Y)</option>
+                    <option value="N">미사용(N)</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn" onclick="closeModal()">닫기</button>
+            <button class="btn btn-blue" onclick="saveZone()">데이터 저장</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 페이지 진입 시 데이터 로드
+    window.onload = loadZones;
+
+    async function loadZones() {
+        const params = { cmpyCd: 'A', whCd: '1000' };
+        try {
+            const res = await fetch("/api/wh/zone/list", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(params)
+            });
+            const list = await res.json();
+
+            const tbody = document.getElementById('zoneTableBody');
+            tbody.innerHTML = list.map(item => `
+                <tr onclick='openModal(${JSON.stringify(item)})'>
+                    <td>${item.viewSeq || 0}</td>
+                    <td><b>${item.zoneCd}</b></td>
+                    <td>${item.zoneNm}</td>
+                    <td>${item.zoneType}</td>
+                    <td>${item.useYn === 'Y' ? '<span style="color:green">사용</span>' : '<span style="color:red">중지</span>'}</td>
+                    <td>${item.saveTime ? item.saveTime.substring(0, 10) : '-'}</td>
+                    <td><button class="btn" style="padding:4px 8px; font-size:12px">수정</button></td>
+                </tr>
+            `).join('');
+        } catch (e) { console.error("데이터 로드 실패", e); }
+    }
+
+    function openModal(data = null) {
+        document.getElementById('zoneModal').style.display = 'block';
+        if(data) {
+            document.getElementById('modalTitle').innerText = "존 정보 수정";
+            document.getElementById('zoneId').value = data.zoneId;
+            document.getElementById('zoneCd').value = data.zoneCd;
+            document.getElementById('zoneCd').readOnly = true;
+            document.getElementById('zoneNm').value = data.zoneNm;
+            document.getElementById('zoneType').value = data.zoneType;
+            document.getElementById('viewSeq').value = data.viewSeq;
+            document.getElementById('useYn').value = data.useYn;
+        } else {
+            document.getElementById('modalTitle').innerText = "신규 존 등록";
+            clearForm();
+        }
+    }
+
+    function closeModal() { document.getElementById('zoneModal').style.display = 'none'; }
+    function clearForm() {
+        document.getElementById('zoneId').value = "";
+        document.getElementById('zoneCd').value = "";
+        document.getElementById('zoneCd').readOnly = false;
+        document.getElementById('zoneNm').value = "";
+        document.getElementById('viewSeq').value = "1";
+        document.getElementById('useYn').value = "Y";
+    }
+
+    async function saveZone() {
+        const payload = {
+            zoneId: document.getElementById('zoneId').value || null,
+            cmpyCd: 'A', whCd: '1000',
+            zoneCd: document.getElementById('zoneCd').value,
+            zoneNm: document.getElementById('zoneNm').value,
+            zoneType: document.getElementById('zoneType').value,
+            viewSeq: document.getElementById('viewSeq').value,
+            useYn: document.getElementById('useYn').value,
+            saveUser: 'SYSTEM', updtUser: 'SYSTEM'
+        };
+
+        const res = await fetch("/api/wh/zone/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if(res.ok) {
+            alert("정상적으로 저장되었습니다.");
+            closeModal();
+            loadZones();
+        }
+    }
+</script>
+</body>
+</html>

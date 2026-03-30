@@ -1,0 +1,167 @@
+/**
+ * erp203001.css - 시공계획 관리 페이지 전용 스타일
+ */
+
+/* 메인 레이아웃 */
+.main-container {
+    height: 100%;
+}
+
+/* 검색 영역 */
+.search-container {
+    width: 100%;
+    font-size: 12px;
+    padding-bottom: 5px;
+}
+
+.search-container-2nd {
+    width: 100%;
+    font-size: 12px;
+    padding-bottom: 5px;
+    background-color: papayawhip;
+    display: none;
+}
+
+/* 버튼 영역 */
+.btn-container-full {
+    width: 100%;
+}
+
+/* 지도 영역 */
+.map-container {
+    width: 40%;
+    height: 100%;
+    font-size: 12px;
+    padding-bottom: 5px;
+    float: left;
+}
+
+.map-inner {
+    width: 100%;
+    height: 100%;
+}
+
+/* 그리드 영역 */
+.grid-container {
+    width: 57%;
+    height: 100%;
+    font-size: 12px;
+    padding-bottom: 5px;
+    float: left;
+    border: solid 0px black;
+}
+
+.grid-wrapper {
+    width: 100%;
+    border: solid 0px black;
+    overflow: hidden;
+}
+
+.grid-main {
+    width: 100%;
+    height: 66%;
+}
+
+.grid-sub {
+    width: 100%;
+    height: 33%;
+    overflow: hidden;
+}
+
+/* 구분선 */
+.vertical-divider {
+    width: 1%;
+    height: 100%;
+    float: left;
+    border-right: solid 4px darkgray;
+    margin-right: 10px;
+}
+
+.horizontal-divider {
+    width: 100%;
+    border: solid 2px darkgray;
+}
+
+.horizontal-divider-light {
+    width: 100%;
+    border: solid 1px lightgray;
+}
+
+/* 메인 콘텐츠 영역 */
+.main-contents {
+    width: 100%;
+    height: 85%;
+    font-size: 12px;
+    padding-bottom: 5px;
+}
+
+/* 공지/알림 영역 */
+.notice-container {
+    width: 100%;
+    border: solid 0px black;
+}
+
+/* 셀 너비 클래스 */
+.cell-140 {
+    width: 140px;
+}
+
+.cell-160 {
+    width: 160px;
+}
+
+.cell-180 {
+    width: 180px;
+}
+
+.cell-200 {
+    width: 200px;
+}
+
+.cell-220 {
+    width: 220px;
+}
+
+.cell-240 {
+    width: 240px;
+}
+
+.cell-280 {
+    width: 280px;
+}
+
+.cell-360 {
+    width: 360px;
+}
+
+.cell-480 {
+    width: 480px;
+}
+
+/* 숨김 처리 */
+.cell-hidden {
+    display: none;
+}
+
+/* 입력 필드 스타일 */
+.input-text-right {
+    text-align: right;
+}
+
+/* 패딩 클래스 */
+.padding-left-20 {
+    padding: 0 0 0 20px;
+}
+
+.padding-horizontal-20 {
+    padding: 0 20px 0 20px;
+}
+
+/* 플로팅 클래스 */
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}

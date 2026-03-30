@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>출고 취소 및 회송 관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --bg:#f8fafc; --card:#fff; --border:#e2e8f0; --text:#1e293b; --primary:#0f172a; }
+        body { background-color: var(--bg); font-family: sans-serif; margin:0; padding-bottom:100px; }
+
+        #hidBarcode { position: absolute; left: -9999px; opacity: 0; }
+
+        .search-container { background: white; padding: 20px; border-bottom: 2px solid var(--border); }
+
+        .count-container { padding: 15px 20px 5px; text-align: right; }
+        #listCount { font-size: 22px; color: #2563eb; font-weight: 800; }
+
+        .card-list { padding: 10px 16px; }
+        .card-item {
+            background: #fff; border: 1px solid var(--border); border-radius: 14px;
+            padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .loc-badge { background: var(--primary); color: #fff; padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 13px; display: inline-block; margin-bottom: 10px; }
+        .qty-tag { font-weight: 800; font-size: 18px; color: #dc2626; text-align: right; display: block; }
+
+        .scanned-active { animation: highlight 1.5s ease-out; border: 2px solid #000 !important; }
+        @keyframes highlight { 0% { transform: scale(1.02); background: #f1f5f9; } 100% { transform: scale(1); background: #fff; } }
+
+        .scan-fab { position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; cursor: pointer; }
+
+        #toast { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.85); color: #fff; padding: 20px 30px; border-radius: 16px; z-index: 9999; font-weight: 700; text-align: center; }
+    </style>
+</head>
+<body onclick="setFocus()">
+
+<input type="text" id="hidBarcode" readonly inputmode="none" autocomplete="off">
+<div id="toast"></div>
+
+<header class="bg-white p-3 border-bottom sticky-top">
+    <h1 class="h6 mb-0 fw-bold">🔄 출고 취소 및 재입고 관리</h1>
+</header>
+
+<main>
+    <div class="search-container">
+        <div class="row g-2">
+            <div class="col-12">
+                <label class="form-label small fw-bold text-muted">출고일자</label>
+                <input type="date" id="dlvyDt" class="form-control">
+            </div>
+            <div class="col-12 mt-2">
+                <button class="btn btn-dark w-100 fw-bold py-2" onclick="loadList()">데이터 조회하기</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="count-container">
+        <div id="listCount">취소 건수: 0건</div>
+    </div>
+
+    <div id="masterBody" class="card-list">
+        <div class="text-center py-5 text-muted small">조회 버튼을 눌러주세요.</div>
+    </div>
+</main>
+
+<div class="scan-fab" onclick="setFocus()">📷</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    const hidInp = document.getElementById('hidBarcode');
+
+    window.onload = function() {
+        document.getElementById('dlvyDt').value = new Date().toISOString().substring(0, 10);
+        setFocus();
+    };
+
+    function setFocus() {
+        hidInp.readOnly = true;
+        hidInp.focus();
+        setTimeout(() => { hidInp.readOnly = false; }, 100);
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!['INPUT', 'BUTTON'].includes(e.target.tagName)) {
+            setFocus();
+        }
+    });
+
+    function onReceiveBarcode(barcode) {
+        if (!barcode) return;
+        const cleanBC = barcode.trim().replace(/\s/g, '');
+        showToast("🔍 스캔: " + cleanBC);
+
+        const targetCard = document.getElementById('card_' + cleanBC);
+
+        if (targetCard) {
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetCard.classList.add('scanned-active');
+            setTimeout(() => { targetCard.classList.remove('scanned-active'); }, 2000);
+        } else {
+            showToast("❌ 목록에 없는 상품\n(" + cleanBC + ")");
+        }
+        setFocus();
+    }
+
+    hidInp.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            onReceiveBarcode(this.value);
+            this.value = '';
+            setFocus();
+        }
+    });
+
+    async function loadList() {
+        const dlvyDt = document.getElementById('dlvyDt').value.replaceAll('-', '');
+        const body = document.getElementById('masterBody');
+
+        try {
+            // 물류센터 파라미터(dcCd)를 제거하거나 서버 기본값에 맞게 호출
+            const response = await fetch(`/hyapp/api/outbound/cancel-list?cmpyCd=A&dlvyDt=${dlvyDt}`);
+            const data = await response.json();
+
+            document.getElementById("listCount").textContent = `취소 건수: ${data.length}건`;
+            body.innerHTML = data.map(item => {
+                const bc = (item.barcode || item.mtrlCd || "").toString().trim();
+                return `
+        <div class="card-item" id="card_${bc}">
+            <div class="loc-badge">📍 원복 위치: ${item.locNm || '미지정'}</div>
+            <div class="fw-bold fs-5">${item.mtrlNm}</div>
+            <div class="info-row d-flex justify-content-between">
+                <span class="qty-tag">취소: ${item.qty} / 스캔: ${item.scanQty || 0}</span>
+                <button class="btn btn-sm btn-primary"
+                        onclick="confirmReturn('${item.tblSoPId}', '${item.mtrlCd}', ${item.scanQty}, '${item.locId}')">
+                    확인
+                </button>
+            </div>
+        </div>
+    `;
+            }).join('') || '<div class="text-center py-5 text-muted">내역이 없습니다.</div>';
+        } catch (e) {
+            showToast("⚠️ 로드 실패");
+        } finally {
+            setFocus();
+        }
+    }
+
+    async function confirmReturn(pId, mtrlCd, sQty, locId) {
+        if(!confirm("실물 재입고를 확인하셨습니까?\n확인 시 재고에 즉시 반영됩니다.")) return;
+
+        try {
+            const res = await fetch('/hyapp/api/outbound/confirm-return', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    tblSoPId: pId,
+                    mtrlCd: mtrlCd,
+                    scanQty: sQty,
+                    locId: locId,
+                    cmpyCd: 'A'
+                })
+            });
+
+            // 서버의 응답 본문(Map)을 받아옵니다.
+            const result = await res.json();
+
+            // HTTP 상태코드가 200대이고, 서버에서 명시적으로 status: "OK"를 보냈는지 확인
+            if (res.ok && result.status === 'OK') {
+                alert("처리가 완료되었습니다.");
+                loadList(); // loadData() 대신 실제 정의된 loadList()를 호출합니다.
+            } else {
+                alert("처리 실패: " + (result.resultMsg || "알 수 없는 오류"));
+            }
+        } catch (e) {
+            console.error("통신 에러:", e);
+            alert("통신 중 오류가 발생했습니다.");
+        } finally {
+            setFocus(); // 스캔 포커스 유지
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.innerHTML = msg.replace(/\n/g, '<br>');
+        $(t).stop().fadeIn(150).delay(1500).fadeOut(150);
+    }
+</script>
+</body>
+</html>

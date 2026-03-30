@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>입고 관리 및 검수 (바코드 출력 통합)</title>
+    <style>
+        :root {
+            --bg:#f1f5f9; --card:#ffffff; --border:#cbd5e1;
+            --primary:#0066ff; --danger:#e11d48; --dark:#1e293b; --sub:#475569;
+        }
+        body { margin:0; font-family: system-ui, sans-serif; background:var(--bg); color:#0f172a; padding-bottom:50px; font-size: 20px; }
+        header { position: sticky; top:0; background:#fff; border-bottom:2px solid #cbd5e1; padding:18px 16px; z-index:100; text-align: center; }
+        h1 { margin:0; font-size:22px; font-weight: 800; }
+        main { padding:16px; }
+        .group-box { background: var(--card); border: 2px solid var(--border); border-radius: 20px; padding: 18px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .group-title { font-size: 22px; font-weight: 900; color: #000; display: flex; align-items: center; gap: 8px; margin: 0; }
+        .group-title::before { content: ""; width: 6px; height: 22px; background: var(--primary); border-radius: 3px; }
+        .btn-new-v { padding: 10px 16px; background: var(--dark); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+
+        /* 바코드 출력 전용 버튼 스타일 */
+        .btn-print-sm { background:#6c757d; color:#fff; border:none; border-radius:8px; font-size:14px; height:40px; padding:0 12px; font-weight:bold; cursor:pointer; }
+        .btn-print-sm:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .v-list { display: flex; flex-direction: column; gap: 10px; }
+        .v-card { width: 100%; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; }
+        .v-info b { font-size: 19px; color: #000; }
+        .v-time { font-size: 15px; color: var(--primary); background: #eff6ff; padding: 4px 10px; border-radius: 6px; font-weight: 800; border: 1px solid #dbeafe; }
+
+        .p-item { border-bottom: 2px solid #f1f5f9; padding: 25px 0; }
+        .p-item:last-child { border-bottom: none; }
+        .p-name-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+        .p-name { font-size: 24px; font-weight: 900; color: #000; word-break: break-all; flex: 1; }
+        .p-info { font-size: 18px; color: #475569; margin-bottom: 16px; font-weight: 600; }
+        .p-info b { color: var(--primary); background: #fff3cd; padding: 2px 8px; border-radius: 4px; }
+
+        .input-row { display:flex; gap:10px; align-items:flex-end; }
+        .input-box { flex:1; }
+        .input-box label { font-size: 16px; color: #1e293b; font-weight: 800; margin-left: 2px; display: block; margin-bottom: 6px; }
+        .input { width:100%; height:55px; border:3px solid #cbd5e1; border-radius:12px; text-align:center; font-weight:900; font-size:26px; background: #fff; color: #000; }
+        .input.pass { color: var(--primary); border-color: #bfdbfe; }
+        .input.fail { color: var(--danger); border-color: #feccae; }
+        .btn-save { height:55px; padding:0 20px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-size:18px; font-weight:900; cursor:pointer; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 id="headerTitle">입고 관리</h1>
+</header>
+
+<main>
+    <div class="group-box">
+        <div class="group-header">
+            <div class="group-title">입차 목록</div>
+            <button class="btn-new-v" onclick="location.href='/hyapp/in_vehicle'">+ 차량 등록</button>
+        </div>
+        <div id="vehicleList" class="v-list">
+            <div style="text-align:center; padding:15px; color:#94a3b8; font-size:16px;">조회 중...</div>
+        </div>
+    </div>
+
+    <div class="group-box">
+        <div class="group-header" style="margin-bottom: 20px;">
+            <div class="group-title">상품 입고 검수</div>
+        </div>
+        <div id="productList">
+            <div style="text-align:center; padding:30px; color:#94a3b8; font-size:18px;">예정 상품 조회 중...</div>
+        </div>
+    </div>
+</main>
+
+<script>
+    let selectedCustomer = null;
+    const today = new Date().toISOString().split('T')[0];
+
+    // 유틸리티 함수: 데이터 필드 추출
+    function pick(obj, keys) {
+        for (let key of keys) {
+            if (obj[key] !== undefined && obj[key] !== null) return obj[key];
+        }
+        return null;
+    }
+
+    window.onload = async function() {
+        const raw = sessionStorage.getItem("SELECTED_CUSTOMER");
+        if (!raw) {
+            alert("선택된 고객사가 없습니다.");
+            location.href = "/hyapp/in_main";
+            return;
+        }
+        selectedCustomer = JSON.parse(raw);
+        document.getElementById("headerTitle").textContent = selectedCustomer.nm;
+
+        loadVehicleList();
+        loadProductList();
+    };
+
+    async function loadVehicleList() {
+        const listEl = document.getElementById("vehicleList");
+        const agntCd = selectedCustomer.cd;
+        const cmpyCd = selectedCustomer.cmpyCd || 'A';
+        try {
+            const res = await fetch(`/hyapp/api/inbound/master/list?cmpyCd=${cmpyCd}&agntCd=${agntCd}&date=${today}`);
+            const list = await res.json();
+            if (!list || list.length === 0) {
+                listEl.innerHTML = "<div style='font-size:16px; color:#94a3b8; text-align:center; padding:10px;'>입차 내역 없음</div>";
+                return;
+            }
+            listEl.innerHTML = list.map(v => `
+                <div class="v-card">
+                    <div class="v-info"><b>${v.vhclTonType} / ${v.inMethod === 'PALLET' ? 'PLT('+v.palletQty+')' : '벌크'}</b></div>
+                    <div class="v-time">${formatTime(v.saveTime)}</div>
+                </div>
+            `).join("");
+        } catch (e) { listEl.innerHTML = "<div style='color:red; font-size:16px;'>데이터 오류</div>"; }
+    }
+
+    function formatTime(dateTimeStr) {
+        if (!dateTimeStr) return "--:--";
+        const date = new Date(dateTimeStr);
+        return date.getHours().toString().padStart(2, '0') + ":" + date.getMinutes().toString().padStart(2, '0');
+    }
+
+    async function loadProductList() {
+        try {
+            const res = await fetch("/hyapp/api/inbound/pending-list", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ dateFrom: today, dateTo: today, agntCd: selectedCustomer.cd, pageNum: 1, pageSize: 100 })
+            });
+            const json = await res.json();
+            renderProducts(json.data || []);
+        } catch (e) { console.error("상품 로드 실패"); }
+    }
+
+    function renderProducts(items) {
+        const listEl = document.getElementById("productList");
+        if (!items || items.length === 0) {
+            listEl.innerHTML = "<div style='text-align:center; padding:30px; font-size:18px;'>검수 대상 없음</div>";
+            return;
+        }
+
+        listEl.innerHTML = items.map(it => {
+            const pId = it.tblInboundProductId || it.TBL_INBOUND_PRODUCT_ID;
+            const name = it.mtrlNm || it.MTRL_NM;
+            const code = it.mtrlCd || it.MTRL_CD;
+            const barcode = it.barcode || it.BARCODE || "";
+            const agntNm = it.agntNm || it.AGNT_NM || selectedCustomer.nm;
+            const agntCd = it.agntCd || it.AGNT_CD || selectedCustomer.cd; // [추가] 고객사 코드
+            const totalPlan = Number(it.inboundQuantity || it.INBOUND_QUANTITY || 0);
+            const doneQty = Number(it.actualQuantity || it.ACTUAL_QUANTITY || 0);
+            const doneFail = Number(it.failQty || it.FAIL_QTY || 0);
+            const fixedLocNm = it.fixedLocNm || it.FIXED_LOC_NM || "";
+
+            const prevTotal = doneQty + doneFail;
+            const remainQty = totalPlan - prevTotal;
+
+            const printData = JSON.stringify({
+                barcode: barcode, agntNm: agntNm, mtrlNm: name,
+                mtrlCd: code, qty: remainQty, pId: pId
+            }).replace(/'/g, "\\'");
+
+            // return 부분 수정: data-mtrl-cd와 data-agnt-cd 주입
+            return `
+        <div class="p-item"
+             data-prev-done="${prevTotal}"
+             data-total-plan="${totalPlan}"
+             data-fixed-loc="${fixedLocNm}"
+             data-mtrl-cd="${code}"
+             data-agnt-cd="${agntCd}">
+            <div class="p-name-row">
+                <div class="p-name">${name}</div>
+                <button id="btn_print_${pId}" class="btn-print-sm" onclick='requestBarcodePrint(${printData})'>
+                    🖨️ 출력
+                </button>
+            </div>
+            <div class="p-info">
+                코드: ${code} | 예정: ${totalPlan} | 완료: ${prevTotal}
+                ${fixedLocNm ? `<br><span style="color:#e11d48; font-weight:800;">📍 고정 위치: ${fixedLocNm}</span>` : ""}
+                <div style="margin-top: 8px; font-size: 20px; color: #1e293b;">
+                    남은 수량: <b style="color: #0066ff; background: #fff3cd; padding: 2px 8px; border-radius: 4px;">${remainQty}</b>
+                </div>
+            </div>
+            <div class="input-row">
+                <div class="input-box">
+                    <label>합격(정상)</label>
+                    <input type="number" id="pass_${pId}" class="input pass" value="${remainQty}" inputmode="numeric" onfocus="this.select()">
+                </div>
+                <div class="input-box">
+                    <label>불량(폐기)</label>
+                    <input type="number" id="fail_${pId}" class="input fail" value="0" inputmode="numeric" onfocus="this.select()">
+                </div>
+                <button class="btn-save" onclick="saveQc(${pId})">저장</button>
+            </div>
+        </div>
+        `;
+        }).join("");
+    }
+
+    async function saveQc(productId) {
+        const passInput = document.getElementById("pass_" + productId);
+        const failInput = document.getElementById("fail_" + productId);
+        const currentPass = parseInt(passInput.value || 0);
+        const currentFail = parseInt(failInput.value || 0);
+
+        // [중요] 해당 상품의 카드(부모)를 찾아 숨겨둔 mtrlCd와 agntCd를 가져옵니다.
+        const itemCard = passInput.closest('.p-item');
+        const mtrlCd = itemCard.getAttribute('data-mtrl-cd');
+        const agntCd = itemCard.getAttribute('data-agnt-cd');
+
+        const prevDoneQty = parseInt(itemCard.getAttribute('data-prev-done') || 0);
+        const totalPlanQty = parseInt(itemCard.getAttribute('data-total-plan') || 0);
+        const fixedLocNm = itemCard.getAttribute('data-fixed-loc');
+
+        // 수량 초과 검증 로직 (기존 유지)
+        const totalDoneQty = prevDoneQty + currentPass + currentFail;
+        if (totalDoneQty > totalPlanQty) {
+            alert(`검수 수량 초과! \n예정: ${totalPlanQty}개 \n최대 ${totalPlanQty - prevDoneQty}개까지만 입력 가능합니다.`);
+            return;
+        }
+
+        if (!confirm("검수 내용을 저장하시겠습니까?")) return;
+
+        try {
+            const res = await fetch("/hyapp/api/inbound/qc/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    tblInboundProductId: productId,
+                    mtrlCd: mtrlCd,  // 이제 NULL이 아닌 값이 전달됩니다.
+                    agntCd: agntCd,  // 이제 NULL이 아닌 값이 전달됩니다.
+                    actualQuantity: currentPass,
+                    failQty: currentFail,
+                    cmpyCd: selectedCustomer.cmpyCd || "A"
+                })
+            });
+
+            const result = await res.json();
+            if (result.success) {
+                alert("검수 내용이 저장되었습니다.");
+                loadProductList();
+            } else {
+                alert("저장 실패: " + (result.message || "알 수 없는 오류"));
+            }
+        } catch (e) {
+            console.error("QC 저장 상세 오류:", e);
+            alert("저장 중 오류 발생: " + e.message);
+        }
+    }
+
+    /**
+     * 바코드 출력 요청 함수
+     */
+    async function requestBarcodePrint(data) {
+        if (!data) return alert("상품 정보가 없습니다.");
+
+        const barcode = data.barcode;
+        const agntNm = data.agntNm;
+        const mtrlNm = data.mtrlNm;
+        const mtrlCd = data.mtrlCd;
+        const qty = data.qty > 0 ? data.qty : 1;
+        const btnId = `btn_print_${data.pId}`;
+        const btn = document.getElementById(btnId);
+
+        if (!barcode || String(barcode).trim() === "") {
+            return alert(`[${agntNm || '알수없음'}] 상품의 바코드 정보가 없어 출력할 수 없습니다.`);
+        }
+
+        if (!confirm(`[${agntNm}]\n${mtrlNm}\n바코드를 출력하시겠습니까?`)) return;
+
+        try {
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = "요청 중...";
+            }
+
+            const res = await fetch("/hyapp/api/print/request", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    agntNm: agntNm,
+                    mtrlNm: mtrlNm,
+                    mtrlCd: mtrlCd,
+                    barcode: barcode,
+                    qty: qty,
+                    cmpyCd: selectedCustomer.cmpyCd || 'A'
+                })
+            });
+
+            if (res.ok) {
+                alert("출력 요청 완료!");
+            } else {
+                throw new Error("서버 응답 오류");
+            }
+        } catch (e) {
+            alert("출력 요청 실패: " + e.message);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = "🖨️ 출력";
+            }
+        }
+    }
+</script>
+</body>
+</html>

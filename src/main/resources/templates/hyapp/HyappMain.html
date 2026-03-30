@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>HyApp 메인</title>
+
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --border:#dfe3eb;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --radius:20px;
+      --shadow:0 8px 20px rgba(0,0,0,.08);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Apple SD Gothic Neo","Noto Sans KR", sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .app{
+      max-width:520px;
+      margin:0 auto;
+      min-height:100%;
+      padding:16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header{ margin-bottom:20px; }
+    header h1{ margin:0; font-size:20px; font-weight:700; }
+    header p{ margin:6px 0 0; font-size:14px; color:var(--muted); }
+
+    .menu-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+      margin-bottom: 16px;
+    }
+
+    .menu-btn{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      letter-spacing:1px;
+      cursor:pointer;
+      transition:transform .08s ease, box-shadow .08s ease;
+      height:120px;
+      font-size:24px;
+    }
+
+    .menu-btn:active{
+      transform:scale(.96);
+      box-shadow:0 4px 10px rgba(0,0,0,.12);
+    }
+
+    .menu-btn.full { width: 100%; height: 100px; }
+
+    .in    { color:#16a34a; }
+    .put   { color:#0891b2; }
+    .out   { color:#dc2626; }
+    .move  { color:#2563eb; }
+    .outcancle    { color:#d97706; }
+    .inv   { color:#7c3aed; }
+    .check { color:#0d9488; }
+    .return { color: #db2777; }
+
+    /* 알림 아이콘 스타일 */
+    .notice-icon-wrapper {
+      position: relative;
+      padding: 8px;
+      cursor: pointer;
+      color: var(--text);
+    }
+    .notice-badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: #ef4444; /* 선명한 빨간색 */
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--bg);
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <header style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h1>sodisW 메인</h1>
+      <p>작업을 선택하세요</p>
+    </div>
+
+    <div class="notice-icon-wrapper" onclick="go('notice')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+      <span id="noticeBadge" class="notice-badge" style="display:none;">0</span>
+    </div>
+  </header>
+
+  <div class="menu-grid">
+    <button class="menu-btn in"   onclick="go('in')">입고 검수</button>
+    <button class="menu-btn put"  onclick="go('put')">적치</button>
+    <button class="menu-btn out"  onclick="go('out')">출고</button>
+    <button class="menu-btn outcancle"  onclick="go('outcancle')">출고취소</button>
+    <button class="menu-btn move" onclick="go('move')">재고이동</button>
+    <button class="menu-btn restock"   onclick="go('restock')">재입고</button>
+    <button class="menu-btn return" onclick="go('return')">반품·교환</button>
+    <button class="menu-btn inv"  onclick="go('inv')">재고조회</button>
+  </div>
+
+  <button class="menu-btn full check" onclick="go('check')">재고실사</button>
+</div>
+
+<script>
+  /**
+   * [중요] 페이지 진입 시 초기화 로직
+   * 뒤로가기나 새로고침으로 진입해도 무조건 실행되도록 'pageshow' 이벤트 사용
+   */
+  window.addEventListener('pageshow', function(event) {
+    // 1. 모든 검색 조건(localStorage) 초기화
+    localStorage.clear();
+    console.log("메인 진입: 모든 작업 기록이 초기화되었습니다.");
+
+    /**
+     * 2. [히스토리 제어]
+     * 현재 페이지를 히스토리의 끝으로 강제 고정하여 뒤로가기 시 앱 종료 유도
+     */
+    if (window.history && window.history.pushState) {
+      window.history.pushState('forward', null, './main');
+      window.onpopstate = function () {
+        // 뒤로가기 감지 시 아무 동작도 하지 않거나 홈으로 고정
+        window.history.pushState('forward', null, './main');
+      };
+    }
+  });
+
+  /**
+   * [중요] 이동 함수 수정
+   * location.href 대신 location.replace를 사용하여 히스토리를 쌓지 않음
+   */
+  function go(type){
+    localStorage.clear();
+
+    let targetUrl = '';
+    switch(type){
+      case 'in':    targetUrl='/hyapp/in'; break;
+      case 'put':   targetUrl='/hyapp/put'; break;
+      case 'out':   targetUrl='/hyapp/out'; break;
+      case 'outcancle':   targetUrl='/hyapp/outcancle'; break;
+      case 'move':  targetUrl='/hyapp/move'; break;
+      case 'restock':    targetUrl='/hyapp/restock'; break;
+      case 'return': targetUrl='/hyapp/return'; break;
+      case 'inv':   targetUrl='/hyapp/inv'; break;
+      case 'check': targetUrl='/hyapp/check'; break;
+      case 'notice': targetUrl='/hyapp/notice'; break; // 알림 목록 페이지
+      default:      targetUrl='/hyapp/main';
+    }
+
+    // 히스토리를 남기지 않고 이동하여 뒤로가기 시 이전 화면이 나오지 않게 함
+    location.replace(targetUrl);
+  }
+
+  window.addEventListener('pageshow', function() {
+    localStorage.clear();
+    updateUnreadNoticeCount(); // 알림 개수 체크 호출
+  });
+
+  async function updateUnreadNoticeCount() {
+    try {
+      // 업로드하신 Controller의 경로에 맞춰 호출
+      const res = await fetch('/hyapp/api/notice/unread-count?cmpyCd=A');
+      const count = await res.json();
+
+      const badge = document.getElementById("noticeBadge");
+      if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = "flex";
+      } else {
+        badge.style.display = "none";
+      }
+    } catch (e) {
+      console.error("알림 조회 실패", e);
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.sonictms.alsys.erp.erp101001.mapper.Erp101001Mapper">
+
+	<!-- 그리드 목록 조회하기 -->
+	<select id="erp101001List" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+			CALL ${schema}..USP_SO_LISTBYALL (
+				#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
+				#{dtType ,mode=IN , jdbcType=VARCHAR},
+				#{fromDt ,mode=IN , jdbcType=VARCHAR},
+				#{toDt ,mode=IN , jdbcType=VARCHAR},
+				#{agntList ,mode=IN , jdbcType=VARCHAR},
+				#{dcList ,mode=IN , jdbcType=VARCHAR},
+				#{soList ,mode=IN , jdbcType=VARCHAR},
+				#{soTypeList,mode=IN , jdbcType=VARCHAR},
+				#{soStatList,mode=IN , jdbcType=VARCHAR},
+				#{mallNm ,mode=IN , jdbcType=VARCHAR},
+				#{acptNm ,mode=IN , jdbcType=VARCHAR},
+				#{acptTel ,mode=IN , jdbcType=VARCHAR},
+				#{useYn ,mode=IN , jdbcType=VARCHAR},
+				#{refSoList ,mode=IN , jdbcType=VARCHAR},
+				#{srchAddr ,mode=IN , jdbcType=VARCHAR},
+				
+				<!-- 20220106 정연호 추가. 시공카테고리 -->
+				#{instCtgrList		,mode=IN	,	jdbcType=VARCHAR}
+			
+			)
+		}
+	</select>
+
+	<!-- 배송확정일 가능한 날짜 조회 -->
+	<select id="erp101001p1List" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_INST_ABLE_LISTBYALL (
+		#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
+		#{dcCd ,mode=IN , jdbcType=VARCHAR},
+		#{fromDt ,mode=IN , jdbcType=VARCHAR},
+		#{srchDay ,mode=IN , jdbcType=VARCHAR},
+		#{prodCdList ,mode=IN , jdbcType=VARCHAR},
+		#{qtyList ,mode=IN , jdbcType=VARCHAR},
+		#{postCd ,mode=IN , jdbcType=VARCHAR},
+		#{addr ,mode=IN , jdbcType=VARCHAR}
+
+		)
+		}
+	</select>
+
+
+
+	<!-- 헤더저장 -->
+	<select id="erp101001p1HeaderSave" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_M_INS (
+		#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
+		#{soNo ,mode=IN , jdbcType=VARCHAR},
+		#{refSoNo ,mode=IN , jdbcType=VARCHAR},
+		#{orgnSoNo ,mode=IN , jdbcType=VARCHAR},
+		#{soType ,mode=IN , jdbcType=VARCHAR},
+		#{soStatCd ,mode=IN , jdbcType=VARCHAR},
+		#{agntCd ,mode=IN , jdbcType=VARCHAR},
+		#{mallCd ,mode=IN , jdbcType=VARCHAR},
+		#{brand ,mode=IN , jdbcType=VARCHAR},
+		#{ordrInptDt ,mode=IN , jdbcType=VARCHAR},
+		#{rcptDt ,mode=IN , jdbcType=VARCHAR},
+		#{rqstDt ,mode=IN , jdbcType=VARCHAR},
+		#{dlvyCnfmDt ,mode=IN , jdbcType=VARCHAR},
+		#{acptEr ,mode=IN , jdbcType=VARCHAR},
+		#{ordrEr ,mode=IN , jdbcType=VARCHAR},
+		#{acptTel1 ,mode=IN , jdbcType=VARCHAR},
+		#{acptTel2 ,mode=IN , jdbcType=VARCHAR},
+		#{postCd ,mode=IN , jdbcType=VARCHAR},
+		#{addr1 ,mode=IN , jdbcType=VARCHAR},
+		#{addr2 ,mode=IN , jdbcType=VARCHAR},
+		#{dlvyRqstMsg ,mode=IN , jdbcType=VARCHAR},
+		#{custSpclTxt ,mode=IN , jdbcType=VARCHAR},
+		#{costType ,mode=IN , jdbcType=VARCHAR},
+		#{rcptCost ,mode=IN , jdbcType=VARCHAR},
+		#{passCost ,mode=IN , jdbcType=VARCHAR},
+		#{dcCd ,mode=IN , jdbcType=VARCHAR},
+		#{useYn ,mode=IN , jdbcType=VARCHAR},
+		#{memo ,mode=IN , jdbcType=VARCHAR},
+		#{inptSys ,mode=IN , jdbcType=VARCHAR},
+		#{saveUser ,mode=IN , jdbcType=VARCHAR}
+		)
+		}
+	</select>
+
+
+	<!-- 상세저장 -->
+	<select id="erp101001p1DetailSave" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_P_INS (
+			#{tblSoMId 		,mode=IN , jdbcType=VARCHAR},
+			#{soNo 			,mode=IN , jdbcType=VARCHAR},
+			#{agntCd 		,mode=IN , jdbcType=VARCHAR},
+			#{prodSeq 		,mode=IN , jdbcType=VARCHAR},
+			#{prodCd 		,mode=IN , jdbcType=VARCHAR},
+			#{prodNm 		,mode=IN , jdbcType=VARCHAR},
+			#{qty 			,mode=IN , jdbcType=VARCHAR},
+			#{instCost 		,mode=IN , jdbcType=VARCHAR},	<!-- 20210913 정연호. 시공비입력 추가 -->
+			#{zoneCd 		,mode=IN , jdbcType=VARCHAR},
+			#{dcCd 			,mode=IN , jdbcType=VARCHAR},
+			#{rqstDt 		,mode=IN , jdbcType=VARCHAR},
+			#{dlvyCnfmDt 	,mode=IN , jdbcType=VARCHAR},
+			#{dlvyRqstMsg 	,mode=IN , jdbcType=VARCHAR},
+			#{useYn 		,mode=IN , jdbcType=VARCHAR},
+			#{memo 			,mode=IN , jdbcType=VARCHAR},
+			#{saveUser 		,mode=IN , jdbcType=VARCHAR},
+			<!-- 20211226 정연호 추가 신규파라미터 -->
+			#{refSoNo 		,mode=IN , jdbcType=VARCHAR},
+			#{dlvyCostType	,mode=IN , jdbcType=VARCHAR},
+			#{rcptCost 		,mode=IN , jdbcType=VARCHAR},
+			#{passCost 		,mode=IN , jdbcType=VARCHAR}
+		)
+		}
+	</select>
+
+	<!-- 주문수정 팝업에서 헤더 불러오기 헤더는 1줄만 불러옴 -->
+	<select id="erp101001p3HeaderList" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_M_LOAD (
+		#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
+
+		)
+		}
+	</select>
+
+	<!-- 주문수정 팝업에서 상세 불러오기 상세는 리스트 -->
+	<select id="erp101001p3DetailList" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_P_LOAD (
+		#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
+
+		)
+		}
+	</select>
+
+	<!-- 상세삭제 -->
+	<select id="erp101001p3DelDetail" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_P_DEL (
+		#{tblSoMId ,mode=IN , jdbcType=VARCHAR},
+		#{tblSoPId ,mode=IN , jdbcType=VARCHAR},
+		#{useYn ,mode=IN , jdbcType=VARCHAR},
+		#{delResn ,mode=IN , jdbcType=VARCHAR},
+		#{memo ,mode=IN , jdbcType=VARCHAR},
+		#{saveUser ,mode=IN , jdbcType=VARCHAR}
+		)
+		}
+	</select>
+	
+	
+	<!-- 20211226 정연호 추가. 상세수정(제품정보 그리드) 고객사주문번호, 착불비만 수정가능 -->
+	<select id="erp101001p3UpdtDetail" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_P_UPDT (
+		
+		#{tblSoPId 		,mode=IN , jdbcType=VARCHAR},
+		#{refSoNo 		,mode=IN , jdbcType=VARCHAR},
+		#{dlvyCostType	,mode=IN , jdbcType=VARCHAR},
+		#{rcptCost 		,mode=IN , jdbcType=VARCHAR},
+		#{passCost 		,mode=IN , jdbcType=VARCHAR},
+		#{saveUser 		,mode=IN , jdbcType=VARCHAR},
+		
+		<!-- 20220108 정연호 추가 수량 추가 -->
+		#{qty 		,mode=IN , jdbcType=VARCHAR}
+		)
+		}
+	</select>
+	
+	
+	
+
+	<!-- 헤더수정 -->
+	<select id="erp101001p1HeaderUpdt" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_M_UPDT (
+		#{tblSoMId ,mode=IN , jdbcType=VARCHAR},
+		#{refSoNo ,mode=IN , jdbcType=VARCHAR},
+		#{orgnSoNo ,mode=IN , jdbcType=VARCHAR},
+		#{soType ,mode=IN , jdbcType=VARCHAR},
+		#{soStatCd ,mode=IN , jdbcType=VARCHAR},
+		#{agntCd ,mode=IN , jdbcType=VARCHAR},
+		#{mallCd ,mode=IN , jdbcType=VARCHAR},
+		#{brand ,mode=IN , jdbcType=VARCHAR},
+		#{ordrInptDt ,mode=IN , jdbcType=VARCHAR},
+		#{rcptDt ,mode=IN , jdbcType=VARCHAR},
+		#{rqstDt ,mode=IN , jdbcType=VARCHAR},
+		#{dlvyCnfmDt ,mode=IN , jdbcType=VARCHAR},
+		#{acptEr ,mode=IN , jdbcType=VARCHAR},
+		#{ordrEr ,mode=IN , jdbcType=VARCHAR},
+		#{acptTel1 ,mode=IN , jdbcType=VARCHAR},
+		#{acptTel2 ,mode=IN , jdbcType=VARCHAR},
+		#{postCd ,mode=IN , jdbcType=VARCHAR},
+		#{addr1 ,mode=IN , jdbcType=VARCHAR},
+		#{addr2 ,mode=IN , jdbcType=VARCHAR},
+		#{dlvyRqstMsg ,mode=IN , jdbcType=VARCHAR},
+		#{custSpclTxt ,mode=IN , jdbcType=VARCHAR},
+		#{costType ,mode=IN , jdbcType=VARCHAR},
+		#{rcptCost ,mode=IN , jdbcType=VARCHAR},
+		#{passCost ,mode=IN , jdbcType=VARCHAR},
+		#{dcCd ,mode=IN , jdbcType=VARCHAR},
+		#{useYn ,mode=IN , jdbcType=VARCHAR},
+		#{memo ,mode=IN , jdbcType=VARCHAR},
+		#{inptSys ,mode=IN , jdbcType=VARCHAR},
+		#{saveUser ,mode=IN , jdbcType=VARCHAR}
+		)
+		}
+	</select>
+
+
+
+
+
+
+	<!-- 원오더찾기 팝업에서 리스트조회 -->
+	<select id="erp101001p4List" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+			CALL ${schema}..USP_SO_ETC_SOLIST (
+				#{cmpyCd 	,mode=IN , jdbcType=VARCHAR},
+				#{dtType 	,mode=IN , jdbcType=VARCHAR},
+				#{fromDt 	,mode=IN , jdbcType=VARCHAR},
+				#{toDt 		,mode=IN , jdbcType=VARCHAR},
+				#{agntCd 	,mode=IN , jdbcType=VARCHAR},
+				#{soNo 		,mode=IN , jdbcType=VARCHAR},
+				#{refSoNo 	,mode=IN , jdbcType=VARCHAR},
+				#{acptNm 	,mode=IN , jdbcType=VARCHAR},
+				#{mallNm 	,mode=IN , jdbcType=VARCHAR}
+			)
+		}
+	</select>
+
+
+	<!-- 반품등록 팝업에서 헤더 불러오기 헤더는 1줄만 불러옴 -->
+	<select id="erp101001p5HeaderList" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_M_LOAD_ETC (
+		#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
+
+		)
+		}
+	</select>
+
+
+	<!-- 반품등록 팝업에서 상세 불러오기 상세는 리스트 -->
+	<select id="erp101001p5DetailList" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_P_LOAD_ETC (
+		#{tblSoMId ,mode=IN , jdbcType=VARCHAR}
+
+		)
+		}
+	</select>
+
+	<!-- 반품오더헤더저장 -->
+	<select id="erp101001p5HeaderSave" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_M_INS (
+		#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
+		#{soNo ,mode=IN , jdbcType=VARCHAR},
+		#{refSoNo ,mode=IN , jdbcType=VARCHAR},
+		#{orgnSoNo ,mode=IN , jdbcType=VARCHAR},
+		#{soType ,mode=IN , jdbcType=VARCHAR},
+		#{soStatCd ,mode=IN , jdbcType=VARCHAR},
+		#{agntCd ,mode=IN , jdbcType=VARCHAR},
+		#{mallCd ,mode=IN , jdbcType=VARCHAR},
+		#{brand ,mode=IN , jdbcType=VARCHAR},
+		#{ordrInptDt ,mode=IN , jdbcType=VARCHAR},
+		#{rcptDt ,mode=IN , jdbcType=VARCHAR},
+		#{rqstDt ,mode=IN , jdbcType=VARCHAR},
+		#{dlvyCnfmDt ,mode=IN , jdbcType=VARCHAR},
+		#{acptEr ,mode=IN , jdbcType=VARCHAR},
+		#{ordrEr ,mode=IN , jdbcType=VARCHAR},
+		#{acptTel1 ,mode=IN , jdbcType=VARCHAR},
+		#{acptTel2 ,mode=IN , jdbcType=VARCHAR},
+		#{postCd ,mode=IN , jdbcType=VARCHAR},
+		#{addr1 ,mode=IN , jdbcType=VARCHAR},
+		#{addr2 ,mode=IN , jdbcType=VARCHAR},
+		#{dlvyRqstMsg ,mode=IN , jdbcType=VARCHAR},
+		#{custSpclTxt ,mode=IN , jdbcType=VARCHAR},
+		#{costType ,mode=IN , jdbcType=VARCHAR},
+		#{rcptCost ,mode=IN , jdbcType=VARCHAR},
+		#{passCost ,mode=IN , jdbcType=VARCHAR},
+		#{dcCd ,mode=IN , jdbcType=VARCHAR},
+		#{useYn ,mode=IN , jdbcType=VARCHAR},
+		#{memo ,mode=IN , jdbcType=VARCHAR},
+		#{inptSys ,mode=IN , jdbcType=VARCHAR},
+		#{saveUser ,mode=IN , jdbcType=VARCHAR}
+		)
+		}
+	</select>
+
+
+	<!-- 반품오더 상세저장 -->
+	<select id="erp101001p5DetailSave" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_P_INS (
+			#{tblSoMId 		,mode=IN , jdbcType=VARCHAR},
+			#{soNo 			,mode=IN , jdbcType=VARCHAR},
+			#{agntCd 		,mode=IN , jdbcType=VARCHAR},
+			#{prodSeq 		,mode=IN , jdbcType=VARCHAR},
+			#{prodCd 		,mode=IN , jdbcType=VARCHAR},
+			#{prodNm 		,mode=IN , jdbcType=VARCHAR},
+			#{qty 			,mode=IN , jdbcType=VARCHAR},
+			#{instCost 		,mode=IN , jdbcType=VARCHAR},	<!-- 20210913 정연호. 시공비입력 추가 -->
+			#{zoneCd 		,mode=IN , jdbcType=VARCHAR},
+			#{dcCd 			,mode=IN , jdbcType=VARCHAR},
+			#{rqstDt 		,mode=IN , jdbcType=VARCHAR},
+			#{dlvyCnfmDt 	,mode=IN , jdbcType=VARCHAR},
+			#{dlvyRqstMsg 	,mode=IN , jdbcType=VARCHAR},
+			#{useYn 		,mode=IN , jdbcType=VARCHAR},
+			#{memo 			,mode=IN , jdbcType=VARCHAR},
+			#{saveUser 		,mode=IN , jdbcType=VARCHAR},
+			<!-- 20211226 정연호 추가 신규파라미터 -->
+			#{refSoNo 		,mode=IN , jdbcType=VARCHAR},
+			#{dlvyCostType	,mode=IN , jdbcType=VARCHAR},
+			#{rcptCost 		,mode=IN , jdbcType=VARCHAR},
+			#{passCost 		,mode=IN , jdbcType=VARCHAR}
+		)
+		}
+	</select>
+
+
+	<!-- 우편번호로 물류센터 찾기 -->
+	<select id="erp101001p1PostCdDcCd" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_DC_SRCH (
+		#{cmpyCd ,mode=IN , jdbcType=VARCHAR},
+		#{postCd ,mode=IN , jdbcType=VARCHAR}
+
+		)
+		}
+	</select>
+	<!-- 체크한 것들 삭제(일괄삭제) -->
+	<select id="erp101001ChkDel" statementType="CALLABLE"
+		parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+		resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		{
+		CALL ${schema}..USP_SO_M_DEL (
+		#{tblSoMId ,mode=IN , jdbcType=VARCHAR},
+		#{saveUser ,mode=IN , jdbcType=VARCHAR}
+		)
+		}
+
+	</select>
+
+	<select id="selectNoCoordList" parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO"
+			resultType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		SELECT
+			M.TBL_SO_M_ID,
+			M.SO_NO,
+			M.ADDR1,
+			M.ADDR2
+		FROM TBL_SO_M M WITH(NOLOCK)
+		WHERE M.CMPY_CD = #{cmpyCd}
+		  AND M.ORDR_INPT_DT BETWEEN #{fromDt} AND #{toDt} -- 필수 날짜 조건
+		  AND (M.MAP_X IS NULL OR M.MAP_X = 0)
+		  AND (M.MAP_Y IS NULL OR M.MAP_Y = 0)
+		-- 필요한 경우 다른 검색 조건(화주, 물류센터 등) 추가
+	</select>
+
+	<update id="updateOrderCoord" parameterType="com.sonictms.alsys.erp.erp101001.entity.Erp101001VO">
+		UPDATE TBL_SO_M
+		SET MAP_X = #{mapX},
+			MAP_Y = #{mapY},
+			SUCC_ADDR = #{succAddr},
+			UPDT_USER = #{updtUser}, -- 로그인 사용자 ID
+			UPDT_TIME = GETDATE()
+		WHERE TBL_SO_M_ID = #{tblSoMId}
+	</update>
+</mapper>

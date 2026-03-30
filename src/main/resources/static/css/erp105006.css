@@ -1,0 +1,204 @@
+/* 재입고 대기 관리 스타일 */
+
+.title-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.title-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-right: 10px;
+}
+
+.sub-title {
+  font-size: 12px;
+  color: #666;
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.btn-container {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.action-button {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  color: #333;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.action-button.primary {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.action-button.primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.action-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.action-button.disabled:hover {
+  background-color: #f8f9fa;
+  border-color: #ddd;
+}
+
+/* 검색 영역 스타일 */
+#searchDiv {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+#searchDiv1 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.item-head {
+  font-weight: bold;
+  color: #495057;
+  white-space: nowrap;
+}
+
+.item-data {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* 그리드 영역 스타일 */
+#gridDiv {
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* 페이지네이션 스타일 */
+.pagination-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+}
+
+.pagination-button {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  background-color: white;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+.pagination-button:hover {
+  background-color: #e9ecef;
+}
+
+.pagination-button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.pagination-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+
+.pagination-info input[type="number"] {
+  width: 60px;
+  padding: 2px 4px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+/* 상태별 행 색상 */
+.row-pending {
+  background-color: #ffe6e6 !important;
+}
+
+.row-inbound-complete {
+  background-color: #fff2cc !important;
+}
+
+.row-complete {
+  background-color: #e8f5e8 !important;
+}
+
+.row-disabled {
+  background-color: #d3d3d3 !important;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1200px) {
+  .btn-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #searchDiv1 {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cell {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+}
+
+@media (max-width: 768px) {
+  .title-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-container {
+    width: 100%;
+  }
+
+  .action-button {
+    flex: 1;
+    text-align: center;
+  }
+}
