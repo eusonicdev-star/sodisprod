@@ -45,4 +45,6 @@ public interface Erp105013Mapper {
 	void updateTempStatus(Erp105013VO vo);
 
 	void updateMtrlMasterQuantity(Erp105013VO vo);
+
+	void updateTempStockStatus(Erp105013VO vo);
 }

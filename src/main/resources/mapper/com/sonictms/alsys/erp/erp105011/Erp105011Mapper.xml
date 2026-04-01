@@ -37,19 +37,27 @@
         ORDER BY Z.VIEW_SEQ, Z.ZONE_NM, L.LOC_NM
     </select>
 
-    <select id="selectLocationInfoByNm" parameterType="com.sonictms.alsys.erp.erp105011.entity.Erp105011VO"
-            resultType="com.sonictms.alsys.erp.erp105011.entity.Erp105011VO">
-        SELECT
-            LOC_ID  AS locId,
-            ZONE_ID AS zoneId,
-            WH_CD   AS whCd,
-            LOC_NM  AS locNm
+    <select id="selectLocationInfoByNm" resultType="com.sonictms.alsys.erp.erp105011.entity.Erp105011VO">
+        SELECT LOC_ID AS locId, ZONE_ID AS zoneId, WH_CD AS whCd
         FROM TBL_WH_LOC_M WITH(NOLOCK)
         WHERE CMPY_CD = #{cmpyCd}
-          AND LOC_NM = #{toLocNm}
-          AND USE_YN = 'Y'
-          AND DELETED_YN = 'N'
+          AND (LOC_NM = #{toLocCd} OR LOC_CD = #{toLocCd}) -- 명칭/코드 대응
+          AND USE_YN = 'Y' AND DELETED_YN = 'N'
     </select>
+
+    <insert id="insertStockMoveLog">
+        INSERT INTO TBL_STOCK_MOVE_LOG (
+            CMPY_CD, AGNT_CD, MTRL_CD,
+            FROM_LOC_ID, TO_LOC_ID,
+            MOVE_QTY, MOVE_TYPE,
+            CREATE_TIME, CREATE_USER
+        ) VALUES (
+                     #{cmpyCd}, #{agntCd}, #{mtrlCd},
+                     #{fromLocId}, #{toLocId},
+                     #{transferQty}, 'WEB_MOVE',
+                     GETDATE(), #{processUser}
+                 )
+    </insert>
 
     <update id="updateDecreaseStock" parameterType="com.sonictms.alsys.erp.erp105011.entity.Erp105011VO">
         UPDATE TBL_STOCK

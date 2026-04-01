@@ -168,31 +168,27 @@
                     $("#transferModal").show();
                 },
                 close: function() { $("#transferModal").hide(); },
+                // fnObj.transferOpen.execute 함수 수정
                 execute: function() {
                     var rId = myGrid.getSelectedRowId();
                     if(!rId) return alert("이동할 항목을 선택해주세요.");
 
                     var data = myGrid.getRowData(rId);
-
-                    // 로그를 찍어 브라우저 콘솔(F12)에서 값이 나오는지 확인하세요.
-                    console.log("선택 행 데이터:", data);
-
-                    var toLocNm = $("#toLocNm").val();
+                    var toLocCd = $("#toLocNm").val(); // 화면의 목적지 입력값
                     var transferQty = $("#transferQty").val();
 
-                    if(!toLocNm) return alert("목적지 로케이션을 입력하세요.");
+                    if(!toLocCd) return alert("목적지 로케이션을 입력하세요.");
                     if(!transferQty || parseInt(transferQty) <= 0) return alert("수량을 입력하세요.");
 
                     if(!confirm("재고 이동을 처리하시겠습니까?")) return;
 
                     var params = {
-                        cmpyCd: myComboCmpyCd.getSelectedValue() || "A",
-                        agntCd: data.agntCd,       // 이제 그리드 컬럼이 활성화되어 값이 잘 들어옵니다.
-                        fromLocId: data.locId,     // 이 값이 Mapper의 #{fromLocId}로 전달됩니다.
+                        cmpyCd: "A",
+                        agntCd: data.agntCd,
                         mtrlCd: data.mtrlCd,
-                        toLocNm: toLocNm,
-                        transferQty: parseInt(transferQty),
-                        transferReason: "로케이션 이동"
+                        fromLocId: data.locId,     // 이미 그리드에서 불러온 상태
+                        toLocCd: toLocCd,          // 사용자가 입력한 목적지 코드
+                        transferQty: parseInt(transferQty)
                     };
 
                     $.ajax({

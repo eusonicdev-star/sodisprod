@@ -32,7 +32,8 @@
             /* [추가] 상품 마스터에서 실제 상품명을 가져와 매칭 여부 확인 */
             M.MTRL_NM     AS mtrlNmCheck,
             CASE WHEN M.MTRL_CD IS NULL THEN 'N' ELSE 'Y' END AS mtrlYn,
-            T.REMARK      AS remark
+            T.REMARK      AS remark,
+            T.STATUS      AS status
         FROM TBL_STOCK_TEMP T WITH(NOLOCK)
 LEFT JOIN TBL_AGENCY_M A ON T.AGNT_NM = A.AGNT_NM AND T.CMPY_CD = A.CMPY_CD
             LEFT JOIN TBL_WH_LOC_M L ON T.LOC_CD  = L.LOC_CD  AND T.CMPY_CD = L.CMPY_CD
@@ -81,7 +82,7 @@ LEFT JOIN TBL_AGENCY_M A ON T.AGNT_NM = A.AGNT_NM AND T.CMPY_CD = A.CMPY_CD
         SELECT
             A.CMPY_CD,
             #{whCd} AS WH_CD,
-            5 AS ZONE_ID, -- 평치 존 ID
+            5 AS ZONE_ID, -- 평치 존 ID (필요시 시스템의 실제 평치 ZONE_ID로 확인 필요)
             'FLOOR_' + A.AGNT_CD AS LOC_CD,
             N'평치_' + A.AGNT_NM AS LOC_NM,
             'FLOOR' AS LOC_TYPE,
@@ -93,18 +94,21 @@ LEFT JOIN TBL_AGENCY_M A ON T.AGNT_NM = A.AGNT_NM AND T.CMPY_CD = A.CMPY_CD
             'N' AS DELETED_YN,
             'Y' AS PICKING_YN
         FROM (
+                 /* [변경 포인트] 주문 이력이 아닌, 현재 재고가 1개라도 있는 고객사 추출 */
                  SELECT DISTINCT
-                     SM.CMPY_CD,
-                     SM.AGNT_CD,
+                     S.CMPY_CD,
+                     AM.AGNT_CD,
                      AM.AGNT_NM
-                 FROM TBL_SO_M SM WITH(NOLOCK)
-        INNER JOIN TBL_AGENCY_M AM WITH(NOLOCK)
-                 ON SM.CMPY_CD = AM.CMPY_CD AND SM.AGNT_CD = AM.AGNT_CD
-                 WHERE SM.RCPT_DT >= CONVERT(VARCHAR(10), DATEADD(MONTH, -3, GETDATE()), 112)
-                   AND SM.USE_YN = 'Y'
-                   AND SM.CMPY_CD = #{cmpyCd}
+                 FROM TBL_STOCK_TEMP S WITH(NOLOCK)
+         INNER JOIN TBL_AGENCY_M AM WITH(NOLOCK)
+                 ON S.CMPY_CD = AM.CMPY_CD AND S.AGNT_NM = AM.AGNT_NM
+                 WHERE S.CMPY_CD = #{cmpyCd}
+                   AND S.WH_CD = #{whCd}
+                   AND S.STOCK_QTY > 0 -- 실제 재고가 남아있는 고객만 대상
+                   AND AM.USE_YN = 'Y'
              ) A
         WHERE NOT EXISTS (
+            /* 이미 해당 고객의 평치 로케이션이 존재하는지 체크 */
             SELECT 1
             FROM TBL_WH_LOC_M L WITH(NOLOCK)
             WHERE L.CMPY_CD = A.CMPY_CD
@@ -167,6 +171,7 @@ LEFT JOIN TBL_AGENCY_M A ON T.AGNT_NM = A.AGNT_NM AND T.CMPY_CD = A.CMPY_CD
         INSERT INTO TBL_STOCK (
             CMPY_CD, WH_CD, AGNT_CD, MTRL_CD,
             ZONE_ID, LOC_ID, STOCK_QTY,
+            ALLOCATED_QTY,
             UPDT_TIME, UPDT_USER
         )
         SELECT
@@ -177,6 +182,7 @@ LEFT JOIN TBL_AGENCY_M A ON T.AGNT_NM = A.AGNT_NM AND T.CMPY_CD = A.CMPY_CD
             DATA.ZONE_ID,
             DATA.LOC_ID,
             SUM(CAST(DATA.STOCK_QTY AS DECIMAL(18,2))) AS STOCK_QTY,
+            0 AS ALLOCATED_QTY,
             GETDATE(),
             #{saveUser}
         FROM (
@@ -259,4 +265,13 @@ LEFT JOIN TBL_AGENCY_M A ON T.AGNT_NM = A.AGNT_NM AND T.CMPY_CD = A.CMPY_CD
         WHERE MM.CMPY_CD = #{cmpyCd}
     </update>
 
+    <update id="updateTempStockStatus" parameterType="com.sonictms.alsys.erp.erp105013.entity.Erp105013VO">
+        UPDATE TBL_STOCK_TEMP
+        SET STATUS = 'C',             -- 'C'omplete (완료)
+            UPDT_TIME = GETDATE(),
+            UPDT_USER = #{saveUser}
+        WHERE CMPY_CD = #{cmpyCd}
+          AND WH_CD = #{whCd}
+          AND (STATUS = 'W' OR STATUS IS NULL) -- 대기 상태인 것들만 업데이트
+    </update>
 </mapper>

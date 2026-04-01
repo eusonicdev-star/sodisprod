@@ -28,4 +28,5 @@ public class Erp105013VO extends CommonVO {
 	private String stockQty;   // 수량
 	private String paltType;   // 팔렛트구분 (엑셀의 '팔렛트구분' 매핑)
 	private String remark;
+	private String status;
 }

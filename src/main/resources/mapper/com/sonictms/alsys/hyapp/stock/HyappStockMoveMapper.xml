@@ -108,4 +108,16 @@
             AND EXISTS (SELECT 1 FROM TBL_WH_LOC_M WHERE LOC_CD = #{fromLocationCd} AND CMPY_CD = #{cmpyCd})
     </insert>
 
+    <insert id="insertStockMoveHistory">
+        INSERT INTO TBL_STOCK_MOVE_H (
+            CMPY_CD, WH_CD, AGNT_CD, MTRL_CD,
+            FROM_LOC_ID, TO_LOC_ID, TRANSFER_QTY,
+            REASON, SAVE_TIME, SAVE_USER
+        ) VALUES (
+                     #{cmpyCd}, #{whCd}, #{agntCd}, #{mtrlCd},
+                     (SELECT TOP 1 LOC_ID FROM TBL_WH_LOC_M WHERE LOC_CD = #{fromLocationCd} AND CMPY_CD = #{cmpyCd}),
+                     (SELECT TOP 1 LOC_ID FROM TBL_WH_LOC_M WHERE LOC_CD = #{toLocationCd} AND CMPY_CD = #{cmpyCd}),
+                     #{moveQty}, 'APP_MOVE', GETDATE(), #{userId}
+                 )
+    </insert>
 </mapper>

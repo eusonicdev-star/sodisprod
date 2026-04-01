@@ -19,6 +19,8 @@ public interface Erp105011Mapper {
     // 재고 이동 이력 저장 (History)
     int insertTransferHistory(Erp105011VO vo);
 
+    int insertStockMoveLog(Erp105011VO vo);
+
     // 목적지 로케이션 유효성 확인 및 정보 조회
     Erp105011VO selectLocationInfoByNm(Erp105011VO vo);
 }

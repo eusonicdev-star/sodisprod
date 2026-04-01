@@ -33,6 +33,7 @@ public class Erp105011VO extends CommonVO {
     // 재고 이동(Transfer) 처리용 필드
     private Long fromLocId;      // 출발지 로케이션 ID
     private Long toLocId;        // 목적지 로케이션 ID
+    private String toLocCd;
     private String toLocNm;      // 목적지 로케이션 명
     private Integer transferQty; // 이동 수량
     private String transferReason; // 이동 사유

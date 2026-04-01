@@ -62,5 +62,8 @@ public class Erp105013Service {
 
         // 5. [추가] 상품 마스터(TBL_MTRL_M)의 전체 수량 업데이트 (최종)
         erp105013Mapper.updateMtrlMasterQuantity(vo);
+
+        // 6. 최종 상태값 변경
+        erp105013Mapper.updateTempStockStatus(vo);
     }
 }
