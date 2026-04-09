@@ -179,6 +179,16 @@
 	</title>
 	<pageHeader>
 		<band height="310" splitType="Stretch">
+			<componentElement>
+				<reportElement x="0" y="0" width="110" height="30">
+					<property name="com.jaspersoft.studio.unit.barHeight" value="px"/>
+					<printWhenExpression><![CDATA[$F{REF_SO_NO} != null && $F{REF_SO_NO}.matches("^[a-zA-Z0-9\\-_]+$")]]></printWhenExpression>
+				</reportElement>
+				<jr:barbecue xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components"
+							 type="Code128" drawText="false" checksumRequired="false" barHeight="30">
+					<jr:codeExpression><![CDATA[$F{REF_SO_NO}]]></jr:codeExpression>
+				</jr:barbecue>
+			</componentElement>
 			<textField isBlankWhenNull="true">
 				<reportElement x="80" y="0" width="140" height="30" uuid="f0046724-b951-4a3c-a2c0-e7e8b357914b"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">

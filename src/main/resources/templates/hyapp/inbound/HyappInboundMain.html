@@ -137,9 +137,19 @@
     }
 
     function selectCustomer(cd, nm) {
-        // 선택한 고객 정보를 세션에 저장하고 다음 단계(차량 정보 입력)로 이동
-        sessionStorage.setItem("SELECTED_CUSTOMER", JSON.stringify({ cd, nm }));
-        // 다음 단계 페이지로 이동 (2번/3번 절차: 차량톤수, 파렛트 입력 화면)
+        // [추가] 화면에서 선택된 날짜 가져오기
+        const selectedDate = document.getElementById('dateInput').value;
+
+        const customerData = {
+            cd: cd,
+            nm: nm,
+            dlvyDt: selectedDate // 날짜 추가
+        };
+
+        // 데이터 확인용 로그
+        console.log("전송 데이터(Main):", customerData);
+
+        sessionStorage.setItem("SELECTED_CUSTOMER", JSON.stringify(customerData));
         location.href = "/hyapp/in_ass";
     }
 

@@ -95,6 +95,17 @@
             85% { opacity: 1; transform: translateY(0); }
             100% { opacity: 0; transform: translateY(-20px); }
         }
+        /* MTO 배지 스타일 */
+        .badge-mto {
+            background-color: #ff5722;
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -206,13 +217,16 @@
         let totalScan = 0;
 
         items.forEach(item => {
-            const isCancel = (item.soStatCd === '0000' || (item.soStatCd && item.soStatCd.startsWith('8')));
+            const isCancel = (item.soStatCd === '0000');
             const isComplete = (item.scanQty || 0) >= (item.qty || 0); // 검수 완료 여부
 
             if(!isCancel) {
                 totalQty += (item.qty || 0);
                 totalScan += (item.scanQty || 0);
             }
+
+            // MTO 여부에 따른 배지 생성 로직 추가
+            const mtoBadge = (item.mto === 'MTO') ? `<span class="badge-mto">MTO</span>` : '';
 
             const div = document.createElement("div");
             div.className = `item-row ${isCancel ? 'status-cancel' : ''}`;
@@ -232,9 +246,9 @@
             div.innerHTML = `
             <div class="item-info">
                 <div class="item-nm">
-                    ${isCancel ? '<span style="color:var(--danger); font-weight:800;">[취소] </span>' : ''}
-                    ${item.mtrlNm || '상품명 없음'}
-                </div>
+                ${isCancel ? '<span style="color:var(--danger); font-weight:800;">[취소] </span>' : ''}
+                ${mtoBadge}  ${item.mtrlNm || '상품명 없음'}
+            </div>
                 <div style="font-size:12px; color:#666;">${item.mtrlCd || ''}</div>
                 ${actionBtnHtml}
             </div>

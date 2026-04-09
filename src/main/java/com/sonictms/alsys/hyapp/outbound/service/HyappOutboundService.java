@@ -56,6 +56,19 @@ public class HyappOutboundService {
             result.put("resultMsg", "검수 대상 상품이 아니거나 스캔 정보가 부정확합니다.");
             return result;
         }
+        System.out.println("getMto: " + item.getMto());
+        // --- [MTO 제어 로직 추가 시작] ---
+        // MTO 제품은 재고 관리를 하지 않으므로 검수량만 업데이트하고 즉시 종료합니다.
+        if ("MTO".equals(item.getMto())) {
+            hyappOutboundMapper.updateScanQty(item.getTblSoPId()); // 검수 수량만 +1
+
+            result.put("status", "OK");
+            result.put("resultMsg", "MTO 상품 검수 완료 (재고 차감 제외)");
+            return result;
+        }
+        // --- [MTO 제어 로직 추가 종료] ---
+
+        vo.setWhCd(item.getWhCd());
 
         // [Step 2] 차감할 재고 ID 결정
         if (vo.getSelectedStockId() != null) {

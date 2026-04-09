@@ -125,17 +125,52 @@
             document.getElementById("listCount").textContent = `취소 건수: ${data.length}건`;
             body.innerHTML = data.map(item => {
                 const bc = (item.barcode || item.mtrlCd || "").toString().trim();
+
+                const isMto = item.mto === 'MTO';
+
+                // 상태 분석
+                const isCancel = item.soStatCd === '0000';
+                // 백업일(문자열 8자리) < 마스터일(문자열 8자리) 비교
+                const isPostponed = item.beforeGiDt && item.giLiftDt && (item.beforeGiDt < item.giLiftDt);
+
+                const displayLoc = item.locCd && item.locCd !== 'NULL' ? item.locCd : '<span class="text-secondary">미지정</span>';
+
+                const agntName = item.agntNm || '-';
+
+                let statusHtml = '';
+                if (isCancel) {
+                    statusHtml = `<span class="badge bg-danger">주문취소</span>
+                      <div class="mt-1 fw-bold text-danger">당초: ${formatDt(item.beforeGiDt)} ➔ 취소됨</div>`;
+                } else if (isPostponed) {
+                    statusHtml = `<span class="badge bg-warning text-dark">배송연기</span>
+                      <div class="mt-1 fw-bold text-primary">${formatDt(item.beforeGiDt)} ➔ ${formatDt(item.giLiftDt)}</div>`;
+                }
+
                 return `
-        <div class="card-item" id="card_${bc}">
-            <div class="loc-badge">📍 원복 위치: ${item.locNm || '미지정'}</div>
+        <div class="card-item" id="card_${bc}" style="border-left: 5px solid ${isCancel ? '#dc3545' : '#ffc107'}">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="loc-badge" style="background:#000; color:#fff;">
+                    📍 피킹 로케이션: <span class="text-warning fw-bold">${displayLoc}</span>
+                </div>
+                ${isMto ? '<span class="badge bg-dark text-warning border border-warning">MTO</span>' : ''}
+            </div>
+            <div class="badge bg-info text-dark">${agntName}</div>
             <div class="fw-bold fs-5">${item.mtrlNm}</div>
-            <div class="info-row d-flex justify-content-between">
-                <span class="qty-tag">취소: ${item.qty} / 스캔: ${item.scanQty || 0}</span>
-                <button class="btn btn-sm btn-primary"
-                        onclick="confirmReturn('${item.tblSoPId}', '${item.mtrlCd}', ${item.scanQty}, '${item.locId}')">
-                    확인
+            <div class="text-muted small mb-2">주문번호: ${item.soNo}</div>
+
+            <div class="bg-light p-2 rounded mb-3 border">
+                ${statusHtml}
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="qty-tag" style="font-size:1.1rem;">수량: ${item.qty}</span>
+                <button class="btn btn-primary"
+                        onclick="confirmReturn('${item.tblSoPId}', '${item.mtrlCd}', ${item.scanQty}, '${item.locCd}')">
+                    실물 재입고 확인
                 </button>
             </div>
+
+            ${item.memo ? `<div class="mt-2 small text-muted border-top pt-1">사유: ${item.memo}</div>` : ''}
         </div>
     `;
             }).join('') || '<div class="text-center py-5 text-muted">내역이 없습니다.</div>';
@@ -144,6 +179,11 @@
         } finally {
             setFocus();
         }
+    }
+
+    // 날짜 포맷 함수
+    function formatDt(s) {
+        return s ? `${s.substring(0,4)}-${s.substring(4,6)}-${s.substring(6,8)}` : '-';
     }
 
     async function confirmReturn(pId, mtrlCd, sQty, locId) {

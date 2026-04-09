@@ -73,7 +73,7 @@
 
 <script>
     let selectedCustomer = null;
-    const today = new Date().toISOString().split('T')[0];
+    let searchDate = new Date().toISOString().split('T')[0]; // 기본값 오늘
 
     // 유틸리티 함수: 데이터 필드 추출
     function pick(obj, keys) {
@@ -91,8 +91,18 @@
             return;
         }
         selectedCustomer = JSON.parse(raw);
+
+        // [중요] 메인에서 넘어온 날짜(dlvyDt)가 있다면 전역 변수 searchDate에 할당
+        if (selectedCustomer.dlvyDt) {
+            searchDate = selectedCustomer.dlvyDt;
+        }
+
+        console.log("받은 고객 정보:", selectedCustomer);
+        console.log("적용된 조회 날짜:", searchDate);
+
         document.getElementById("headerTitle").textContent = selectedCustomer.nm;
 
+        // 초기 리스트 로드
         loadVehicleList();
         loadProductList();
     };
@@ -102,7 +112,8 @@
         const agntCd = selectedCustomer.cd;
         const cmpyCd = selectedCustomer.cmpyCd || 'A';
         try {
-            const res = await fetch(`/hyapp/api/inbound/master/list?cmpyCd=${cmpyCd}&agntCd=${agntCd}&date=${today}`);
+            // [수정] today -> searchDate 변수 사용
+            const res = await fetch(`/hyapp/api/inbound/master/list?cmpyCd=${cmpyCd}&agntCd=${agntCd}&date=${searchDate}`);
             const list = await res.json();
             if (!list || list.length === 0) {
                 listEl.innerHTML = "<div style='font-size:16px; color:#94a3b8; text-align:center; padding:10px;'>입차 내역 없음</div>";
@@ -125,14 +136,21 @@
 
     async function loadProductList() {
         try {
+            console.log("상품 조회 요청 날짜:", searchDate);
             const res = await fetch("/hyapp/api/inbound/pending-list", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ dateFrom: today, dateTo: today, agntCd: selectedCustomer.cd, pageNum: 1, pageSize: 100 })
+                body: JSON.stringify({
+                    dateFrom: searchDate, // [수정] searchDate 사용
+                    dateTo: searchDate,   // [수정] searchDate 사용
+                    agntCd: selectedCustomer.cd,
+                    pageNum: 1,
+                    pageSize: 100
+                })
             });
             const json = await res.json();
             renderProducts(json.data || []);
-        } catch (e) { console.error("상품 로드 실패"); }
+        } catch (e) { console.error("상품 로드 실패", e); }
     }
 
     function renderProducts(items) {

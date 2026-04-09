@@ -27,6 +27,8 @@ public class HyappOutboundVO {
     private String mtrlCd;
     private String mtrlNm;
     private String barcode;
+    private String mto;
+    private String mtoYn;
 
     // --- 배송 및 날짜 정보 ---
     private String postCd;
@@ -58,6 +60,7 @@ public class HyappOutboundVO {
     // --- 재고(Stock) 및 로케이션 필드 ---
     private Long stockId;
     private String locId;
+    private String locCd;
     private String locNm; // 로케이션 명칭
     private Integer stockQty;
     private String expireDate;
@@ -73,4 +76,13 @@ public class HyappOutboundVO {
 
     private String fromLocNm;     // 보충 출발지 로케이션명
     private String toLocNm;       // 보충 목적지 로케이션명
+
+    // HyappOutboundVO.java에 추가
+    private String histType;       // BACKWARD, CANCEL 등
+    private String beforeStatCd;   // 변경 전 상태
+    private String beforeStatNm;   // 변경 전 상태명
+    private String afterStatNm;    // 변경 후 상태명
+    private String beforeGiDt;     // 변경 전 출고일
+    private String histSaveTime;   // 이력 저장 시간
+    private String histSaveUser;   // 작업자
 }

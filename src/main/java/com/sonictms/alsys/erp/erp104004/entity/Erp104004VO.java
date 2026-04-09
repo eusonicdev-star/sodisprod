@@ -33,6 +33,7 @@ public class Erp104004VO extends CommonVO {
     private String prodNm;    //상품명칭
     private String qty;    //수량
     private String cbm;    //CBM
+    private String pickLoc; // 추가: 피킹 로케이션
 
     //20220106 정연호 추사. 시공카테고리
     private String instCtgr;

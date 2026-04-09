@@ -15,6 +15,9 @@
         <if test="zoneId != null and zoneId != ''">
             AND L.ZONE_ID = #{zoneId}
         </if>
+        <if test="locCd != null and locCd != ''">
+            AND L.LOC_CD = #{locCd}
+        </if>
         AND L.DELETED_YN = 'N'
         ORDER BY Z.ZONE_CD, L.LOC_CD
     </select>

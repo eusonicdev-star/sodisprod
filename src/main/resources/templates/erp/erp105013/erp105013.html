@@ -151,6 +151,28 @@
                         }
                     });
                 }
+
+                var hasCompleted = false;
+                myGrid.forEachRow(function(id) {
+                    if (myGrid.cells(id, 6).getValue().indexOf("완료") !== -1) {
+                        hasCompleted = true;
+                    }
+                });
+
+                if (hasCompleted) {
+                    // 버튼을 비활성화하고 색상을 회색으로 변경
+                    $(".primary:contains('최종 재고 실사 내역 반영하기')").prop("disabled", true).css({
+                        "background-color": "#cbd5e1",
+                        "cursor": "not-allowed"
+                    });
+                } else {
+                    // 다시 활성화 (새 파일을 올렸을 경우 대비)
+                    $(".primary:contains('최종 재고 실사 내역 반영하기')").prop("disabled", false).css({
+                        "background-color": "#3b82f6",
+                        "cursor": "pointer"
+                    });
+                }
+
             }
         });
     }
@@ -201,16 +223,27 @@
     }
 
     function fnFilterError() {
-        myGrid.filterByAll();
-        myGrid.filterBy(10, function(value, id) { // 상품확인(10) 기준
-            var agntCd = myGrid.cells(id, 7).getValue(); // 화주코드(7) 기준
-            return (!agntCd || agntCd.trim() === '' || value === 'N');
+        // 1. 먼저 모든 필터를 초기화하여 전체 데이터를 대상으로 합니다.
+        myGrid.filterBy(0, "");
+
+        // 2. 커스텀 필터링 로직 실행
+        myGrid.filterBy(10, function(value, id) {
+            // value는 10번 컬럼(mtrlYn)의 값입니다.
+            var agntCd = myGrid.cells(id, 7).getValue(); // 화주코드(7)
+            var status = myGrid.cells(id, 6).getValue(); // 상태(6) - '완료' 포함 여부 체크용
+
+            // 화주코드가 없거나(null/empty), 상품확인이 'N'인 경우만 노출
+            // 만약 '완료'된 항목은 에러에서 제외하고 싶다면 status 조건도 추가 가능합니다.
+            var isError = (!agntCd || agntCd.trim() === '' || value === 'N');
+
+            return isError;
         });
     }
 
     function fnFilterAll() {
+        // 모든 필터를 해제하고 전체 행을 다시 표시합니다.
         myGrid.filterBy(0, "");
-        myGrid.filterByAll();
+        myGrid.render_dataset(); // 그리드를 다시 그려 필터를 완전히 제거
     }
 </script>
 </body>

@@ -244,12 +244,13 @@ LEFT JOIN TBL_AGENCY_M A ON T.AGNT_NM = A.AGNT_NM AND T.CMPY_CD = A.CMPY_CD
     <update id="updateMtrlMasterQuantity" parameterType="com.sonictms.alsys.erp.erp105013.entity.Erp105013VO">
         UPDATE MM
         SET
-            MM.CURRENT_QUANTITY = ST.total_qty,
-            MM.YONGIN_CURRENT_QUANTITY = ST.total_qty,
+            /* ST.total_qty가 없으면 0으로 업데이트 */
+            MM.CURRENT_QUANTITY = ISNULL(ST.total_qty, 0),
+            MM.YONGIN_CURRENT_QUANTITY = ISNULL(ST.total_qty, 0),
             MM.UPDT_USER = #{saveUser},
             MM.UPDT_TIME = GETDATE()
             FROM TBL_MTRL_M MM
-    INNER JOIN (
+    LEFT JOIN (
         SELECT
             CMPY_CD,
             AGNT_CD,
@@ -257,7 +258,7 @@ LEFT JOIN TBL_AGENCY_M A ON T.AGNT_NM = A.AGNT_NM AND T.CMPY_CD = A.CMPY_CD
             SUM(ISNULL(STOCK_QTY, 0)) as total_qty
         FROM TBL_STOCK
         WHERE CMPY_CD = #{cmpyCd}
-            AND WH_CD = #{whCd} -- 현재 작업 중인 창고 기준
+            AND WH_CD = #{whCd}
             GROUP BY CMPY_CD, AGNT_CD, MTRL_CD
             ) ST ON MM.CMPY_CD = ST.CMPY_CD
             AND MM.AGNT_CD = ST.AGNT_CD

@@ -17,7 +17,7 @@
             (ip.INBOUND_QUANTITY - ISNULL(ip.ACTUAL_QUANTITY, 0) - ISNULL(ip.FAIL_QTY, 0)) as remainQuantity,
             ip.INBOUND_STATUS as inboundStatus,
             ip.EXPECTED_DATE as expectedDate,
-            m.BARCODE as barcode,
+            ISNULL(m.BARCODE,m.TBL_MTRL_M_ID) as barcode,
             (SELECT LOC_NM FROM TBL_WH_LOC_M WHERE LOC_CD = m.FIXED_LOC_CD) as fixedLocNm
         FROM TBL_INBOUND_PRODUCT ip
                  LEFT JOIN TBL_AGENCY_M a ON ip.AGNT_CD = a.AGNT_CD AND ip.CMPY_CD = a.CMPY_CD
@@ -237,11 +237,12 @@
         ip.CMPY_CD AS cmpyCd,
         ip.AGNT_CD AS agntCd,
         a.AGNT_NM AS agntNm,
-        -- [수정] 상품 마스터(m)에서 바코드를 가져옵니다.
-        m.BARCODE AS barcode,
+        ISNULL(m.BARCODE,m.TBL_MTRL_M_ID) AS barcode,
         ip.MTRL_CD AS mtrlCd,
         ip.MTRL_NM AS mtrlNm,
         ip.TBL_MTRL_M_ID AS tblMtrlMId,
+        m.FIXED_LOC_CD AS fixedLocId,
+        m.FIXED_LOC_CD AS fixedLocNm,
         ip.INBOUND_QUANTITY AS inboundQuantity,
         ip.ACTUAL_QUANTITY AS actualQuantity,
         ISNULL(ph.TOTAL_PUT_QTY, 0) AS totalPutawayQty,
@@ -252,10 +253,13 @@
         ip.REMARKS AS remarks
         FROM dbo.TBL_INBOUND_PRODUCT ip
         LEFT JOIN dbo.TBL_AGENCY_M a
-        ON a.CMPY_CD = ip.CMPY_CD AND a.AGNT_CD = ip.AGNT_CD
-        -- [조인 추가] 바코드 정보를 가져오기 위해 상품 마스터 조인
+        ON a.CMPY_CD = ip.CMPY_CD
+        AND a.AGNT_CD = ip.AGNT_CD
+        -- [수정] AGNT_CD 조건을 추가하여 화주별 상품을 정확히 매칭
         LEFT JOIN dbo.TBL_MTRL_M m
-        ON m.CMPY_CD = ip.CMPY_CD AND m.MTRL_CD = ip.MTRL_CD
+        ON m.CMPY_CD = ip.CMPY_CD
+        AND m.AGNT_CD = ip.AGNT_CD  -- 이 조건이 누락되면 데이터가 늘어날 수 있습니다.
+        AND m.MTRL_CD = ip.MTRL_CD
         LEFT JOIN (
         SELECT
         TBL_INBOUND_PRODUCT_ID,
@@ -392,7 +396,7 @@
         A.AGNT_CD as agntCd,
         M.MTRL_NM as mtrlNm,
         M.MTRL_CD as mtrlCd,
-        M.BARCODE as barcode
+        ISNULL(m.BARCODE,m.TBL_MTRL_M_ID) as barcode
         FROM TBL_MTRL_M M
         INNER JOIN TBL_AGENCY_M A ON M.AGNT_CD = A.AGNT_CD AND M.CMPY_CD = A.CMPY_CD
         WHERE M.CMPY_CD = #{cmpyCd}
@@ -408,7 +412,7 @@
             </foreach>
 
             /* 2. 또는 바코드/상품코드와 정확히 일치하는지 확인 (OR 조건 추가) */
-            OR M.BARCODE IN
+            OR ISNULL(M.BARCODE,M.TBL_MTRL_M_ID) IN
             <foreach collection="keywordList" item="word" open="(" separator="," close=")">
                 #{word}
             </foreach>
@@ -487,7 +491,7 @@
             ISNULL(ph.TOTAL_PUT_QTY, 0) AS totalPutawayQty,
             /* 검수수량에서 적치수량을 뺀 정확한 잔량 계산 */
             (ISNULL(ip.ACTUAL_QUANTITY, 0) - ISNULL(ph.TOTAL_PUT_QTY, 0)) AS remainingQty,
-            m.BARCODE AS barcode
+            ISNULL(m.BARCODE,m.TBL_MTRL_M_ID) AS barcode
         FROM dbo.TBL_INBOUND_PRODUCT ip
                  INNER JOIN dbo.TBL_MTRL_M m
                             ON ip.TBL_MTRL_M_ID = m.TBL_MTRL_M_ID
@@ -505,7 +509,7 @@
         ) ph ON ip.TBL_INBOUND_PRODUCT_ID = ph.TBL_INBOUND_PRODUCT_ID
         WHERE ip.INBOUND_STATUS = 'COMPLETED'
           AND (ip.DELETED_YN IS NULL OR ip.DELETED_YN = 'N')
-          AND m.BARCODE = #{barcode}
+          AND ISNULL(m.BARCODE,m.TBL_MTRL_M_ID) = #{barcode}
           AND ip.CMPY_CD = #{cmpyCd}
             /* [수정] 수량이 0인 것도 조회하여 프론트에서 처리할 수 있게 함 */
           AND (ISNULL(ip.ACTUAL_QUANTITY, 0) - ISNULL(ph.TOTAL_PUT_QTY, 0)) >= 0

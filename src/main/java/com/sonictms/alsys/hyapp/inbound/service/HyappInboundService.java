@@ -41,17 +41,18 @@ public class HyappInboundService {
                 // 재고 반영에 필요한 기본 정보(agntCd 등) 보강
                 HyappInboundVO forInv = hyappInboundMapper.selectInboundForInventory(vo);
 
+
                 if (forInv != null) {
                     // 고정 로케이션 정보 조회 (MTRL_CD 기준)
                     HyappInboundVO fixedInfo = hyappInboundMapper.getFixedLocationInfo(forInv.getMtrlCd(), vo.getCmpyCd());
-
+/**
                     // [Case 1] 고정 로케이션이 있는 경우 -> 자동 적치 수행
                     if (fixedInfo != null && fixedInfo.getLocId() != null) {
                         // ★ 핵심: 이번에 검수된 '분할 수량' 만큼만 적치 이력 및 재고 반영
                         vo.setMtrlCd(forInv.getMtrlCd());
                         processAutoPutaway(vo, fixedInfo, vo.getActualQuantity(), forInv.getAgntCd());
                     }
-
+**/
                     // 3. TBL_MTRL_M 재고 업데이트 및 이력 생성 실행
                     // Mapper가 List를 받으므로 Collections.singletonList로 전달합니다.
                     forInv.setActualQuantity(vo.getActualQuantity()); // 쿼리의 + NULL 해결
@@ -68,6 +69,7 @@ public class HyappInboundService {
                         }
                     }
                 }
+
             }
         }
         return updated;
